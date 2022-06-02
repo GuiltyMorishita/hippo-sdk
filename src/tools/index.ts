@@ -1,4 +1,4 @@
-import { parseTypeTagOrThrow, StructTag } from "@manahippo/aptos-tsgen";
+import { getTypeTagFullname, parseTypeTagOrThrow, StructTag, TypeTag } from "@manahippo/aptos-tsgen";
 import { AptosAccount, AptosClient, HexString, Types } from "aptos";
 import bigInt from "big-integer";
 import { Command } from "commander";
@@ -117,6 +117,68 @@ const actionShowWallet = async() => {
   }
 }
 
+const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string) => {
+  const amount = bigInt(amountIn);
+  if (amount.leq(0)) {
+    throw new Error("Amount should be number greater than 0, but got: "+amountIn);
+  }
+  const {config} = program.opts();
+  const {client, account} = readConfig(config);
+  const repo = getParserRepo();
+  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, account.address(), []);
+  let fromTag, toTag;
+  const lpTokenTags = [];
+  const symbolToCoinTagFullname: Record<string, string> = {};
+  for(const ti of registry.token_info_list) {
+    if(ti.delisted) {
+      continue;
+    }
+    const coinTypeTag = typeInfoToTypeTag(ti.token_type);
+    symbolToCoinTagFullname[ti.symbol] = getTypeTagFullname(coinTypeTag);
+    if(ti.symbol === fromSymbol) {
+      fromTag = coinTypeTag;
+    }
+    else if(ti.symbol === toSymbol) {
+      toTag = coinTypeTag;
+    }
+
+    // look for our LP token
+    if (
+      coinTypeTag instanceof StructTag &&
+      coinTypeTag.address.hex() === account.address().hex() && 
+      coinTypeTag.module === SwapTs.CPSwap.moduleName &&
+      coinTypeTag.name === SwapTs.CPSwap.LPToken.structName
+    ) {
+      lpTokenTags.push(coinTypeTag);
+    }
+  }
+  if(!fromTag) {
+    throw new Error(`Unsupported coin symbol: ${fromSymbol}`);
+  }
+  if(!toTag) {
+    throw new Error(`Unsupported coin symbol: ${toSymbol}`);
+  }
+  const fromFullname = getTypeTagFullname(fromTag);
+  const toFullname = getTypeTagFullname(toTag);
+
+  // identify a pool where the LHS and RHS tokens are exactly fromTag and toTag
+  for(const lpTag of lpTokenTags) {
+    const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
+    const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
+    if(lhsFullname === fromFullname && rhsFullname === toFullname) {
+      const result = await SwapTs.CPScripts.swap_script(client, account, amount, bigInt(0), bigInt(0), bigInt(0), lpTag.typeParams);
+      console.log(result);
+      return;
+    }
+    else if(rhsFullname === fromFullname && lhsFullname === toFullname) {
+      const result = await SwapTs.CPScripts.swap_script(client, account, bigInt(0), amount, bigInt(0), bigInt(0), lpTag.typeParams);
+      console.log(result);
+      return;
+    }
+  }
+  throw new Error(`Did not find a pool directly from ${fromSymbol} to ${toSymbol}`);
+}
+
 const actionMockDeploy = async () => {
   const {config} = program.opts();
   const {client, account} = readConfig(config);
@@ -175,5 +237,12 @@ program
 program
   .command("show-wallet")
   .action(actionShowWallet);
+
+program
+  .command("swap")
+  .argument('<from-coin>')
+  .argument('<to-coin>')
+  .argument('<raw-amount-in>')
+  .action(actionSwap);
 
 program.parse();
