@@ -1,11 +1,11 @@
-import { getTypeTagFullname, parseTypeTagOrThrow, StructTag, TypeTag } from "@manahippo/aptos-tsgen";
+import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag } from "@manahippo/aptos-tsgen";
 import { AptosAccount, AptosClient, HexString, Types } from "aptos";
 import bigInt from "big-integer";
 import { Command } from "commander";
 import * as fs from "fs";
 import * as yaml from "yaml";
 import { getParserRepo } from "../generated/repo";
-import * as SwapTs from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
+import * as SwapTs from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import * as X0x1 from "../generated/X0x1";
 import { CONFIGS } from "../config";
 
@@ -79,8 +79,10 @@ const actionShowPools = async () => {
     ) {
       // found our LPToken!
       console.log(structTag.typeParams);
-      const poolMeta = await SwapTs.CPSwap.TokenPairMetadata.load(repo, client, account.address(), structTag.typeParams);
+      const poolMeta = await SwapTs.CPSwap.TokenPairMetadata.load(repo, client, contractAddress, structTag.typeParams);
       printResource(poolMeta);
+      const poolReserve = await SwapTs.CPSwap.TokenPairReserve.load(repo, client, contractAddress, structTag.typeParams);
+      printResource(poolReserve);
     }
   }
 }
@@ -126,14 +128,13 @@ const actionShowWallet = async() => {
   }
 }
 
-const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string) => {
-  const amount = bigInt(amountIn);
-  if (amount.leq(0)) {
-    throw new Error("Amount should be number greater than 0, but got: "+amountIn);
-  }
-  const {config} = program.opts();
-  const {client, account, contractAddress} = readConfig();
-  const repo = getParserRepo();
+const getFromToAndLps = async(
+  repo: AptosParserRepo, 
+  client: AptosClient, 
+  contractAddress: HexString, 
+  fromSymbol: string, 
+  toSymbol: string
+) => {
   const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
   let fromTag, toTag;
   const lpTokenTags = [];
@@ -167,6 +168,17 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
   if(!toTag) {
     throw new Error(`Unsupported coin symbol: ${toSymbol}`);
   }
+  return {fromTag, toTag, lpTokenTags};
+}
+
+const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string) => {
+  const amount = bigInt(amountIn);
+  if (amount.leq(0)) {
+    throw new Error("Amount should be number greater than 0, but got: "+amountIn);
+  }
+  const {client, account, contractAddress} = readConfig();
+  const repo = getParserRepo();
+  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, fromSymbol, toSymbol);
   const fromFullname = getTypeTagFullname(fromTag);
   const toFullname = getTypeTagFullname(toTag);
 
@@ -186,6 +198,54 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
     }
   }
   throw new Error(`Did not find a pool directly from ${fromSymbol} to ${toSymbol}`);
+}
+
+const actionAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsAmtIn: string, rhsAmtIn: string) => {
+  const lhsAmt = bigInt(lhsAmtIn);
+  if (lhsAmt.leq(0)) {
+    throw new Error("Amount should be number greater than 0, but got: "+lhsAmtIn);
+  }
+  const rhsAmt = bigInt(rhsAmtIn);
+  if (rhsAmt.leq(0)) {
+    throw new Error("Amount should be number greater than 0, but got: "+rhsAmtIn);
+  }
+  const {client, account, contractAddress} = readConfig();
+  const repo = getParserRepo();
+  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, lhsSymbol, rhsSymbol);
+  const fromFullname = getTypeTagFullname(fromTag);
+  const toFullname = getTypeTagFullname(toTag);
+  for(const lpTag of lpTokenTags) {
+    const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
+    const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
+    if(lhsFullname === fromFullname && rhsFullname === toFullname) {
+      const result = await SwapTs.CPScripts.add_liquidity_script(client, account, lhsAmt, rhsAmt, lpTag.typeParams);
+      console.log(result);
+      return;
+    }
+  }
+  throw new Error(`Did not find a pool for ${lhsSymbol}-${rhsSymbol}`);
+}
+
+const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, removeAmtStr: string) => {
+  const removeAmt = bigInt(removeAmtStr);
+  if (removeAmt.leq(0)) {
+    throw new Error("Amount should be number greater than 0, but got: "+removeAmtStr);
+  }
+  const {client, account, contractAddress} = readConfig();
+  const repo = getParserRepo();
+  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, lhsSymbol, rhsSymbol);
+  const fromFullname = getTypeTagFullname(fromTag);
+  const toFullname = getTypeTagFullname(toTag);
+  for(const lpTag of lpTokenTags) {
+    const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
+    const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
+    if(lhsFullname === fromFullname && rhsFullname === toFullname) {
+      const result = await SwapTs.CPScripts.remove_liquidity(client, account, removeAmt, bigInt(0), bigInt(0), lpTag.typeParams);
+      console.log(result);
+      return;
+    }
+  }
+  throw new Error(`Did not find a pool for ${lhsSymbol}-${rhsSymbol}`);
 }
 
 const actionMockDeploy = async () => {
@@ -251,5 +311,20 @@ program
   .argument('<to-coin>')
   .argument('<raw-amount-in>')
   .action(actionSwap);
+
+program
+  .command("add-liquidity")
+  .argument('<lhs-coin>')
+  .argument('<rhs-coin>')
+  .argument('<raw-lhs-amount-in>')
+  .argument('<raw-rhs-amount-in>')
+  .action(actionAddLiquidity);
+
+program
+  .command("remove-liquidity")
+  .argument('<lhs-coin>')
+  .argument('<rhs-coin>')
+  .argument('<liquidity-amount-out>')
+  .action(actionRemoveLiquidity);
 
 program.parse();

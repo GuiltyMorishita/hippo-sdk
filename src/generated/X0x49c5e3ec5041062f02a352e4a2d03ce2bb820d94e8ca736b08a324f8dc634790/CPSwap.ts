@@ -9,7 +9,7 @@ import { parseStructProto } from "@manahippo/aptos-tsgen";
 import { AptosClient } from "aptos";
 import * as X0x1 from "../X0x1";
 
-export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
+export const moduleAddress = new HexString("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
 export const moduleName = "CPSwap";
 
 export const ERROR_INSUFFICIENT_AMOUNT: bigInt.BigInteger = bigInt("6");
@@ -32,7 +32,7 @@ export const ERROR_TOKENS_NOT_SORTED: bigInt.BigInteger = bigInt("9");
 export const ERROR_X_NOT_REGISTERED: bigInt.BigInteger = bigInt("16");
 export const ERROR_Y_NOT_REGISTERED: bigInt.BigInteger = bigInt("16");
 export const MINIMUM_LIQUIDITY: bigInt.BigInteger = bigInt("1000");
-export const MODULE_ADMIN: HexString = new HexString("f70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
+export const MODULE_ADMIN: HexString = new HexString("49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
 
 export class LPToken {
   static moduleAddress = moduleAddress;
@@ -78,11 +78,11 @@ export class TokenPairMetadata {
     {name: "fee_to", typeTag: parseTypeTagOrThrow("address")},
     {name: "fee_on", typeTag: parseTypeTagOrThrow("bool")},
     {name: "k_last", typeTag: parseTypeTagOrThrow("u128")},
-    {name: "lp", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPSwap::LPToken<$tv0,$tv1>>")},
+    {name: "lp", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPSwap::LPToken<$tv0,$tv1>>")},
     {name: "balance_x", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<$tv0>")},
     {name: "balance_y", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<$tv1>")},
-    {name: "mint_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::MintCapability<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPSwap::LPToken<$tv0,$tv1>>")},
-    {name: "burn_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::BurnCapability<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPSwap::LPToken<$tv0,$tv1>>")}
+    {name: "mint_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::MintCapability<0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPSwap::LPToken<$tv0,$tv1>>")},
+    {name: "burn_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::BurnCapability<0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPSwap::LPToken<$tv0,$tv1>>")}
   ];
 
   locked: boolean;
@@ -158,7 +158,7 @@ export class TokenPairReserve {
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPSwap::LPToken", LPToken.LPTokenParser);
-  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPSwap::TokenPairMetadata", TokenPairMetadata.TokenPairMetadataParser);
-  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPSwap::TokenPairReserve", TokenPairReserve.TokenPairReserveParser);
+  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPSwap::LPToken", LPToken.LPTokenParser);
+  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPSwap::TokenPairMetadata", TokenPairMetadata.TokenPairMetadataParser);
+  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPSwap::TokenPairReserve", TokenPairReserve.TokenPairReserveParser);
 }
