@@ -7,27 +7,35 @@ import * as yaml from "yaml";
 import { getParserRepo } from "../generated/repo";
 import * as SwapTs from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
 import * as X0x1 from "../generated/X0x1";
+import { CONFIGS } from "../config";
 
-const readConfig = (path: string) => {
-  const ymlContent = fs.readFileSync(path, {encoding: "utf-8"});
+const readConfig = () => {
+  const {config, profile} = program.opts();
+  const ymlContent = fs.readFileSync(config, {encoding: "utf-8"});
   const result = yaml.parse(ymlContent);
   console.log(result);
   if (!result.profiles) {
     throw new Error("Expect a profiles to be present in yaml config");
   }
-  if (!result.profiles.default) {
-    throw new Error("Expect a default profile to be present in yaml config");
+  if (!result.profiles[profile]) {
+    throw new Error(`Expect a ${profile} profile to be present in yaml config`);
   }
-  if (!result.profiles.default.rest_url) {
-    throw new Error("Expect rest_url to be present in default profile");
+  const url = result.profiles[profile].rest_url;
+  const privateKeyStr = result.profiles[profile].private_key;
+  if (!url) {
+    throw new Error(`Expect rest_url to be present in ${profile} profile`);
   }
-  if (!result.profiles.default.private_key) {
-    throw new Error("Expect private_key to be present in default profile");
+  if (!privateKeyStr) {
+    throw new Error(`Expect private_key to be present in ${profile} profile`);
   }
-  const privateKey = new HexString(result.profiles.default.private_key);
-  const client = new AptosClient(result.profiles.default.rest_url);
+  const privateKey = new HexString(privateKeyStr);
+  const isDevnet = (url as string).includes("devnet");
+  const netConf = isDevnet? CONFIGS.devnet : CONFIGS.localhost;
+  const contractAddress = netConf.contractAddress;
+  const client = new AptosClient(result.profiles[profile].rest_url);
   const account = new AptosAccount(privateKey.toUint8Array());
-  return {client, account};
+  console.log(`Using address ${account.address().hex()}`);
+  return {client, account, contractAddress};
 }
 
 function printResource(resource: any) {
@@ -50,24 +58,22 @@ function typeInfoToTypeTag(typeInfo: X0x1.TypeInfo.TypeInfo) {
 }
 
 const actionShowTokenRegistry = async () => {
-  const {config} = program.opts();
-  const {client, account} = readConfig(config);
+  const {client, account, contractAddress} = readConfig();
   const repo = getParserRepo();
-  const tokens = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, account.address(), []);
+  const tokens = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
   printResource(tokens);
 }
 
 const actionShowPools = async () => {
-  const {config} = program.opts();
-  const {client, account} = readConfig(config);
+  const {client, account, contractAddress} = readConfig();
   const repo = getParserRepo();
-  const tokens = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, account.address(), []);
+  const tokens = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
   const tokenList = tokens.token_info_list;
   for(const pi of tokenList) {
     const structTag = typeInfoToTypeTag(pi.token_type);
     if (
       structTag instanceof StructTag &&
-      structTag.address.hex() === account.address().hex() && 
+      structTag.address.hex() === contractAddress.hex() && 
       structTag.module === SwapTs.CPSwap.moduleName &&
       structTag.name === SwapTs.CPSwap.LPToken.structName
     ) {
@@ -84,10 +90,9 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, options: an
   if (amount.leq(0)) {
     throw new Error("Amount should be number greater than 0, but got: "+rawAmount);
   }
-  const {config} = program.opts();
-  const {client, account} = readConfig(config);
+  const {client, account, contractAddress} = readConfig();
   const repo = getParserRepo();
-  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, account.address(), []);
+  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if (ti.delisted) {
       continue;
@@ -103,17 +108,21 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, options: an
 }
 
 const actionShowWallet = async() => {
-  const {config} = program.opts();
-  const {client, account} = readConfig(config);
+  const {client, account, contractAddress} = readConfig();
   const repo = getParserRepo();
-  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, account.address(), []);
+  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if(ti.delisted) {
       continue;
     }
     const coinTypeTag = typeInfoToTypeTag(ti.token_type);
-    const coin = await X0x1.Coin.CoinStore.load(repo, client, account.address(), [coinTypeTag])
-    console.log(`${ti.symbol}: ${coin.coin.value}`);
+    try{
+      const coin = await X0x1.Coin.CoinStore.load(repo, client, account.address(), [coinTypeTag])
+      console.log(`${ti.symbol}: ${coin.coin.value}`);
+    }
+    catch(e) {
+      continue;
+    }
   }
 }
 
@@ -123,9 +132,9 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
     throw new Error("Amount should be number greater than 0, but got: "+amountIn);
   }
   const {config} = program.opts();
-  const {client, account} = readConfig(config);
+  const {client, account, contractAddress} = readConfig();
   const repo = getParserRepo();
-  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, account.address(), []);
+  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -145,7 +154,7 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
     // look for our LP token
     if (
       coinTypeTag instanceof StructTag &&
-      coinTypeTag.address.hex() === account.address().hex() && 
+      coinTypeTag.address.hex() === contractAddress.hex() && 
       coinTypeTag.module === SwapTs.CPSwap.moduleName &&
       coinTypeTag.name === SwapTs.CPSwap.LPToken.structName
     ) {
@@ -180,9 +189,7 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
 }
 
 const actionMockDeploy = async () => {
-  const {config} = program.opts();
-  const {client, account} = readConfig(config);
-  const repo = getParserRepo();
+  const {client, account, contractAddress} = readConfig();
   const payload = await SwapTs.CPScripts.build_payload_mock_deploy_script([]);
   const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: "10000"});
   const signedTxn = await client.signTransaction(account, txnRequest);
@@ -193,11 +200,10 @@ const actionMockDeploy = async () => {
 }
 
 const actionListModules = async () => {
-  const {config} = program.opts();
-  const {client, account} = readConfig(config);
+  const {client, account, contractAddress} = readConfig();
   try{
     console.log(client.nodeUrl);
-    const result = await client.getAccountModules(account.address());
+    const result = await client.getAccountModules(contractAddress);
     printResources(result);
   }
   catch(e) {
@@ -210,7 +216,8 @@ const program = new Command();
 program
   .name('hippo-cli')
   .description('Hippo SDK cli tool.')
-  .requiredOption('-c, --config <path>', 'path to your aptos config.yml (generated with "aptos init")');
+  .requiredOption('-c, --config <path>', 'path to your aptos config.yml (generated with "aptos init")')
+  .option('-p, --profile <PROFILE>', 'aptos config profile to use', 'default')
 
 program
   .command("mock-deploy")
