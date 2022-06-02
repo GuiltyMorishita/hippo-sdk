@@ -5,7 +5,7 @@ import { Command } from "commander";
 import * as fs from "fs";
 import * as yaml from "yaml";
 import { getParserRepo } from "../generated/repo";
-import * as SwapTs from "../generated/X0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68";
+import * as SwapTs from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
 import * as X0x1 from "../generated/X0x1";
 
 const readConfig = (path: string) => {

@@ -2,7 +2,7 @@ import { HexString } from "aptos";
 import bigInt from "big-integer";
 import { AptosParserRepo } from "@manahippo/aptos-tsgen";
 
-export const moduleAddress = new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68");
+export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const moduleName = "CPSwapUtils";
 
 export const ERROR_INSUFFICIENT_AMOUNT: bigInt.BigInteger = bigInt("2");

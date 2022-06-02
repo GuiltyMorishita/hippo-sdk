@@ -9,7 +9,7 @@ import { parseStructProto } from "@manahippo/aptos-tsgen";
 import { AptosClient } from "aptos";
 import * as X0x1 from "../X0x1";
 
-export const moduleAddress = new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68");
+export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const moduleName = "StableCurveSwap";
 
 export const ERROR_SWAP_INVALID_DERIVIATION: bigInt.BigInteger = bigInt("2020");
@@ -64,8 +64,8 @@ export class LPCapability {
     {name: "$tv1", isPhantom: true}
   ];
   static fields: FieldDeclType[] = [
-    {name: "mint", typeTag: parseTypeTagOrThrow("0x1::Coin::MintCapability<0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::StableCurveSwap::LPToken<$tv0,$tv1>>")},
-    {name: "burn", typeTag: parseTypeTagOrThrow("0x1::Coin::BurnCapability<0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::StableCurveSwap::LPToken<$tv0,$tv1>>")}
+    {name: "mint", typeTag: parseTypeTagOrThrow("0x1::Coin::MintCapability<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::StableCurveSwap::LPToken<$tv0,$tv1>>")},
+    {name: "burn", typeTag: parseTypeTagOrThrow("0x1::Coin::BurnCapability<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::StableCurveSwap::LPToken<$tv0,$tv1>>")}
   ];
 
   mint: X0x1.Coin.MintCapability;
@@ -158,7 +158,7 @@ export class StableCurvePoolInfo {
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::StableCurveSwap::LPToken", LPToken.LPTokenParser);
-  repo.addParser("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::StableCurveSwap::LPCapability", LPCapability.LPCapabilityParser);
-  repo.addParser("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::StableCurveSwap::StableCurvePoolInfo", StableCurvePoolInfo.StableCurvePoolInfoParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::StableCurveSwap::LPToken", LPToken.LPTokenParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::StableCurveSwap::LPCapability", LPCapability.LPCapabilityParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::StableCurveSwap::StableCurvePoolInfo", StableCurvePoolInfo.StableCurvePoolInfoParser);
 }

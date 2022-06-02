@@ -9,7 +9,7 @@ import { sendAndWait } from "@manahippo/aptos-tsgen";
 import { buildPayload } from "@manahippo/aptos-tsgen";
 import { AptosParserRepo } from "@manahippo/aptos-tsgen";
 
-export const moduleAddress = new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68");
+export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const moduleName = "CPScripts";
 
 export const E_LP_TOKEN_ALREADY_REGISTERED: bigInt.BigInteger = bigInt("7");
@@ -37,7 +37,7 @@ export async function create_token_pair_script(
   return sendAndWait(
     client,
     account,
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::create_token_pair_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::create_token_pair_script",
     typeParamStrings,
     [
       fee_to,
@@ -62,7 +62,7 @@ export function build_payload_create_token_pair_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::create_token_pair_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::create_token_pair_script",
     typeParamStrings,
     [
       fee_to,
@@ -87,7 +87,7 @@ export async function add_liquidity_script(
   return sendAndWait(
     client,
     account,
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::add_liquidity_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::add_liquidity_script",
     typeParamStrings,
     [
       amount_x.toString(),
@@ -102,7 +102,7 @@ export function build_payload_add_liquidity_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::add_liquidity_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::add_liquidity_script",
     typeParamStrings,
     [
       amount_x.toString(),
@@ -123,7 +123,7 @@ export async function remove_liquidity(
   return sendAndWait(
     client,
     account,
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::remove_liquidity",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::remove_liquidity",
     typeParamStrings,
     [
       liquidity.toString(),
@@ -140,7 +140,7 @@ export function build_payload_remove_liquidity(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::remove_liquidity",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::remove_liquidity",
     typeParamStrings,
     [
       liquidity.toString(),
@@ -163,7 +163,7 @@ export async function swap_script(
   return sendAndWait(
     client,
     account,
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::swap_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::swap_script",
     typeParamStrings,
     [
       x_in.toString(),
@@ -182,7 +182,7 @@ export function build_payload_swap_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::swap_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::swap_script",
     typeParamStrings,
     [
       x_in.toString(),
@@ -202,7 +202,7 @@ export async function mock_deploy_script(
   return sendAndWait(
     client,
     account,
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::mock_deploy_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::mock_deploy_script",
     typeParamStrings,
     []
   );
@@ -212,7 +212,7 @@ export function build_payload_mock_deploy_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::CPScripts::mock_deploy_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::CPScripts::mock_deploy_script",
     typeParamStrings,
     []
   );
