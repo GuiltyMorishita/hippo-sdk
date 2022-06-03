@@ -40,10 +40,12 @@ automatically picks the deployed devnet contract address.
 
 To get started, try these:
 ```
-yarn cli -c YOUR_CONFIG_FILE show-token-registry
-yarn cli -c YOUR_CONFIG_FILE show-wallet
-yarn cli -c YOUR_CONFIG_FILE hit-faucet BTC 12345
-yarn cli -c YOUR_CONFIG_FILE hit-faucet USDC 10
-yarn cli -c YOUR_CONFIG_FILE swap BTC USDC 1000
-yarn cli -c YOUR_CONFIG_FILE show-wallet
+yarn cli -c YOUR_CONFIG_FILE test hippo-client
+yarn cli -c YOUR_CONFIG_FILE test wallet-client
+yarn cli -c YOUR_CONFIG_FILE test wallet-client-faucet BTC 1.1
+yarn cli -c YOUR_CONFIG_FILE test wallet-client-faucet USDC 11000
+yarn cli -c YOUR_CONFIG_FILE test add-liquidity BTC USDC 1 10000
+yarn cli -c YOUR_CONFIG_FILE test swap BTC USDT 0.1
+yarn cli -c YOUR_CONFIG_FILE test remove-liquidity BTC USDC 50
+yarn cli -c YOUR_CONFIG_FILE test hippo-client
 ```

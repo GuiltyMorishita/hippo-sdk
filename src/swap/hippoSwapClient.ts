@@ -242,7 +242,8 @@ export class HippoSwapClient {
       throw new Error(`Direct CP Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
     }
     const {lpToken, isReversed} = lpTokenResult;
-    if(!(lpToken.typeTag instanceof StructTag)) {
+    const lpTokenTag = typeInfoToTypeTag(lpToken.token_type);
+    if(!(lpTokenTag instanceof StructTag)) {
       throw new Error();
     }
     if (isReversed) {
@@ -252,7 +253,7 @@ export class HippoSwapClient {
     const rhsTokenInfo = this.symbolToTokenInfo[rhsSymbol];
     const lhsRawAmt = bigInt((lhsAmt * Math.pow(10, lhsTokenInfo.decimals)).toFixed(0));
     const rhsRawAmt = bigInt((rhsAmt * Math.pow(10, rhsTokenInfo.decimals)).toFixed(0));
-    return CPScripts.build_payload_add_liquidity_script(lhsRawAmt, rhsRawAmt, lpToken.typeTag.typeParams);
+    return CPScripts.build_payload_add_liquidity_script(lhsRawAmt, rhsRawAmt, lpTokenTag.typeParams);
   }
 
   async makeCPRemoveLiquidityPayload(
@@ -267,7 +268,8 @@ export class HippoSwapClient {
       throw new Error(`Direct CP Pool for ${lhsSymbol} - ${rhsSymbol} does not exist`);
     }
     const {lpToken, isReversed} = lpTokenResult;
-    if(!(lpToken.typeTag instanceof StructTag)) {
+    const lpTokenTag = typeInfoToTypeTag(lpToken.token_type);
+    if(!(lpTokenTag instanceof StructTag)) {
       throw new Error();
     }
     if (isReversed) {
@@ -278,7 +280,7 @@ export class HippoSwapClient {
     const liquidityRawAmt = bigInt(liqiudityAmt * Math.pow(10, lpToken.decimals));
     const lhsMinRawAmt = bigInt(lhsMinAmt * Math.pow(10, lhsTokenInfo.decimals));
     const rhsMinRawAmt = bigInt(rhsMinAmt * Math.pow(10, rhsTokenInfo.decimals));
-    return CPScripts.build_payload_remove_liquidity(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, lpToken.typeTag.typeParams);
+    return CPScripts.build_payload_remove_liquidity(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, lpTokenTag.typeParams);
   }
 
   getJointName(xTag: TypeTag, yTag: TypeTag) {
@@ -294,10 +296,10 @@ export class HippoSwapClient {
 
   printSelf() {
     for(const token of this.singleTokens) {
-      console.log(`Single token: ${token.symbol}, fullname=${getTypeTagFullname(typeInfoToTypeTag(token.token_type))}`);
+      console.log(`Single token: ${token.symbol}`);
     }
     for(const token of this.cpLPTokens) {
-      console.log(`CP LP token: ${token.symbol}, fullname=${getTypeTagFullname(typeInfoToTypeTag(token.token_type))}`);
+      console.log(`CP LP token: ${token.symbol}`);
     }
     for(const cpMeta of this.cpMetas) {
       if(!(cpMeta.typeTag instanceof StructTag)) {
@@ -306,11 +308,10 @@ export class HippoSwapClient {
       const [xTag, yTag] = cpMeta.typeTag.typeParams;
       const [xFullname, yFullname] = [xTag, yTag].map(getTypeTagFullname);
       const [xTokenInfo, yTokenInfo] = [xFullname, yFullname].map(name=>this.tokenFullnameToTokenInfo[name]);
-      const jointName = this.getJointName(xTag, yTag);
+      console.log("#############")
       console.log(`CP Pool: ${xTokenInfo.symbol} <-> ${yTokenInfo.symbol}`);
-      console.log(`CP joint name: ${jointName}`);
-      console.log(`CP x balance: ${cpMeta.balance_x.value}`);
-      console.log(`CP y balance: ${cpMeta.balance_y.value}`);
+      console.log(`CP x balance: ${cpMeta.balance_x.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals)}`);
+      console.log(`CP y balance: ${cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals)}`);
       console.log(`CP price (y-per-x): ${this.getCpPrice(cpMeta).yToX}`)
     }
   }
