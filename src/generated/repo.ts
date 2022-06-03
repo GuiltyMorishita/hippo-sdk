@@ -29,7 +29,7 @@ import * as X0x1_SystemAddresses from "./X0x1/SystemAddresses";
 import * as X0x1_Table from "./X0x1/Table";
 import * as X0x1_TestCoin from "./X0x1/TestCoin";
 import * as X0x1_Timestamp from "./X0x1/Timestamp";
-import * as X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790_TokenRegistry4 from "./X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790/TokenRegistry4";
+import * as X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790_TokenRegistry from "./X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790/TokenRegistry";
 import * as X0x1_TransactionFee from "./X0x1/TransactionFee";
 import * as X0x1_TransactionPublishingOption from "./X0x1/TransactionPublishingOption";
 import * as X0x1_TypeInfo from "./X0x1/TypeInfo";
@@ -69,7 +69,7 @@ export function getParserRepo(): AptosParserRepo {
   X0x1_Table.loadParsers(repo);
   X0x1_TestCoin.loadParsers(repo);
   X0x1_Timestamp.loadParsers(repo);
-  X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790_TokenRegistry4.loadParsers(repo);
+  X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790_TokenRegistry.loadParsers(repo);
   X0x1_TransactionFee.loadParsers(repo);
   X0x1_TransactionPublishingOption.loadParsers(repo);
   X0x1_TypeInfo.loadParsers(repo);

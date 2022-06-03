@@ -1,73 +1,26 @@
-import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag } from "@manahippo/aptos-tsgen";
-import { AptosAccount, AptosClient, HexString, Types } from "aptos";
+import { AptosParserRepo, getTypeTagFullname, StructTag } from "@manahippo/aptos-tsgen";
+import { AptosClient, HexString, Types } from "aptos";
 import bigInt from "big-integer";
 import { Command } from "commander";
-import * as fs from "fs";
-import * as yaml from "yaml";
 import { getParserRepo } from "../generated/repo";
 import * as SwapTs from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import * as X0x1 from "../generated/X0x1";
-import { CONFIGS } from "../config";
+import { printResource, printResources, typeInfoToTypeTag } from "../utils";
+import { readConfig, sendPayloadTx } from "./utils";
+import { HippoSwapClient } from "../swap/hippoSwapClient";
 
-const readConfig = () => {
-  const {config, profile} = program.opts();
-  const ymlContent = fs.readFileSync(config, {encoding: "utf-8"});
-  const result = yaml.parse(ymlContent);
-  console.log(result);
-  if (!result.profiles) {
-    throw new Error("Expect a profiles to be present in yaml config");
-  }
-  if (!result.profiles[profile]) {
-    throw new Error(`Expect a ${profile} profile to be present in yaml config`);
-  }
-  const url = result.profiles[profile].rest_url;
-  const privateKeyStr = result.profiles[profile].private_key;
-  if (!url) {
-    throw new Error(`Expect rest_url to be present in ${profile} profile`);
-  }
-  if (!privateKeyStr) {
-    throw new Error(`Expect private_key to be present in ${profile} profile`);
-  }
-  const privateKey = new HexString(privateKeyStr);
-  const isDevnet = (url as string).includes("devnet");
-  const netConf = isDevnet? CONFIGS.devnet : CONFIGS.localhost;
-  const contractAddress = netConf.contractAddress;
-  const client = new AptosClient(result.profiles[profile].rest_url);
-  const account = new AptosAccount(privateKey.toUint8Array());
-  console.log(`Using address ${account.address().hex()}`);
-  return {client, account, contractAddress};
-}
-
-function printResource(resource: any) {
-  console.log(JSON.stringify(resource, null, 2));
-}
-
-function printResources(resources: any[]) {
-  let i = 0;
-  console.log(`Total resource count: ${resources.length}`);
-  for (const resource of resources) {
-    console.log(`##################${i}`);
-    printResource(resource);
-    i++;
-  }
-}
-
-function typeInfoToTypeTag(typeInfo: X0x1.TypeInfo.TypeInfo) {
-  const fullname =  `${typeInfo.account_address.hex()}::${typeInfo.module_name.toString()}::${typeInfo.struct_name.toString()}`;
-  return parseTypeTagOrThrow(fullname);
-}
 
 const actionShowTokenRegistry = async () => {
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
-  const tokens = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokens = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   printResource(tokens);
 }
 
 const actionShowPools = async () => {
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
-  const tokens = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokens = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   const tokenList = tokens.token_info_list;
   for(const pi of tokenList) {
     const structTag = typeInfoToTypeTag(pi.token_type);
@@ -92,9 +45,9 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, options: an
   if (amount.leq(0)) {
     throw new Error("Amount should be number greater than 0, but got: "+rawAmount);
   }
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
-  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if (ti.delisted) {
       continue;
@@ -110,9 +63,9 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, options: an
 }
 
 const actionShowWallet = async() => {
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
-  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if(ti.delisted) {
       continue;
@@ -135,7 +88,7 @@ const getFromToAndLps = async(
   fromSymbol: string, 
   toSymbol: string
 ) => {
-  const registry = await SwapTs.TokenRegistry4.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -176,7 +129,7 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
   if (amount.leq(0)) {
     throw new Error("Amount should be number greater than 0, but got: "+amountIn);
   }
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
   const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, fromSymbol, toSymbol);
   const fromFullname = getTypeTagFullname(fromTag);
@@ -209,7 +162,7 @@ const actionAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsAmtIn:
   if (rhsAmt.leq(0)) {
     throw new Error("Amount should be number greater than 0, but got: "+rhsAmtIn);
   }
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
   const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, lhsSymbol, rhsSymbol);
   const fromFullname = getTypeTagFullname(fromTag);
@@ -231,7 +184,7 @@ const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, remove
   if (removeAmt.leq(0)) {
     throw new Error("Amount should be number greater than 0, but got: "+removeAmtStr);
   }
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
   const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, lhsSymbol, rhsSymbol);
   const fromFullname = getTypeTagFullname(fromTag);
@@ -249,18 +202,13 @@ const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, remove
 }
 
 const actionMockDeploy = async () => {
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   const payload = await SwapTs.CPScripts.build_payload_mock_deploy_script([]);
-  const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: "10000"});
-  const signedTxn = await client.signTransaction(account, txnRequest);
-  const txnResult = await client.submitTransaction(signedTxn);
-  await client.waitForTransaction(txnResult.hash);
-  const txDetails = (await client.getTransaction(txnResult.hash)) as Types.UserTransaction;
-  console.log(txDetails);
+  await sendPayloadTx(client, account, payload, 10000);
 }
 
 const actionListModules = async () => {
-  const {client, account, contractAddress} = readConfig();
+  const {client, account, contractAddress} = readConfig(program);
   try{
     console.log(client.nodeUrl);
     const result = await client.getAccountModules(contractAddress);
@@ -326,5 +274,46 @@ program
   .argument('<rhs-coin>')
   .argument('<liquidity-amount-out>')
   .action(actionRemoveLiquidity);
+
+
+const testCommand = new Command("test");
+
+const testHippoClient = async () => {
+  const typeTag = X0x1.Option.Option.fields[0].typeTag;
+  console.log(JSON.stringify(typeTag));
+  if(false)
+    return;
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  swapClient.printSelf();
+}
+
+const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const uiAmtInNum = Number.parseFloat(uiAmtIn);
+  if(uiAmtInNum <= 0) {
+    throw new Error(`Input amount needs to be greater than 0`);
+  }
+  const payload = await swapClient.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
+  await sendPayloadTx(client, account, payload);
+
+}
+
+// sub-commands
+testCommand
+  .command("hippoClient")
+  .action(testHippoClient);
+
+testCommand
+  .command("swap")
+  .argument("<from-symbol>")
+  .argument("<to-symbol>")
+  .argument("<ui-amount-in>")
+  .action(testClientSwap);
+
+program.addCommand(testCommand);
 
 program.parse();
