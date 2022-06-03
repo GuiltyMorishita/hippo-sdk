@@ -1,4 +1,4 @@
-import { AptosParserRepo, getTypeTagFullname, StructTag } from "@manahippo/aptos-tsgen";
+import { AptosParserRepo, AptosVectorU8, getTypeTagFullname, StructTag } from "@manahippo/aptos-tsgen";
 import { AptosClient, HexString, Types } from "aptos";
 import bigInt from "big-integer";
 import { Command } from "commander";
@@ -9,6 +9,8 @@ import { printResource, printResources, typeInfoToTypeTag } from "../utils";
 import { readConfig, sendPayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
+import { CoinInfo } from "../generated/X0x1/Coin";
+import { time } from "console";
 
 
 const actionShowTokenRegistry = async () => {
@@ -385,5 +387,71 @@ testCommand
   .action(testClientRemoveLiquidity);
 
 program.addCommand(testCommand);
+
+// other random things
+
+const checkTestCoin = async () => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const testCoinTag = new StructTag(
+    X0x1.TestCoin.moduleAddress,
+    X0x1.TestCoin.moduleName,
+    X0x1.TestCoin.TestCoin.structName,
+    []
+  );
+  const testCoinInfo = await CoinInfo.load(repo, client, X0x1.TestCoin.moduleAddress, [testCoinTag])
+  printResource(testCoinInfo);
+  const registry = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  for(const tokenInfo of registry.token_info_list) {
+    if(tokenInfo.delisted) {
+      continue;
+    }
+    const tag = typeInfoToTypeTag(tokenInfo.token_type);
+    if(getTypeTagFullname(tag) === getTypeTagFullname(testCoinTag)) {
+      console.log("TestCoin already registered.");
+      return;
+    }
+  }
+  const result = await SwapTs.TokenRegistry.add_token_script(
+    client, 
+    account, 
+    new AptosVectorU8("TestCoin"), 
+    new AptosVectorU8("APTOS"), 
+    new AptosVectorU8("Aptos TestCoin"), 
+    testCoinInfo.decimals.toJSNumber(),
+    new AptosVectorU8("https://miro.medium.com/max/3150/1*Gf747eyRywU8Img0tK5wvw.png"),
+    new AptosVectorU8("https://aptoslabs.com/"),
+    [testCoinTag]
+  );
+  console.log(result);
+}
+
+const updateTokenRegistry = async (symbol: string, description: string, logo_url: string, project_url: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const payload = SwapTs.TokenRegistry.build_payload_update_token_info_script(
+    new AptosVectorU8(symbol), 
+    new AptosVectorU8(description), 
+    new AptosVectorU8(logo_url), 
+    new AptosVectorU8(project_url), 
+    []
+  );
+  await sendPayloadTx(client, account, payload, 3000);
+}
+
+const others = new Command('others');
+
+others
+  .command("check-test-coin")
+  .action(checkTestCoin);
+
+others
+  .command("update-token-registry")
+  .argument("<SYMBOL>")
+  .argument("<description>")
+  .argument("<logo_url>")
+  .argument("<project_url>")
+  .action(updateTokenRegistry);
+
+program.addCommand(others);
 
 program.parse();
