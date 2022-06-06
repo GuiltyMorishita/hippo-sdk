@@ -322,6 +322,18 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
   await testWalletClient();
 }
 
+const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const uiAmtInNum = Number.parseFloat(uiAmtIn);
+  if(uiAmtInNum <= 0) {
+    throw new Error(`Input amount needs to be greater than 0`);
+  }
+  const quote = swapClient.getCPQuoteBySymbols(fromSymbol, toSymbol, uiAmtInNum);
+  printResource(quote);
+}
+
 const testClientAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
   const {client, account, contractAddress, netConf} = readConfig(program);
   const repo = getParserRepo();
@@ -370,6 +382,13 @@ testCommand
   .argument("<to-symbol>")
   .argument("<ui-amount-in>")
   .action(testClientSwap);
+
+testCommand
+  .command("quote")
+  .argument("<from-symbol>")
+  .argument("<to-symbol>")
+  .argument("<ui-amount-in>")
+  .action(testClientQuote);
 
 testCommand
   .command("add-liquidity")

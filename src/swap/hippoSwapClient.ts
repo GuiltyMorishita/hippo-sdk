@@ -177,6 +177,49 @@ export class HippoSwapClient {
     return {xToY: xUiBalance / yUiBalance, yToX: yUiBalance / xUiBalance};
   }
 
+  getCpQuote(cpMeta: CPSwap.TokenPairMetadata, isXtoY: boolean, inputUiAmt: number) {
+    if(!(cpMeta.typeTag instanceof StructTag)) {
+      throw new Error();
+    }
+    const [xTag, yTag] = cpMeta.typeTag.typeParams;
+    const xTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(xTag)];
+    const yTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(yTag)];
+    const xUiBalance = cpMeta.balance_x .value.toJSNumber() / Math.pow(10, xTokenInfo.decimals);
+    const yUiBalance = cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals);
+    const k = xUiBalance * yUiBalance;
+    let outputUiAmt, initialPrice, finalPrice;
+    if (isXtoY) {
+      // compute output in Y
+      const newXUiBalance = xUiBalance + inputUiAmt;
+      const newYUiBalance = k / newXUiBalance;
+      outputUiAmt = yUiBalance - newYUiBalance;
+      initialPrice = xUiBalance / yUiBalance;
+      finalPrice = newXUiBalance / newYUiBalance;
+    } else {
+      // compute output in X
+      const newYUiBalance = yUiBalance + inputUiAmt;
+      const newXUiBalance = k / newYUiBalance;
+      outputUiAmt = xUiBalance - newXUiBalance;
+      initialPrice = yUiBalance / xUiBalance;
+      finalPrice = newYUiBalance / newXUiBalance;
+    }
+    const avgPrice = inputUiAmt / outputUiAmt;
+    const priceImpact = (finalPrice - initialPrice) / initialPrice;
+
+    return {outputUiAmt, initialPrice, avgPrice, finalPrice, priceImpact}
+
+  }
+
+  getCPQuoteBySymbols(symbolX: string, symbolY: string, inputUiAmt: number) {
+    const lpInfo = this.getCpLpTokenInfo(symbolX, symbolY);
+    if(!lpInfo) {
+      return SwapClientErrors.NO_ROUTE;
+    }
+    const {isReversed, jointName} = lpInfo;
+    const cpMeta = this.xyFullnameToCPMeta[jointName];
+    return this.getCpQuote(cpMeta, !isReversed, inputUiAmt);
+  }
+
   async reloadOnePoolBySymbols(symbolX: string, symbolY: string) {
     const lpInfo = this.getCpLpTokenInfo(symbolX, symbolY);
     if(!lpInfo) {
