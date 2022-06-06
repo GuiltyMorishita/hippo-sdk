@@ -2,8 +2,8 @@ import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, Ty
 import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
-import { getParserRepo } from "../generated/repo";
 import { CPScripts, CPSwap, TokenRegistry } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
+import { CoinInfo } from "../generated/X0x1/Coin";
 import { typeInfoToTypeTag } from "../utils";
 
 export type UITokenAmount = number;
@@ -335,6 +335,23 @@ export class HippoSwapClient {
     }
     const [xFullname, yFullname] = [xTag, yTag].map(getTypeTagFullname);
     return `${xFullname}<->${yFullname}`;
+  }
+
+  async getTokenTotalSupply(tokenInfo: TokenRegistry.TokenInfo) {
+    const coinTag = typeInfoToTypeTag(tokenInfo.token_type);
+    const coinInfo = await CoinInfo.load(this.repo, this.aptosClient, this.netConfig.contractAddress, [coinTag]);
+    if (coinInfo.supply.vec.length > 0) {
+      return coinInfo.supply.vec[0] as unknown as bigInt.BigInteger;
+    }
+    return null;
+  }
+
+  async getTokenTotalSupplyBySymbol(symbol: string) {
+    const tokenInfo = this.symbolToTokenInfo[symbol];
+    if (!tokenInfo) {
+      throw new Error("Symbol not found");
+    }
+    return await this.getTokenTotalSupply(tokenInfo);
   }
 
   printSelf() {

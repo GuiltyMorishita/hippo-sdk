@@ -361,6 +361,14 @@ const testClientRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, li
   await testWalletClient();
 }
 
+const testShowSupply = async(symbol: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const supply = await swapClient.getTokenTotalSupplyBySymbol(symbol);
+  console.log(supply);
+}
+
 // sub-commands
 testCommand
   .command("hippo-client")
@@ -404,6 +412,11 @@ testCommand
   .argument("<rhs-symbol>")
   .argument("<liquidity-ui-amount>")
   .action(testClientRemoveLiquidity);
+
+testCommand
+  .command("show-supply")
+  .argument("<SYMBOL>")
+  .action(testShowSupply);
 
 program.addCommand(testCommand);
 
