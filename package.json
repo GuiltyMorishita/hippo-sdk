@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/hippo-sdk",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Hippo SDK for Aptos",
   "main": "dist/index.js",
   "repository": "git@hippo.github.com:hippospace/hippo-sdk.git",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@manahippo/aptos-tsgen": "^0.0.38",
-    "aptos": "^0.0.20",
+    "aptos": "0.0.20",
     "commander": "^9.3.0",
     "yaml": "^2.1.1"
   }

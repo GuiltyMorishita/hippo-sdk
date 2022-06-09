@@ -6,7 +6,7 @@ import { getParserRepo } from "../generated/repo";
 import * as SwapTs from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import * as X0x1 from "../generated/X0x1";
 import { printResource, printResources, typeInfoToTypeTag } from "../utils";
-import { readConfig, sendPayloadTx } from "./utils";
+import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/X0x1/Coin";
@@ -322,6 +322,20 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
   await testWalletClient();
 }
 
+const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const uiAmtInNum = Number.parseFloat(uiAmtIn);
+  if(uiAmtInNum <= 0) {
+    throw new Error(`Input amount needs to be greater than 0`);
+  }
+  const payload = await swapClient.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
+  const result = await simulatePayloadTx(client, account, payload);
+  printResource(result);
+  await testWalletClient();
+}
+
 const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
   const {client, account, contractAddress, netConf} = readConfig(program);
   const repo = getParserRepo();
@@ -390,6 +404,13 @@ testCommand
   .argument("<to-symbol>")
   .argument("<ui-amount-in>")
   .action(testClientSwap);
+
+testCommand
+  .command("simulate-swap")
+  .argument("<from-symbol>")
+  .argument("<to-symbol>")
+  .argument("<ui-amount-in>")
+  .action(testClientSimulateSwap);
 
 testCommand
   .command("quote")
