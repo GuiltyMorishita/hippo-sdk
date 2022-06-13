@@ -103,7 +103,7 @@ export class HippoSwapClient {
       this.tokenFullnameToTokenInfo[tokenFullname] = tokenInfo;
       if (
         coinTypeTag instanceof StructTag &&
-        coinTypeTag.address.hex() === this.contractAddress.hex() && 
+        coinTypeTag.address.hex() === this.contractAddress.hex() &&
         [CPSwap.moduleName, StableCurveSwap.moduleName].includes(coinTypeTag.module)
       ) {
         // lp token
@@ -150,7 +150,6 @@ export class HippoSwapClient {
     const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoStableCurvePool(xTokenInfo, yTokenInfo, lpTokenInfo, stablePool));
   }
-
   private setPool(pool: HippoPool) {
     const xyFullname = pool.xyFullname();
     if(!(xyFullname in this.xyFullnameToPoolSet)) {

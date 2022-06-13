@@ -29,7 +29,7 @@ const actionShowPools = async () => {
     const structTag = typeInfoToTypeTag(pi.token_type);
     if (
       structTag instanceof StructTag &&
-      structTag.address.hex() === contractAddress.hex() && 
+      structTag.address.hex() === contractAddress.hex() &&
       structTag.module === SwapTs.CPSwap.moduleName &&
       structTag.name === SwapTs.CPSwap.LPToken.structName
     ) {
@@ -39,6 +39,16 @@ const actionShowPools = async () => {
       printResource(poolMeta);
       const poolReserve = await SwapTs.CPSwap.TokenPairReserve.load(repo, client, contractAddress, structTag.typeParams);
       printResource(poolReserve);
+    }
+    else if (
+      structTag instanceof StructTag &&
+      structTag.address.hex() == contractAddress.hex() &&
+      structTag.module === SwapTs.StableCurveSwap.moduleName &&
+      structTag.name === SwapTs.StableCurveSwap.LPToken.structName
+    ){
+      console.log(structTag.typeParams)
+      const poolMeta = await SwapTs.StableCurveSwap.StableCurvePoolInfo.load(repo, client, contractAddress, structTag.typeParams);
+      printResource(poolMeta);
     }
   }
 }
@@ -85,10 +95,10 @@ const actionShowWallet = async() => {
 }
 
 const getFromToAndLps = async(
-  repo: AptosParserRepo, 
-  client: AptosClient, 
-  contractAddress: HexString, 
-  fromSymbol: string, 
+  repo: AptosParserRepo,
+  client: AptosClient,
+  contractAddress: HexString,
+  fromSymbol: string,
   toSymbol: string
 ) => {
   const registry = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
@@ -111,7 +121,7 @@ const getFromToAndLps = async(
     // look for our LP token
     if (
       coinTypeTag instanceof StructTag &&
-      coinTypeTag.address.hex() === contractAddress.hex() && 
+      coinTypeTag.address.hex() === contractAddress.hex() &&
       coinTypeTag.module === SwapTs.CPSwap.moduleName &&
       coinTypeTag.name === SwapTs.CPSwap.LPToken.structName
     ) {
@@ -208,7 +218,12 @@ const actionMockDeploy = async () => {
   const {client, account} = readConfig(program);
   const payload = await SwapTs.CPScripts.build_payload_mock_deploy_script([]);
   await sendPayloadTx(client, account, payload, 10000);
+  console.log('cpswap')
+  const stableCurvePayload = await SwapTs.StableCurveScripts.build_payload_mock_deploy_script([])
+  await sendPayloadTx(client, account, stableCurvePayload, 10000);
+  console.log('stable curve swap')
 }
+
 
 const actionListModules = async () => {
   const {client, contractAddress} = readConfig(program);
@@ -389,7 +404,6 @@ const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhs
   const poolType = cliPoolTypeToPoolType(poolTypeStr);
   const pools = await swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
   if (pools.length === 0) {
-    console.log("Corresponding pool does not exist");
     return;
   }
   if (pools.length !== 1) {
@@ -539,11 +553,11 @@ const checkTestCoin = async () => {
     }
   }
   const result = await SwapTs.TokenRegistry.add_token_script(
-    client, 
-    account, 
-    new AptosVectorU8("TestCoin"), 
-    new AptosVectorU8("APTOS"), 
-    new AptosVectorU8("Aptos TestCoin"), 
+    client,
+    account,
+    new AptosVectorU8("TestCoin"),
+    new AptosVectorU8("APTOS"),
+    new AptosVectorU8("Aptos TestCoin"),
     testCoinInfo.decimals.toJSNumber(),
     new AptosVectorU8("https://miro.medium.com/max/3150/1*Gf747eyRywU8Img0tK5wvw.png"),
     new AptosVectorU8("https://aptoslabs.com/"),
@@ -555,10 +569,10 @@ const checkTestCoin = async () => {
 const updateTokenRegistry = async (symbol: string, description: string, logo_url: string, project_url: string) => {
   const {client, account} = readConfig(program);
   const payload = SwapTs.TokenRegistry.build_payload_update_token_info_script(
-    new AptosVectorU8(symbol), 
-    new AptosVectorU8(description), 
-    new AptosVectorU8(logo_url), 
-    new AptosVectorU8(project_url), 
+    new AptosVectorU8(symbol),
+    new AptosVectorU8(description),
+    new AptosVectorU8(logo_url),
+    new AptosVectorU8(project_url),
     []
   );
   await sendPayloadTx(client, account, payload, 3000);
