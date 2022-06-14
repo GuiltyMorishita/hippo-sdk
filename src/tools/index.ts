@@ -317,7 +317,13 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const payload = await swapClient.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
+  const result = swapClient.getBestQuoteBySymbols(fromSymbol, toSymbol, uiAmtInNum, 3);
+  if (!result) {
+    console.log("No route");
+    return;
+  }
+  const {bestRoute} = result;
+  const payload = await bestRoute.makeSwapPayload(uiAmtInNum, 0);
   await sendPayloadTx(client, account, payload);
   await testWalletClient();
 }
@@ -330,9 +336,15 @@ const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmt
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const payload = await swapClient.makeCPSwapPayload(fromSymbol, toSymbol, uiAmtInNum, 0);
-  const result = await simulatePayloadTx(client, account, payload);
-  printResource(result);
+  const result = swapClient.getBestQuoteBySymbols(fromSymbol, toSymbol, uiAmtInNum, 3);
+  if (!result) {
+    console.log("No route");
+    return;
+  }
+  const {bestRoute} = result;
+  const payload = await bestRoute.makeSwapPayload(uiAmtInNum, 0);
+  const simResult = await simulatePayloadTx(client, account, payload);
+  printResource(simResult);
   await testWalletClient();
 }
 
@@ -344,8 +356,13 @@ const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: str
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const quote = swapClient.getCPQuoteBySymbols(fromSymbol, toSymbol, uiAmtInNum);
-  printResource(quote);
+  const result = await swapClient.getBestQuoteBySymbols(fromSymbol, toSymbol, uiAmtInNum, 3);
+  if (!result) {
+    console.log("No route");
+    return;
+  }
+  const {bestQuote} = result;
+  printResource(bestQuote);
 }
 
 const testClientAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {

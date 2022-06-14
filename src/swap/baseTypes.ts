@@ -68,7 +68,6 @@ export abstract class HippoPool extends TradeRoute {
   abstract estimateWithdrawalOutput(lpUiAmount: UITokenAmount, lpSupplyUiAmt: UITokenAmount): {xUiAmt: UITokenAmount; yUiAmt: UITokenAmount};
 
   abstract estimateNeededYFromXDeposit(xUiAmt: UITokenAmount): UITokenAmount;
-
   abstract estimateNeededXFromYDeposit(yUiAmt: UITokenAmount): UITokenAmount;
 
   abstract getPoolType(): PoolType;

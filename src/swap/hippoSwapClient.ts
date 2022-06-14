@@ -5,7 +5,7 @@ import { NetworkConfiguration } from "../config";
 import { CPSwap, TokenRegistry, StableCurveSwap } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import { CoinInfo } from "../generated/X0x1/Coin";
 import { typeInfoToTypeTag } from "../utils";
-import { HippoPool, PoolType, RouteStep, SteppedRoute, TradeRoute, UITokenAmount } from "./baseTypes";
+import { HippoPool, PoolType, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 
@@ -272,6 +272,23 @@ export class HippoSwapClient {
     return routes.map(route => route.getQuote(inputUiAmt));
   }
 
+  getBestQuoteBySymbols(symbolX: string, symbolY: string, inputUiAmt: number, maxSteps: number) {
+    const routes = this.getSteppedRoutesBySymbol(symbolX, symbolY, maxSteps);
+    if (routes.length === 0) {
+      return null;
+    }
+    const quotes = routes.map(route => route.getQuote(inputUiAmt));
+    let bestRoute = routes[0];
+    let bestQuote = quotes[0];
+    quotes.forEach((quote, idx)=>{
+      if(quote.outputUiAmt > bestQuote.outputUiAmt) {
+        bestQuote = quote;
+        bestRoute = routes[idx];
+      }
+    });
+    return {bestQuote, bestRoute};
+  }
+
   async reloadPoolsBySymbols(symbolX: string, symbolY: string) {
     const routes = this.getSteppedRoutesBySymbol(symbolX, symbolY, 3);
     if(routes.length === 0) {
@@ -350,6 +367,7 @@ export class HippoSwapClient {
     for(const token of this.singleTokens) {
       console.log(`Single token: ${token.symbol}`);
     }
+    /*
     for(const cpMeta of this.cpMetas) {
       if(!(cpMeta.typeTag instanceof StructTag)) {
         throw new Error();
@@ -363,5 +381,6 @@ export class HippoSwapClient {
       console.log(`CP y balance: ${cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals)}`);
       console.log(`CP price (y-per-x): ${this.getCpPrice(cpMeta).yToX}`)
     }
+    */
   }
 }
