@@ -22,9 +22,9 @@ export class HippoConstantProductPool extends HippoPool {
   getId(): string {
     return `HippoConstantProductPool<${this.xyFullname()}>`;
   }
-  getCurrentPrice(): PriceType {
-    const xUiBalance = this.xUiBalance();
-    const yUiBalance = this.yUiBalance();
+  getCurrentPriceDirectional(isXtoY: boolean): PriceType {
+    const xUiBalance = isXtoY ? this.xUiBalance() : this.yUiBalance();
+    const yUiBalance = isXtoY ? this.yUiBalance() : this.xUiBalance();
     return {xToY: xUiBalance / yUiBalance, yToX: yUiBalance / xUiBalance};
   }
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {

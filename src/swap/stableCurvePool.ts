@@ -22,7 +22,7 @@ export class HippoStableCurvePool extends HippoPool {
   getId(): string {
     return `HippoStableCurvePool<${this.xyFullname()}>`;
   }
-  getCurrentPrice(): PriceType {
+  getCurrentPriceDirectional(isXtoY: boolean): PriceType {
     // TODO
     throw new Error();
   }

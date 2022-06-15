@@ -366,8 +366,6 @@ const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: str
   printResource(bestQuote);
 }
 
-type CliPoolType = 'cp' | 'stable';
-
 const poolTypeMap = {
   cp: PoolType.CONSTANT_PRODUCT,
   stable: PoolType.STABLE_CURVE,
@@ -443,6 +441,14 @@ const testShowSupply = async(symbol: string) => {
   console.log(supply);
 }
 
+const testShowRoutes = async(lhsSymbol: string, rhsSymbol: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const repo = getParserRepo();
+  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const routes = swapClient.getSteppedRoutesBySymbol(lhsSymbol, rhsSymbol, 3);
+  printResources(routes.map(r=>r.summarize()));
+}
+
 // sub-commands
 testCommand
   .command("hippo-client")
@@ -500,6 +506,12 @@ testCommand
   .command("show-supply")
   .argument("<SYMBOL>")
   .action(testShowSupply);
+
+testCommand
+  .command("show-routes")
+  .argument("<lhs-symbol>")
+  .argument("<rhs-symbol>")
+  .action(testShowRoutes);
 
 program.addCommand(testCommand);
 

@@ -180,8 +180,12 @@ export class HippoSwapClient {
     const poolSetXY = this.xyFullnameToPoolSet[xyFullname];
     const poolSetYX = this.xyFullnameToPoolSet[yxFullname];
     const routes: SteppedRoute[] = [];
-    poolSetXY.pools().forEach(p => routes.push(new SteppedRoute([new RouteStep(p, true)])));
-    poolSetYX.pools().forEach(p => routes.push(new SteppedRoute([new RouteStep(p, false)])));
+    if (poolSetXY) {
+      poolSetXY.pools().forEach(p => routes.push(new SteppedRoute([new RouteStep(p, true)])));
+    }
+    if (poolSetYX) {
+      poolSetYX.pools().forEach(p => routes.push(new SteppedRoute([new RouteStep(p, false)])));
+    }
     return routes;
   }
 
@@ -195,6 +199,9 @@ export class HippoSwapClient {
     // enumarate S such that Step1Routes(X, S).length > 0 && Step1Routes(S, Y) > 0
     const routes: SteppedRoute[] = [];
     for(const S of this.singleTokens) {
+      if([symbolX, symbolY].includes(S.symbol)) {
+        continue;
+      }
       const xToSRoutes = this.get1StepRoutesBySymbol(symbolX, S.symbol);
       if (xToSRoutes.length === 0) {
         continue;
@@ -223,6 +230,9 @@ export class HippoSwapClient {
     // enumarate S such that Step2Routes(X, S).length > 0 && Step1Routes(S, Y) > 0
     const routes: SteppedRoute[] = [];
     for(const S of this.singleTokens) {
+      if([symbolX, symbolY].includes(S.symbol)) {
+        continue;
+      }
       const xToSRoutes = this.get2StepRoutesBySymbol(symbolX, S.symbol);
       if (xToSRoutes.length === 0) {
         continue;

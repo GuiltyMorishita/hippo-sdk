@@ -83,6 +83,12 @@ export abstract class HippoPool extends TradeRoute {
 
   abstract getId(): string;
 
+  abstract getCurrentPriceDirectional(isXtoY: boolean): PriceType;
+
+  getCurrentPrice(): PriceType {
+    return this.getCurrentPriceDirectional(true);
+  }
+
   abstract getQuoteDirectional(uiAmount: UITokenAmount, isXtoY: boolean) : QuoteType;
 
   getQuote(uiAmount: UITokenAmount): QuoteType {
@@ -144,24 +150,43 @@ export class SteppedRoute extends TradeRoute {
   }
 
   getCurrentPrice(): PriceType {
-    if (this.steps.length === 1) {
-      const price = this.steps[0].pool.getCurrentPrice();
-      if(this.steps[0].isXtoY) {
-        return price;
-      } else {
-        return {xToY: price.yToX, yToX: price.xToY};
-      }
+    let xToY = 1;
+    let yToX = 1;
+    for(const step of this.steps) {
+      const price = step.pool.getCurrentPriceDirectional(step.isXtoY);
+      xToY *= price.xToY;
+      yToX *= price.yToX;
     }
-    else {
-      throw new Error();
-    }
+    return {xToY, yToX};
   }
 
   getQuote(uiAmount: UITokenAmount) : QuoteType {
     if (this.steps.length === 1) {
       return this.steps[0].pool.getQuoteDirectional(uiAmount, this.steps[0].isXtoY);
     } else {
-      throw new Error();
+      let prevOutputUiAmt = uiAmount;
+      let avgPrice = 1;
+      let initialPrice = 1;
+      let finalPrice = 1;
+      const quotes = [];
+      for(const step of this.steps) {
+        const quote = step.pool.getQuoteDirectional(prevOutputUiAmt, step.isXtoY);
+        quotes.push(quote);
+        prevOutputUiAmt = quote.outputUiAmt;
+        avgPrice *= quote.avgPrice;
+        initialPrice *= quote.initialPrice;
+        finalPrice = quote.finalPrice;
+      }
+      return {
+        inputSymbol: this.xTokenInfo.symbol,
+        outputSymbol: this.yTokenInfo.symbol,
+        avgPrice,
+        initialPrice,
+        finalPrice,
+        inputUiAmt: uiAmount,
+        outputUiAmt: prevOutputUiAmt,
+        priceImpact: (finalPrice - initialPrice) / initialPrice,
+      }
     }
   }
 
@@ -185,5 +210,20 @@ export class SteppedRoute extends TradeRoute {
 
   getAllPools(): HippoPool[] {
     return this.steps.map(step => step.pool);
+  }
+
+  getSymbolPath(): string[] {
+    const symbols = [this.steps[0].lhsTokenInfo().symbol];
+    for(const step of this.steps) {
+      if (step.lhsTokenInfo().symbol !== symbols[symbols.length - 1]) {
+        throw new Error(`Bad path`);
+      }
+      symbols.push(step.rhsTokenInfo().symbol);
+    }
+    return symbols;
+  }
+
+  summarize(): string {
+    return this.getSymbolPath().join(' -> ');
   }
 }
