@@ -11,6 +11,7 @@ import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/X0x1/Coin";
 import { time } from "console";
+import { PoolType } from "../swap/baseTypes";
 
 
 const actionShowTokenRegistry = async () => {
@@ -365,7 +366,21 @@ const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: str
   printResource(bestQuote);
 }
 
-const testClientAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
+type CliPoolType = 'cp' | 'stable';
+
+const poolTypeMap = {
+  cp: PoolType.CONSTANT_PRODUCT,
+  stable: PoolType.STABLE_CURVE,
+}
+
+function cliPoolTypeToPoolType(poolType: string): PoolType {
+  if (poolType in poolTypeMap) {
+    return poolTypeMap[poolType as keyof typeof poolTypeMap];
+  }
+  throw new Error(`${poolType} does not refer to a valid poolType. Valid values are: ${Object.keys(poolTypeMap)}`);
+}
+
+const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
   const {client, account, contractAddress, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
@@ -374,12 +389,26 @@ const testClientAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsUi
   if(lhsUiAmt <= 0 || rhsUiAmt <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const payload = await swapClient.makeCPAddLiquidityPayload(lhsSymbol, rhsSymbol, lhsUiAmt, rhsUiAmt);
+  const poolType = cliPoolTypeToPoolType(poolTypeStr);
+  const pools = await swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
+  if (pools.length === 0) {
+    console.log("Corresponding pool does not exist");
+    return;
+  }
+  if (pools.length !== 1) {
+    console.log("Found multiple pools of the same type???");
+    return;
+  }
+  if (pools[0].xTokenInfo.symbol !== lhsSymbol || pools[0].yTokenInfo.symbol !== rhsSymbol) {
+    console.log("Pool mismatch");
+    return;
+  }
+  const payload = await pools[0].makeAddLiquidityPayload(lhsUiAmt, rhsUiAmt);
   await sendPayloadTx(client, account, payload);
   await testWalletClient();
 }
 
-const testClientRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, liquidityUiAmtStr: string) => {
+const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, liquidityUiAmtStr: string) => {
   const {client, account, contractAddress, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
@@ -387,7 +416,21 @@ const testClientRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, li
   if(liquidityUiAmt <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const payload = await swapClient.makeCPRemoveLiquidityPayload(lhsSymbol, rhsSymbol, liquidityUiAmt, 0, 0);
+  const poolType = cliPoolTypeToPoolType(poolTypeStr);
+  const pools = await swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
+  if (pools.length === 0) {
+    console.log("Corresponding pool does not exist");
+    return;
+  }
+  if (pools.length !== 1) {
+    console.log("Found multiple pools of the same type???");
+    return;
+  }
+  if (pools[0].xTokenInfo.symbol !== lhsSymbol || pools[0].yTokenInfo.symbol !== rhsSymbol) {
+    console.log("Pool mismatch");
+    return;
+  }
+  const payload = await pools[0].makeRemoveLiquidityPayload(liquidityUiAmt, 0, 0);
   await sendPayloadTx(client, account, payload);
   await testWalletClient();
 }
@@ -438,6 +481,7 @@ testCommand
 
 testCommand
   .command("add-liquidity")
+  .argument("<pool-type>", "pool-type may be 'cp' or 'stable'")
   .argument("<lhs-symbol>")
   .argument("<rhs-symbol>")
   .argument("<lhs-ui-amount-in>")
@@ -446,6 +490,7 @@ testCommand
 
 testCommand
   .command("remove-liquidity")
+  .argument("<pool-type>", "pool-type may be 'cp' or 'stable'")
   .argument("<lhs-symbol>")
   .argument("<rhs-symbol>")
   .argument("<liquidity-ui-amount>")

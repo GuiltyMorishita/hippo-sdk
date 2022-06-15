@@ -242,15 +242,22 @@ export class HippoSwapClient {
   }
 
   hasDirectPoolFor(symbolX: string, symbolY: string) {
-    const lpInfo = this.get1StepRoutesBySymbol(symbolX, symbolY);
-    return lpInfo !== null;
+    const routes = this.get1StepRoutesBySymbol(symbolX, symbolY);
+    return routes.length > 0;
+  }
+
+  getDirectPoolsBySymbols(symbolX: string, symbolY: string): HippoPool[] {
+    const routes = this.get1StepRoutesBySymbol(symbolX, symbolY);
+    return routes.map(route => route.steps[0].pool);
+  }
+
+  getDirectPoolsBySymbolsAndPoolType(symbolX: string, symbolY: string, poolType: PoolType): HippoPool[] {
+    const routes = this.get1StepRoutesBySymbol(symbolX, symbolY);
+    return routes.map(route => route.steps[0].pool).filter(p=>p.getPoolType() === poolType);
   }
 
   getDirectPricesBySymbols(symbolX: string, symbolY: string) {
     const routes = this.get1StepRoutesBySymbol(symbolX, symbolY);
-    if(routes.length === 0) {
-      return SwapClientErrors.NO_ROUTE;
-    }
     return routes.map(route => route.getCurrentPrice());
   }
 
