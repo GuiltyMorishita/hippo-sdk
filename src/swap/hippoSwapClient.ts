@@ -159,6 +159,16 @@ export class HippoSwapClient {
     this.xyFullnameToPoolSet[xyFullname].setPool(pool);
   }
 
+  allPools() {
+    const pools: HippoPool[] = [];
+    for(const [_fullname, poolSet] of Object.entries(this.xyFullnameToPoolSet)) {
+      for(const pool of poolSet.pools()) {
+        pools.push(pool);
+      }
+    }
+    return pools;
+  }
+
   getTokenInfoBySymbol(symbol: string) {
     return this.symbolToTokenInfo[symbol];
   }

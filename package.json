@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/hippo-sdk",
-  "version": "0.0.16",
+  "version": "0.0.18",
   "description": "Hippo SDK for Aptos",
   "main": "dist/index.js",
   "repository": "git@hippo.github.com:hippospace/hippo-sdk.git",
