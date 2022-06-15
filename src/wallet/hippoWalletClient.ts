@@ -4,7 +4,6 @@ import { NetworkConfiguration } from "../config";
 import { MockCoin, TokenRegistry } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import * as X0x1 from "../generated/X0x1";
 import { typeInfoToTypeTag } from "../utils";
-import { tokenType } from "yaml/dist/parse/cst";
 import bigInt from "big-integer";
 
 export async function getCoinStoresForAddress(client: AptosClient, address: HexString, repo: AptosParserRepo) {

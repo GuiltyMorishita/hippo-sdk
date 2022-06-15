@@ -1,5 +1,5 @@
 import { AptosParserRepo, AptosVectorU8, getTypeTagFullname, StructTag } from "@manahippo/aptos-tsgen";
-import { AptosClient, HexString, Types } from "aptos";
+import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { Command } from "commander";
 import { getParserRepo } from "../generated/repo";
@@ -10,19 +10,18 @@ import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/X0x1/Coin";
-import { time } from "console";
 import { PoolType } from "../swap/baseTypes";
 
 
 const actionShowTokenRegistry = async () => {
-  const {client, account, contractAddress} = readConfig(program);
+  const {client, contractAddress} = readConfig(program);
   const repo = getParserRepo();
   const tokens = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   printResource(tokens);
 }
 
 const actionShowPools = async () => {
-  const {client, account, contractAddress} = readConfig(program);
+  const {client, contractAddress} = readConfig(program);
   const repo = getParserRepo();
   const tokens = await SwapTs.TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
   const tokenList = tokens.token_info_list;
@@ -44,7 +43,7 @@ const actionShowPools = async () => {
   }
 }
 
-const actionHitFaucet = async (coinSymbol:string, rawAmount: string, options: any) => {
+const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: any) => {
   const amount = bigInt(rawAmount);
   if (amount.leq(0)) {
     throw new Error("Amount should be number greater than 0, but got: "+rawAmount);
@@ -206,13 +205,13 @@ const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, remove
 }
 
 const actionMockDeploy = async () => {
-  const {client, account, contractAddress} = readConfig(program);
+  const {client, account} = readConfig(program);
   const payload = await SwapTs.CPScripts.build_payload_mock_deploy_script([]);
   await sendPayloadTx(client, account, payload, 10000);
 }
 
 const actionListModules = async () => {
-  const {client, account, contractAddress} = readConfig(program);
+  const {client, contractAddress} = readConfig(program);
   try{
     console.log(client.nodeUrl);
     const result = await client.getAccountModules(contractAddress);
@@ -283,14 +282,14 @@ program
 const testCommand = new Command("test");
 
 const testHippoClient = async () => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   swapClient.printSelf();
 }
 
 const testWalletClient = async () => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, netConf} = readConfig(program);
   const repo = getParserRepo();
   const walletClient = await HippoWalletClient.createInTwoCalls(netConf, client, repo, account.address());
   walletClient.debugPrint();
@@ -301,7 +300,7 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
   if(uiAmountNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, netConf} = readConfig(program);
   const repo = getParserRepo();
   const walletClient = await HippoWalletClient.createInTwoCalls(netConf, client, repo, account.address());
   const payload = await walletClient.makeFaucetMintToPayload(uiAmountNum, symbol);
@@ -311,7 +310,7 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
 }
 
 const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
@@ -330,7 +329,7 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
 }
 
 const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
@@ -350,7 +349,7 @@ const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmt
 }
 
 const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
@@ -379,7 +378,7 @@ function cliPoolTypeToPoolType(poolType: string): PoolType {
 }
 
 const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const lhsUiAmt = Number.parseFloat(lhsUiAmtStr);
@@ -407,7 +406,7 @@ const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhs
 }
 
 const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, liquidityUiAmtStr: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const liquidityUiAmt = Number.parseFloat(liquidityUiAmtStr);
@@ -434,7 +433,7 @@ const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, 
 }
 
 const testShowSupply = async(symbol: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const supply = await swapClient.getTokenTotalSupplyBySymbol(symbol);
@@ -442,7 +441,7 @@ const testShowSupply = async(symbol: string) => {
 }
 
 const testShowRoutes = async(lhsSymbol: string, rhsSymbol: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, netConf} = readConfig(program);
   const repo = getParserRepo();
   const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
   const routes = swapClient.getSteppedRoutesBySymbol(lhsSymbol, rhsSymbol, 3);
@@ -518,7 +517,7 @@ program.addCommand(testCommand);
 // other random things
 
 const checkTestCoin = async () => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account, contractAddress} = readConfig(program);
   const repo = getParserRepo();
   const testCoinTag = new StructTag(
     X0x1.TestCoin.moduleAddress,
@@ -554,7 +553,7 @@ const checkTestCoin = async () => {
 }
 
 const updateTokenRegistry = async (symbol: string, description: string, logo_url: string, project_url: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
+  const {client, account} = readConfig(program);
   const payload = SwapTs.TokenRegistry.build_payload_update_token_info_script(
     new AptosVectorU8(symbol), 
     new AptosVectorU8(description), 

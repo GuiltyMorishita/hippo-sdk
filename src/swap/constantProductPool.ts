@@ -40,8 +40,8 @@ export class HippoConstantProductPool extends HippoPool {
       const newXUiBalance = xUiBalance + inputUiAmt;
       const newYUiBalance = k / newXUiBalance;
       outputUiAmt = yUiBalance - newYUiBalance;
-      initialPrice = xUiBalance / yUiBalance;
-      finalPrice = newXUiBalance / newYUiBalance;
+      initialPrice = yUiBalance / xUiBalance;
+      finalPrice = newYUiBalance / newXUiBalance;
     } else {
       inputSymbol = this.yTokenInfo.symbol;
       outputSymbol = this.xTokenInfo.symbol;
@@ -49,10 +49,10 @@ export class HippoConstantProductPool extends HippoPool {
       const newYUiBalance = yUiBalance + inputUiAmt;
       const newXUiBalance = k / newYUiBalance;
       outputUiAmt = xUiBalance - newXUiBalance;
-      initialPrice = yUiBalance / xUiBalance;
-      finalPrice = newYUiBalance / newXUiBalance;
+      initialPrice = xUiBalance / yUiBalance;
+      finalPrice = newXUiBalance / newYUiBalance;
     }
-    const avgPrice = inputUiAmt / outputUiAmt;
+    const avgPrice = outputUiAmt / inputUiAmt;
     const priceImpact = (finalPrice - initialPrice) / initialPrice;
 
     return {inputSymbol, outputSymbol, inputUiAmt, outputUiAmt, initialPrice, avgPrice, finalPrice, priceImpact};

@@ -10,10 +10,6 @@ import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 
 
-enum SwapClientErrors {
-  NO_ROUTE,
-}
-
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
   const resources = await client.getAccountResources(netConf.contractAddress);
   let registry: TokenRegistry.TokenRegistry | null = null;
@@ -150,7 +146,7 @@ export class HippoSwapClient {
 
   private setStableCurvePool(stablePool: StableCurveSwap.StableCurvePoolInfo) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(stablePool);
-    const lpTag = new StructTag(CPSwap.moduleAddress, CPSwap.moduleName, CPSwap.LPToken.structName, [xTag, yTag]);
+    const lpTag = new StructTag(StableCurveSwap.moduleAddress, StableCurveSwap.moduleName, StableCurveSwap.LPToken.structName, [xTag, yTag]);
     const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoStableCurvePool(xTokenInfo, yTokenInfo, lpTokenInfo, stablePool));
   }
@@ -311,7 +307,6 @@ export class HippoSwapClient {
     if(routes.length === 0) {
       return;
     }
-    // FIXME: compute all routes, and update all pools in all routes
     const poolMap = new Map<string, HippoPool>();
     for(const route of routes) {
       const pools = route.getAllPools();
