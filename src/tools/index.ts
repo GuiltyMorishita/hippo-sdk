@@ -579,6 +579,14 @@ const updateTokenRegistry = async (symbol: string, description: string, logo_url
   await sendPayloadTx(client, account, payload, 3000);
 }
 
+const furnishMockTokenDetails = async () => {
+  // yes we steal from solana-token-list
+  await updateTokenRegistry('USDT', 'Tether', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg', 'https://tether.to/');
+  await updateTokenRegistry('USDC', 'USDC', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png', 'https://www.centre.io/');
+  await updateTokenRegistry('DAI', 'DAI', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FYpdBuyAHSbdaAyD1sKkxyLWbAP8uUW9h6uvdhK74ij1/logo.png', 'https://makerdao.com/');
+  await updateTokenRegistry('BTC', 'Bitcoin', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png', 'https://bitcoin.org');
+}
+
 const others = new Command('others');
 
 others
@@ -592,6 +600,10 @@ others
   .argument("<logo_url>")
   .argument("<project_url>")
   .action(updateTokenRegistry);
+
+others
+  .command("furnish-token-details")
+  .action(furnishMockTokenDetails);
 
 program.addCommand(others);
 
