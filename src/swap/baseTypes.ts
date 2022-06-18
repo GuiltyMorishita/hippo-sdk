@@ -1,5 +1,7 @@
 import { getTypeTagFullname, StructTag } from "@manahippo/aptos-tsgen";
-import { TransactionPayload } from "aptos/dist/api/data-contracts";
+import { Types } from "aptos";
+import bigInt from "big-integer";
+import { Router } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import { TokenInfo } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790/TokenRegistry";
 import { typeInfoToTypeTag } from "../utils";
 
@@ -22,9 +24,21 @@ export type QuoteType = {
 }
 
 export enum PoolType {
-  CONSTANT_PRODUCT = 0,
-  STABLE_CURVE = 1,
-  THREE_PIECE = 2,
+  CONSTANT_PRODUCT = 1,
+  STABLE_CURVE = 2,
+  THREE_PIECE = 3,
+}
+
+export function poolTypeToName(poolType: PoolType) {
+  if (poolType === PoolType.CONSTANT_PRODUCT) {
+    return "ConstantProduct"
+  } else if (poolType === PoolType.STABLE_CURVE) {
+    return "StableCurve"
+  } else if (poolType === PoolType.THREE_PIECE) {
+    return "ThreePiece"
+  } else {
+    throw new Error();
+  }
 }
 
 export abstract class TradeRoute {
@@ -51,7 +65,7 @@ export abstract class TradeRoute {
   abstract makeSwapPayload( 
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
-  ): Promise<TransactionPayload>;
+  ): Promise<Types.TransactionPayload>;
 
 
 }
@@ -81,6 +95,9 @@ export abstract class HippoPool extends TradeRoute {
     return `${xFullname}<->${yFullname}`;
   }
 
+  abstract xUiBalance(): number;
+  abstract yUiBalance(): number;
+
   abstract getId(): string;
 
   abstract getCurrentPriceDirectional(isXtoY: boolean): PriceType;
@@ -100,22 +117,22 @@ export abstract class HippoPool extends TradeRoute {
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
     isXtoY: boolean,
-  ): Promise<TransactionPayload>;
+  ): Promise<Types.TransactionPayload>;
 
   makeSwapPayload( 
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
-  ): Promise<TransactionPayload> {
+  ): Promise<Types.TransactionPayload> {
     return this.makeSwapPayloadDirectional(amountIn, minAmountOut, true);
   }
 
-  abstract makeAddLiquidityPayload(lhsAmt: UITokenAmount, rhsAmt: UITokenAmount): Promise<TransactionPayload>;
+  abstract makeAddLiquidityPayload(lhsAmt: UITokenAmount, rhsAmt: UITokenAmount): Promise<Types.TransactionPayload>;
 
   abstract makeRemoveLiquidityPayload(
     liqiudityAmt: UITokenAmount, 
     lhsMinAmt: UITokenAmount, 
     rhsMinAmt: UITokenAmount,
-  ): Promise<TransactionPayload>;
+  ): Promise<Types.TransactionPayload>;
 }
 
 export class RouteStep {
@@ -175,7 +192,7 @@ export class SteppedRoute extends TradeRoute {
         prevOutputUiAmt = quote.outputUiAmt;
         avgPrice *= quote.avgPrice;
         initialPrice *= quote.initialPrice;
-        finalPrice = quote.finalPrice;
+        finalPrice *= quote.finalPrice;
       }
       return {
         inputSymbol: this.xTokenInfo.symbol,
@@ -193,10 +210,53 @@ export class SteppedRoute extends TradeRoute {
   makeSwapPayload( 
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
-  ): Promise<TransactionPayload> {
+  ): Promise<Types.TransactionPayload> {
     if (this.steps.length === 1) {
       return this.steps[0].pool.makeSwapPayloadDirectional(amountIn, minAmountOut, this.steps[0].isXtoY);
-    } else {
+    } else if (this.steps.length === 2) {
+      const fromTokenInfo = this.steps[0].lhsTokenInfo();
+      const middleTokenInfo = this.steps[0].rhsTokenInfo();
+      const toTokenInfo = this.steps[1].rhsTokenInfo();
+      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals)).toFixed(0));
+      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals)).toFixed(0));
+      return Promise.resolve(Router.build_payload_two_step_route_script(
+        this.steps[0].pool.getPoolType(),
+        this.steps[0].isXtoY,
+        this.steps[1].pool.getPoolType(),
+        this.steps[1].isXtoY,
+        fromRawAmount,
+        toRawAmount,
+        [
+          typeInfoToTypeTag(fromTokenInfo.token_type),
+          typeInfoToTypeTag(middleTokenInfo.token_type),
+          typeInfoToTypeTag(toTokenInfo.token_type),
+        ]
+      ));
+    } else if (this.steps.length === 3) {
+      const fromTokenInfo = this.steps[0].lhsTokenInfo();
+      const middle1TokenInfo = this.steps[0].rhsTokenInfo();
+      const middle2TokenInfo = this.steps[1].rhsTokenInfo();
+      const toTokenInfo = this.steps[2].rhsTokenInfo();
+      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals)).toFixed(0));
+      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals)).toFixed(0));
+      return Promise.resolve(Router.build_payload_three_step_route_script(
+        this.steps[0].pool.getPoolType(),
+        this.steps[0].isXtoY,
+        this.steps[1].pool.getPoolType(),
+        this.steps[1].isXtoY,
+        this.steps[2].pool.getPoolType(),
+        this.steps[2].isXtoY,
+        fromRawAmount,
+        toRawAmount,
+        [
+          typeInfoToTypeTag(fromTokenInfo.token_type),
+          typeInfoToTypeTag(middle1TokenInfo.token_type),
+          typeInfoToTypeTag(middle2TokenInfo.token_type),
+          typeInfoToTypeTag(toTokenInfo.token_type),
+        ]
+      ));
+    }
+    else {
       throw new Error();
     }
   }

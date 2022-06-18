@@ -2,12 +2,14 @@ import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, Ty
 import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
-import { CPSwap, TokenRegistry, StableCurveSwap } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
+import { CPSwap, TokenRegistry, StableCurveSwap, PieceSwap } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
 import { CoinInfo } from "../generated/X0x1/Coin";
 import { typeInfoToTypeTag } from "../utils";
-import { HippoPool, PoolType, RouteStep, SteppedRoute} from "./baseTypes";
+import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
+import { HippoPieceSwapPool } from "./pieceSwapPool";
+import { PieceSwapPoolInfo } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790/PieceSwap";
 
 
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
@@ -15,6 +17,7 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
   let registry: TokenRegistry.TokenRegistry | null = null;
   const cpMetas: CPSwap.TokenPairMetadata[] = [];
   const stablePoolInfos: StableCurveSwap.StableCurvePoolInfo[] = [];
+  const piecePoolInfos: PieceSwapPoolInfo[] = [];
   for(const resource of resources) {
     try{
       const typeTag = parseTypeTagOrThrow(resource.type);
@@ -28,6 +31,9 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
       else if(parsed instanceof StableCurveSwap.StableCurvePoolInfo) {
         stablePoolInfos.push(parsed);
       }
+      else if(parsed instanceof PieceSwapPoolInfo) {
+        piecePoolInfos.push(parsed);
+      }
     }
     catch(e){
       console.log(`Could not parse resource of type: ${resource.type}`);
@@ -36,7 +42,7 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
   if(!registry) {
     throw new Error(`Failed to load TokenRegistry from contract account: ${netConf.contractAddress.hex()}`);
   }
-  return {registry, cpMetas, stablePoolInfos}
+  return {registry, cpMetas, stablePoolInfos, piecePoolInfos}
 }
 
 export class PoolSet {
@@ -67,8 +73,16 @@ export class HippoSwapClient {
   public contractAddress: HexString;
 
   static async createInOneCall(netConfig: NetworkConfiguration, aptosClient: AptosClient, repo: AptosParserRepo) {
-    const {registry, cpMetas, stablePoolInfos} = await loadContractResources(netConfig, aptosClient, repo);
-    return new HippoSwapClient(netConfig, aptosClient, registry.token_info_list, cpMetas, stablePoolInfos, repo);
+    const {registry, cpMetas, stablePoolInfos, piecePoolInfos} = await loadContractResources(netConfig, aptosClient, repo);
+    return new HippoSwapClient(
+      netConfig, 
+      aptosClient, 
+      registry.token_info_list, 
+      cpMetas, 
+      stablePoolInfos, 
+      piecePoolInfos, 
+      repo
+    );
   }
   constructor(
     public netConfig: NetworkConfiguration,
@@ -76,6 +90,7 @@ export class HippoSwapClient {
     public tokenList:  TokenRegistry.TokenInfo[],
     public cpMetas: CPSwap.TokenPairMetadata[],
     public stablePoolInfos: StableCurveSwap.StableCurvePoolInfo[],
+    public piecePoolInfos: PieceSwap.PieceSwapPoolInfo[],
     public repo: AptosParserRepo,
   ) {
     // init cached maps/lists
@@ -104,7 +119,7 @@ export class HippoSwapClient {
       if (
         coinTypeTag instanceof StructTag &&
         coinTypeTag.address.hex() === this.contractAddress.hex() &&
-        [CPSwap.moduleName, StableCurveSwap.moduleName].includes(coinTypeTag.module)
+        [CPSwap.moduleName, StableCurveSwap.moduleName, PieceSwap.moduleName].includes(coinTypeTag.module)
       ) {
         // lp token
         continue;
@@ -120,6 +135,10 @@ export class HippoSwapClient {
     // add stable-curve pools
     for(const stablePool of this.stablePoolInfos) {
       this.setStableCurvePool(stablePool);
+    }
+    // add pieceswap pools
+    for(const piecePool of this.piecePoolInfos) {
+      this.setPiecePool(piecePool);
     }
   }
 
@@ -149,6 +168,13 @@ export class HippoSwapClient {
     const lpTag = new StructTag(StableCurveSwap.moduleAddress, StableCurveSwap.moduleName, StableCurveSwap.LPToken.structName, [xTag, yTag]);
     const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoStableCurvePool(xTokenInfo, yTokenInfo, lpTokenInfo, stablePool));
+  }
+
+  private setPiecePool(piecePool: PieceSwap.PieceSwapPoolInfo) {
+    const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(piecePool);
+    const lpTag = new StructTag(PieceSwap.moduleAddress, PieceSwap.moduleName, PieceSwap.LPToken.structName, [xTag, yTag]);
+    const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
+    this.setPool(new HippoPieceSwapPool(xTokenInfo, yTokenInfo, lpTokenInfo, piecePool));
   }
   private setPool(pool: HippoPool) {
     const xyFullname = pool.xyFullname();
@@ -388,20 +414,15 @@ export class HippoSwapClient {
     for(const token of this.singleTokens) {
       console.log(`Single token: ${token.symbol}`);
     }
-    /*
-    for(const cpMeta of this.cpMetas) {
-      if(!(cpMeta.typeTag instanceof StructTag)) {
-        throw new Error();
-      }
-      const [xTag, yTag] = cpMeta.typeTag.typeParams;
-      const [xFullname, yFullname] = [xTag, yTag].map(getTypeTagFullname);
-      const [xTokenInfo, yTokenInfo] = [xFullname, yFullname].map(name=>this.tokenFullnameToTokenInfo[name]);
+    for(const pool of this.allPools()) {
+      const xTokenInfo = pool.xTokenInfo;
+      const yTokenInfo = pool.yTokenInfo;
       console.log("#############")
-      console.log(`CP Pool: ${xTokenInfo.symbol} <-> ${yTokenInfo.symbol}`);
-      console.log(`CP x balance: ${cpMeta.balance_x.value.toJSNumber() / Math.pow(10, xTokenInfo.decimals)}`);
-      console.log(`CP y balance: ${cpMeta.balance_y.value.toJSNumber() / Math.pow(10, yTokenInfo.decimals)}`);
-      console.log(`CP price (y-per-x): ${this.getCpPrice(cpMeta).yToX}`)
+      console.log(`Pool: ${xTokenInfo.symbol} <-> ${yTokenInfo.symbol}`);
+      console.log(`Type: ${poolTypeToName(pool.getPoolType())}`);
+      console.log(`x balance: ${pool.xUiBalance()}`);
+      console.log(`y balance: ${pool.yUiBalance()}`);
+      console.log(`price (y-per-x): ${pool.getCurrentPrice().yToX}`)
     }
-    */
   }
 }

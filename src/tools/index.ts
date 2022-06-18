@@ -218,10 +218,11 @@ const actionMockDeploy = async () => {
   const {client, account} = readConfig(program);
   const payload = await SwapTs.CPScripts.build_payload_mock_deploy_script([]);
   await sendPayloadTx(client, account, payload, 10000);
-  console.log('cpswap')
-  const stableCurvePayload = await SwapTs.StableCurveScripts.build_payload_mock_deploy_script([])
-  await sendPayloadTx(client, account, stableCurvePayload, 10000);
-  console.log('stable curve swap')
+  console.log('CPSwap')
+  const pieceSwapPayload = await SwapTs.PieceSwapScript.build_payload_mock_deploy_script([])
+  await sendPayloadTx(client, account, pieceSwapPayload, 10000);
+  console.log('PieceSwap')
+  // skip stable-curve for now
 }
 
 
