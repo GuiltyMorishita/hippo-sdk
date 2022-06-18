@@ -1,7 +1,7 @@
 import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag } from "@manahippo/aptos-tsgen";
 import { AptosClient, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
-import { MockCoin, TokenRegistry } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
+import { MockCoin, TokenRegistry } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
 import * as X0x1 from "../generated/X0x1";
 import { typeInfoToTypeTag } from "../utils";
 import bigInt from "big-integer";

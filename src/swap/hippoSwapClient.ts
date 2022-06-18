@@ -2,14 +2,14 @@ import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, Ty
 import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
-import { CPSwap, TokenRegistry, StableCurveSwap, PieceSwap } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
+import { CPSwap, TokenRegistry, StableCurveSwap, PieceSwap } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
 import { CoinInfo } from "../generated/X0x1/Coin";
 import { typeInfoToTypeTag } from "../utils";
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 import { HippoPieceSwapPool } from "./pieceSwapPool";
-import { PieceSwapPoolInfo } from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790/PieceSwap";
+import { PieceSwapPoolInfo } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/PieceSwap";
 
 
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {

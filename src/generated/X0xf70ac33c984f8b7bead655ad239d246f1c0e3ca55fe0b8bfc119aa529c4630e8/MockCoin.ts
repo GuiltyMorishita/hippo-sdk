@@ -13,7 +13,7 @@ import { sendAndWait } from "@manahippo/aptos-tsgen";
 import { buildPayload } from "@manahippo/aptos-tsgen";
 import * as X0x1 from "../X0x1";
 
-export const moduleAddress = new HexString("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
+export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const moduleName = "MockCoin";
 
 
@@ -220,7 +220,7 @@ export async function faucet_mint_to_script(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::faucet_mint_to_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::faucet_mint_to_script",
     typeParamStrings,
     [
       amount.toString(),
@@ -233,7 +233,7 @@ export function build_payload_faucet_mint_to_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::faucet_mint_to_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::faucet_mint_to_script",
     typeParamStrings,
     [
       amount.toString(),
@@ -242,12 +242,12 @@ export function build_payload_faucet_mint_to_script(
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::TokenSharedCapability", TokenSharedCapability.TokenSharedCapabilityParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WBTC", WBTC.WBTCParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WETH", WETH.WETHParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WUSDT", WUSDT.WUSDTParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WUSDC", WUSDC.WUSDCParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WDAI", WDAI.WDAIParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WDOT", WDOT.WDOTParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::MockCoin::WSOL", WSOL.WSOLParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::TokenSharedCapability", TokenSharedCapability.TokenSharedCapabilityParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WBTC", WBTC.WBTCParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WETH", WETH.WETHParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WUSDT", WUSDT.WUSDTParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WUSDC", WUSDC.WUSDCParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WDAI", WDAI.WDAIParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WDOT", WDOT.WDOTParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::MockCoin::WSOL", WSOL.WSOLParser);
 }

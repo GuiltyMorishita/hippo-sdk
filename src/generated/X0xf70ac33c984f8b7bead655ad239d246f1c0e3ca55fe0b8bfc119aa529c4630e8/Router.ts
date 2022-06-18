@@ -8,7 +8,7 @@ import { sendAndWait } from "@manahippo/aptos-tsgen";
 import { buildPayload } from "@manahippo/aptos-tsgen";
 import { AptosParserRepo } from "@manahippo/aptos-tsgen";
 
-export const moduleAddress = new HexString("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
+export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const moduleName = "Router";
 
 export const E_OUTPUT_LESS_THAN_MINIMUM: bigInt.BigInteger = bigInt("2");
@@ -32,7 +32,7 @@ export async function two_step_route_script(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::Router::two_step_route_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::Router::two_step_route_script",
     typeParamStrings,
     [
       first_pool_type,
@@ -55,7 +55,7 @@ export function build_payload_two_step_route_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::Router::two_step_route_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::Router::two_step_route_script",
     typeParamStrings,
     [
       first_pool_type,
@@ -85,7 +85,7 @@ export async function three_step_route_script(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::Router::three_step_route_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::Router::three_step_route_script",
     typeParamStrings,
     [
       first_pool_type,
@@ -112,7 +112,7 @@ export function build_payload_three_step_route_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::Router::three_step_route_script",
+    "0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::Router::three_step_route_script",
     typeParamStrings,
     [
       first_pool_type,

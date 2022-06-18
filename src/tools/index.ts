@@ -3,7 +3,7 @@ import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { Command } from "commander";
 import { getParserRepo } from "../generated/repo";
-import * as SwapTs from "../generated/X0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790";
+import * as SwapTs from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
 import * as X0x1 from "../generated/X0x1";
 import { printResource, printResources, typeInfoToTypeTag } from "../utils";
 import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";

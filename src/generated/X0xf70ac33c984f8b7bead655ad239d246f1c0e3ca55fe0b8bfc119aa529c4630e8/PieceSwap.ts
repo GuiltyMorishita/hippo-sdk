@@ -9,14 +9,14 @@ import { parseStructProto } from "@manahippo/aptos-tsgen";
 import { AptosClient } from "aptos";
 import * as X0x1 from "../X0x1";
 
-export const moduleAddress = new HexString("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
+export const moduleAddress = new HexString("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const moduleName = "PieceSwap";
 
 export const ERROR_ALREADY_INITIALIZED: bigInt.BigInteger = bigInt("1");
 export const ERROR_NOT_CREATOR: bigInt.BigInteger = bigInt("3");
 export const ERROR_ONLY_ADMIN: bigInt.BigInteger = bigInt("0");
 export const MINIMUM_LIQUIDITY: bigInt.BigInteger = bigInt("1000");
-export const MODULE_ADMIN: HexString = new HexString("49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
+export const MODULE_ADMIN: HexString = new HexString("f70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8");
 export const ERROR_COIN_NOT_INITIALIZED: bigInt.BigInteger = bigInt("2");
 
 export class LPToken {
@@ -56,8 +56,8 @@ export class PieceSwapPoolInfo {
     {name: "reserve_x", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<$tv0>")},
     {name: "reserve_y", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<$tv1>")},
     {name: "lp_amt", typeTag: parseTypeTagOrThrow("u64")},
-    {name: "lp_mint_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::MintCapability<0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwap::LPToken<$tv0,$tv1>>")},
-    {name: "lp_burn_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::BurnCapability<0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwap::LPToken<$tv0,$tv1>>")},
+    {name: "lp_mint_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::MintCapability<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::PieceSwap::LPToken<$tv0,$tv1>>")},
+    {name: "lp_burn_cap", typeTag: parseTypeTagOrThrow("0x1::Coin::BurnCapability<0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::PieceSwap::LPToken<$tv0,$tv1>>")},
     {name: "K", typeTag: parseTypeTagOrThrow("u128")},
     {name: "K2", typeTag: parseTypeTagOrThrow("u128")},
     {name: "Xa", typeTag: parseTypeTagOrThrow("u128")},
@@ -111,6 +111,6 @@ export class PieceSwapPoolInfo {
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwap::LPToken", LPToken.LPTokenParser);
-  repo.addParser("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwap::PieceSwapPoolInfo", PieceSwapPoolInfo.PieceSwapPoolInfoParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::PieceSwap::LPToken", LPToken.LPTokenParser);
+  repo.addParser("0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8::PieceSwap::PieceSwapPoolInfo", PieceSwapPoolInfo.PieceSwapPoolInfoParser);
 }
