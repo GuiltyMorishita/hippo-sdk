@@ -22,10 +22,16 @@ export class HippoConstantProductPool extends HippoPool {
   getId(): string {
     return `HippoConstantProductPool<${this.xyFullname()}>`;
   }
+  getAfterFeeFactor() : number {
+    return 0.997;
+  }
   getCurrentPriceDirectional(isXtoY: boolean): PriceType {
     const xUiBalance = isXtoY ? this.xUiBalance() : this.yUiBalance();
     const yUiBalance = isXtoY ? this.yUiBalance() : this.xUiBalance();
-    return {xToY: xUiBalance / yUiBalance, yToX: yUiBalance / xUiBalance};
+    return {
+      xToY: xUiBalance / yUiBalance / this.getAfterFeeFactor(), 
+      yToX: yUiBalance / xUiBalance / this.getAfterFeeFactor()
+    };
   }
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {
     const xUiBalance = this.xUiBalance();
@@ -39,7 +45,7 @@ export class HippoConstantProductPool extends HippoPool {
       // compute output in Y
       const newXUiBalance = xUiBalance + inputUiAmt;
       const newYUiBalance = k / newXUiBalance;
-      outputUiAmt = yUiBalance - newYUiBalance;
+      outputUiAmt = (yUiBalance - newYUiBalance) * this.getAfterFeeFactor();
       initialPrice = yUiBalance / xUiBalance;
       finalPrice = newYUiBalance / newXUiBalance;
     } else {
@@ -48,7 +54,7 @@ export class HippoConstantProductPool extends HippoPool {
       // compute output in X
       const newYUiBalance = yUiBalance + inputUiAmt;
       const newXUiBalance = k / newYUiBalance;
-      outputUiAmt = xUiBalance - newXUiBalance;
+      outputUiAmt = (xUiBalance - newXUiBalance) * this.getAfterFeeFactor();
       initialPrice = xUiBalance / yUiBalance;
       finalPrice = newXUiBalance / newYUiBalance;
     }
