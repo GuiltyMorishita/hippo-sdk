@@ -206,7 +206,7 @@ const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, remove
     const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
     const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
     if(lhsFullname === fromFullname && rhsFullname === toFullname) {
-      const result = await SwapTs.CPScripts.remove_liquidity(client, account, removeAmt, bigInt(0), bigInt(0), lpTag.typeParams);
+      const result = await SwapTs.CPScripts.remove_liquidity_script(client, account, removeAmt, bigInt(0), bigInt(0), lpTag.typeParams);
       console.log(result);
       return;
     }

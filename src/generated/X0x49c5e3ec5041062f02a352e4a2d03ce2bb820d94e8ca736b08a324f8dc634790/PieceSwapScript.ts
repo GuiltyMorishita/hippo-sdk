@@ -10,9 +10,8 @@ import { buildPayload } from "@manahippo/aptos-tsgen";
 import { AptosParserRepo } from "@manahippo/aptos-tsgen";
 
 export const moduleAddress = new HexString("0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790");
-export const moduleName = "StableCurveScripts";
+export const moduleName = "PieceSwapScript";
 
-export const MICRO_CONVERSION_FACTOR: bigInt.BigInteger = bigInt("1000000");
 export const E_LP_TOKEN_ALREADY_REGISTERED: bigInt.BigInteger = bigInt("7");
 export const E_OUTPUT_LESS_THAN_MIN: bigInt.BigInteger = bigInt("3");
 export const E_SWAP_NONZERO_INPUT_REQUIRED: bigInt.BigInteger = bigInt("2");
@@ -22,62 +21,62 @@ export const E_TOKEN_REGISTRY_NOT_INITIALIZED: bigInt.BigInteger = bigInt("4");
 export const E_TOKEN_X_NOT_REGISTERED: bigInt.BigInteger = bigInt("5");
 export const E_TOKEN_Y_NOT_REGISTERED: bigInt.BigInteger = bigInt("6");
 
-export async function create_new_pool(
+export async function create_new_pool_script(
   client: AptosClient,
   account: AptosAccount,
   lp_name: AptosVectorU8,
   lp_symbol: AptosVectorU8,
-  lp_description: AptosVectorU8,
-  lp_logo_url: AptosVectorU8,
-  lp_project_url: AptosVectorU8,
-  fee: bigInt.BigInteger,
-  admin_fee: bigInt.BigInteger,
+  k: bigInt.BigInteger,
+  w1_numerator: bigInt.BigInteger,
+  w1_denominator: bigInt.BigInteger,
+  w2_numerator: bigInt.BigInteger,
+  w2_denominator: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::create_new_pool",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::create_new_pool_script",
     typeParamStrings,
     [
       lp_name.hex(),
       lp_symbol.hex(),
-      lp_description.hex(),
-      lp_logo_url.hex(),
-      lp_project_url.hex(),
-      fee.toString(),
-      admin_fee.toString(),
+      k.toString(),
+      w1_numerator.toString(),
+      w1_denominator.toString(),
+      w2_numerator.toString(),
+      w2_denominator.toString(),
     ]
   );
 }
-export function build_payload_create_new_pool(
+export function build_payload_create_new_pool_script(
   lp_name: AptosVectorU8,
   lp_symbol: AptosVectorU8,
-  lp_description: AptosVectorU8,
-  lp_logo_url: AptosVectorU8,
-  lp_project_url: AptosVectorU8,
-  fee: bigInt.BigInteger,
-  admin_fee: bigInt.BigInteger,
+  k: bigInt.BigInteger,
+  w1_numerator: bigInt.BigInteger,
+  w1_denominator: bigInt.BigInteger,
+  w2_numerator: bigInt.BigInteger,
+  w2_denominator: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::create_new_pool",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::create_new_pool_script",
     typeParamStrings,
     [
       lp_name.hex(),
       lp_symbol.hex(),
-      lp_description.hex(),
-      lp_logo_url.hex(),
-      lp_project_url.hex(),
-      fee.toString(),
-      admin_fee.toString(),
+      k.toString(),
+      w1_numerator.toString(),
+      w1_denominator.toString(),
+      w2_numerator.toString(),
+      w2_denominator.toString(),
     ]
   );
 }
 
-export async function add_liquidity(
+export async function add_liquidity_script(
   client: AptosClient,
   account: AptosAccount,
   amount_x: bigInt.BigInteger,
@@ -88,7 +87,7 @@ export async function add_liquidity(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::add_liquidity",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::add_liquidity_script",
     typeParamStrings,
     [
       amount_x.toString(),
@@ -96,14 +95,14 @@ export async function add_liquidity(
     ]
   );
 }
-export function build_payload_add_liquidity(
+export function build_payload_add_liquidity_script(
   amount_x: bigInt.BigInteger,
   amount_y: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::add_liquidity",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::add_liquidity_script",
     typeParamStrings,
     [
       amount_x.toString(),
@@ -112,41 +111,33 @@ export function build_payload_add_liquidity(
   );
 }
 
-export async function remove_liquidity(
+export async function remove_liquidity_script(
   client: AptosClient,
   account: AptosAccount,
   liquidity: bigInt.BigInteger,
-  min_amount_x: bigInt.BigInteger,
-  min_amount_y: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::remove_liquidity",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::remove_liquidity_script",
     typeParamStrings,
     [
       liquidity.toString(),
-      min_amount_x.toString(),
-      min_amount_y.toString(),
     ]
   );
 }
-export function build_payload_remove_liquidity(
+export function build_payload_remove_liquidity_script(
   liquidity: bigInt.BigInteger,
-  min_amount_x: bigInt.BigInteger,
-  min_amount_y: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::remove_liquidity",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::remove_liquidity_script",
     typeParamStrings,
     [
       liquidity.toString(),
-      min_amount_x.toString(),
-      min_amount_y.toString(),
     ]
   );
 }
@@ -164,7 +155,7 @@ export async function swap_script(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::swap_script",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::swap_script",
     typeParamStrings,
     [
       x_in.toString(),
@@ -183,7 +174,7 @@ export function build_payload_swap_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::swap_script",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::swap_script",
     typeParamStrings,
     [
       x_in.toString(),
@@ -203,7 +194,7 @@ export async function mock_deploy_script(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::mock_deploy_script",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::mock_deploy_script",
     typeParamStrings,
     []
   );
@@ -213,7 +204,7 @@ export function build_payload_mock_deploy_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::StableCurveScripts::mock_deploy_script",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::PieceSwapScript::mock_deploy_script",
     typeParamStrings,
     []
   );

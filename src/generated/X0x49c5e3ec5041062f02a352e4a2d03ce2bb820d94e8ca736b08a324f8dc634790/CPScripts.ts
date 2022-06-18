@@ -21,7 +21,7 @@ export const E_TOKEN_REGISTRY_NOT_INITIALIZED: bigInt.BigInteger = bigInt("4");
 export const E_TOKEN_X_NOT_REGISTERED: bigInt.BigInteger = bigInt("5");
 export const E_TOKEN_Y_NOT_REGISTERED: bigInt.BigInteger = bigInt("6");
 
-export async function create_token_pair_script(
+export async function create_new_pool_script(
   client: AptosClient,
   account: AptosAccount,
   fee_to: HexString,
@@ -37,7 +37,7 @@ export async function create_token_pair_script(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::create_token_pair_script",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::create_new_pool_script",
     typeParamStrings,
     [
       fee_to,
@@ -50,7 +50,7 @@ export async function create_token_pair_script(
     ]
   );
 }
-export function build_payload_create_token_pair_script(
+export function build_payload_create_new_pool_script(
   fee_to: HexString,
   fee_on: boolean,
   lp_name: AptosVectorU8,
@@ -62,7 +62,7 @@ export function build_payload_create_token_pair_script(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::create_token_pair_script",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::create_new_pool_script",
     typeParamStrings,
     [
       fee_to,
@@ -111,7 +111,7 @@ export function build_payload_add_liquidity_script(
   );
 }
 
-export async function remove_liquidity(
+export async function remove_liquidity_script(
   client: AptosClient,
   account: AptosAccount,
   liquidity: bigInt.BigInteger,
@@ -123,7 +123,7 @@ export async function remove_liquidity(
   return sendAndWait(
     client,
     account,
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::remove_liquidity",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::remove_liquidity_script",
     typeParamStrings,
     [
       liquidity.toString(),
@@ -132,7 +132,7 @@ export async function remove_liquidity(
     ]
   );
 }
-export function build_payload_remove_liquidity(
+export function build_payload_remove_liquidity_script(
   liquidity: bigInt.BigInteger,
   amount_x_min: bigInt.BigInteger,
   amount_y_min: bigInt.BigInteger,
@@ -140,7 +140,7 @@ export function build_payload_remove_liquidity(
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
   return buildPayload(
-    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::remove_liquidity",
+    "0x49c5e3ec5041062f02a352e4a2d03ce2bb820d94e8ca736b08a324f8dc634790::CPScripts::remove_liquidity_script",
     typeParamStrings,
     [
       liquidity.toString(),
