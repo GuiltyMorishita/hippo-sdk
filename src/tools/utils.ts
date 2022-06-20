@@ -56,11 +56,11 @@ export async function simulatePayloadTx(
   max_gas=1000
 ){
   const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: `${max_gas}`});
-  const signedTxn = await client.signTransaction(account, txnRequest);
+  const signedTxn = makeSimulationTx(account, txnRequest);
   const http = client.transactions.http;
 
   const response = await http.request<UserTransaction, AptosError>({
-    path: `/simulate_transaction`,
+    path: `/transactions/simulate`,
     method: "POST",
     body: signedTxn,
     type: ContentType.Json,
@@ -68,4 +68,21 @@ export async function simulatePayloadTx(
   });
   console.log(response.status);
   return response.data;
+}
+
+export function makeSimulationTx(
+  accountFrom: AptosAccount,
+  txnRequest: Types.UserTransactionRequest,
+): Types.SubmitTransactionRequest {
+  
+  const invalidSignatureBytes = new Uint8Array(64);
+  const invalidSignature = HexString.fromUint8Array(invalidSignatureBytes);
+
+  const transactionSignature: Types.TransactionSignature = {
+    type: "ed25519_signature",
+    public_key: accountFrom.pubKey().hex(),
+    signature: invalidSignature.hex(),
+  };
+
+  return { signature: transactionSignature, ...txnRequest };
 }

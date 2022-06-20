@@ -65,7 +65,11 @@ export class PieceSwapPoolInfo {
     {name: "m", typeTag: parseTypeTagOrThrow("u128")},
     {name: "n", typeTag: parseTypeTagOrThrow("u128")},
     {name: "x_deci_mult", typeTag: parseTypeTagOrThrow("u64")},
-    {name: "y_deci_mult", typeTag: parseTypeTagOrThrow("u64")}
+    {name: "y_deci_mult", typeTag: parseTypeTagOrThrow("u64")},
+    {name: "swap_fee_per_million", typeTag: parseTypeTagOrThrow("u64")},
+    {name: "protocol_fee_share_per_thousand", typeTag: parseTypeTagOrThrow("u64")},
+    {name: "protocol_fee_x", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<$tv0>")},
+    {name: "protocol_fee_y", typeTag: parseTypeTagOrThrow("0x1::Coin::Coin<$tv1>")}
   ];
 
   reserve_x: X0x1.Coin.Coin;
@@ -81,6 +85,10 @@ export class PieceSwapPoolInfo {
   n: bigInt.BigInteger;
   x_deci_mult: bigInt.BigInteger;
   y_deci_mult: bigInt.BigInteger;
+  swap_fee_per_million: bigInt.BigInteger;
+  protocol_fee_share_per_thousand: bigInt.BigInteger;
+  protocol_fee_x: X0x1.Coin.Coin;
+  protocol_fee_y: X0x1.Coin.Coin;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.reserve_x = proto['reserve_x'] as X0x1.Coin.Coin;
@@ -96,6 +104,10 @@ export class PieceSwapPoolInfo {
     this.n = proto['n'] as bigInt.BigInteger;
     this.x_deci_mult = proto['x_deci_mult'] as bigInt.BigInteger;
     this.y_deci_mult = proto['y_deci_mult'] as bigInt.BigInteger;
+    this.swap_fee_per_million = proto['swap_fee_per_million'] as bigInt.BigInteger;
+    this.protocol_fee_share_per_thousand = proto['protocol_fee_share_per_thousand'] as bigInt.BigInteger;
+    this.protocol_fee_x = proto['protocol_fee_x'] as X0x1.Coin.Coin;
+    this.protocol_fee_y = proto['protocol_fee_y'] as X0x1.Coin.Coin;
   }
 
   static PieceSwapPoolInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : PieceSwapPoolInfo {

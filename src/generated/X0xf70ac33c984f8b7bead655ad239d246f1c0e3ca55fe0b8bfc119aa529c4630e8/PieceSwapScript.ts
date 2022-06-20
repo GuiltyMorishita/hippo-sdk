@@ -31,6 +31,8 @@ export async function create_new_pool_script(
   w1_denominator: bigInt.BigInteger,
   w2_numerator: bigInt.BigInteger,
   w2_denominator: bigInt.BigInteger,
+  swap_fee_per_million: bigInt.BigInteger,
+  protocol_fee_share_per_thousand: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
@@ -47,6 +49,8 @@ export async function create_new_pool_script(
       w1_denominator.toString(),
       w2_numerator.toString(),
       w2_denominator.toString(),
+      swap_fee_per_million.toString(),
+      protocol_fee_share_per_thousand.toString(),
     ]
   );
 }
@@ -58,6 +62,8 @@ export function build_payload_create_new_pool_script(
   w1_denominator: bigInt.BigInteger,
   w2_numerator: bigInt.BigInteger,
   w2_denominator: bigInt.BigInteger,
+  swap_fee_per_million: bigInt.BigInteger,
+  protocol_fee_share_per_thousand: bigInt.BigInteger,
   typeParams: TypeTag[],
 ) {
   const typeParamStrings = typeParams.map(t=>getTypeTagFullname(t));
@@ -72,6 +78,8 @@ export function build_payload_create_new_pool_script(
       w1_denominator.toString(),
       w2_numerator.toString(),
       w2_denominator.toString(),
+      swap_fee_per_million.toString(),
+      protocol_fee_share_per_thousand.toString(),
     ]
   );
 }
