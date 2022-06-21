@@ -40,15 +40,17 @@ export class HippoPieceSwapPool extends HippoPool {
       this.poolInfo.m.toJSNumber(),
       this.poolInfo.n.toJSNumber(),
     )
+    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJSNumber() / 1000000);
     if (isXtoY) {
-      return {xToY: delta_x / delta_y, yToX: delta_y / delta_x};
+      return {xToY: delta_x / delta_y * feeDiscountFactor, yToX: delta_y / delta_x * feeDiscountFactor};
     } else {
-      return {yToX: delta_x / delta_y, xToY: delta_y / delta_x};
+      return {yToX: delta_x / delta_y * feeDiscountFactor, xToY: delta_y / delta_x * feeDiscountFactor};
     }
   }
 
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {
     const initialPrice = this.getCurrentPriceDirectional(isXtoY);
+    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJSNumber() / 1000000);
     const outputUiAmt = get_swap_x_to_y_out(
       this.xUiBalance(),
       this.yUiBalance(),
@@ -59,7 +61,7 @@ export class HippoPieceSwapPool extends HippoPool {
       this.poolInfo.Xb.toJSNumber(),
       this.poolInfo.m.toJSNumber(),
       this.poolInfo.n.toJSNumber(),
-    )
+    ) * feeDiscountFactor;
     const finalPrice = this.getCurrentPriceDirectional(
       isXtoY, 
       isXtoY ? inputUiAmt : -outputUiAmt,
