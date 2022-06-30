@@ -19,6 +19,7 @@ import * as TypeInfo from "./TypeInfo";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "Coin";
 
+export const MAX_U128: bigInt.BigInteger = bigInt("340282366920938463463374607431768211455");
 export const ECOIN_INFO_ADDRESS_MISMATCH: bigInt.BigInteger = bigInt("0");
 export const ECOIN_INFO_ALREADY_PUBLISHED: bigInt.BigInteger = bigInt("1");
 export const ECOIN_INFO_NOT_PUBLISHED: bigInt.BigInteger = bigInt("2");
@@ -26,6 +27,7 @@ export const ECOIN_STORE_ALREADY_PUBLISHED: bigInt.BigInteger = bigInt("3");
 export const ECOIN_STORE_NOT_PUBLISHED: bigInt.BigInteger = bigInt("4");
 export const EDESTRUCTION_OF_NONZERO_TOKEN: bigInt.BigInteger = bigInt("6");
 export const EINSUFFICIENT_BALANCE: bigInt.BigInteger = bigInt("5");
+export const ETOTAL_SUPPLY_OVERFLOW: bigInt.BigInteger = bigInt("7");
 
 export class CoinEvents {
   static moduleAddress = moduleAddress;
@@ -167,7 +169,7 @@ export class CoinInfo {
     {name: "name", typeTag: parseTypeTagOrThrow("0x1::ASCII::String")},
     {name: "symbol", typeTag: parseTypeTagOrThrow("0x1::ASCII::String")},
     {name: "decimals", typeTag: parseTypeTagOrThrow("u64")},
-    {name: "supply", typeTag: parseTypeTagOrThrow("0x1::Option::Option<u64>")}
+    {name: "supply", typeTag: parseTypeTagOrThrow("0x1::Option::Option<u128>")}
   ];
 
   name: string;

@@ -75,6 +75,7 @@ export class NewBlockEvent {
     {name: "round", typeTag: parseTypeTagOrThrow("u64")},
     {name: "previous_block_votes", typeTag: parseTypeTagOrThrow("vector<bool>")},
     {name: "proposer", typeTag: parseTypeTagOrThrow("address")},
+    {name: "failed_proposer_indices", typeTag: parseTypeTagOrThrow("vector<u64>")},
     {name: "time_microseconds", typeTag: parseTypeTagOrThrow("u64")}
   ];
 
@@ -82,6 +83,7 @@ export class NewBlockEvent {
   round: bigInt.BigInteger;
   previous_block_votes: boolean[];
   proposer: HexString;
+  failed_proposer_indices: bigInt.BigInteger[];
   time_microseconds: bigInt.BigInteger;
 
   constructor(proto: any, public typeTag: TypeTag) {
@@ -89,6 +91,7 @@ export class NewBlockEvent {
     this.round = proto['round'] as bigInt.BigInteger;
     this.previous_block_votes = proto['previous_block_votes'] as boolean[];
     this.proposer = proto['proposer'] as HexString;
+    this.failed_proposer_indices = proto['failed_proposer_indices'] as bigInt.BigInteger[];
     this.time_microseconds = proto['time_microseconds'] as bigInt.BigInteger;
   }
 

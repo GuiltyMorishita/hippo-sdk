@@ -17,7 +17,6 @@ export async function create_initialize_validators(
   client: AptosClient,
   account: AptosAccount,
   owners: HexString[],
-  owner_auth_keys: AptosVectorU8[],
   consensus_pubkeys: AptosVectorU8[],
   validator_network_addresses: AptosVectorU8[],
   full_node_network_addresses: AptosVectorU8[],
@@ -32,7 +31,6 @@ export async function create_initialize_validators(
     typeParamStrings,
     [
       owners,
-      owner_auth_keys.map((x)=>{return x.hex();}),
       consensus_pubkeys.map((x)=>{return x.hex();}),
       validator_network_addresses.map((x)=>{return x.hex();}),
       full_node_network_addresses.map((x)=>{return x.hex();}),
@@ -42,7 +40,6 @@ export async function create_initialize_validators(
 }
 export function build_payload_create_initialize_validators(
   owners: HexString[],
-  owner_auth_keys: AptosVectorU8[],
   consensus_pubkeys: AptosVectorU8[],
   validator_network_addresses: AptosVectorU8[],
   full_node_network_addresses: AptosVectorU8[],
@@ -55,7 +52,6 @@ export function build_payload_create_initialize_validators(
     typeParamStrings,
     [
       owners,
-      owner_auth_keys.map((x)=>{return x.hex();}),
       consensus_pubkeys.map((x)=>{return x.hex();}),
       validator_network_addresses.map((x)=>{return x.hex();}),
       full_node_network_addresses.map((x)=>{return x.hex();}),

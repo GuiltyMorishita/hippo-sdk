@@ -128,6 +128,29 @@ export class ChainSpecificAccountInfo {
 
 }
 
+export class SignerCapability {
+  static moduleAddress = moduleAddress;
+  static moduleName = moduleName;
+  static structName: string = "SignerCapability";
+  static typeParameters: TypeParamDeclType[] = [
+  ];
+  static fields: FieldDeclType[] = [
+    {name: "account", typeTag: parseTypeTagOrThrow("address")}
+  ];
+
+  account: HexString;
+
+  constructor(proto: any, public typeTag: TypeTag) {
+    this.account = proto['account'] as HexString;
+  }
+
+  static SignerCapabilityParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SignerCapability {
+    const proto = parseStructProto(data, typeTag, repo, SignerCapability);
+    return new SignerCapability(proto, typeTag);
+  }
+
+}
+
 export async function rotate_authentication_key(
   client: AptosClient,
   account: AptosAccount,
@@ -193,4 +216,5 @@ export function build_payload_create_account(
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::Account::Account", Account.AccountParser);
   repo.addParser("0x1::Account::ChainSpecificAccountInfo", ChainSpecificAccountInfo.ChainSpecificAccountInfoParser);
+  repo.addParser("0x1::Account::SignerCapability", SignerCapability.SignerCapabilityParser);
 }

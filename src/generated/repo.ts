@@ -8,6 +8,7 @@ import * as X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8_
 import * as X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8_CPSwapUtils from "./X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/CPSwapUtils";
 import * as X0x1_ChainId from "./X0x1/ChainId";
 import * as X0x1_Coin from "./X0x1/Coin";
+import * as X0x1_Comparator from "./X0x1/Comparator";
 import * as X0x1_ConsensusConfig from "./X0x1/ConsensusConfig";
 import * as X0x1_Errors from "./X0x1/Errors";
 import * as X0x1_Event from "./X0x1/Event";
@@ -53,6 +54,7 @@ export function getParserRepo(): AptosParserRepo {
   X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8_CPSwapUtils.loadParsers(repo);
   X0x1_ChainId.loadParsers(repo);
   X0x1_Coin.loadParsers(repo);
+  X0x1_Comparator.loadParsers(repo);
   X0x1_ConsensusConfig.loadParsers(repo);
   X0x1_Errors.loadParsers(repo);
   X0x1_Event.loadParsers(repo);

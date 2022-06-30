@@ -4,6 +4,7 @@ export * as BCS from "./BCS";
 export * as Block from "./Block";
 export * as ChainId from "./ChainId";
 export * as Coin from "./Coin";
+export * as Comparator from "./Comparator";
 export * as ConsensusConfig from "./ConsensusConfig";
 export * as Errors from "./Errors";
 export * as Event from "./Event";
