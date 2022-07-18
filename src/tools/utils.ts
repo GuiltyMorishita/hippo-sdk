@@ -10,7 +10,7 @@ export const readConfig = (program: Command) => {
   const {config, profile} = program.opts();
   const ymlContent = fs.readFileSync(config, {encoding: "utf-8"});
   const result = yaml.parse(ymlContent);
-  console.log(result);
+  //console.log(result);
   if (!result.profiles) {
     throw new Error("Expect a profiles to be present in yaml config");
   }

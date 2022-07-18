@@ -1,8 +1,8 @@
+import { u64 } from '@manahippo/move-to-ts';
 import { TransactionPayload } from 'aptos/dist/api/data-contracts';
-import bigInt from 'big-integer';
-import { PieceSwapScript } from '../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8';
-import { PieceSwapPoolInfo } from '../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/PieceSwap';
-import { TokenInfo } from '../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/TokenRegistry';
+import { PieceSwapScript } from '../generated/HippoSwap';
+import { PieceSwapPoolInfo } from '../generated/HippoSwap/PieceSwap';
+import { TokenInfo } from '../generated/TokenRegistry/TokenRegistry';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 
 export class HippoPieceSwapPool extends HippoPool {
@@ -16,11 +16,11 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 
   xUiBalance() {
-    return this.poolInfo.reserve_x.value.toJSNumber() / Math.pow(10, this.xTokenInfo.decimals);
+    return this.poolInfo.reserve_x.value.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
   }
 
   yUiBalance() {
-    return this.poolInfo.reserve_y.value.toJSNumber() / Math.pow(10, this.yTokenInfo.decimals);
+    return this.poolInfo.reserve_y.value.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
   }
 
   getId(): string {
@@ -33,14 +33,14 @@ export class HippoPieceSwapPool extends HippoPool {
       this.xUiBalance() + xShift,
       this.yUiBalance() + yShift,
       delta_x,
-      this.poolInfo.K.toJSNumber(),
-      this.poolInfo.K2.toJSNumber(),
-      this.poolInfo.Xa.toJSNumber(),
-      this.poolInfo.Xb.toJSNumber(),
-      this.poolInfo.m.toJSNumber(),
-      this.poolInfo.n.toJSNumber(),
+      this.poolInfo.K.toJsNumber(),
+      this.poolInfo.K2.toJsNumber(),
+      this.poolInfo.Xa.toJsNumber(),
+      this.poolInfo.Xb.toJsNumber(),
+      this.poolInfo.m.toJsNumber(),
+      this.poolInfo.n.toJsNumber(),
     )
-    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJSNumber() / 1000000);
+    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000);
     if (isXtoY) {
       return {xToY: delta_x / delta_y * feeDiscountFactor, yToX: delta_y / delta_x * feeDiscountFactor};
     } else {
@@ -50,17 +50,17 @@ export class HippoPieceSwapPool extends HippoPool {
 
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {
     const initialPrice = this.getCurrentPriceDirectional(isXtoY);
-    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJSNumber() / 1000000);
+    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000);
     const outputUiAmt = get_swap_x_to_y_out(
       this.xUiBalance(),
       this.yUiBalance(),
       inputUiAmt,
-      this.poolInfo.K.toJSNumber(),
-      this.poolInfo.K2.toJSNumber(),
-      this.poolInfo.Xa.toJSNumber(),
-      this.poolInfo.Xb.toJSNumber(),
-      this.poolInfo.m.toJSNumber(),
-      this.poolInfo.n.toJSNumber(),
+      this.poolInfo.K.toJsNumber(),
+      this.poolInfo.K2.toJsNumber(),
+      this.poolInfo.Xa.toJsNumber(),
+      this.poolInfo.Xb.toJsNumber(),
+      this.poolInfo.m.toJsNumber(),
+      this.poolInfo.n.toJsNumber(),
     ) * feeDiscountFactor;
     const finalPrice = this.getCurrentPriceDirectional(
       isXtoY, 
@@ -68,8 +68,8 @@ export class HippoPieceSwapPool extends HippoPool {
       isXtoY ? -outputUiAmt : inputUiAmt,
     );
     return {
-      inputSymbol: isXtoY ? this.xTokenInfo.symbol : this.yTokenInfo.symbol,
-      outputSymbol: isXtoY ? this.yTokenInfo.symbol : this.xTokenInfo.symbol,
+      inputSymbol: isXtoY ? this.xTokenInfo.symbol.str() : this.yTokenInfo.symbol.str(),
+      outputSymbol: isXtoY ? this.yTokenInfo.symbol.str() : this.xTokenInfo.symbol.str(),
       inputUiAmt: inputUiAmt,
       outputUiAmt: outputUiAmt,
       initialPrice: initialPrice.yToX,
@@ -107,32 +107,32 @@ export class HippoPieceSwapPool extends HippoPool {
   ): Promise<TransactionPayload> {
     const fromTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
     const toTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
-    const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals)).toFixed(0));
-    const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals)).toFixed(0));
+    const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
     if(isXtoY) {
-      return PieceSwapScript.build_payload_swap_script(
+      return PieceSwapScript.buildPayload_swap_script(
         fromRawAmount, 
-        bigInt(0), 
-        bigInt(0), 
+        u64(0), 
+        u64(0), 
         toRawAmount, 
         this.lpTag().typeParams
       );
     }
     else {
-      return PieceSwapScript.build_payload_swap_script(
-        bigInt(0), 
+      return PieceSwapScript.buildPayload_swap_script(
+        u64(0), 
         fromRawAmount, 
         toRawAmount, 
-        bigInt(0), 
+        u64(0), 
         this.lpTag().typeParams
       );
     }
   }
 
   async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
-    const xRawAmt = bigInt((xUiAmt * Math.pow(10, this.xTokenInfo.decimals)).toFixed(0));
-    const yRawAmt = bigInt((yUiAmt * Math.pow(10, this.yTokenInfo.decimals)).toFixed(0));
-    return PieceSwapScript.build_payload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
+    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
+    return PieceSwapScript.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
   }
 
   async makeRemoveLiquidityPayload(
@@ -140,26 +140,26 @@ export class HippoPieceSwapPool extends HippoPool {
     _lhsMinAmt: UITokenAmount, 
     _rhsMinAmt: UITokenAmount,
   ): Promise<TransactionPayload> {
-    const liquidityRawAmt = bigInt(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals));
-    return PieceSwapScript.build_payload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams);
+    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
+    return PieceSwapScript.buildPayload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams);
   }
 
 
   getStage() : PieceStage {
     const current_x = this.xUiBalance();
     const current_y = this.yUiBalance();
-    const xa = this.poolInfo.Xa.toJSNumber();
-    const xb = this.poolInfo.Xb.toJSNumber();
+    const xa = this.poolInfo.Xa.toJsNumber();
+    const xb = this.poolInfo.Xb.toJsNumber();
     return getStage(current_x, current_y, xa, xb);
   }
 
   getScalingFactor() : number {
     const x = this.xUiBalance();
     const y = this.yUiBalance();
-    const k = this.poolInfo.K.toJSNumber();
-    const k2 = this.poolInfo.K2.toJSNumber();
-    const m = this.poolInfo.m.toJSNumber();
-    const n = this.poolInfo.n.toJSNumber();
+    const k = this.poolInfo.K.toJsNumber();
+    const k2 = this.poolInfo.K2.toJsNumber();
+    const m = this.poolInfo.m.toJsNumber();
+    const n = this.poolInfo.n.toJsNumber();
     const stage = this.getStage();
     return getScalingFactor(x, y, k, k2, m, n, stage);
   }

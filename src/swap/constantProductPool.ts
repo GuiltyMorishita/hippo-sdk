@@ -1,7 +1,7 @@
+import { u64 } from '@manahippo/move-to-ts';
 import { TransactionPayload } from 'aptos/dist/api/data-contracts';
-import bigInt from 'big-integer';
-import { CPScripts, CPSwap } from '../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8';
-import { TokenInfo } from '../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/TokenRegistry';
+import { CPScripts, CPSwap } from '../generated/HippoSwap';
+import { TokenInfo } from '../generated/TokenRegistry/TokenRegistry';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 
 export class HippoConstantProductPool extends HippoPool {
@@ -14,10 +14,10 @@ export class HippoConstantProductPool extends HippoPool {
     super(xTokenInfo, yTokenInfo, lpTokenInfo);
   }
   xUiBalance() {
-    return this.cpPoolMeta.balance_x .value.toJSNumber() / Math.pow(10, this.xTokenInfo.decimals);
+    return this.cpPoolMeta.balance_x.value.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
   }
   yUiBalance() {
-    return this.cpPoolMeta.balance_y .value.toJSNumber() / Math.pow(10, this.yTokenInfo.decimals);
+    return this.cpPoolMeta.balance_y .value.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
   }
   getId(): string {
     return `HippoConstantProductPool<${this.xyFullname()}>`;
@@ -40,8 +40,8 @@ export class HippoConstantProductPool extends HippoPool {
     let outputUiAmt, initialPrice, finalPrice;
     let inputSymbol, outputSymbol;
     if (isXtoY) {
-      inputSymbol = this.xTokenInfo.symbol;
-      outputSymbol = this.yTokenInfo.symbol;
+      inputSymbol = this.xTokenInfo.symbol.str();
+      outputSymbol = this.yTokenInfo.symbol.str();
       // compute output in Y
       const newXUiBalance = xUiBalance + inputUiAmt;
       const newYUiBalance = k / newXUiBalance;
@@ -49,8 +49,8 @@ export class HippoConstantProductPool extends HippoPool {
       initialPrice = yUiBalance / xUiBalance;
       finalPrice = newYUiBalance / newXUiBalance;
     } else {
-      inputSymbol = this.yTokenInfo.symbol;
-      outputSymbol = this.xTokenInfo.symbol;
+      inputSymbol = this.yTokenInfo.symbol.str();
+      outputSymbol = this.xTokenInfo.symbol.str();
       // compute output in X
       const newYUiBalance = yUiBalance + inputUiAmt;
       const newXUiBalance = k / newYUiBalance;
@@ -91,32 +91,32 @@ export class HippoConstantProductPool extends HippoPool {
   ): Promise<TransactionPayload> {
     const fromTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
     const toTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
-    const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals)).toFixed(0));
-    const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals)).toFixed(0));
+    const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
     if(isXtoY) {
-      return CPScripts.build_payload_swap_script(
+      return CPScripts.buildPayload_swap_script(
         fromRawAmount, 
-        bigInt(0), 
-        bigInt(0), 
+        u64(0), 
+        u64(0), 
         toRawAmount, 
         this.lpTag().typeParams
       );
     }
     else {
-      return CPScripts.build_payload_swap_script(
-        bigInt(0), 
+      return CPScripts.buildPayload_swap_script(
+        u64(0), 
         fromRawAmount, 
         toRawAmount, 
-        bigInt(0), 
+        u64(0), 
         this.lpTag().typeParams
       );
     }
   }
 
   async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
-    const xRawAmt = bigInt((xUiAmt * Math.pow(10, this.xTokenInfo.decimals)).toFixed(0));
-    const yRawAmt = bigInt((yUiAmt * Math.pow(10, this.yTokenInfo.decimals)).toFixed(0));
-    return CPScripts.build_payload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
+    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
+    return CPScripts.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
   }
 
   async makeRemoveLiquidityPayload(
@@ -124,9 +124,9 @@ export class HippoConstantProductPool extends HippoPool {
     lhsMinAmt: UITokenAmount, 
     rhsMinAmt: UITokenAmount,
   ): Promise<TransactionPayload> {
-    const liquidityRawAmt = bigInt(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals));
-    const lhsMinRawAmt = bigInt(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals));
-    const rhsMinRawAmt = bigInt(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals));
-    return CPScripts.build_payload_remove_liquidity_script(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);
+    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
+    const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
+    const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
+    return CPScripts.buildPayload_remove_liquidity_script(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);
   }
 }

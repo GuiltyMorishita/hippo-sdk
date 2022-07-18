@@ -1,15 +1,16 @@
-import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, TypeTag } from "@manahippo/aptos-tsgen";
+import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, TypeTag } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
-import { CPSwap, TokenRegistry, StableCurveSwap, PieceSwap } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
-import { CoinInfo } from "../generated/X0x1/Coin";
+import { CPSwap, StableCurveSwap, PieceSwap } from "../generated/HippoSwap";
+import { TokenRegistry } from "../generated/TokenRegistry";
+import { CoinInfo } from "../generated/AptosFramework/Coin";
 import { typeInfoToTypeTag } from "../utils";
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 import { HippoPieceSwapPool } from "./pieceSwapPool";
-import { PieceSwapPoolInfo } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/PieceSwap";
+import { PieceSwapPoolInfo } from "../generated/HippoSwap/PieceSwap";
 
 
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
@@ -114,7 +115,7 @@ export class HippoSwapClient {
       }
       const coinTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
       const tokenFullname = getTypeTagFullname(coinTypeTag);
-      this.symbolToTokenInfo[tokenInfo.symbol] = tokenInfo;
+      this.symbolToTokenInfo[tokenInfo.symbol.str()] = tokenInfo;
       this.tokenFullnameToTokenInfo[tokenFullname] = tokenInfo;
       if (
         coinTypeTag instanceof StructTag &&
@@ -230,14 +231,14 @@ export class HippoSwapClient {
     // enumarate S such that Step1Routes(X, S).length > 0 && Step1Routes(S, Y) > 0
     const routes: SteppedRoute[] = [];
     for(const S of this.singleTokens) {
-      if([symbolX, symbolY].includes(S.symbol)) {
+      if([symbolX, symbolY].includes(S.symbol.str())) {
         continue;
       }
-      const xToSRoutes = this.get1StepRoutesBySymbol(symbolX, S.symbol);
+      const xToSRoutes = this.get1StepRoutesBySymbol(symbolX, S.symbol.str());
       if (xToSRoutes.length === 0) {
         continue;
       }
-      const sToYRoutes = this.get1StepRoutesBySymbol(S.symbol, symbolY);
+      const sToYRoutes = this.get1StepRoutesBySymbol(S.symbol.str(), symbolY);
       if (xToSRoutes.length === 0) {
         continue;
       }
@@ -261,14 +262,14 @@ export class HippoSwapClient {
     // enumarate S such that Step2Routes(X, S).length > 0 && Step1Routes(S, Y) > 0
     const routes: SteppedRoute[] = [];
     for(const S of this.singleTokens) {
-      if([symbolX, symbolY].includes(S.symbol)) {
+      if([symbolX, symbolY].includes(S.symbol.str())) {
         continue;
       }
-      const xToSRoutes = this.get2StepRoutesBySymbol(symbolX, S.symbol);
+      const xToSRoutes = this.get2StepRoutesBySymbol(symbolX, S.symbol.str());
       if (xToSRoutes.length === 0) {
         continue;
       }
-      const sToYRoutes = this.get1StepRoutesBySymbol(S.symbol, symbolY);
+      const sToYRoutes = this.get1StepRoutesBySymbol(S.symbol.str(), symbolY);
       if (xToSRoutes.length === 0) {
         continue;
       }
@@ -412,13 +413,13 @@ export class HippoSwapClient {
 
   printSelf() {
     for(const token of this.singleTokens) {
-      console.log(`Single token: ${token.symbol}`);
+      console.log(`Single token: ${token.symbol.str()}`);
     }
     for(const pool of this.allPools()) {
       const xTokenInfo = pool.xTokenInfo;
       const yTokenInfo = pool.yTokenInfo;
       console.log("#############")
-      console.log(`Pool: ${xTokenInfo.symbol} <-> ${yTokenInfo.symbol}`);
+      console.log(`Pool: ${xTokenInfo.symbol.str()} <-> ${yTokenInfo.symbol.str()}`);
       console.log(`Type: ${poolTypeToName(pool.getPoolType())}`);
       console.log(`x balance: ${pool.xUiBalance()}`);
       console.log(`y balance: ${pool.yUiBalance()}`);

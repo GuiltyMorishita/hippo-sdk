@@ -1,14 +1,14 @@
-import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag } from "@manahippo/aptos-tsgen";
+import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, u64 } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
-import { MockCoin, TokenRegistry } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
-import * as X0x1 from "../generated/X0x1";
+import { TokenRegistry } from "../generated/TokenRegistry";
+import { MockCoin } from "../generated/HippoSwap";
+import * as AptosFramework from "../generated/AptosFramework";
 import { typeInfoToTypeTag } from "../utils";
-import bigInt from "big-integer";
 
 export async function getCoinStoresForAddress(client: AptosClient, address: HexString, repo: AptosParserRepo) {
   const walletResources = await client.getAccountResources(address);
-  const stores: X0x1.Coin.CoinStore[] = [];
+  const stores: AptosFramework.Coin.CoinStore[] = [];
   for(const resource of walletResources) {
     try{
       const typeTag = parseTypeTagOrThrow(resource.type);
@@ -17,13 +17,13 @@ export async function getCoinStoresForAddress(client: AptosClient, address: HexS
       }
       // we only looking for 0x1::Coin::CoinStore
       if(
-        typeTag.address.hex() !== X0x1.Coin.moduleAddress.hex() ||
-        typeTag.module !== X0x1.Coin.moduleName ||
-        typeTag.name !== X0x1.Coin.CoinStore.structName
+        typeTag.address.hex() !== AptosFramework.Coin.moduleAddress.hex() ||
+        typeTag.module !== AptosFramework.Coin.moduleName ||
+        typeTag.name !== AptosFramework.Coin.CoinStore.structName
       ) {
         continue;
       }
-      const store = repo.parse(resource.data, typeTag) as unknown as X0x1.Coin.CoinStore;
+      const store = repo.parse(resource.data, typeTag) as unknown as AptosFramework.Coin.CoinStore;
       stores.push(store);
     }
     catch(e) {
@@ -36,8 +36,8 @@ export async function getCoinStoresForAddress(client: AptosClient, address: HexS
 
 
 export class HippoWalletClient {
-  public symbolToCoinStore: Record<string, X0x1.Coin.CoinStore>;
-  public fullnameToCoinStore: Record<string, X0x1.Coin.CoinStore>;
+  public symbolToCoinStore: Record<string, AptosFramework.Coin.CoinStore>;
+  public fullnameToCoinStore: Record<string, AptosFramework.Coin.CoinStore>;
   public fullnameToTokenInfo: Record<string, TokenRegistry.TokenInfo>;
   public symbolToTokenInfo: Record<string, TokenRegistry.TokenInfo>;
   public mockCoinSymbols: string[];
@@ -47,7 +47,7 @@ export class HippoWalletClient {
     public repo: AptosParserRepo,
     public registry: TokenRegistry.TokenRegistry,
     public walletAddress: HexString,
-    public coinStores: X0x1.Coin.CoinStore[],
+    public coinStores: AptosFramework.Coin.CoinStore[],
   ) {
     this.symbolToCoinStore = {};
     this.fullnameToCoinStore = {};
@@ -67,7 +67,7 @@ export class HippoWalletClient {
       const typeTag = typeInfoToTypeTag(tokenInfo.token_type);
       const fullname = getTypeTagFullname(typeTag);
       this.fullnameToTokenInfo[fullname] = tokenInfo;
-      this.symbolToTokenInfo[tokenInfo.symbol] = tokenInfo;
+      this.symbolToTokenInfo[tokenInfo.symbol.str()] = tokenInfo;
       if(!(typeTag instanceof StructTag)) {
         throw new Error();
       }
@@ -75,7 +75,7 @@ export class HippoWalletClient {
         typeTag.address.hex() === MockCoin.moduleAddress.hex() &&
         typeTag.module === MockCoin.moduleName
       ) {
-        this.mockCoinSymbols.push(tokenInfo.symbol);
+        this.mockCoinSymbols.push(tokenInfo.symbol.str());
       }
     }
     for(const store of this.coinStores) {
@@ -93,7 +93,7 @@ export class HippoWalletClient {
         // token not part of our registry
         continue;
       }
-      this.symbolToCoinStore[tokenInfo.symbol] = store;
+      this.symbolToCoinStore[tokenInfo.symbol.str()] = store;
     }
   }
 
@@ -121,16 +121,16 @@ export class HippoWalletClient {
     if(!tokenInfo) {
       throw new Error(`Cannot find TokenInfo for ${symbol}`);
     }
-    const rawAmount = bigInt(Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals)))
+    const rawAmount = u64(Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber())))
     const tokenTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
-    return MockCoin.build_payload_faucet_mint_to_script(rawAmount, [tokenTypeTag])
+    return MockCoin.buildPayload_faucet_mint_to_script(rawAmount, [tokenTypeTag])
   }
 
   debugPrint() {
     for(const symbol in this.symbolToCoinStore) {
       const store = this.symbolToCoinStore[symbol];
       const tokenInfo = this.symbolToTokenInfo[symbol];
-      console.log(`${tokenInfo.symbol}: ${store.coin.value.toJSNumber() / Math.pow(10, tokenInfo.decimals)}`);
+      console.log(`${tokenInfo.symbol.str()}: ${store.coin.value.toJsNumber() / Math.pow(10, tokenInfo.decimals.toJsNumber())}`);
     }
   }
 }

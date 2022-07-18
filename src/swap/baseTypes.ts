@@ -1,8 +1,8 @@
-import { getTypeTagFullname, StructTag } from "@manahippo/aptos-tsgen";
+import { getTypeTagFullname, StructTag, u64, u8 } from "@manahippo/move-to-ts";
 import { Types } from "aptos";
 import bigInt from "big-integer";
-import { Router } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8";
-import { TokenInfo } from "../generated/X0xf70ac33c984f8b7bead655ad239d246f1c0e3ca55fe0b8bfc119aa529c4630e8/TokenRegistry";
+import { Router } from "../generated/HippoSwap";
+import { TokenInfo } from "../generated/TokenRegistry/TokenRegistry";
 import { typeInfoToTypeTag } from "../utils";
 
 export type UITokenAmount = number;
@@ -195,8 +195,8 @@ export class SteppedRoute extends TradeRoute {
         finalPrice *= quote.finalPrice;
       }
       return {
-        inputSymbol: this.xTokenInfo.symbol,
-        outputSymbol: this.yTokenInfo.symbol,
+        inputSymbol: this.xTokenInfo.symbol.str(),
+        outputSymbol: this.yTokenInfo.symbol.str(),
         avgPrice,
         initialPrice,
         finalPrice,
@@ -217,15 +217,15 @@ export class SteppedRoute extends TradeRoute {
       const fromTokenInfo = this.steps[0].lhsTokenInfo();
       const middleTokenInfo = this.steps[0].rhsTokenInfo();
       const toTokenInfo = this.steps[1].rhsTokenInfo();
-      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals)).toFixed(0));
-      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals)).toFixed(0));
-      return Promise.resolve(Router.build_payload_two_step_route_script(
-        this.steps[0].pool.getPoolType(),
+      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
+      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+      return Promise.resolve(Router.buildPayload_two_step_route_script(
+        u8(this.steps[0].pool.getPoolType()),
         this.steps[0].isXtoY,
-        this.steps[1].pool.getPoolType(),
+        u8(this.steps[1].pool.getPoolType()),
         this.steps[1].isXtoY,
-        fromRawAmount,
-        toRawAmount,
+        u64(fromRawAmount),
+        u64(toRawAmount),
         [
           typeInfoToTypeTag(fromTokenInfo.token_type),
           typeInfoToTypeTag(middleTokenInfo.token_type),
@@ -237,17 +237,17 @@ export class SteppedRoute extends TradeRoute {
       const middle1TokenInfo = this.steps[0].rhsTokenInfo();
       const middle2TokenInfo = this.steps[1].rhsTokenInfo();
       const toTokenInfo = this.steps[2].rhsTokenInfo();
-      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals)).toFixed(0));
-      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals)).toFixed(0));
-      return Promise.resolve(Router.build_payload_three_step_route_script(
-        this.steps[0].pool.getPoolType(),
+      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
+      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+      return Promise.resolve(Router.buildPayload_three_step_route_script(
+        u8(this.steps[0].pool.getPoolType()),
         this.steps[0].isXtoY,
-        this.steps[1].pool.getPoolType(),
+        u8(this.steps[1].pool.getPoolType()),
         this.steps[1].isXtoY,
-        this.steps[2].pool.getPoolType(),
+        u8(this.steps[2].pool.getPoolType()),
         this.steps[2].isXtoY,
-        fromRawAmount,
-        toRawAmount,
+        u64(fromRawAmount),
+        u64(toRawAmount),
         [
           typeInfoToTypeTag(fromTokenInfo.token_type),
           typeInfoToTypeTag(middle1TokenInfo.token_type),
@@ -280,7 +280,7 @@ export class SteppedRoute extends TradeRoute {
       }
       symbols.push(step.rhsTokenInfo().symbol);
     }
-    return symbols;
+    return symbols.map( s => s.str() );
   }
 
   summarize(): string {

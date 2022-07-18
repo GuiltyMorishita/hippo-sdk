@@ -1,9 +1,9 @@
-import { parseTypeTagOrThrow } from "@manahippo/aptos-tsgen";
-import * as X0x1 from "./generated/X0x1";
+import { parseTypeTagOrThrow, u8str } from "@manahippo/move-to-ts";
+import * as AptosFramework from "./generated/AptosFramework";
 
 
-export function typeInfoToTypeTag(typeInfo: X0x1.TypeInfo.TypeInfo) {
-  const fullname =  `${typeInfo.account_address.hex()}::${typeInfo.module_name.toString()}::${typeInfo.struct_name.toString()}`;
+export function typeInfoToTypeTag(typeInfo: AptosFramework.TypeInfo.TypeInfo) {
+  const fullname =  `${typeInfo.account_address.hex()}::${u8str(typeInfo.module_name)}::${u8str(typeInfo.struct_name)}`;
   return parseTypeTagOrThrow(fullname);
 }
 
