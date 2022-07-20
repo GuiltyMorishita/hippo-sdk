@@ -1,22 +1,36 @@
-import { AptosParserRepo, getTypeTagFullname, StructTag, u64, strToU8 } from "@manahippo/move-to-ts";
+import { AptosParserRepo, getTypeTagFullname, StructTag, u64, strToU8, u8str } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { Command } from "commander";
 import { getProjectRepo } from "../generated";
-import { AptosFramework, HippoSwap } from "../generated/";
+import { AptosFramework, HippoSwap, Econia, Std } from "../generated/";
 import { TokenRegistry } from "../generated/TokenRegistry";
-import { printResource, printResources, typeInfoToTypeTag } from "../utils";
+import { printResource, printResources, typeInfoToTypeTag, typeTagToTypeInfo } from "../utils";
 import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/AptosFramework/Coin";
 import { PoolType } from "../swap/baseTypes";
+import { EconiaClient } from "../aggregator/econia";
+import { Registry } from "../generated/Econia";
+import { MI } from "../generated/Econia/Registry";
 
 
 const actionShowTokenRegistry = async () => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
   const tokens = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
-  printResource(tokens);
+  for(const tokInfo of tokens.token_info_list) {
+    console.log(`########${tokInfo.symbol.str()}#######`);
+    console.log(`name: ${tokInfo.name.str()}`);
+    console.log(`description: ${tokInfo.description.str()}`);
+    console.log(`decimals: ${tokInfo.decimals.toJsNumber()}`);
+    console.log(`logo_url: ${tokInfo.logo_url.str()}`);
+    console.log(`project_url: ${tokInfo.project_url.str()}`);
+    const tagName = getTypeTagFullname(typeInfoToTypeTag(tokInfo.token_type));
+    console.log(`type: ${tagName}`);
+    console.log(`delisted: ${tokInfo.delisted}`);
+    console.log("");
+  }
 }
 
 const actionShowPools = async () => {
@@ -594,5 +608,247 @@ others
   .action(furnishMockTokenDetails);
 
 program.addCommand(others);
+
+// for econia
+
+const ECONIA_ADDR_DEV = new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659");
+
+const econiaListMarkets = async () => {
+  const {client} = readConfig(program);
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const markets = await econia.getMarkets();
+  console.log(`Number of markets: ${markets.length}`);
+  for (const entry of markets) {
+    const [key, value] = entry;
+    console.log(`MARKET###############`);
+    console.log(`LHS: ${u8str(key.b.struct_name)}`);
+    console.log(`RHS: ${u8str(key.q.struct_name)}`);
+    console.log(`owner: ${value}`);
+  }
+}
+
+const econiaListOrders = async (owner: string, base: string, quote: string) => {
+  const {client} = readConfig(program);
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const markets = await econia.getMarkets();
+  for(const entry of markets) {
+    const [mi, ownerHex] = entry;
+    if (ownerHex.hex() === owner && u8str(mi.b.struct_name) === base && u8str(mi.q.struct_name) === quote) {
+      const asks = await econia.getOrders(ownerHex, true, mi);
+      const bids = await econia.getOrders(ownerHex, false, mi);
+      console.log(`Num asks: ${asks.length}`);
+      for(const ask of asks.slice(0, 10).reverse()) {
+        console.log(ask);
+      }
+      console.log(`Num bids: ${bids.length}`);
+      for(const bid of bids.slice(0, 10)) {
+        console.log(bid);
+      }
+      return;
+    }
+  }
+  console.log(`Did not find the market for ${base}-${quote} owned by ${owner}`);
+}
+
+function econiaGetTags(tokRegistry: TokenRegistry.TokenRegistry, base: string, quote: string, exp: string) {
+  const tokenInfos = tokRegistry.token_info_list;
+  const baseTokInfo = tokenInfos.filter(ti => ti.symbol.str() === base)[0] || null;
+  const quoteTokInfo = tokenInfos.filter(ti => ti.symbol.str() === quote)[0] || null;
+  if (!baseTokInfo) {
+    console.log(`${base} not found from our TokenRegistry`);
+    return null;
+  }
+  if (!quoteTokInfo) {
+    console.log(`${quote} not found from our TokenRegistry`);
+    return null;
+  }
+  if (!(exp.length >= 2 && exp.length <= 3 && exp.charAt(0) === "E" && parseInt(exp.substr(1)) <= 19)) {
+    console.log(`Invalid exp: ${exp}, only allow E0 to E19`);
+    return null;
+  }
+  const baseTag = typeInfoToTypeTag(baseTokInfo.token_type);
+  const quoteTag = typeInfoToTypeTag(quoteTokInfo.token_type);
+  const expTag = new StructTag(Registry.moduleAddress, Registry.moduleName, exp, []);
+  return [baseTag, quoteTag, expTag];
+}
+
+function econiaGetMi(tokRegistry: TokenRegistry.TokenRegistry, base: string, quote: string, exp: string) {
+  const tags = econiaGetTags(tokRegistry, base, quote, exp);
+  if (!tags) {
+    return null;
+  }
+  const [baseTag, quoteTag, expTag] = tags;
+  const mi = new MI({
+    b: typeTagToTypeInfo(baseTag),
+    q: typeTagToTypeInfo(quoteTag),
+    e: typeTagToTypeInfo(expTag),
+  }, new StructTag(MI.moduleAddress, MI.moduleName, MI.structName, []))
+  return mi;
+}
+
+const econiaRegisterMarket = async (base: string, quote: string, exp: string) => {
+  const {client, account, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const tags = econiaGetTags(tokRegistry, base, quote, exp);
+  if(!tags){
+    return;
+  }
+  const [baseTag, quoteTag, expTag] = tags;
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const payload = econia.buildPayloadRegisterMarket(baseTag, quoteTag, expTag);
+  await sendPayloadTx(client, account, payload);
+}
+
+const econiaSubmitBid = async (owner: string, base: string, quote: string, exp: string, price: string, size: string) => {
+  const {client, account, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mi = econiaGetMi(tokRegistry, base, quote, exp);
+  if(!mi){
+    return;
+  }
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const ownerHex = new HexString(owner);
+  const p = u64(price);
+  const s = u64(size);
+  const payload = econia.buildPayloadSubmitBid(ownerHex, p, s, mi);
+  console.log(JSON.stringify(payload, null, 2));
+  await sendPayloadTx(client, account, payload);
+}
+
+const econiaSubmitAsk = async (owner: string, base: string, quote: string, exp: string, price: string, size: string) => {
+  const {client, account, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mi = econiaGetMi(tokRegistry, base, quote, exp);
+  if(!mi){
+    return;
+  }
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const ownerHex = new HexString(owner);
+  const p = u64(price);
+  const s = u64(size);
+  const payload = econia.buildPayloadSubmitAsk(ownerHex, p, s, mi);
+  await sendPayloadTx(client, account, payload);
+}
+
+const econiaInitUser = async () => {
+  const {client, account} = readConfig(program);
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const payload = econia.buildPayloadInitUser();
+  await sendPayloadTx(client, account, payload);
+}
+
+const econiaDeposit = async (base: string, quote: string, exp: string, baseAmt: string, quoteAmt: string) => {
+  const {client, account, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mi = econiaGetMi(tokRegistry, base, quote, exp);
+  if(!mi){
+    return;
+  }
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const payload = econia.buildPayloadDeposit(u64(baseAmt), u64(quoteAmt), mi);
+  await sendPayloadTx(client, account, payload);
+}
+
+const econiaWithdraw = async (base: string, quote: string, exp: string, baseAmt: string, quoteAmt: string) => {
+  const {client, account, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mi = econiaGetMi(tokRegistry, base, quote, exp);
+  if(!mi){
+    return;
+  }
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const payload = econia.buildPayloadWithdraw(u64(baseAmt), u64(quoteAmt), mi);
+  await sendPayloadTx(client, account, payload);
+}
+
+const econiaInitContainers = async (base: string, quote: string, exp: string) => {
+  const {client, account, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mi = econiaGetMi(tokRegistry, base, quote, exp);
+  if(!mi){
+    return;
+  }
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const payload = econia.buildPayloadInitContainers(mi);
+  await sendPayloadTx(client, account, payload);
+}
+
+
+const econia = new Command('econia');
+
+econia
+  .command("list-markets")
+  .action(econiaListMarkets)
+
+econia
+  .command("list-orders")
+  .argument("<OWNER_ADDRESS>")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .action(econiaListOrders)
+
+econia
+  .command("register-market")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .argument("<EXP>")
+  .action(econiaRegisterMarket)
+
+econia
+  .command("submit-bid")
+  .argument("<OWNER_ADDRESS>")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .argument("<EXP>")
+  .argument("<price>")
+  .argument("<size>")
+  .action(econiaSubmitBid)
+
+econia
+  .command("submit-ask")
+  .argument("<OWNER_ADDRESS>")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .argument("<EXP>")
+  .argument("<price>")
+  .argument("<size>")
+  .action(econiaSubmitAsk)
+
+econia
+  .command("deposit")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .argument("<EXP>")
+  .argument("<base-amt>")
+  .argument("<quote-qmt>")
+  .action(econiaDeposit)
+
+econia
+  .command("withdraw")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .argument("<EXP>")
+  .argument("<base-amt>")
+  .argument("<quote-qmt>")
+  .action(econiaWithdraw)
+
+econia
+  .command("init-containers")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .argument("<EXP>")
+  .action(econiaInitContainers)
+
+econia
+  .command("init-user")
+  .action(econiaInitUser)
+
+program.addCommand(econia);
 
 program.parse();

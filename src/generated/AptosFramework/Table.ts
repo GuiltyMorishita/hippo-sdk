@@ -245,3 +245,41 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::Table::Table", Table.TableParser);
 }
 
+export class TypedTable<K, V> {
+  static buildFromField<K, V>(table: Table, field: FieldDeclType): TypedTable<K, V> {
+    const tag = field.typeTag;
+    if (!(tag instanceof StructTag)) {
+      throw new Error();
+    }
+    if (tag.getParamlessName() !== '0x1::Table::Table') {
+      throw new Error();
+    }
+    if (tag.typeParams.length !== 2) {
+      throw new Error();
+    }
+    const [keyTag, valueTag] = tag.typeParams;
+    return new TypedTable<K, V>(table, keyTag, valueTag);
+  }
+
+  constructor(
+    public table: Table,
+    public keyTag: TypeTag,
+    public valueTag: TypeTag
+  ) {
+  }
+
+  async loadEntryRaw(client: AptosClient, key: K): Promise<any> {
+    return await client.getTableItem(this.table.handle.value.toString(), {
+      key_type: $.getTypeTagFullname(this.keyTag),
+      value_type: $.getTypeTagFullname(this.valueTag),
+      key: $.moveValueToOpenApiObject(key, this.keyTag),
+    });
+  }
+
+  async loadEntry(client: AptosClient, repo: AptosParserRepo, key: K): Promise<V> {
+    const rawVal = await this.loadEntryRaw(client, key);
+    return repo.parse(rawVal.data, this.valueTag);
+  }
+}
+
+

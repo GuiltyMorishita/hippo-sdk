@@ -270,3 +270,57 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::IterableTable::IterableValue", IterableValue.IterableValueParser);
 }
 
+export class TypedIterableTable<K, V> {
+  static buildFromField<K, V>(table: IterableTable, field: FieldDeclType): TypedIterableTable<K, V> {
+    const tag = field.typeTag;
+    if (!(tag instanceof StructTag)) {
+      throw new Error();
+    }
+    if (tag.getParamlessName() !== '0x1::IterableTable::IterableTable') {
+      throw new Error();
+    }
+    if (tag.typeParams.length !== 2) {
+      throw new Error();
+    }
+    const [keyTag, valueTag] = tag.typeParams;
+    return new TypedIterableTable<K, V>(table, keyTag, valueTag);
+  }
+
+  iterValueTag: StructTag;
+  constructor(
+    public table: IterableTable,
+    public keyTag: TypeTag,
+    public valueTag: TypeTag
+  ) {
+    this.iterValueTag = new StructTag(moduleAddress, moduleName, "IterableValue", [keyTag, valueTag])
+  }
+
+  async loadEntryRaw(client: AptosClient, key: K): Promise<any> {
+    return await client.getTableItem(this.table.inner.handle.value.toString(), {
+      key_type: $.getTypeTagFullname(this.keyTag),
+      value_type: $.getTypeTagFullname(this.iterValueTag),
+      key: $.moveValueToOpenApiObject(key, this.keyTag),
+    });
+  }
+
+  async loadEntry(client: AptosClient, repo: AptosParserRepo, key: K): Promise<IterableValue> {
+    const rawVal = await this.loadEntryRaw(client, key);
+    return repo.parse(rawVal.data, this.iterValueTag) as IterableValue;
+  }
+
+  async fetchAll(client: AptosClient, repo: AptosParserRepo): Promise<[K, V][]> {
+    const result: [K, V][] = [];
+    const cache = new $.DummyCache();
+    let next = this.table.head;
+    while(next && Std.Option.is_some$(next, cache, [this.keyTag])) {
+      const key = Std.Option.borrow$(next, cache, [this.keyTag]) as K;
+      const iterVal = await this.loadEntry(client, repo, key);
+      const value = iterVal.val as V;
+      result.push([key, value]);
+      next = iterVal.next;
+    }
+    return result;
+  }
+}
+
+
