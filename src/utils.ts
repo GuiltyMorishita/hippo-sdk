@@ -18,6 +18,12 @@ export function typeTagToTypeInfo(tag: TypeTag): AptosFramework.TypeInfo.TypeInf
   }, new StructTag(AptosFramework.TypeInfo.moduleAddress, AptosFramework.TypeInfo.moduleName, AptosFramework.TypeInfo.TypeInfo.structName, []))
 }
 
+export function isTypeInfoSame(ti1: AptosFramework.TypeInfo.TypeInfo, ti2: AptosFramework.TypeInfo.TypeInfo) {
+  return ti1.account_address.toShortString() === ti2.account_address.toShortString() &&
+    u8str(ti1.module_name) === u8str(ti2.module_name) && 
+    u8str(ti1.struct_name) === u8str(ti2.struct_name);
+}
+
 export function printResource(resource: any) {
   console.log(JSON.stringify(resource, null, 2));
 }

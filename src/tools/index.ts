@@ -1,10 +1,10 @@
-import { AptosParserRepo, getTypeTagFullname, StructTag, u64, strToU8, u8str } from "@manahippo/move-to-ts";
+import { AptosParserRepo, getTypeTagFullname, StructTag, u64, strToU8, u8str, DummyCache } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { Command } from "commander";
 import { getProjectRepo } from "../generated";
 import { AptosFramework, HippoSwap, Econia, Std } from "../generated/";
 import { TokenRegistry } from "../generated/TokenRegistry";
-import { printResource, printResources, typeInfoToTypeTag, typeTagToTypeInfo } from "../utils";
+import { isTypeInfoSame, printResource, printResources, typeInfoToTypeTag, typeTagToTypeInfo } from "../utils";
 import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
@@ -13,6 +13,7 @@ import { PoolType } from "../swap/baseTypes";
 import { EconiaClient } from "../aggregator/econia";
 import { Registry } from "../generated/Econia";
 import { MI } from "../generated/Econia/Registry";
+import { get_price_levels$ } from "../generated/Econia/Book";
 
 
 const actionShowTokenRegistry = async () => {
@@ -628,12 +629,18 @@ const econiaListMarkets = async () => {
 }
 
 const econiaListOrders = async (owner: string, base: string, quote: string) => {
-  const {client} = readConfig(program);
+  const {client, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
   const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mii = econiaGetMi(tokRegistry, base, quote, "E0");
+  if (!mii) {
+    return;
+  }
   const markets = await econia.getMarkets();
   for(const entry of markets) {
     const [mi, ownerHex] = entry;
-    if (ownerHex.hex() === owner && u8str(mi.b.struct_name) === base && u8str(mi.q.struct_name) === quote) {
+    if (ownerHex.hex() === owner && isTypeInfoSame(mii.b, mi.b) && isTypeInfoSame(mii.q, mi.q) ) {
       const asks = await econia.getOrders(ownerHex, true, mi);
       const bids = await econia.getOrders(ownerHex, false, mi);
       console.log(`Num asks: ${asks.length}`);
@@ -643,6 +650,36 @@ const econiaListOrders = async (owner: string, base: string, quote: string) => {
       console.log(`Num bids: ${bids.length}`);
       for(const bid of bids.slice(0, 10)) {
         console.log(bid);
+      }
+      return;
+    }
+  }
+  console.log(`Did not find the market for ${base}-${quote} owned by ${owner}`);
+}
+
+const econiaListLevels = async (owner: string, base: string, quote: string) => {
+  const {client, contractAddress} = readConfig(program);
+  const repo = getProjectRepo();
+  const tokRegistry = await TokenRegistry.TokenRegistry.load(repo, client, contractAddress, []);
+  const mii = econiaGetMi(tokRegistry, base, quote, "E0");
+  if (!mii) {
+    return;
+  }
+  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
+  const markets = await econia.getMarkets();
+  const cache = new DummyCache();
+  for(const entry of markets) {
+    const [mi, ownerHex] = entry;
+    if (ownerHex.hex() === owner && isTypeInfoSame(mii.b, mi.b) && isTypeInfoSame(mii.q, mi.q) ) {
+      const asks = await econia.getOrders(ownerHex, true, mi);
+      const bids = await econia.getOrders(ownerHex, false, mi);
+      const askLevels = get_price_levels$(asks, cache);
+      const bidLevels = get_price_levels$(bids, cache);
+      for(const askLevel of askLevels.reverse()) {
+        console.log(`ASK: ${askLevel.price.toJsNumber()}  | ${askLevel.size.toJsNumber()}`);
+      }
+      for(const bidLevel of bidLevels) {
+        console.log(`BID: ${bidLevel.price.toJsNumber()}  | ${bidLevel.size.toJsNumber()}`);
       }
       return;
     }
@@ -792,6 +829,13 @@ econia
   .argument("<BASE_SYMBOL>")
   .argument("<QUOTE_SYMBOL>")
   .action(econiaListOrders)
+
+econia
+  .command("list-levels")
+  .argument("<OWNER_ADDRESS>")
+  .argument("<BASE_SYMBOL>")
+  .argument("<QUOTE_SYMBOL>")
+  .action(econiaListLevels)
 
 econia
   .command("register-market")
