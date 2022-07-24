@@ -1,8 +1,7 @@
 import { u64 } from '@manahippo/move-to-ts';
 import { TransactionPayload } from 'aptos/dist/api/data-contracts';
-import bigInt from 'big-integer';
-import { StableCurveScripts, StableCurveSwap } from '../generated/HippoSwap';
-import { TokenInfo } from '../generated/TokenRegistry/TokenRegistry';
+import { stable_curve_scripts$_, stable_curve_swap$_ } from '../generated/hippo_swap';
+import { TokenInfo } from '../generated/token_registry/token_registry';
 import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
 
 export class HippoStableCurvePool extends HippoPool {
@@ -11,7 +10,7 @@ export class HippoStableCurvePool extends HippoPool {
     xTokenInfo: TokenInfo,
     yTokenInfo: TokenInfo,
     lpTokenInfo: TokenInfo,
-    public stablePoolInfo: StableCurveSwap.StableCurvePoolInfo,
+    public stablePoolInfo: stable_curve_swap$_.StableCurvePoolInfo,
   ) {
     super(xTokenInfo, yTokenInfo, lpTokenInfo);
   }
@@ -155,7 +154,7 @@ export class HippoStableCurvePool extends HippoPool {
     const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
     const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
     if(isXtoY) {
-      return StableCurveScripts.buildPayload_swap_script(
+      return stable_curve_scripts$_.buildPayload_swap_script(
         fromRawAmount,
         u64(0),
         u64(0),
@@ -164,7 +163,7 @@ export class HippoStableCurvePool extends HippoPool {
       );
     }
     else {
-      return StableCurveScripts.buildPayload_swap_script(
+      return stable_curve_scripts$_.buildPayload_swap_script(
         u64(0),
         fromRawAmount,
         toRawAmount,
@@ -177,7 +176,7 @@ export class HippoStableCurvePool extends HippoPool {
   async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
     const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
     const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
-    return StableCurveScripts.buildPayload_add_liquidity(xRawAmt, yRawAmt, this.lpTag().typeParams);
+    return stable_curve_scripts$_.buildPayload_add_liquidity(xRawAmt, yRawAmt, this.lpTag().typeParams);
   }
 
   async makeRemoveLiquidityPayload(
@@ -188,6 +187,6 @@ export class HippoStableCurvePool extends HippoPool {
     const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
     const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
     const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
-    return StableCurveScripts.buildPayload_remove_liquidity(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);
+    return stable_curve_scripts$_.buildPayload_remove_liquidity(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);
   }
 }

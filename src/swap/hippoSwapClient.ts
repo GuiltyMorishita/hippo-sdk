@@ -2,34 +2,34 @@ import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, Ty
 import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
-import { CPSwap, StableCurveSwap, PieceSwap } from "../generated/HippoSwap";
-import { TokenRegistry } from "../generated/TokenRegistry";
-import { CoinInfo } from "../generated/AptosFramework/Coin";
+import { cp_swap$_, stable_curve_swap$_, piece_swap$_ } from "../generated/hippo_swap";
+import { token_registry$_ } from "../generated/token_registry";
+import { CoinInfo } from "../generated/aptos_framework/coin";
 import { typeInfoToTypeTag } from "../utils";
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 import { HippoPieceSwapPool } from "./pieceSwapPool";
-import { PieceSwapPoolInfo } from "../generated/HippoSwap/PieceSwap";
+import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
 
 
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
   const resources = await client.getAccountResources(netConf.contractAddress);
-  let registry: TokenRegistry.TokenRegistry | null = null;
-  const cpMetas: CPSwap.TokenPairMetadata[] = [];
-  const stablePoolInfos: StableCurveSwap.StableCurvePoolInfo[] = [];
+  let registry: token_registry$_.TokenRegistry | null = null;
+  const cpMetas: cp_swap$_.TokenPairMetadata[] = [];
+  const stablePoolInfos: stable_curve_swap$_.StableCurvePoolInfo[] = [];
   const piecePoolInfos: PieceSwapPoolInfo[] = [];
   for(const resource of resources) {
     try{
       const typeTag = parseTypeTagOrThrow(resource.type);
       const parsed = repo.parse(resource.data, typeTag);
-      if (parsed instanceof TokenRegistry.TokenRegistry) {
+      if (parsed instanceof token_registry$_.TokenRegistry) {
         registry = parsed;
       }
-      else if(parsed instanceof CPSwap.TokenPairMetadata) {
+      else if(parsed instanceof cp_swap$_.TokenPairMetadata) {
         cpMetas.push(parsed);
       }
-      else if(parsed instanceof StableCurveSwap.StableCurvePoolInfo) {
+      else if(parsed instanceof stable_curve_swap$_.StableCurvePoolInfo) {
         stablePoolInfos.push(parsed);
       }
       else if(parsed instanceof PieceSwapPoolInfo) {
@@ -64,11 +64,11 @@ export class PoolSet {
 
 export class HippoSwapClient {
   // supported single tokens
-  public singleTokens: TokenRegistry.TokenInfo[];
+  public singleTokens: token_registry$_.TokenInfo[];
   // maps TokenInfo.symbol to TokenInfo
-  public symbolToTokenInfo: Record<string, TokenRegistry.TokenInfo>;
+  public symbolToTokenInfo: Record<string, token_registry$_.TokenInfo>;
   // maps token-struct-fullname to TokenInfo
-  public tokenFullnameToTokenInfo: Record<string, TokenRegistry.TokenInfo>;
+  public tokenFullnameToTokenInfo: Record<string, token_registry$_.TokenInfo>;
   // maps `${xToken-struct-fullname}<->${yToken-struct-fullname}` to HippoPool[]
   public xyFullnameToPoolSet: Record<string, PoolSet>;
   public contractAddress: HexString;
@@ -88,10 +88,10 @@ export class HippoSwapClient {
   constructor(
     public netConfig: NetworkConfiguration,
     public aptosClient: AptosClient,
-    public tokenList:  TokenRegistry.TokenInfo[],
-    public cpMetas: CPSwap.TokenPairMetadata[],
-    public stablePoolInfos: StableCurveSwap.StableCurvePoolInfo[],
-    public piecePoolInfos: PieceSwap.PieceSwapPoolInfo[],
+    public tokenList:  token_registry$_.TokenInfo[],
+    public cpMetas: cp_swap$_.TokenPairMetadata[],
+    public stablePoolInfos: stable_curve_swap$_.StableCurvePoolInfo[],
+    public piecePoolInfos: piece_swap$_.PieceSwapPoolInfo[],
     public repo: AptosParserRepo,
   ) {
     // init cached maps/lists
@@ -120,7 +120,7 @@ export class HippoSwapClient {
       if (
         coinTypeTag instanceof StructTag &&
         coinTypeTag.address.hex() === this.contractAddress.hex() &&
-        [CPSwap.moduleName, StableCurveSwap.moduleName, PieceSwap.moduleName].includes(coinTypeTag.module)
+        [cp_swap$_.moduleName, stable_curve_swap$_.moduleName, piece_swap$_.moduleName].includes(coinTypeTag.module)
       ) {
         // lp token
         continue;
@@ -157,23 +157,23 @@ export class HippoSwapClient {
     return {xTokenInfo, yTokenInfo, xTag, yTag};
   }
 
-  private setCPPool(cpMeta: CPSwap.TokenPairMetadata) {
+  private setCPPool(cpMeta: cp_swap$_.TokenPairMetadata) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(cpMeta);
-    const lpTag = new StructTag(CPSwap.moduleAddress, CPSwap.moduleName, CPSwap.LPToken.structName, [xTag, yTag]);
+    const lpTag = new StructTag(cp_swap$_.moduleAddress, cp_swap$_.moduleName, cp_swap$_.LPToken.structName, [xTag, yTag]);
     const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoConstantProductPool(xTokenInfo, yTokenInfo, lpTokenInfo, cpMeta));
   }
 
-  private setStableCurvePool(stablePool: StableCurveSwap.StableCurvePoolInfo) {
+  private setStableCurvePool(stablePool: stable_curve_swap$_.StableCurvePoolInfo) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(stablePool);
-    const lpTag = new StructTag(StableCurveSwap.moduleAddress, StableCurveSwap.moduleName, StableCurveSwap.LPToken.structName, [xTag, yTag]);
+    const lpTag = new StructTag(stable_curve_swap$_.moduleAddress, stable_curve_swap$_.moduleName, stable_curve_swap$_.LPToken.structName, [xTag, yTag]);
     const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoStableCurvePool(xTokenInfo, yTokenInfo, lpTokenInfo, stablePool));
   }
 
-  private setPiecePool(piecePool: PieceSwap.PieceSwapPoolInfo) {
+  private setPiecePool(piecePool: piece_swap$_.PieceSwapPoolInfo) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(piecePool);
-    const lpTag = new StructTag(PieceSwap.moduleAddress, PieceSwap.moduleName, PieceSwap.LPToken.structName, [xTag, yTag]);
+    const lpTag = new StructTag(piece_swap$_.moduleAddress, piece_swap$_.moduleName, piece_swap$_.LPToken.structName, [xTag, yTag]);
     const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoPieceSwapPool(xTokenInfo, yTokenInfo, lpTokenInfo, piecePool));
   }
@@ -365,9 +365,9 @@ export class HippoSwapClient {
     const tagFullname = getTypeTagFullname(tag);
     const resource = await this.aptosClient.getAccountResource(this.contractAddress, tagFullname);
     const parsed = this.repo.parse(resource.data, tag);
-    if (parsed instanceof CPSwap.TokenPairMetadata) {
+    if (parsed instanceof cp_swap$_.TokenPairMetadata) {
       this.setCPPool(parsed);
-    } else if (parsed instanceof StableCurveSwap.StableCurvePoolInfo) {
+    } else if (parsed instanceof stable_curve_swap$_.StableCurvePoolInfo) {
       this.setStableCurvePool(parsed);
     }
     else {
@@ -394,7 +394,7 @@ export class HippoSwapClient {
     return `${xFullname}<->${yFullname}`;
   }
 
-  async getTokenTotalSupply(tokenInfo: TokenRegistry.TokenInfo) {
+  async getTokenTotalSupply(tokenInfo: token_registry$_.TokenInfo) {
     const coinTag = typeInfoToTypeTag(tokenInfo.token_type);
     const coinInfo = await CoinInfo.load(this.repo, this.aptosClient, this.netConfig.contractAddress, [coinTag]);
     if (coinInfo.supply.vec.length > 0) {

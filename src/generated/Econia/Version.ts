@@ -1,13 +1,13 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as Std from "../Std";
+import * as std$_ from "../std";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659");
+export const moduleAddress = new HexString("0xc0deb00c");
 export const moduleName = "Version";
 
 export const E_MC_EXISTS : U64 = u64("1");
@@ -45,7 +45,7 @@ export function get_updated_mock_version_number$ (
   $c: AptosDataCache,
 ): U64 {
   let v_n;
-  v_n = $c.borrow_global_mut<MC>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Version", "MC", []), new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659")).i;
+  v_n = $c.borrow_global_mut<MC>(new StructTag(new HexString("0xc0deb00c"), "Version", "MC", []), new HexString("0xc0deb00c")).i;
   $.set(v_n, $.copy(v_n).add(u64("1")));
   return $.copy(v_n);
 }
@@ -61,18 +61,18 @@ export function init_mock_version_number$ (
   $c: AptosDataCache,
 ): void {
   let addr;
-  addr = Std.Signer.address_of$(account, $c);
-  if (!($.copy(addr).hex() === new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659").hex())) {
+  addr = std$_.signer$_.address_of$(account, $c);
+  if (!($.copy(addr).hex() === new HexString("0xc0deb00c").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  if (!!$c.exists(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Version", "MC", []), $.copy(addr))) {
+  if (!!$c.exists(new StructTag(new HexString("0xc0deb00c"), "Version", "MC", []), $.copy(addr))) {
     throw $.abortCode(E_MC_EXISTS);
   }
-  $c.move_to(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Version", "MC", []), account, new MC({ i: u64("0") }, new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Version", "MC", [])));
+  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Version", "MC", []), account, new MC({ i: u64("0") }, new StructTag(new HexString("0xc0deb00c"), "Version", "MC", [])));
   return;
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659::Version::MC", MC.MCParser);
+  repo.addParser("0xc0deb00c::Version::MC", MC.MCParser);
 }
 

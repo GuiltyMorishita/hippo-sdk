@@ -1,42 +1,42 @@
 
 import { AptosParserRepo } from "@manahippo/move-to-ts";
-import * as Book from './Book';
-import * as Caps from './Caps';
-import * as Coins from './Coins';
-import * as CritBit from './CritBit';
-import * as ID from './ID';
-import * as Init from './Init';
-import * as Match from './Match';
-import * as Orders from './Orders';
-import * as Registry from './Registry';
-import * as User from './User';
-import * as Version from './Version';
+import * as Book$_ from './Book';
+import * as Caps$_ from './Caps';
+import * as Coins$_ from './Coins';
+import * as CritBit$_ from './CritBit';
+import * as ID$_ from './ID';
+import * as Init$_ from './Init';
+import * as Match$_ from './Match';
+import * as Orders$_ from './Orders';
+import * as Registry$_ from './Registry';
+import * as User$_ from './User';
+import * as Version$_ from './Version';
 
-export * as Book from './Book';
-export * as Caps from './Caps';
-export * as Coins from './Coins';
-export * as CritBit from './CritBit';
-export * as ID from './ID';
-export * as Init from './Init';
-export * as Match from './Match';
-export * as Orders from './Orders';
-export * as Registry from './Registry';
-export * as User from './User';
-export * as Version from './Version';
+export * as Book$_ from './Book';
+export * as Caps$_ from './Caps';
+export * as Coins$_ from './Coins';
+export * as CritBit$_ from './CritBit';
+export * as ID$_ from './ID';
+export * as Init$_ from './Init';
+export * as Match$_ from './Match';
+export * as Orders$_ from './Orders';
+export * as Registry$_ from './Registry';
+export * as User$_ from './User';
+export * as Version$_ from './Version';
 
 
 export function loadParsers(repo: AptosParserRepo) {
-  Book.loadParsers(repo);
-  Caps.loadParsers(repo);
-  Coins.loadParsers(repo);
-  CritBit.loadParsers(repo);
-  ID.loadParsers(repo);
-  Init.loadParsers(repo);
-  Match.loadParsers(repo);
-  Orders.loadParsers(repo);
-  Registry.loadParsers(repo);
-  User.loadParsers(repo);
-  Version.loadParsers(repo);
+  Book$_.loadParsers(repo);
+  Caps$_.loadParsers(repo);
+  Coins$_.loadParsers(repo);
+  CritBit$_.loadParsers(repo);
+  ID$_.loadParsers(repo);
+  Init$_.loadParsers(repo);
+  Match$_.loadParsers(repo);
+  Orders$_.loadParsers(repo);
+  Registry$_.loadParsers(repo);
+  User$_.loadParsers(repo);
+  Version$_.loadParsers(repo);
 }
 
 export function getPackageRepo(): AptosParserRepo {

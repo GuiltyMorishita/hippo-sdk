@@ -1,7 +1,7 @@
 import { u64 } from '@manahippo/move-to-ts';
 import { TransactionPayload } from 'aptos/dist/api/data-contracts';
-import { CPScripts, CPSwap } from '../generated/HippoSwap';
-import { TokenInfo } from '../generated/TokenRegistry/TokenRegistry';
+import { cp_scripts$_, cp_swap$_ } from '../generated/hippo_swap';
+import { TokenInfo } from '../generated/token_registry/token_registry';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 
 export class HippoConstantProductPool extends HippoPool {
@@ -9,7 +9,7 @@ export class HippoConstantProductPool extends HippoPool {
     xTokenInfo: TokenInfo,
     yTokenInfo: TokenInfo,
     lpTokenInfo: TokenInfo,
-    public cpPoolMeta: CPSwap.TokenPairMetadata,
+    public cpPoolMeta: cp_swap$_.TokenPairMetadata,
   ) {
     super(xTokenInfo, yTokenInfo, lpTokenInfo);
   }
@@ -94,7 +94,7 @@ export class HippoConstantProductPool extends HippoPool {
     const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
     const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
     if(isXtoY) {
-      return CPScripts.buildPayload_swap_script(
+      return cp_scripts$_.buildPayload_swap_script(
         fromRawAmount, 
         u64(0), 
         u64(0), 
@@ -103,7 +103,7 @@ export class HippoConstantProductPool extends HippoPool {
       );
     }
     else {
-      return CPScripts.buildPayload_swap_script(
+      return cp_scripts$_.buildPayload_swap_script(
         u64(0), 
         fromRawAmount, 
         toRawAmount, 
@@ -116,7 +116,7 @@ export class HippoConstantProductPool extends HippoPool {
   async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
     const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
     const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
-    return CPScripts.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
+    return cp_scripts$_.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
   }
 
   async makeRemoveLiquidityPayload(
@@ -127,6 +127,6 @@ export class HippoConstantProductPool extends HippoPool {
     const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
     const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
     const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
-    return CPScripts.buildPayload_remove_liquidity_script(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);
+    return cp_scripts$_.buildPayload_remove_liquidity_script(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);
   }
 }

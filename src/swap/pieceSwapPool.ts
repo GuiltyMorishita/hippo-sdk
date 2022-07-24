@@ -1,8 +1,8 @@
 import { u64 } from '@manahippo/move-to-ts';
 import { TransactionPayload } from 'aptos/dist/api/data-contracts';
-import { PieceSwapScript } from '../generated/HippoSwap';
-import { PieceSwapPoolInfo } from '../generated/HippoSwap/PieceSwap';
-import { TokenInfo } from '../generated/TokenRegistry/TokenRegistry';
+import { piece_swap_script$_ } from '../generated/hippo_swap';
+import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
+import { TokenInfo } from '../generated/token_registry/token_registry';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 
 export class HippoPieceSwapPool extends HippoPool {
@@ -110,7 +110,7 @@ export class HippoPieceSwapPool extends HippoPool {
     const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
     const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
     if(isXtoY) {
-      return PieceSwapScript.buildPayload_swap_script(
+      return piece_swap_script$_.buildPayload_swap_script(
         fromRawAmount, 
         u64(0), 
         u64(0), 
@@ -119,7 +119,7 @@ export class HippoPieceSwapPool extends HippoPool {
       );
     }
     else {
-      return PieceSwapScript.buildPayload_swap_script(
+      return piece_swap_script$_.buildPayload_swap_script(
         u64(0), 
         fromRawAmount, 
         toRawAmount, 
@@ -132,7 +132,7 @@ export class HippoPieceSwapPool extends HippoPool {
   async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
     const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
     const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
-    return PieceSwapScript.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
+    return piece_swap_script$_.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
   }
 
   async makeRemoveLiquidityPayload(
@@ -141,7 +141,7 @@ export class HippoPieceSwapPool extends HippoPool {
     _rhsMinAmt: UITokenAmount,
   ): Promise<TransactionPayload> {
     const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
-    return PieceSwapScript.buildPayload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams);
+    return piece_swap_script$_.buildPayload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams);
   }
 
 

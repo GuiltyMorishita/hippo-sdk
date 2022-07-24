@@ -1,14 +1,14 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as Std from "../Std";
-import * as CritBit from "./CritBit";
+import * as std$_ from "../std";
+import * as CritBit$_ from "./CritBit";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659");
+export const moduleAddress = new HexString("0xc0deb00c");
 export const moduleName = "Orders";
 
 export const ASK : boolean = true;
@@ -58,17 +58,17 @@ export class OO
   ];
   static fields: FieldDeclType[] = [
   { name: "f", typeTag: AtomicTypeTag.U64 },
-  { name: "a", typeTag: new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "CritBit", "CB", [AtomicTypeTag.U64]) },
-  { name: "b", typeTag: new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "CritBit", "CB", [AtomicTypeTag.U64]) }];
+  { name: "a", typeTag: new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [AtomicTypeTag.U64]) },
+  { name: "b", typeTag: new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [AtomicTypeTag.U64]) }];
 
   f: U64;
-  a: CritBit.CB;
-  b: CritBit.CB;
+  a: CritBit$_.CB;
+  b: CritBit$_.CB;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.f = proto['f'] as U64;
-    this.a = proto['a'] as CritBit.CB;
-    this.b = proto['b'] as CritBit.CB;
+    this.a = proto['a'] as CritBit$_.CB;
+    this.b = proto['b'] as CritBit$_.CB;
   }
 
   static OOParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : OO {
@@ -124,7 +124,7 @@ export function add_order$ (
   if (!exists_orders$($.copy(addr), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_NO_ORDERS);
   }
-  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
   s_f = $.copy(o_o.f);
   base_subunits = u128($.copy(size)).mul(u128($.copy(s_f)));
   if (!!$.copy(base_subunits).gt(u128(HI_64))) {
@@ -135,10 +135,10 @@ export function add_order$ (
     throw $.abortCode(E_QUOTE_OVERFLOW);
   }
   if ((side == ASK)) {
-    CritBit.insert$(o_o.a, $.copy(id), $.copy(size), $c, [AtomicTypeTag.U64] as TypeTag[]);
+    CritBit$_.insert$(o_o.a, $.copy(id), $.copy(size), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
   else{
-    CritBit.insert$(o_o.b, $.copy(id), $.copy(size), $c, [AtomicTypeTag.U64] as TypeTag[]);
+    CritBit$_.insert$(o_o.b, $.copy(id), $.copy(size), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
   return [u64($.copy(base_subunits)), u64($.copy(quote_subunits))];
 }
@@ -174,18 +174,18 @@ export function cancel_order$ (
   if (!exists_orders$($.copy(addr), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_NO_ORDERS);
   }
-  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
   if ((side == ASK)) {
-    if (!CritBit.has_key$(o_o.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[])) {
+    if (!CritBit$_.has_key$(o_o.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[])) {
       throw $.abortCode(E_NO_SUCH_ORDER);
     }
-    return CritBit.pop$(o_o.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
+    return CritBit$_.pop$(o_o.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
   else{
-    if (!CritBit.has_key$(o_o.b, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[])) {
+    if (!CritBit$_.has_key$(o_o.b, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[])) {
       throw $.abortCode(E_NO_SUCH_ORDER);
     }
-    return CritBit.pop$(o_o.b, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
+    return CritBit$_.pop$(o_o.b, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
 }
 
@@ -200,13 +200,13 @@ export function decrement_order_size$ (
 ): void {
   let temp$1, order_size, tree;
   if ((side == ASK)) {
-    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).a;
+    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).a;
   }
   else{
-    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).b;
+    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).b;
   }
   tree = temp$1;
-  order_size = CritBit.borrow_mut$(tree, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
+  order_size = CritBit$_.borrow_mut$(tree, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
   $.set(order_size, $.copy(order_size).sub($.copy(amount)));
   return;
 }
@@ -216,17 +216,17 @@ export function exists_orders$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(a));
+  return $c.exists(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(a));
 }
 
 export function get_friend_cap$ (
   account: HexString,
   $c: AptosDataCache,
 ): FriendCap {
-  if (!(Std.Signer.address_of$(account, $c).hex() === new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659").hex())) {
+  if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0xc0deb00c").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  return new FriendCap({  }, new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "FriendCap", []));
+  return new FriendCap({  }, new StructTag(new HexString("0xc0deb00c"), "Orders", "FriendCap", []));
 }
 
 export function init_orders$ (
@@ -237,11 +237,11 @@ export function init_orders$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let o_o;
-  if (!!exists_orders$(Std.Signer.address_of$(user, $c), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
+  if (!!exists_orders$(std$_.signer$_.address_of$(user, $c), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_ORDERS_EXISTS);
   }
-  o_o = new OO({ f: $.copy(f), a: CritBit.empty$($c, [AtomicTypeTag.U64] as TypeTag[]), b: CritBit.empty$($c, [AtomicTypeTag.U64] as TypeTag[]) }, new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]));
-  $c.move_to(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), user, o_o);
+  o_o = new OO({ f: $.copy(f), a: CritBit$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]), b: CritBit$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]));
+  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), user, o_o);
   return;
 }
 
@@ -254,12 +254,12 @@ export function remove_order$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let open_orders;
-  open_orders = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr));
+  open_orders = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr));
   if ((side == ASK)) {
-    CritBit.pop$(open_orders.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
+    CritBit$_.pop$(open_orders.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
   else{
-    CritBit.pop$(open_orders.b, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
+    CritBit$_.pop$(open_orders.b, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
   return;
 }
@@ -270,11 +270,11 @@ export function scale_factor$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): U64 {
-  return $.copy($c.borrow_global<OO>(new StructTag(new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr)).f);
+  return $.copy($c.borrow_global<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr)).f);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659::Orders::FriendCap", FriendCap.FriendCapParser);
-  repo.addParser("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659::Orders::OO", OO.OOParser);
+  repo.addParser("0xc0deb00c::Orders::FriendCap", FriendCap.FriendCapParser);
+  repo.addParser("0xc0deb00c::Orders::OO", OO.OOParser);
 }
 
