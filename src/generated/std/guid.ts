@@ -6,7 +6,7 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
 import * as signer$_ from "./signer";
-export const packageName = "MoveNursery";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "guid";
 

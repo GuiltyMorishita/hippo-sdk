@@ -119,6 +119,7 @@ export class PieceSwapPoolInfo
     const result = await repo.loadResource(client, address, PieceSwapPoolInfo, typeParams);
     return result as unknown as PieceSwapPoolInfo;
   }
+
 }
 export function add_liquidity$ (
   sender: HexString,

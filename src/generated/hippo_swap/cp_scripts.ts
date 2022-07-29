@@ -6,8 +6,8 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
 import * as aptos_framework$_ from "../aptos_framework";
+import * as coin_registry$_ from "../coin_registry";
 import * as std$_ from "../std";
-import * as token_registry$_ from "../token_registry";
 import * as cp_swap$_ from "./cp_swap";
 import * as math$_ from "./math";
 import * as mock_coin$_ from "./mock_coin";
@@ -52,6 +52,7 @@ export function buildPayload_add_liquidity_script (
   );
 
 }
+
 export function create_new_pool$ (
   sender: HexString,
   fee_to: HexString,
@@ -66,25 +67,25 @@ export function create_new_pool$ (
 ): void {
   let admin_addr, decimals, decimals__1;
   admin_addr = std$_.signer$_.address_of$(sender, $c);
-  if (!token_registry$_.token_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
+  if (!coin_registry$_.coin_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
     throw $.abortCode(E_TOKEN_REGISTRY_NOT_INITIALIZED);
   }
-  if (!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [$p[0]] as TypeTag[])) {
+  if (!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [$p[0]] as TypeTag[])) {
     throw $.abortCode(E_TOKEN_X_NOT_REGISTERED);
   }
-  if (!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [$p[1]] as TypeTag[])) {
+  if (!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [$p[1]] as TypeTag[])) {
     throw $.abortCode(E_TOKEN_Y_NOT_REGISTERED);
   }
-  if (!!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[])) {
+  if (!!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[])) {
     throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
   }
-  if (!!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[1], $p[0]])] as TypeTag[])) {
+  if (!!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[1], $p[0]])] as TypeTag[])) {
     throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
   }
   decimals = math$_.max$(u128(aptos_framework$_.coin$_.decimals$($c, [$p[0]] as TypeTag[])), u128(aptos_framework$_.coin$_.decimals$($c, [$p[1]] as TypeTag[])), $c);
   decimals__1 = u64($.copy(decimals));
   cp_swap$_.create_token_pair$(sender, $.copy(fee_to), fee_on, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $c, [$p[0], $p[1]] as TypeTag[]);
-  token_registry$_.token_registry$_.add_token$(sender, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8($.copy(decimals__1)), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[]);
+  coin_registry$_.coin_registry$_.add_token$(sender, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8($.copy(decimals__1)), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[]);
   return;
 }
 
@@ -131,6 +132,7 @@ export function buildPayload_create_new_pool_script (
   );
 
 }
+
 export function init_coin_and_create_store$ (
   admin: HexString,
   name: U8[],
@@ -140,7 +142,7 @@ export function init_coin_and_create_store$ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   mock_coin$_.initialize$(admin, u64("8"), $c, [$p[0]] as TypeTag[]);
-  token_registry$_.token_registry$_.add_token$(admin, $.copy(name), $.copy(symbol), $.copy(name), $.copy(decimals), [], [], $c, [$p[0]] as TypeTag[]);
+  coin_registry$_.coin_registry$_.add_token$(admin, $.copy(name), $.copy(symbol), $.copy(name), $.copy(decimals), [], [], $c, [$p[0]] as TypeTag[]);
   return;
 }
 
@@ -179,8 +181,8 @@ export function mock_deploy_script$ (
 ): void {
   let admin_addr, btc_amt;
   admin_addr = std$_.signer$_.address_of$(admin, $c);
-  if (!token_registry$_.token_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
-    token_registry$_.token_registry$_.initialize$(admin, $c);
+  if (!coin_registry$_.coin_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
+    coin_registry$_.coin_registry$_.initialize$(admin, $c);
   }
   else{
   }
@@ -235,6 +237,7 @@ export function buildPayload_remove_liquidity_script (
   );
 
 }
+
 export function swap_script$ (
   sender: HexString,
   x_in: U64,
@@ -306,6 +309,7 @@ export function buildPayload_swap_script (
   );
 
 }
+
 export function loadParsers(repo: AptosParserRepo) {
 }
 

@@ -14,7 +14,7 @@ import * as Orders$_ from "./Orders";
 import * as Registry$_ from "./Registry";
 import * as Version$_ from "./Version";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "User";
 
 export const ASK : boolean = true;
@@ -117,7 +117,7 @@ export function buildPayload_cancel_ask (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::cancel_ask",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::cancel_ask",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -126,6 +126,7 @@ export function buildPayload_cancel_ask (
   );
 
 }
+
 export function cancel_bid$ (
   user: HexString,
   host: HexString,
@@ -145,7 +146,7 @@ export function buildPayload_cancel_bid (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::cancel_bid",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::cancel_bid",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -154,6 +155,7 @@ export function buildPayload_cancel_bid (
   );
 
 }
+
 export function cancel_order$ (
   user: HexString,
   host: HexString,
@@ -167,10 +169,10 @@ export function cancel_order$ (
   temp$1 = Caps$_.orders_f_c$($c);
   update_s_c$(temp$2, temp$1, $c);
   addr = std$_.signer$_.address_of$(user, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
     throw $.abortCode(E_NO_O_C);
   }
-  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
   if ((side == ASK)) {
     temp$5 = $.copy(addr);
     temp$4 = $.copy(id);
@@ -207,7 +209,7 @@ export function dec_available_collateral$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let order_collateral;
-  order_collateral = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(user));
+  order_collateral = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(user));
   order_collateral.b_a = $.copy(order_collateral.b_a).sub($.copy(base));
   order_collateral.q_a = $.copy(order_collateral.q_a).sub($.copy(quote));
   return;
@@ -235,7 +237,7 @@ export function buildPayload_deposit (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::deposit",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::deposit",
     typeParamStrings,
     [
       $.payloadArg(b_val),
@@ -244,6 +246,7 @@ export function buildPayload_deposit (
   );
 
 }
+
 export function deposit_internal$ (
   user: HexString,
   b_val: U64,
@@ -254,7 +257,7 @@ export function deposit_internal$ (
 ): void {
   let temp$1, addr, o_c;
   addr = std$_.signer$_.address_of$(user, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
     throw $.abortCode(E_NO_O_C);
   }
   if ($.copy(b_val).gt(u64("0"))) {
@@ -266,7 +269,7 @@ export function deposit_internal$ (
   if (!temp$1) {
     throw $.abortCode(E_NO_TRANSFER);
   }
-  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
   if ($.copy(b_val).gt(u64("0"))) {
     aptos_framework$_.coin$_.merge$(o_c.b_c, aptos_framework$_.coin$_.withdraw$(user, $.copy(b_val), $c, [$p[0]] as TypeTag[]), $c, [$p[0]] as TypeTag[]);
     o_c.b_a = $.copy(o_c.b_a).add($.copy(b_val));
@@ -288,7 +291,7 @@ export function exists_o_c$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(a));
+  return $c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(a));
 }
 
 export function exists_sequence_counter$ (
@@ -296,7 +299,7 @@ export function exists_sequence_counter$ (
   _c: Orders$_.FriendCap,
   $c: AptosDataCache,
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "SC", []), $.copy(a));
+  return $c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "SC", []), $.copy(a));
 }
 
 export function get_available_collateral$ (
@@ -306,7 +309,7 @@ export function get_available_collateral$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): [U64, U64] {
   let order_collateral;
-  order_collateral = $c.borrow_global<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(user));
+  order_collateral = $c.borrow_global<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(user));
   return [$.copy(order_collateral.b_a), $.copy(order_collateral.q_a)];
 }
 
@@ -320,7 +323,7 @@ export function init_containers$ (
     throw $.abortCode(E_NO_MARKET);
   }
   user_addr = std$_.signer$_.address_of$(user, $c);
-  if (!!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(user_addr))) {
+  if (!!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(user_addr))) {
     throw $.abortCode(E_O_C_EXISTS);
   }
   if (!!Orders$_.exists_orders$($.copy(user_addr), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
@@ -330,8 +333,8 @@ export function init_containers$ (
   temp$2 = u64("0");
   temp$3 = aptos_framework$_.coin$_.zero$($c, [$p[1]] as TypeTag[]);
   temp$4 = u64("0");
-  o_c = new OC({ b_a: temp$2, b_c: temp$1, q_a: temp$4, q_c: temp$3 }, new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]));
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), user, o_c);
+  o_c = new OC({ b_a: temp$2, b_c: temp$1, q_a: temp$4, q_c: temp$3 }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), user, o_c);
   temp$7 = user;
   temp$6 = Registry$_.scale_factor$($c, [$p[2]] as TypeTag[]);
   temp$5 = Caps$_.orders_f_c$($c);
@@ -345,19 +348,20 @@ export function buildPayload_init_containers (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::init_containers",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::init_containers",
     typeParamStrings,
     []
   );
 
 }
+
 export function init_o_c$ (
   user: HexString,
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let temp$1, temp$2, temp$3, temp$4, o_c;
-  if (!!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), std$_.signer$_.address_of$(user, $c))) {
+  if (!!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), std$_.signer$_.address_of$(user, $c))) {
     throw $.abortCode(E_O_C_EXISTS);
   }
   if (!Registry$_.is_registered$($c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
@@ -367,8 +371,8 @@ export function init_o_c$ (
   temp$2 = u64("0");
   temp$3 = aptos_framework$_.coin$_.zero$($c, [$p[1]] as TypeTag[]);
   temp$4 = u64("0");
-  o_c = new OC({ b_a: temp$2, b_c: temp$1, q_a: temp$4, q_c: temp$3 }, new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]));
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), user, o_c);
+  o_c = new OC({ b_a: temp$2, b_c: temp$1, q_a: temp$4, q_c: temp$3 }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), user, o_c);
   return;
 }
 
@@ -378,10 +382,10 @@ export function init_user$ (
 ): void {
   let user_addr;
   user_addr = std$_.signer$_.address_of$(user, $c);
-  if (!!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "SC", []), $.copy(user_addr))) {
+  if (!!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "SC", []), $.copy(user_addr))) {
     throw $.abortCode(E_S_C_EXISTS);
   }
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "User", "SC", []), user, new SC({ i: aptos_framework$_.account$_.get_sequence_number$($.copy(user_addr), $c) }, new StructTag(new HexString("0xc0deb00c"), "User", "SC", [])));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "SC", []), user, new SC({ i: aptos_framework$_.account$_.get_sequence_number$($.copy(user_addr), $c) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "SC", [])));
   return;
 }
 
@@ -390,12 +394,13 @@ export function buildPayload_init_user (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xc0deb00c::User::init_user",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::init_user",
     typeParamStrings,
     []
   );
 
 }
+
 export function process_fill$ (
   target: HexString,
   incoming: HexString,
@@ -424,13 +429,13 @@ export function process_fill$ (
     [temp$1, temp$2] = [$.copy(target), $.copy(incoming)];
   }
   [base_to, base_from] = [temp$1, temp$2];
-  yields_base = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(base_from));
+  yields_base = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(base_from));
   base_coins = aptos_framework$_.coin$_.extract$(yields_base.b_c, $.copy(base_to_route), $c, [$p[0]] as TypeTag[]);
-  gets_base = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(base_to));
+  gets_base = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(base_to));
   aptos_framework$_.coin$_.merge$(gets_base.b_c, base_coins, $c, [$p[0]] as TypeTag[]);
   gets_base.b_a = $.copy(gets_base.b_a).add($.copy(base_to_route));
   quote_coins = aptos_framework$_.coin$_.extract$(gets_base.q_c, $.copy(quote_to_route), $c, [$p[1]] as TypeTag[]);
-  gets_quote = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(base_from));
+  gets_quote = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(base_from));
   aptos_framework$_.coin$_.merge$(gets_quote.q_c, quote_coins, $c, [$p[1]] as TypeTag[]);
   gets_quote.q_a = $.copy(gets_quote.q_a).add($.copy(quote_to_route));
   return;
@@ -457,7 +462,7 @@ export function buildPayload_submit_ask (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::submit_ask",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::submit_ask",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -467,6 +472,7 @@ export function buildPayload_submit_ask (
   );
 
 }
+
 export function submit_bid$ (
   user: HexString,
   host: HexString,
@@ -488,7 +494,7 @@ export function buildPayload_submit_bid (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::submit_bid",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::submit_bid",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -498,6 +504,7 @@ export function buildPayload_submit_bid (
   );
 
 }
+
 export function submit_limit_order$ (
   user: HexString,
   host: HexString,
@@ -517,10 +524,10 @@ export function submit_limit_order$ (
     throw $.abortCode(E_NO_MARKET);
   }
   addr = std$_.signer$_.address_of$(user, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
     throw $.abortCode(E_NO_O_C);
   }
-  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
   v_n = Version$_.get_v_n$($c);
   if ((side == ASK)) {
     id = ID$_.id_a$($.copy(price), $.copy(v_n), $c);
@@ -575,10 +582,10 @@ export function update_s_c$ (
 ): void {
   let s_c, s_n, user_addr;
   user_addr = std$_.signer$_.address_of$(u, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "SC", []), $.copy(user_addr))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "SC", []), $.copy(user_addr))) {
     throw $.abortCode(E_NO_S_C);
   }
-  s_c = $c.borrow_global_mut<SC>(new StructTag(new HexString("0xc0deb00c"), "User", "SC", []), $.copy(user_addr));
+  s_c = $c.borrow_global_mut<SC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "SC", []), $.copy(user_addr));
   s_n = aptos_framework$_.account$_.get_sequence_number$($.copy(user_addr), $c);
   if (!$.copy(s_n).gt($.copy(s_c.i))) {
     throw $.abortCode(E_INVALID_S_N);
@@ -614,7 +621,7 @@ export function buildPayload_withdraw (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::User::withdraw",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::withdraw",
     typeParamStrings,
     [
       $.payloadArg(b_val),
@@ -623,6 +630,7 @@ export function buildPayload_withdraw (
   );
 
 }
+
 export function withdraw_internal$ (
   user: HexString,
   b_val: U64,
@@ -633,7 +641,7 @@ export function withdraw_internal$ (
 ): void {
   let temp$1, addr, o_c;
   addr = std$_.signer$_.address_of$(user, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr))) {
     throw $.abortCode(E_NO_O_C);
   }
   if ($.copy(b_val).gt(u64("0"))) {
@@ -645,7 +653,7 @@ export function withdraw_internal$ (
   if (!temp$1) {
     throw $.abortCode(E_NO_TRANSFER);
   }
-  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0xc0deb00c"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_c = $c.borrow_global_mut<OC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "User", "OC", [$p[0], $p[1], $p[2]]), $.copy(addr));
   if ($.copy(b_val).gt(u64("0"))) {
     if (!!$.copy(b_val).gt($.copy(o_c.b_a))) {
       throw $.abortCode(E_WITHDRAW_TOO_MUCH);
@@ -668,7 +676,7 @@ export function withdraw_internal$ (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::User::OC", OC.OCParser);
-  repo.addParser("0xc0deb00c::User::SC", SC.SCParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::OC", OC.OCParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::User::SC", SC.SCParser);
 }
 

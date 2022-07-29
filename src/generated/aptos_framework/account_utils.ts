@@ -19,7 +19,7 @@ export function create_and_fund_account$ (
   $c: AptosDataCache,
 ): void {
   account$_.create_account$($.copy(account), $c);
-  coin$_.transfer$(funder, $.copy(account), $.copy(amount), $c, [new StructTag(new HexString("0x1"), "test_coin", "TestCoin", [])] as TypeTag[]);
+  coin$_.transfer$(funder, $.copy(account), $.copy(amount), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
   return;
 }
 

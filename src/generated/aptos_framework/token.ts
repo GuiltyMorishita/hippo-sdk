@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
-import * as table$_ from "./table";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "token";
@@ -107,22 +107,22 @@ export class Collections
   { name: "create_token_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])]) },
   { name: "mint_token_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "token", "MintTokenEvent", [])]) }];
 
-  collections: table$_.Table;
-  token_data: table$_.Table;
-  burn_capabilities: table$_.Table;
-  mint_capabilities: table$_.Table;
-  create_collection_events: std$_.event$_.EventHandle;
-  create_token_events: std$_.event$_.EventHandle;
-  mint_token_events: std$_.event$_.EventHandle;
+  collections: aptos_std$_.table$_.Table;
+  token_data: aptos_std$_.table$_.Table;
+  burn_capabilities: aptos_std$_.table$_.Table;
+  mint_capabilities: aptos_std$_.table$_.Table;
+  create_collection_events: aptos_std$_.event$_.EventHandle;
+  create_token_events: aptos_std$_.event$_.EventHandle;
+  mint_token_events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.collections = proto['collections'] as table$_.Table;
-    this.token_data = proto['token_data'] as table$_.Table;
-    this.burn_capabilities = proto['burn_capabilities'] as table$_.Table;
-    this.mint_capabilities = proto['mint_capabilities'] as table$_.Table;
-    this.create_collection_events = proto['create_collection_events'] as std$_.event$_.EventHandle;
-    this.create_token_events = proto['create_token_events'] as std$_.event$_.EventHandle;
-    this.mint_token_events = proto['mint_token_events'] as std$_.event$_.EventHandle;
+    this.collections = proto['collections'] as aptos_std$_.table$_.Table;
+    this.token_data = proto['token_data'] as aptos_std$_.table$_.Table;
+    this.burn_capabilities = proto['burn_capabilities'] as aptos_std$_.table$_.Table;
+    this.mint_capabilities = proto['mint_capabilities'] as aptos_std$_.table$_.Table;
+    this.create_collection_events = proto['create_collection_events'] as aptos_std$_.event$_.EventHandle;
+    this.create_token_events = proto['create_token_events'] as aptos_std$_.event$_.EventHandle;
+    this.mint_token_events = proto['mint_token_events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static CollectionsParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Collections {
@@ -419,14 +419,14 @@ export class TokenStore
   { name: "deposit_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "token", "DepositEvent", [])]) },
   { name: "withdraw_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])]) }];
 
-  tokens: table$_.Table;
-  deposit_events: std$_.event$_.EventHandle;
-  withdraw_events: std$_.event$_.EventHandle;
+  tokens: aptos_std$_.table$_.Table;
+  deposit_events: aptos_std$_.event$_.EventHandle;
+  withdraw_events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.tokens = proto['tokens'] as table$_.Table;
-    this.deposit_events = proto['deposit_events'] as std$_.event$_.EventHandle;
-    this.withdraw_events = proto['withdraw_events'] as std$_.event$_.EventHandle;
+    this.tokens = proto['tokens'] as aptos_std$_.table$_.Table;
+    this.deposit_events = proto['deposit_events'] as aptos_std$_.event$_.EventHandle;
+    this.withdraw_events = proto['withdraw_events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static TokenStoreParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : TokenStore {
@@ -473,8 +473,8 @@ export function balance_of$ (
 ): U64 {
   let temp$1, token_store;
   token_store = $c.borrow_global<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(owner));
-  if (table$_.contains$(token_store.tokens, $.copy(id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
-    temp$1 = $.copy(table$_.borrow$(token_store.tokens, $.copy(id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).value);
+  if (aptos_std$_.table$_.contains$(token_store.tokens, $.copy(id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
+    temp$1 = $.copy(aptos_std$_.table$_.borrow$(token_store.tokens, $.copy(id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).value);
   }
   else{
     temp$1 = u64("0");
@@ -490,17 +490,17 @@ export function burn$ (
   let _cap, account_addr, collections, supply, token_data;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOLLECTIONS_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOLLECTIONS_NOT_PUBLISHED, $c));
   }
   collections = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr));
-  if (!table$_.contains$(collections.token_data, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(ETOKEN_NOT_PUBLISHED, $c));
+  if (!aptos_std$_.table$_.contains$(collections.token_data, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.not_found$(ETOKEN_NOT_PUBLISHED, $c));
   }
-  if (!table$_.contains$(collections.burn_capabilities, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.requires_capability$(ENO_BURN_CAPABILITY, $c));
+  if (!aptos_std$_.table$_.contains$(collections.burn_capabilities, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.permission_denied$(ENO_BURN_CAPABILITY, $c));
   }
-  _cap = table$_.borrow$(collections.burn_capabilities, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[]);
-  token_data = table$_.borrow_mut$(collections.token_data, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]);
+  _cap = aptos_std$_.table$_.borrow$(collections.burn_capabilities, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[]);
+  token_data = aptos_std$_.table$_.borrow_mut$(collections.token_data, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]);
   if (std$_.option$_.is_some$(token_data.supply, $c, [AtomicTypeTag.U64] as TypeTag[])) {
     supply = std$_.option$_.borrow_mut$(token_data.supply, $c, [AtomicTypeTag.U64] as TypeTag[]);
     $.set(supply, $.copy(supply).sub($.copy(token.value)));
@@ -522,19 +522,19 @@ export function create_collection$ (
   let temp$1, temp$2, account_addr, collection, collection_handle, collections;
   account_addr = std$_.signer$_.address_of$(creator, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "token", "Collections", []), creator, new Collections({ collections: table$_.new__$($c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[]), token_data: table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]), burn_capabilities: table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[]), mint_capabilities: table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[]), create_collection_events: std$_.event$_.new_event_handle$(creator, $c, [new StructTag(new HexString("0x1"), "token", "CreateCollectionEvent", [])] as TypeTag[]), create_token_events: std$_.event$_.new_event_handle$(creator, $c, [new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])] as TypeTag[]), mint_token_events: std$_.event$_.new_event_handle$(creator, $c, [new StructTag(new HexString("0x1"), "token", "MintTokenEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "token", "Collections", [])));
+    $c.move_to(new StructTag(new HexString("0x1"), "token", "Collections", []), creator, new Collections({ collections: aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[]), token_data: aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]), burn_capabilities: aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[]), mint_capabilities: aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[]), create_collection_events: aptos_std$_.event$_.new_event_handle$(creator, $c, [new StructTag(new HexString("0x1"), "token", "CreateCollectionEvent", [])] as TypeTag[]), create_token_events: aptos_std$_.event$_.new_event_handle$(creator, $c, [new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])] as TypeTag[]), mint_token_events: aptos_std$_.event$_.new_event_handle$(creator, $c, [new StructTag(new HexString("0x1"), "token", "MintTokenEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "token", "Collections", [])));
   }
   else{
   }
   collections = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr)).collections;
   [temp$1, temp$2] = [collections, $.copy(name)];
-  if (!!table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECOLLECTION_ALREADY_EXISTS, $c));
+  if (!!aptos_std$_.table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.already_exists$(ECOLLECTION_ALREADY_EXISTS, $c));
   }
   collection = new Collection({ description: $.copy(description), name: $.copy(name), uri: $.copy(uri), count: u64("0"), maximum: $.copy(maximum) }, new StructTag(new HexString("0x1"), "token", "Collection", []));
-  table$_.add$(collections, $.copy(name), collection, $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[]);
+  aptos_std$_.table$_.add$(collections, $.copy(name), collection, $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[]);
   collection_handle = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr));
-  std$_.event$_.emit_event$(collection_handle.create_collection_events, new CreateCollectionEvent({ creator: $.copy(account_addr), collection_name: $.copy(name), uri: $.copy(uri), description: $.copy(description), maximum: $.copy(maximum) }, new StructTag(new HexString("0x1"), "token", "CreateCollectionEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "CreateCollectionEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(collection_handle.create_collection_events, new CreateCollectionEvent({ creator: $.copy(account_addr), collection_name: $.copy(name), uri: $.copy(uri), description: $.copy(description), maximum: $.copy(maximum) }, new StructTag(new HexString("0x1"), "token", "CreateCollectionEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "CreateCollectionEvent", [])] as TypeTag[]);
   return;
 }
 
@@ -629,17 +629,17 @@ export function create_token$ (
   let temp$2, account_addr, collection__1, collections, supply, token_data, token_handle, token_id;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOLLECTIONS_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOLLECTIONS_NOT_PUBLISHED, $c));
   }
   collections = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr));
   token_id = create_token_id$($.copy(account_addr), $.copy(collection), $.copy(name), $c);
-  if (!table$_.contains$(collections.collections, $.copy(token_id.collection), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECOLLECTION_NOT_PUBLISHED, $c));
+  if (!aptos_std$_.table$_.contains$(collections.collections, $.copy(token_id.collection), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.already_exists$(ECOLLECTION_NOT_PUBLISHED, $c));
   }
-  if (!!table$_.contains$(collections.token_data, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.already_published$(ETOKEN_ALREADY_EXISTS, $c));
+  if (!!aptos_std$_.table$_.contains$(collections.token_data, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.already_exists$(ETOKEN_ALREADY_EXISTS, $c));
   }
-  collection__1 = table$_.borrow_mut$(collections.collections, $.copy(token_id.collection), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[]);
+  collection__1 = aptos_std$_.table$_.borrow_mut$(collections.collections, $.copy(token_id.collection), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0x1"), "token", "Collection", [])] as TypeTag[]);
   collection__1.count = $.copy(collection__1.count).add(u64("1"));
   if (std$_.option$_.is_some$(collection__1.maximum, $c, [AtomicTypeTag.U64] as TypeTag[])) {
     if (!$.copy(std$_.option$_.borrow$(collection__1.maximum, $c, [AtomicTypeTag.U64] as TypeTag[])).ge($.copy(collection__1.count))) {
@@ -656,9 +656,9 @@ export function create_token$ (
   }
   supply = temp$2;
   token_data = new TokenData({ collection: $.copy(token_id.collection), description: $.copy(description), name: $.copy(token_id.name), maximum: $.copy(maximum), supply: $.copy(supply), uri: $.copy(uri), royalty: new Royalty({ royalty_points_per_million: $.copy(royalty_points_per_million), creator_account: std$_.signer$_.address_of$(account, $c) }, new StructTag(new HexString("0x1"), "token", "Royalty", [])) }, new StructTag(new HexString("0x1"), "token", "TokenData", []));
-  table$_.add$(collections.token_data, $.copy(token_id), $.copy(token_data), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]);
-  table$_.add$(collections.burn_capabilities, $.copy(token_id), new BurnCapability({ token_id: $.copy(token_id) }, new StructTag(new HexString("0x1"), "token", "BurnCapability", [])), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[]);
-  table$_.add$(collections.mint_capabilities, $.copy(token_id), new MintCapability({ token_id: $.copy(token_id) }, new StructTag(new HexString("0x1"), "token", "MintCapability", [])), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[]);
+  aptos_std$_.table$_.add$(collections.token_data, $.copy(token_id), $.copy(token_data), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]);
+  aptos_std$_.table$_.add$(collections.burn_capabilities, $.copy(token_id), new BurnCapability({ token_id: $.copy(token_id) }, new StructTag(new HexString("0x1"), "token", "BurnCapability", [])), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "BurnCapability", [])] as TypeTag[]);
+  aptos_std$_.table$_.add$(collections.mint_capabilities, $.copy(token_id), new MintCapability({ token_id: $.copy(token_id) }, new StructTag(new HexString("0x1"), "token", "MintCapability", [])), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[]);
   if ($.copy(initial_balance).gt(u64("0"))) {
     initialize_token_store$(account, $c);
     initialize_token$(account, $.copy(token_id), $c);
@@ -667,7 +667,7 @@ export function create_token$ (
   else{
   }
   token_handle = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(account_addr));
-  std$_.event$_.emit_event$(token_handle.create_token_events, new CreateTokenEvent({ id: $.copy(token_id), token_data: $.copy(token_data), initial_balance: $.copy(initial_balance) }, new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(token_handle.create_token_events, new CreateTokenEvent({ id: $.copy(token_id), token_data: $.copy(token_data), initial_balance: $.copy(initial_balance) }, new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "CreateTokenEvent", [])] as TypeTag[]);
   return $.copy(token_id);
 }
 
@@ -769,7 +769,7 @@ export function deposit_token$ (
   initialize_token_store$(account, $c);
   tokens = $c.borrow_global_mut<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr)).tokens;
   [temp$1, temp$2] = [tokens, $.copy(token.id)];
-  if (!table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
+  if (!aptos_std$_.table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
     initialize_token$(account, $.copy(token.id), $c);
   }
   else{
@@ -784,7 +784,7 @@ export function direct_deposit$ (
 ): void {
   let token_store;
   token_store = $c.borrow_global_mut<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr));
-  std$_.event$_.emit_event$(token_store.deposit_events, new DepositEvent({ id: $.copy(token.id), amount: $.copy(token.value) }, new StructTag(new HexString("0x1"), "token", "DepositEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "DepositEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(token_store.deposit_events, new DepositEvent({ id: $.copy(token.id), amount: $.copy(token.value) }, new StructTag(new HexString("0x1"), "token", "DepositEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "DepositEvent", [])] as TypeTag[]);
   direct_deposit_without_event$($.copy(account_addr), token, $c);
   return;
 }
@@ -796,13 +796,13 @@ export function direct_deposit_without_event$ (
 ): void {
   let recipient_token, token_store;
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ETOKEN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ETOKEN_STORE_NOT_PUBLISHED, $c));
   }
   token_store = $c.borrow_global_mut<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr));
-  if (!table$_.contains$(token_store.tokens, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(EBALANCE_NOT_PUBLISHED, $c));
+  if (!aptos_std$_.table$_.contains$(token_store.tokens, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.not_found$(EBALANCE_NOT_PUBLISHED, $c));
   }
-  recipient_token = table$_.borrow_mut$(token_store.tokens, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  recipient_token = aptos_std$_.table$_.borrow_mut$(token_store.tokens, $.copy(token.id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
   merge$(recipient_token, token, $c);
   return;
 }
@@ -869,18 +869,18 @@ export function initialize_token$ (
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, account_addr, tokens;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ETOKEN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ETOKEN_STORE_NOT_PUBLISHED, $c));
   }
   tokens = $c.borrow_global_mut<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr)).tokens;
   [temp$1, temp$2] = [tokens, $.copy(token_id)];
-  if (!!table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.already_published$(EALREADY_HAS_BALANCE, $c));
+  if (!!aptos_std$_.table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.already_exists$(EALREADY_HAS_BALANCE, $c));
   }
   temp$6 = tokens;
   temp$5 = $.copy(token_id);
   temp$3 = u64("0");
   temp$4 = $.copy(token_id);
-  table$_.add$(temp$6, temp$5, new Token({ id: temp$4, value: temp$3 }, new StructTag(new HexString("0x1"), "token", "Token", [])), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  aptos_std$_.table$_.add$(temp$6, temp$5, new Token({ id: temp$4, value: temp$3 }, new StructTag(new HexString("0x1"), "token", "Token", [])), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
   return;
 }
 
@@ -939,7 +939,7 @@ export function initialize_token_store$ (
   $c: AptosDataCache,
 ): void {
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "TokenStore", []), std$_.signer$_.address_of$(account, $c))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "token", "TokenStore", []), account, new TokenStore({ tokens: table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]), deposit_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "token", "DepositEvent", [])] as TypeTag[]), withdraw_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "token", "TokenStore", [])));
+    $c.move_to(new StructTag(new HexString("0x1"), "token", "TokenStore", []), account, new TokenStore({ tokens: aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]), deposit_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "token", "DepositEvent", [])] as TypeTag[]), withdraw_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "token", "TokenStore", [])));
   }
   else{
   }
@@ -952,7 +952,7 @@ export function merge$ (
   $c: AptosDataCache,
 ): void {
   if (!$.deep_eq(dst_token.id, source_token.id)) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINVALID_TOKEN_MERGE, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINVALID_TOKEN_MERGE, $c));
   }
   dst_token.value = $.copy(dst_token.value).add($.copy(source_token.value));
   source_token;
@@ -968,21 +968,21 @@ export function mint$ (
 ): void {
   let _cap, creator_collections, maximum, minter_collections, supply, token_data;
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(token_id.creator))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOLLECTIONS_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOLLECTIONS_NOT_PUBLISHED, $c));
   }
   minter_collections = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), std$_.signer$_.address_of$(account, $c));
-  if (!table$_.contains$(minter_collections.mint_capabilities, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.requires_capability$(ENO_MINT_CAPABILITY, $c));
+  if (!aptos_std$_.table$_.contains$(minter_collections.mint_capabilities, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.permission_denied$(ENO_MINT_CAPABILITY, $c));
   }
-  _cap = table$_.borrow$(minter_collections.mint_capabilities, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[]);
+  _cap = aptos_std$_.table$_.borrow$(minter_collections.mint_capabilities, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "MintCapability", [])] as TypeTag[]);
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(token_id.creator))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOLLECTIONS_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOLLECTIONS_NOT_PUBLISHED, $c));
   }
   creator_collections = $c.borrow_global_mut<Collections>(new StructTag(new HexString("0x1"), "token", "Collections", []), $.copy(token_id.creator));
-  if (!table$_.contains$(creator_collections.token_data, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(ETOKEN_NOT_PUBLISHED, $c));
+  if (!aptos_std$_.table$_.contains$(creator_collections.token_data, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.not_found$(ETOKEN_NOT_PUBLISHED, $c));
   }
-  token_data = table$_.borrow_mut$(creator_collections.token_data, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]);
+  token_data = aptos_std$_.table$_.borrow_mut$(creator_collections.token_data, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "TokenData", [])] as TypeTag[]);
   if (std$_.option$_.is_some$(token_data.supply, $c, [AtomicTypeTag.U64] as TypeTag[])) {
     supply = std$_.option$_.borrow_mut$(token_data.supply, $c, [AtomicTypeTag.U64] as TypeTag[]);
     $.set(supply, $.copy(supply).add($.copy(amount)));
@@ -1042,7 +1042,7 @@ export function withdraw_token$ (
   let account_addr, token_store;
   account_addr = std$_.signer$_.address_of$(account, $c);
   token_store = $c.borrow_global_mut<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr));
-  std$_.event$_.emit_event$(token_store.withdraw_events, new WithdrawEvent({ id: $.copy(id), amount: $.copy(amount) }, new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(token_store.withdraw_events, new WithdrawEvent({ id: $.copy(id), amount: $.copy(amount) }, new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])), $c, [new StructTag(new HexString("0x1"), "token", "WithdrawEvent", [])] as TypeTag[]);
   return withdraw_without_event_internal$($.copy(account_addr), $.copy(id), $.copy(amount), $c);
 }
 
@@ -1054,14 +1054,14 @@ export function withdraw_without_event_internal$ (
 ): Token {
   let temp$1, temp$2, balance, tokens;
   if (!$c.exists(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ETOKEN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ETOKEN_STORE_NOT_PUBLISHED, $c));
   }
   tokens = $c.borrow_global_mut<TokenStore>(new StructTag(new HexString("0x1"), "token", "TokenStore", []), $.copy(account_addr)).tokens;
   [temp$1, temp$2] = [tokens, $.copy(id)];
-  if (!table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(EBALANCE_NOT_PUBLISHED, $c));
+  if (!aptos_std$_.table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.not_found$(EBALANCE_NOT_PUBLISHED, $c));
   }
-  balance = table$_.borrow_mut$(tokens, $.copy(id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).value;
+  balance = aptos_std$_.table$_.borrow_mut$(tokens, $.copy(id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).value;
   $.set(balance, $.copy(balance).sub($.copy(amount)));
   return new Token({ id: $.copy(id), value: $.copy(amount) }, new StructTag(new HexString("0x1"), "token", "Token", []));
 }

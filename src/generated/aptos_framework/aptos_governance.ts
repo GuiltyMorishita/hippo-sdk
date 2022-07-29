@@ -5,6 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
 import * as account$_ from "./account";
 import * as coin$_ from "./coin";
@@ -12,7 +13,6 @@ import * as governance_proposal$_ from "./governance_proposal";
 import * as reconfiguration$_ from "./reconfiguration";
 import * as stake$_ from "./stake";
 import * as system_addresses$_ from "./system_addresses";
-import * as table$_ from "./table";
 import * as timestamp$_ from "./timestamp";
 import * as voting$_ from "./voting";
 export const packageName = "AptosFramework";
@@ -38,18 +38,24 @@ export class CreateProposalEvent
   { name: "proposer", typeTag: AtomicTypeTag.Address },
   { name: "stake_pool", typeTag: AtomicTypeTag.Address },
   { name: "proposal_id", typeTag: AtomicTypeTag.U64 },
-  { name: "execution_hash", typeTag: new VectorTag(AtomicTypeTag.U8) }];
+  { name: "execution_hash", typeTag: new VectorTag(AtomicTypeTag.U8) },
+  { name: "metadata_location", typeTag: new VectorTag(AtomicTypeTag.U8) },
+  { name: "metadata_hash", typeTag: new VectorTag(AtomicTypeTag.U8) }];
 
   proposer: HexString;
   stake_pool: HexString;
   proposal_id: U64;
   execution_hash: U8[];
+  metadata_location: U8[];
+  metadata_hash: U8[];
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.proposer = proto['proposer'] as HexString;
     this.stake_pool = proto['stake_pool'] as HexString;
     this.proposal_id = proto['proposal_id'] as U64;
     this.execution_hash = proto['execution_hash'] as U8[];
+    this.metadata_location = proto['metadata_location'] as U8[];
+    this.metadata_hash = proto['metadata_hash'] as U8[];
   }
 
   static CreateProposalEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : CreateProposalEvent {
@@ -106,14 +112,14 @@ export class GovernanceEvents
   { name: "update_config_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])]) },
   { name: "vote_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])]) }];
 
-  create_proposal_events: std$_.event$_.EventHandle;
-  update_config_events: std$_.event$_.EventHandle;
-  vote_events: std$_.event$_.EventHandle;
+  create_proposal_events: aptos_std$_.event$_.EventHandle;
+  update_config_events: aptos_std$_.event$_.EventHandle;
+  vote_events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.create_proposal_events = proto['create_proposal_events'] as std$_.event$_.EventHandle;
-    this.update_config_events = proto['update_config_events'] as std$_.event$_.EventHandle;
-    this.vote_events = proto['vote_events'] as std$_.event$_.EventHandle;
+    this.create_proposal_events = proto['create_proposal_events'] as aptos_std$_.event$_.EventHandle;
+    this.update_config_events = proto['update_config_events'] as aptos_std$_.event$_.EventHandle;
+    this.vote_events = proto['vote_events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static GovernanceEventsParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : GovernanceEvents {
@@ -259,10 +265,10 @@ export class VotingRecords
   static fields: FieldDeclType[] = [
   { name: "votes", typeTag: new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool]) }];
 
-  votes: table$_.Table;
+  votes: aptos_std$_.table$_.Table;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.votes = proto['votes'] as table$_.Table;
+    this.votes = proto['votes'] as aptos_std$_.table$_.Table;
   }
 
   static VotingRecordsParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : VotingRecords {
@@ -279,27 +285,26 @@ export function create_proposal$ (
   proposer: HexString,
   stake_pool: HexString,
   execution_hash: U8[],
-  code_location: U8[],
-  title: U8[],
-  description: U8[],
+  metadata_location: U8[],
+  metadata_hash: U8[],
   $c: AptosDataCache,
 ): void {
-  let temp$1, temp$2, temp$3, temp$4, temp$5, current_time, early_resolution_vote_threshold, events, governance_config, proposal_expiration, proposal_id, proposer_address, stake_balance, total_supply, total_voting_token_supply;
+  let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, current_time, early_resolution_vote_threshold, events, governance_config, proposal_expiration, proposal_id, proposer_address, stake_balance, total_supply, total_voting_token_supply;
   proposer_address = std$_.signer$_.address_of$(proposer, $c);
   if (!(stake$_.get_delegated_voter$($.copy(stake_pool), $c).hex() === $.copy(proposer_address).hex())) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(ENOT_DELEGATED_VOTER, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(ENOT_DELEGATED_VOTER, $c));
   }
   governance_config = $c.borrow_global<GovernanceConfig>(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceConfig", []), new HexString("0x1"));
   stake_balance = stake$_.get_active_staked_balance$($.copy(stake_pool), $c);
   if (!$.copy(stake_balance).ge($.copy(governance_config.required_proposer_stake))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINSUFFICIENT_PROPOSER_STAKE, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINSUFFICIENT_PROPOSER_STAKE, $c));
   }
   current_time = timestamp$_.now_seconds$($c);
   proposal_expiration = $.copy(current_time).add($.copy(governance_config.voting_period_secs));
   if (!stake$_.get_lockup_secs$($.copy(stake_pool), $c).ge($.copy(proposal_expiration))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINSUFFICIENT_STAKE_LOCKUP, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINSUFFICIENT_STAKE_LOCKUP, $c));
   }
-  total_voting_token_supply = coin$_.supply$($c, [new StructTag(new HexString("0x1"), "test_coin", "TestCoin", [])] as TypeTag[]);
+  total_voting_token_supply = coin$_.supply$($c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
   early_resolution_vote_threshold = std$_.option$_.none$($c, [AtomicTypeTag.U128] as TypeTag[]);
   if (std$_.option$_.is_some$(total_voting_token_supply, $c, [AtomicTypeTag.U128] as TypeTag[])) {
     total_supply = $.copy(std$_.option$_.borrow$(total_voting_token_supply, $c, [AtomicTypeTag.U128] as TypeTag[]));
@@ -307,14 +312,16 @@ export function create_proposal$ (
   }
   else{
   }
-  proposal_id = voting$_.create_proposal$($.copy(proposer_address), new HexString("0x1"), governance_proposal$_.create_proposal$(std$_.string$_.utf8$($.copy(code_location), $c), std$_.string$_.utf8$($.copy(title), $c), std$_.string$_.utf8$($.copy(description), $c), $c), $.copy(execution_hash), $.copy(governance_config.min_voting_threshold), $.copy(proposal_expiration), $.copy(early_resolution_vote_threshold), $c, [new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", [])] as TypeTag[]);
+  proposal_id = voting$_.create_proposal$($.copy(proposer_address), new HexString("0x1"), governance_proposal$_.create_proposal$(std$_.string$_.utf8$($.copy(metadata_location), $c), std$_.string$_.utf8$($.copy(metadata_hash), $c), $c), $.copy(execution_hash), $.copy(governance_config.min_voting_threshold), $.copy(proposal_expiration), $.copy(early_resolution_vote_threshold), $c, [new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", [])] as TypeTag[]);
   events = $c.borrow_global_mut<GovernanceEvents>(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", []), new HexString("0x1"));
-  temp$5 = events.create_proposal_events;
+  temp$7 = events.create_proposal_events;
   temp$1 = $.copy(proposal_id);
   temp$2 = $.copy(proposer_address);
   temp$3 = $.copy(stake_pool);
   temp$4 = $.copy(execution_hash);
-  std$_.event$_.emit_event$(temp$5, new CreateProposalEvent({ proposer: temp$2, stake_pool: temp$3, proposal_id: temp$1, execution_hash: temp$4 }, new StructTag(new HexString("0x1"), "aptos_governance", "CreateProposalEvent", [])), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "CreateProposalEvent", [])] as TypeTag[]);
+  temp$5 = $.copy(metadata_location);
+  temp$6 = $.copy(metadata_hash);
+  aptos_std$_.event$_.emit_event$(temp$7, new CreateProposalEvent({ proposer: temp$2, stake_pool: temp$3, proposal_id: temp$1, execution_hash: temp$4, metadata_location: temp$5, metadata_hash: temp$6 }, new StructTag(new HexString("0x1"), "aptos_governance", "CreateProposalEvent", [])), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "CreateProposalEvent", [])] as TypeTag[]);
   return;
 }
 
@@ -322,9 +329,8 @@ export function create_proposal$ (
 export function buildPayload_create_proposal (
   stake_pool: HexString,
   execution_hash: U8[],
-  code_location: U8[],
-  title: U8[],
-  description: U8[],
+  metadata_location: U8[],
+  metadata_hash: U8[],
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
@@ -333,9 +339,8 @@ export function buildPayload_create_proposal (
     [
       $.payloadArg(stake_pool),
       $.u8ArrayArg(execution_hash),
-      $.u8ArrayArg(code_location),
-      $.u8ArrayArg(title),
-      $.u8ArrayArg(description),
+      $.u8ArrayArg(metadata_location),
+      $.u8ArrayArg(metadata_hash),
     ]
   );
 
@@ -364,8 +369,8 @@ export function initialize$ (
   temp$2 = $.copy(min_voting_threshold);
   temp$3 = $.copy(required_proposer_stake);
   $c.move_to(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceConfig", []), temp$4, new GovernanceConfig({ min_voting_threshold: temp$2, required_proposer_stake: temp$3, voting_period_secs: temp$1 }, new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceConfig", [])));
-  $c.move_to(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", []), aptos_framework, new GovernanceEvents({ create_proposal_events: std$_.event$_.new_event_handle$(aptos_framework, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "CreateProposalEvent", [])] as TypeTag[]), update_config_events: std$_.event$_.new_event_handle$(aptos_framework, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])] as TypeTag[]), vote_events: std$_.event$_.new_event_handle$(aptos_framework, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", [])));
-  $c.move_to(new StructTag(new HexString("0x1"), "aptos_governance", "VotingRecords", []), aptos_framework, new VotingRecords({ votes: table$_.new__$($c, [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool] as TypeTag[]) }, new StructTag(new HexString("0x1"), "aptos_governance", "VotingRecords", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", []), aptos_framework, new GovernanceEvents({ create_proposal_events: aptos_std$_.event$_.new_event_handle$(aptos_framework, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "CreateProposalEvent", [])] as TypeTag[]), update_config_events: aptos_std$_.event$_.new_event_handle$(aptos_framework, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])] as TypeTag[]), vote_events: aptos_std$_.event$_.new_event_handle$(aptos_framework, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "aptos_governance", "VotingRecords", []), aptos_framework, new VotingRecords({ votes: aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool] as TypeTag[]) }, new StructTag(new HexString("0x1"), "aptos_governance", "VotingRecords", [])));
   return;
 }
 
@@ -400,7 +405,7 @@ export function update_governance_config$ (
   governance_config.min_voting_threshold = $.copy(min_voting_threshold);
   governance_config.required_proposer_stake = $.copy(required_proposer_stake);
   events = $c.borrow_global_mut<GovernanceEvents>(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", []), new HexString("0x1"));
-  std$_.event$_.emit_event$(events.update_config_events, new UpdateConfigEvent({ min_voting_threshold: $.copy(min_voting_threshold), required_proposer_stake: $.copy(required_proposer_stake), voting_period_secs: $.copy(voting_period_secs) }, new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(events.update_config_events, new UpdateConfigEvent({ min_voting_threshold: $.copy(min_voting_threshold), required_proposer_stake: $.copy(required_proposer_stake), voting_period_secs: $.copy(voting_period_secs) }, new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "UpdateConfigEvent", [])] as TypeTag[]);
   return;
 }
 
@@ -414,26 +419,26 @@ export function vote$ (
   let temp$1, events, proposal_expiration, record_key, voter_address, voting_power, voting_records;
   voter_address = std$_.signer$_.address_of$(voter, $c);
   if (!(stake$_.get_delegated_voter$($.copy(stake_pool), $c).hex() === $.copy(voter_address).hex())) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(ENOT_DELEGATED_VOTER, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(ENOT_DELEGATED_VOTER, $c));
   }
   voting_power = stake$_.get_active_staked_balance$($.copy(stake_pool), $c);
   if (!$.copy(voting_power).gt(u64("0"))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(ENO_VOTING_POWER, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(ENO_VOTING_POWER, $c));
   }
   proposal_expiration = voting$_.get_proposal_expiration_secs$(new HexString("0x1"), $.copy(proposal_id), $c, [new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", [])] as TypeTag[]);
   if (!stake$_.get_lockup_secs$($.copy(stake_pool), $c).ge($.copy(proposal_expiration))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINSUFFICIENT_STAKE_LOCKUP, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINSUFFICIENT_STAKE_LOCKUP, $c));
   }
   voting_records = $c.borrow_global_mut<VotingRecords>(new StructTag(new HexString("0x1"), "aptos_governance", "VotingRecords", []), new HexString("0x1"));
   record_key = new RecordKey({ stake_pool: $.copy(stake_pool), proposal_id: $.copy(proposal_id) }, new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []));
-  if (!!table$_.contains$(voting_records.votes, $.copy(record_key), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EALREADY_VOTED, $c));
+  if (!!aptos_std$_.table$_.contains$(voting_records.votes, $.copy(record_key), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool] as TypeTag[])) {
+    throw $.abortCode(std$_.error$_.invalid_argument$(EALREADY_VOTED, $c));
   }
-  table$_.add$(voting_records.votes, $.copy(record_key), true, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool] as TypeTag[]);
+  aptos_std$_.table$_.add$(voting_records.votes, $.copy(record_key), true, $c, [new StructTag(new HexString("0x1"), "aptos_governance", "RecordKey", []), AtomicTypeTag.Bool] as TypeTag[]);
   temp$1 = governance_proposal$_.create_empty_proposal$($c);
   voting$_.vote$(temp$1, new HexString("0x1"), $.copy(proposal_id), $.copy(voting_power), should_pass, $c, [new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", [])] as TypeTag[]);
   events = $c.borrow_global_mut<GovernanceEvents>(new StructTag(new HexString("0x1"), "aptos_governance", "GovernanceEvents", []), new HexString("0x1"));
-  std$_.event$_.emit_event$(events.vote_events, new VoteEvent({ proposal_id: $.copy(proposal_id), voter: $.copy(voter_address), stake_pool: $.copy(stake_pool), num_votes: $.copy(voting_power), should_pass: should_pass }, new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(events.vote_events, new VoteEvent({ proposal_id: $.copy(proposal_id), voter: $.copy(voter_address), stake_pool: $.copy(stake_pool), num_votes: $.copy(voting_power), should_pass: should_pass }, new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])), $c, [new StructTag(new HexString("0x1"), "aptos_governance", "VoteEvent", [])] as TypeTag[]);
   return;
 }
 

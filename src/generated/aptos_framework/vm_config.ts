@@ -139,7 +139,7 @@ export function initialize$ (
   timestamp$_.assert_genesis$($c);
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "vm_config", "VMConfig", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECONFIG, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECONFIG, $c));
   }
   gas_constants = new GasConstants({ global_memory_per_byte_cost: u64("4"), global_memory_per_byte_write_cost: u64("9"), min_transaction_gas_units: u64("600"), large_transaction_cutoff: u64("600"), intrinsic_gas_per_byte: u64("8"), maximum_number_of_gas_units: u64("4000000"), min_price_per_gas_unit: $.copy(min_price_per_gas_unit), max_price_per_gas_unit: u64("10000"), max_transaction_size_in_bytes: u64("262144"), gas_unit_scaling_factor: u64("1000"), default_account_size: u64("800") }, new StructTag(new HexString("0x1"), "vm_config", "GasConstants", []));
   $c.move_to(new StructTag(new HexString("0x1"), "vm_config", "VMConfig", []), account, new VMConfig({ gas_schedule: new GasSchedule({ instruction_schedule: $.copy(instruction_schedule), native_schedule: $.copy(native_schedule), gas_constants: $.copy(gas_constants) }, new StructTag(new HexString("0x1"), "vm_config", "GasSchedule", [])) }, new StructTag(new HexString("0x1"), "vm_config", "VMConfig", [])));
@@ -165,13 +165,13 @@ export function set_gas_constants$ (
   timestamp$_.assert_operating$($c);
   system_addresses$_.assert_core_resource$(account, $c);
   if (!$.copy(min_price_per_gas_unit).le($.copy(max_price_per_gas_unit))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EGAS_CONSTANT_INCONSISTENCY, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EGAS_CONSTANT_INCONSISTENCY, $c));
   }
   if (!$.copy(min_transaction_gas_units).le($.copy(maximum_number_of_gas_units))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EGAS_CONSTANT_INCONSISTENCY, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EGAS_CONSTANT_INCONSISTENCY, $c));
   }
   if (!$c.exists(new StructTag(new HexString("0x1"), "vm_config", "VMConfig", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECONFIG, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECONFIG, $c));
   }
   gas_constants = $c.borrow_global_mut<VMConfig>(new StructTag(new HexString("0x1"), "vm_config", "VMConfig", []), new HexString("0x1")).gas_schedule.gas_constants;
   gas_constants.global_memory_per_byte_cost = $.copy(global_memory_per_byte_cost);

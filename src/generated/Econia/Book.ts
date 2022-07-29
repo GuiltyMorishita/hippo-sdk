@@ -9,7 +9,7 @@ import * as std$_ from "../std";
 import * as CritBit$_ from "./CritBit";
 import * as ID$_ from "./ID";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "Book";
 
 export const ASK : boolean = true;
@@ -59,8 +59,8 @@ export class OB
   ];
   static fields: FieldDeclType[] = [
   { name: "f", typeTag: AtomicTypeTag.U64 },
-  { name: "a", typeTag: new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])]) },
-  { name: "b", typeTag: new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])]) },
+  { name: "a", typeTag: new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "CB", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])]) },
+  { name: "b", typeTag: new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "CB", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])]) },
   { name: "m_a", typeTag: AtomicTypeTag.U128 },
   { name: "m_b", typeTag: AtomicTypeTag.U128 }];
 
@@ -87,6 +87,19 @@ export class OB
     const result = await repo.loadResource(client, address, OB, typeParams);
     return result as unknown as OB;
   }
+
+  show_book_as_orders() {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return show_book_as_orders$(this, cache, tags);
+  }
+
+  show_book_as_price_levels() {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return show_book_as_price_levels$(this, cache, tags);
+  }
+
 }
 
 export class Order 
@@ -206,11 +219,11 @@ export function add_position$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): boolean {
   let m_a_p, m_b_p, o_b;
-  o_b = $c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host));
+  o_b = $c.borrow_global_mut<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host));
   [m_a_p, m_b_p] = [ID$_.price$($.copy(o_b.m_a), $c), ID$_.price$($.copy(o_b.m_b), $c)];
   if ((side == ASK)) {
     if ($.copy(price).gt($.copy(m_b_p))) {
-      CritBit$_.insert$(o_b.a, $.copy(id), new P({ s: $.copy(size), a: $.copy(user) }, new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+      CritBit$_.insert$(o_b.a, $.copy(id), new P({ s: $.copy(size), a: $.copy(user) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
       if ($.copy(price).lt($.copy(m_a_p))) {
         o_b.m_a = $.copy(id);
       }
@@ -223,7 +236,7 @@ export function add_position$ (
   }
   else{
     if ($.copy(price).lt($.copy(m_a_p))) {
-      CritBit$_.insert$(o_b.b, $.copy(id), new P({ s: $.copy(size), a: $.copy(user) }, new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+      CritBit$_.insert$(o_b.b, $.copy(id), new P({ s: $.copy(size), a: $.copy(user) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
       if ($.copy(price).gt($.copy(m_b_p))) {
         o_b.m_b = $.copy(id);
       }
@@ -268,16 +281,16 @@ export function cancel_position$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let temp$1, temp$2, asks, bids, o_b;
-  o_b = $c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host));
+  o_b = $c.borrow_global_mut<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host));
   if ((side == ASK)) {
     asks = o_b.a;
-    CritBit$_.pop$(asks, $.copy(id), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+    CritBit$_.pop$(asks, $.copy(id), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
     if ($.copy(o_b.m_a).eq($.copy(id))) {
-      if (CritBit$_.is_empty$(asks, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[])) {
+      if (CritBit$_.is_empty$(asks, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[])) {
         temp$1 = MIN_ASK_DEFAULT;
       }
       else{
-        temp$1 = CritBit$_.min_key$(asks, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+        temp$1 = CritBit$_.min_key$(asks, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
       }
       o_b.m_a = temp$1;
     }
@@ -286,13 +299,13 @@ export function cancel_position$ (
   }
   else{
     bids = o_b.b;
-    CritBit$_.pop$(bids, $.copy(id), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+    CritBit$_.pop$(bids, $.copy(id), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
     if ($.copy(o_b.m_b).eq($.copy(id))) {
-      if (CritBit$_.is_empty$(bids, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[])) {
+      if (CritBit$_.is_empty$(bids, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[])) {
         temp$2 = MAX_BID_DEFAULT;
       }
       else{
-        temp$2 = CritBit$_.max_key$(bids, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+        temp$2 = CritBit$_.max_key$(bids, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
       }
       o_b.m_b = temp$2;
     }
@@ -338,17 +351,17 @@ export function exists_book$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(a));
+  return $c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(a));
 }
 
 export function get_friend_cap$ (
   account: HexString,
   $c: AptosDataCache,
 ): FriendCap {
-  if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0xc0deb00c").hex())) {
+  if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  return new FriendCap({  }, new StructTag(new HexString("0xc0deb00c"), "Book", "FriendCap", []));
+  return new FriendCap({  }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "FriendCap", []));
 }
 
 export function get_orders$ (
@@ -357,36 +370,47 @@ export function get_orders$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): Order[] {
-  let temp$1, temp$2, n_positions, orders, price, remaining_traversals, size, target_id, target_parent_field, target_position_ref_mut, traversal_dir, tree;
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host_address))) {
+  let book;
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host_address))) {
     throw $.abortCode(E_NO_BOOK);
   }
-  orders = std$_.vector$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "Book", "Order", [])] as TypeTag[]);
+  book = $c.borrow_global_mut<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host_address));
+  return get_orders_inner$(book, side, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
+}
+
+export function get_orders_inner$ (
+  book: OB,
+  side: boolean,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <B, Q, E>*/
+): Order[] {
+  let temp$1, temp$2, n_positions, orders, price, remaining_traversals, size, target_id, target_parent_field, target_position_ref_mut, traversal_dir, tree;
+  orders = std$_.vector$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "Order", [])] as TypeTag[]);
   if ((side == ASK)) {
-    [temp$1, temp$2] = [$c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host_address)).a, R];
+    [temp$1, temp$2] = [book.a, R];
   }
   else{
-    [temp$1, temp$2] = [$c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host_address)).b, L];
+    [temp$1, temp$2] = [book.b, L];
   }
   [tree, traversal_dir] = [temp$1, temp$2];
-  n_positions = CritBit$_.length$(tree, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+  n_positions = CritBit$_.length$(tree, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
   if ($.copy(n_positions).eq(u64("0"))) {
     return orders;
   }
   else{
   }
   remaining_traversals = $.copy(n_positions).sub(u64("1"));
-  [target_id, target_position_ref_mut, target_parent_field, ] = CritBit$_.traverse_init_mut$(tree, traversal_dir, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+  [target_id, target_position_ref_mut, target_parent_field, ] = CritBit$_.traverse_init_mut$(tree, traversal_dir, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
   while (true) {
     price = ID$_.price$($.copy(target_id), $c);
     size = $.copy(target_position_ref_mut.s);
-    std$_.vector$_.push_back$(orders, new Order({ price: $.copy(price), size: $.copy(size) }, new StructTag(new HexString("0xc0deb00c"), "Book", "Order", [])), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "Order", [])] as TypeTag[]);
+    std$_.vector$_.push_back$(orders, new Order({ price: $.copy(price), size: $.copy(size) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "Order", [])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "Order", [])] as TypeTag[]);
     if ($.copy(remaining_traversals).eq(u64("0"))) {
       return orders;
     }
     else{
     }
-    [target_id, target_position_ref_mut, target_parent_field, ] = CritBit$_.traverse_mut$(tree, $.copy(target_id), $.copy(target_parent_field), traversal_dir, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+    [target_id, target_position_ref_mut, target_parent_field, ] = CritBit$_.traverse_mut$(tree, $.copy(target_id), $.copy(target_parent_field), traversal_dir, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
     remaining_traversals = $.copy(remaining_traversals).sub(u64("1"));
   }
 }
@@ -396,8 +420,8 @@ export function get_price_levels$ (
   $c: AptosDataCache,
 ): PriceLevel[] {
   let level_price, level_size, n_orders, order, order_index, price_levels;
-  price_levels = std$_.vector$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "Book", "PriceLevel", [])] as TypeTag[]);
-  n_orders = std$_.vector$_.length$(orders, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "Order", [])] as TypeTag[]);
+  price_levels = std$_.vector$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "PriceLevel", [])] as TypeTag[]);
+  n_orders = std$_.vector$_.length$(orders, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "Order", [])] as TypeTag[]);
   if ($.copy(n_orders).eq(u64("0"))) {
     return price_levels;
   }
@@ -405,10 +429,10 @@ export function get_price_levels$ (
   }
   [order_index, level_price, level_size] = [u64("0"), u64("0"), u64("0")];
   while (true) {
-    order = std$_.vector$_.borrow$(orders, $.copy(order_index), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "Order", [])] as TypeTag[]);
+    order = std$_.vector$_.borrow$(orders, $.copy(order_index), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "Order", [])] as TypeTag[]);
     if ($.copy(order.price).neq($.copy(level_price))) {
       if ($.copy(order_index).gt(u64("0"))) {
-        std$_.vector$_.push_back$(price_levels, new PriceLevel({ price: $.copy(level_price), size: $.copy(level_size) }, new StructTag(new HexString("0xc0deb00c"), "Book", "PriceLevel", [])), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "PriceLevel", [])] as TypeTag[]);
+        std$_.vector$_.push_back$(price_levels, new PriceLevel({ price: $.copy(level_price), size: $.copy(level_size) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "PriceLevel", [])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "PriceLevel", [])] as TypeTag[]);
       }
       else{
       }
@@ -419,7 +443,7 @@ export function get_price_levels$ (
     }
     order_index = $.copy(order_index).add(u64("1"));
     if ($.copy(order_index).eq($.copy(n_orders))) {
-      std$_.vector$_.push_back$(price_levels, new PriceLevel({ price: $.copy(level_price), size: $.copy(level_size) }, new StructTag(new HexString("0xc0deb00c"), "Book", "PriceLevel", [])), $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "PriceLevel", [])] as TypeTag[]);
+      std$_.vector$_.push_back$(price_levels, new PriceLevel({ price: $.copy(level_price), size: $.copy(level_size) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "PriceLevel", [])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "PriceLevel", [])] as TypeTag[]);
       break;
     }
     else{
@@ -437,14 +461,14 @@ export function init_book$ (
 ): void {
   let temp$1, temp$2, m_a, m_b, o_b;
   temp$2 = std$_.signer$_.address_of$(host, $c);
-  temp$1 = new FriendCap({  }, new StructTag(new HexString("0xc0deb00c"), "Book", "FriendCap", []));
+  temp$1 = new FriendCap({  }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "FriendCap", []));
   if (!!exists_book$(temp$2, temp$1, $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_BOOK_EXISTS);
   }
   m_a = MIN_ASK_DEFAULT;
   m_b = MAX_BID_DEFAULT;
-  o_b = new OB({ f: $.copy(f), a: CritBit$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]), b: CritBit$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]), m_a: $.copy(m_a), m_b: $.copy(m_b) }, new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]));
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), host, o_b);
+  o_b = new OB({ f: $.copy(f), a: CritBit$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]), b: CritBit$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]), m_a: $.copy(m_a), m_b: $.copy(m_b) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), host, o_b);
   return;
 }
 
@@ -454,7 +478,7 @@ export function n_asks$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): U64 {
-  return CritBit$_.length$($c.borrow_global<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr)).a, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+  return CritBit$_.length$($c.borrow_global<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr)).a, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
 }
 
 export function n_bids$ (
@@ -463,7 +487,7 @@ export function n_bids$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): U64 {
-  return CritBit$_.length$($c.borrow_global<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr)).b, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+  return CritBit$_.length$($c.borrow_global<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr)).b, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
 }
 
 export function process_fill_scenarios$ (
@@ -501,22 +525,22 @@ export function refresh_extreme_order_id$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let temp$1, temp$2, order_book;
-  order_book = $c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  order_book = $c.borrow_global_mut<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr));
   if ((side == ASK)) {
-    if (CritBit$_.is_empty$(order_book.a, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[])) {
+    if (CritBit$_.is_empty$(order_book.a, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[])) {
       temp$1 = MIN_ASK_DEFAULT;
     }
     else{
-      temp$1 = CritBit$_.min_key$(order_book.a, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+      temp$1 = CritBit$_.min_key$(order_book.a, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
     }
     order_book.m_a = temp$1;
   }
   else{
-    if (CritBit$_.is_empty$(order_book.b, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[])) {
+    if (CritBit$_.is_empty$(order_book.b, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[])) {
       temp$2 = MAX_BID_DEFAULT;
     }
     else{
-      temp$2 = CritBit$_.max_key$(order_book.b, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+      temp$2 = CritBit$_.max_key$(order_book.b, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
     }
     order_book.m_b = temp$2;
   }
@@ -529,7 +553,31 @@ export function scale_factor$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): U64 {
-  return $.copy($c.borrow_global<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr)).f);
+  return $.copy($c.borrow_global<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(addr)).f);
+}
+
+export function show_book_as_orders$ (
+  book: OB,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <B, Q, E>*/
+): [Order[], Order[]] {
+  let asks, bids;
+  asks = get_orders_inner$(book, ASK, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
+  bids = get_orders_inner$(book, BID, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
+  return [asks, bids];
+}
+
+export function show_book_as_price_levels$ (
+  book: OB,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <B, Q, E>*/
+): [PriceLevel[], PriceLevel[]] {
+  let ask_levels, asks, bid_levels, bids;
+  asks = get_orders_inner$(book, ASK, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
+  bids = get_orders_inner$(book, BID, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
+  ask_levels = get_price_levels$(asks, $c);
+  bid_levels = get_price_levels$(bids, $c);
+  return [ask_levels, bid_levels];
 }
 
 export function traverse_fill$ (
@@ -548,17 +596,17 @@ export function traverse_fill$ (
 ): [U128, HexString, U64, U64, U64, boolean, boolean] {
   let temp$1, temp$2, filled, insufficient_quote, perfect, size, target_address, target_child_index, target_id, target_parent_field, target_position_ref_mut, traversal_dir, tree;
   if ((side == ASK)) {
-    [temp$1, temp$2] = [$c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host)).a, R];
+    [temp$1, temp$2] = [$c.borrow_global_mut<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host)).a, R];
   }
   else{
-    [temp$1, temp$2] = [$c.borrow_global_mut<OB>(new StructTag(new HexString("0xc0deb00c"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host)).b, L];
+    [temp$1, temp$2] = [$c.borrow_global_mut<OB>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "OB", [$p[0], $p[1], $p[2]]), $.copy(host)).b, L];
   }
   [tree, traversal_dir] = [temp$1, temp$2];
   if (init) {
-    [target_id, target_position_ref_mut, target_parent_field, target_child_index] = CritBit$_.traverse_init_mut$(tree, traversal_dir, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+    [target_id, target_position_ref_mut, target_parent_field, target_child_index] = CritBit$_.traverse_init_mut$(tree, traversal_dir, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
   }
   else{
-    [target_id, target_position_ref_mut, target_parent_field, target_child_index, {  }] = CritBit$_.traverse_pop_mut$(tree, $.copy(start_id), $.copy(start_parent_field), $.copy(start_child_index), $.copy(n_positions), traversal_dir, $c, [new StructTag(new HexString("0xc0deb00c"), "Book", "P", [])] as TypeTag[]);
+    [target_id, target_position_ref_mut, target_parent_field, target_child_index, {  }] = CritBit$_.traverse_pop_mut$(tree, $.copy(start_id), $.copy(start_parent_field), $.copy(start_child_index), $.copy(n_positions), traversal_dir, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "P", [])] as TypeTag[]);
   }
   target_address = $.copy(target_position_ref_mut.a);
   [insufficient_quote, size] = check_size$(side, $.copy(target_id), $.copy(target_position_ref_mut.s), $.copy(size_left), $.copy(quote_available), $c);
@@ -597,10 +645,10 @@ export function traverse_pop_fill$ (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::Book::FriendCap", FriendCap.FriendCapParser);
-  repo.addParser("0xc0deb00c::Book::OB", OB.OBParser);
-  repo.addParser("0xc0deb00c::Book::Order", Order.OrderParser);
-  repo.addParser("0xc0deb00c::Book::P", P.PParser);
-  repo.addParser("0xc0deb00c::Book::PriceLevel", PriceLevel.PriceLevelParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Book::FriendCap", FriendCap.FriendCapParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Book::OB", OB.OBParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Book::Order", Order.OrderParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Book::P", P.PParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Book::PriceLevel", PriceLevel.PriceLevelParser);
 }
 

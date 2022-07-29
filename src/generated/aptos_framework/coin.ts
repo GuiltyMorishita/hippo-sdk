@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
-import * as type_info$_ from "./type_info";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "coin";
@@ -84,10 +84,10 @@ export class CoinEvents
   static fields: FieldDeclType[] = [
   { name: "register_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])]) }];
 
-  register_events: std$_.event$_.EventHandle;
+  register_events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.register_events = proto['register_events'] as std$_.event$_.EventHandle;
+    this.register_events = proto['register_events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static CoinEventsParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : CoinEvents {
@@ -152,13 +152,13 @@ export class CoinStore
   { name: "withdraw_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])]) }];
 
   coin: Coin;
-  deposit_events: std$_.event$_.EventHandle;
-  withdraw_events: std$_.event$_.EventHandle;
+  deposit_events: aptos_std$_.event$_.EventHandle;
+  withdraw_events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.coin = proto['coin'] as Coin;
-    this.deposit_events = proto['deposit_events'] as std$_.event$_.EventHandle;
-    this.withdraw_events = proto['withdraw_events'] as std$_.event$_.EventHandle;
+    this.deposit_events = proto['deposit_events'] as aptos_std$_.event$_.EventHandle;
+    this.withdraw_events = proto['withdraw_events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static CoinStoreParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : CoinStore {
@@ -233,10 +233,10 @@ export class RegisterEvent
   static fields: FieldDeclType[] = [
   { name: "type_info", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) }];
 
-  type_info: type_info$_.TypeInfo;
+  type_info: aptos_std$_.type_info$_.TypeInfo;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.type_info = proto['type_info'] as type_info$_.TypeInfo;
+    this.type_info = proto['type_info'] as aptos_std$_.type_info$_.TypeInfo;
   }
 
   static RegisterEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : RegisterEvent {
@@ -275,7 +275,7 @@ export function balance$ (
   $p: TypeTag[], /* <CoinType>*/
 ): U64 {
   if (!is_account_registered$($.copy(owner), $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOIN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOIN_STORE_NOT_PUBLISHED, $c));
   }
   return $.copy($c.borrow_global<CoinStore>(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), $.copy(owner)).coin.value);
 }
@@ -289,10 +289,10 @@ export function burn$ (
   let temp$1, coin_addr, supply, supply__2;
   let { value: amount } = coin;
   if (!$.copy(amount).gt(u64("0"))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINVALID_COIN_AMOUNT, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINVALID_COIN_AMOUNT, $c));
   }
-  temp$1 = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_addr = type_info$_.account_address$(temp$1, $c);
+  temp$1 = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_addr = aptos_std$_.type_info$_.account_address$(temp$1, $c);
   supply = $c.borrow_global_mut<CoinInfo>(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_addr)).supply;
   if (std$_.option$_.is_some$(supply, $c, [AtomicTypeTag.U128] as TypeTag[])) {
     supply__2 = std$_.option$_.borrow_mut$(supply, $c, [AtomicTypeTag.U128] as TypeTag[]);
@@ -327,8 +327,8 @@ export function decimals$ (
   $p: TypeTag[], /* <CoinType>*/
 ): U64 {
   let coin_address, type_info;
-  type_info = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_address = type_info$_.account_address$(type_info, $c);
+  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_address = aptos_std$_.type_info$_.account_address$(type_info, $c);
   return $.copy($c.borrow_global<CoinInfo>(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_address)).decimals);
 }
 
@@ -340,10 +340,10 @@ export function deposit$ (
 ): void {
   let coin_store;
   if (!is_account_registered$($.copy(account_addr), $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOIN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOIN_STORE_NOT_PUBLISHED, $c));
   }
   coin_store = $c.borrow_global_mut<CoinStore>(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), $.copy(account_addr));
-  std$_.event$_.emit_event$(coin_store.deposit_events, new DepositEvent({ amount: $.copy(coin.value) }, new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(coin_store.deposit_events, new DepositEvent({ amount: $.copy(coin.value) }, new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])] as TypeTag[]);
   merge$(coin_store.coin, coin, $c, [$p[0]] as TypeTag[]);
   return;
 }
@@ -355,7 +355,7 @@ export function destroy_zero$ (
 ): void {
   let { value: value } = zero_coin;
   if (!$.copy(value).eq(u64("0"))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EDESTRUCTION_OF_NONZERO_TOKEN, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EDESTRUCTION_OF_NONZERO_TOKEN, $c));
   }
   return;
 }
@@ -367,7 +367,7 @@ export function extract$ (
   $p: TypeTag[], /* <CoinType>*/
 ): Coin {
   if (!$.copy(coin.value).ge($.copy(amount))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINSUFFICIENT_BALANCE, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINSUFFICIENT_BALANCE, $c));
   }
   coin.value = $.copy(coin.value).sub($.copy(amount));
   return new Coin({ value: $.copy(amount) }, new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]]));
@@ -395,12 +395,12 @@ export function initialize$ (
 ): [MintCapability, BurnCapability] {
   let temp$1, temp$2, temp$3, temp$4, account_addr, coin_info, type_info;
   account_addr = std$_.signer$_.address_of$(account, $c);
-  type_info = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  if (!(type_info$_.account_address$(type_info, $c).hex() === $.copy(account_addr).hex())) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(ECOIN_INFO_ADDRESS_MISMATCH, $c));
+  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  if (!(aptos_std$_.type_info$_.account_address$(type_info, $c).hex() === $.copy(account_addr).hex())) {
+    throw $.abortCode(std$_.error$_.invalid_argument$(ECOIN_INFO_ADDRESS_MISMATCH, $c));
   }
   if (!!$c.exists(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECOIN_INFO_ALREADY_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECOIN_INFO_ALREADY_PUBLISHED, $c));
   }
   temp$4 = $.copy(name);
   temp$3 = $.copy(symbol);
@@ -429,8 +429,8 @@ export function is_coin_initialized$ (
   $p: TypeTag[], /* <CoinType>*/
 ): boolean {
   let coin_address, type_info;
-  type_info = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_address = type_info$_.account_address$(type_info, $c);
+  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_address = aptos_std$_.type_info$_.account_address$(type_info, $c);
   return $c.exists(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_address));
 }
 
@@ -457,14 +457,14 @@ export function mint$ (
   }
   else{
   }
-  temp$1 = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_addr = type_info$_.account_address$(temp$1, $c);
+  temp$1 = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_addr = aptos_std$_.type_info$_.account_address$(temp$1, $c);
   supply = $c.borrow_global_mut<CoinInfo>(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_addr)).supply;
   if (std$_.option$_.is_some$(supply, $c, [AtomicTypeTag.U128] as TypeTag[])) {
     supply__2 = std$_.option$_.borrow_mut$(supply, $c, [AtomicTypeTag.U128] as TypeTag[]);
     amount_u128 = u128($.copy(amount));
     if (!$.copy(supply__2).le(MAX_U128.sub($.copy(amount_u128)))) {
-      throw $.abortCode(std$_.errors$_.invalid_argument$(ETOTAL_SUPPLY_OVERFLOW, $c));
+      throw $.abortCode(std$_.error$_.invalid_argument$(ETOTAL_SUPPLY_OVERFLOW, $c));
     }
     $.set(supply__2, $.copy(supply__2).add($.copy(amount_u128)));
   }
@@ -478,8 +478,8 @@ export function name$ (
   $p: TypeTag[], /* <CoinType>*/
 ): std$_.string$_.String {
   let coin_address, type_info;
-  type_info = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_address = type_info$_.account_address$(type_info, $c);
+  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_address = aptos_std$_.type_info$_.account_address$(type_info, $c);
   return $.copy($c.borrow_global<CoinInfo>(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_address)).name);
 }
 
@@ -512,16 +512,16 @@ export function register_internal$ (
   let account_addr, coin_events, coin_store;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!!is_account_registered$($.copy(account_addr), $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECOIN_STORE_ALREADY_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECOIN_STORE_ALREADY_PUBLISHED, $c));
   }
   if (!$c.exists(new StructTag(new HexString("0x1"), "coin", "CoinEvents", []), $.copy(account_addr))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "coin", "CoinEvents", []), account, new CoinEvents({ register_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "coin", "CoinEvents", [])));
+    $c.move_to(new StructTag(new HexString("0x1"), "coin", "CoinEvents", []), account, new CoinEvents({ register_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "coin", "CoinEvents", [])));
   }
   else{
   }
   coin_events = $c.borrow_global_mut<CoinEvents>(new StructTag(new HexString("0x1"), "coin", "CoinEvents", []), $.copy(account_addr));
-  std$_.event$_.emit_event$(coin_events.register_events, new RegisterEvent({ type_info: type_info$_.type_of$($c, [$p[0]] as TypeTag[]) }, new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])] as TypeTag[]);
-  coin_store = new CoinStore({ coin: new Coin({ value: u64("0") }, new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])), deposit_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])] as TypeTag[]), withdraw_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]));
+  aptos_std$_.event$_.emit_event$(coin_events.register_events, new RegisterEvent({ type_info: aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]) }, new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "RegisterEvent", [])] as TypeTag[]);
+  coin_store = new CoinStore({ coin: new Coin({ value: u64("0") }, new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])), deposit_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])] as TypeTag[]), withdraw_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]));
   $c.move_to(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), account, coin_store);
   return;
 }
@@ -531,8 +531,8 @@ export function supply$ (
   $p: TypeTag[], /* <CoinType>*/
 ): std$_.option$_.Option {
   let coin_address, type_info;
-  type_info = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_address = type_info$_.account_address$(type_info, $c);
+  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_address = aptos_std$_.type_info$_.account_address$(type_info, $c);
   return $.copy($c.borrow_global<CoinInfo>(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_address)).supply);
 }
 
@@ -541,8 +541,8 @@ export function symbol$ (
   $p: TypeTag[], /* <CoinType>*/
 ): std$_.string$_.String {
   let coin_address, type_info;
-  type_info = type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  coin_address = type_info$_.account_address$(type_info, $c);
+  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  coin_address = aptos_std$_.type_info$_.account_address$(type_info, $c);
   return $.copy($c.borrow_global<CoinInfo>(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(coin_address)).symbol);
 }
 
@@ -593,10 +593,10 @@ export function withdraw$ (
   let account_addr, coin_store;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!is_account_registered$($.copy(account_addr), $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECOIN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECOIN_STORE_NOT_PUBLISHED, $c));
   }
   coin_store = $c.borrow_global_mut<CoinStore>(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), $.copy(account_addr));
-  std$_.event$_.emit_event$(coin_store.withdraw_events, new WithdrawEvent({ amount: $.copy(amount) }, new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(coin_store.withdraw_events, new WithdrawEvent({ amount: $.copy(amount) }, new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])] as TypeTag[]);
   return extract$(coin_store.coin, $.copy(amount), $c, [$p[0]] as TypeTag[]);
 }
 

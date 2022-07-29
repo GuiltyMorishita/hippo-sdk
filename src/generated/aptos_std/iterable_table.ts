@@ -7,7 +7,7 @@ import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-t
 import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
 import * as table$_ from "./table";
-export const packageName = "AptosFramework";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "iterable_table";
 
@@ -41,6 +41,7 @@ export class IterableTable
     const proto = $.parseStructProto(data, typeTag, repo, IterableTable);
     return new IterableTable(proto, typeTag);
   }
+  toTypedIterTable<K, V>(field: $.FieldDeclType) { return (TypedIterableTable<K, V>).buildFromField(this, field); }
 
 }
 

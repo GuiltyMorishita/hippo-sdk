@@ -7,6 +7,7 @@ import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-t
 import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
 import * as account$_ from "./account";
+import * as aptos_coin$_ from "./aptos_coin";
 import * as aptos_governance$_ from "./aptos_governance";
 import * as block$_ from "./block";
 import * as chain_id$_ from "./chain_id";
@@ -14,7 +15,6 @@ import * as coin$_ from "./coin";
 import * as consensus_config$_ from "./consensus_config";
 import * as reconfiguration$_ from "./reconfiguration";
 import * as stake$_ from "./stake";
-import * as test_coin$_ from "./test_coin";
 import * as timestamp$_ from "./timestamp";
 import * as transaction_fee$_ from "./transaction_fee";
 import * as transaction_publishing_option$_ from "./transaction_publishing_option";
@@ -60,8 +60,8 @@ export function create_initialize_validators$ (
       stake$_.register_validator_candidate$(owner_account, $.copy(consensus_pubkey), $.copy(pop), $.copy(cur_validator_network_addresses), $.copy(cur_full_node_network_addresses), $c);
       stake$_.increase_lockup$(owner_account, $.copy(initial_lockup_timestamp), $c);
       amount = $.copy(std$_.vector$_.borrow$(staking_distribution, $.copy(i), $c, [AtomicTypeTag.U64] as TypeTag[]));
-      coin$_.register$(owner_account, $c, [new StructTag(new HexString("0x1"), "test_coin", "TestCoin", [])] as TypeTag[]);
-      test_coin$_.mint$(aptos_framework_account, $.copy(owner), $.copy(amount), $c);
+      coin$_.register$(owner_account, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+      aptos_coin$_.mint$(aptos_framework_account, $.copy(owner), $.copy(amount), $c);
       stake$_.add_stake$(owner_account, $.copy(amount), $c);
       stake$_.join_validator_set_internal$(owner_account, $.copy(owner), $c);
       i = $.copy(i).add(u64("1"));
@@ -119,7 +119,7 @@ export function initialize$ (
   $c: AptosDataCache,
 ): void {
   if (!$.copy(epoch_interval).gt(u64("0"))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINVALID_EPOCH_DURATION, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINVALID_EPOCH_DURATION, $c));
   }
   return initialize_internal$(core_resource_account, $.copy(core_resource_account_auth_key), $.copy(initial_script_allow_list), is_open_module, $.copy(instruction_schedule), $.copy(native_schedule), $.copy(chain_id), $.copy(initial_version), $.copy(consensus_config), $.copy(min_price_per_gas_unit), $.copy(epoch_interval), $.copy(minimum_stake), $.copy(maximum_stake), $.copy(min_lockup_duration_secs), $.copy(max_lockup_duration_secs), allow_validator_set_change, $.copy(rewards_rate), $.copy(rewards_rate_denominator), $c);
 }
@@ -157,11 +157,9 @@ export function initialize_internal$ (
   vm_config$_.initialize$(aptos_framework_account, $.copy(instruction_schedule), $.copy(native_schedule), $.copy(min_price_per_gas_unit), $c);
   consensus_config$_.set$(aptos_framework_account, $.copy(consensus_config), $c);
   transaction_publishing_option$_.initialize$(aptos_framework_account, $.copy(initial_script_allow_list), is_open_module, $c);
-  [mint_cap, burn_cap] = test_coin$_.initialize$(aptos_framework_account, core_resource_account, $c);
-  stake$_.store_test_coin_mint_cap$(aptos_framework_account, $.copy(mint_cap), $c);
-  transaction_fee$_.store_test_coin_burn_cap$(aptos_framework_account, $.copy(burn_cap), $c);
-  std$_.event$_.destroy_handle$(std$_.event$_.new_event_handle$(aptos_framework_account, $c, [AtomicTypeTag.U64] as TypeTag[]), $c, [AtomicTypeTag.U64] as TypeTag[]);
-  std$_.event$_.destroy_handle$(std$_.event$_.new_event_handle$(aptos_framework_account, $c, [AtomicTypeTag.U64] as TypeTag[]), $c, [AtomicTypeTag.U64] as TypeTag[]);
+  [mint_cap, burn_cap] = aptos_coin$_.initialize$(aptos_framework_account, core_resource_account, $c);
+  stake$_.store_aptos_coin_mint_cap$(aptos_framework_account, $.copy(mint_cap), $c);
+  transaction_fee$_.store_aptos_coin_burn_cap$(aptos_framework_account, $.copy(burn_cap), $c);
   chain_id$_.initialize$(aptos_framework_account, $.copy(chain_id), $c);
   reconfiguration$_.initialize$(aptos_framework_account, $c);
   block$_.initialize_block_metadata$(aptos_framework_account, $.copy(epoch_interval), $c);

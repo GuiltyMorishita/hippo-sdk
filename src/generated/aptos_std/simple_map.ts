@@ -7,7 +7,7 @@ import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-t
 import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
 import * as comparator$_ from "./comparator";
-export const packageName = "AptosFramework";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "simple_map";
 
@@ -78,7 +78,7 @@ export function add$ (
   [temp$1, temp$2] = [map, key];
   [maybe_idx, maybe_placement] = find$(temp$1, temp$2, $c, [$p[0], $p[1]] as TypeTag[]);
   if (!std$_.option$_.is_none$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EKEY_ALREADY_EXISTS, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_ALREADY_EXISTS, $c));
   }
   std$_.vector$_.push_back$(map.data, new Element({ key: key, value: value }, new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
   placement = std$_.option$_.extract$(maybe_placement, $c, [AtomicTypeTag.U64] as TypeTag[]);
@@ -101,7 +101,7 @@ export function borrow$ (
   let idx, maybe_idx;
   [maybe_idx, ] = find$(map, key, $c, [$p[0], $p[1]] as TypeTag[]);
   if (!std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EKEY_NOT_FOUND, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_NOT_FOUND, $c));
   }
   idx = std$_.option$_.extract$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
   return std$_.vector$_.borrow$(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).value;
@@ -117,7 +117,7 @@ export function borrow_mut$ (
   [temp$1, temp$2] = [map, key];
   [maybe_idx, ] = find$(temp$1, temp$2, $c, [$p[0], $p[1]] as TypeTag[]);
   if (!std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EKEY_NOT_FOUND, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_NOT_FOUND, $c));
   }
   idx = std$_.option$_.extract$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
   return std$_.vector$_.borrow_mut$(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).value;
@@ -212,7 +212,7 @@ export function remove$ (
   [temp$1, temp$2] = [map, key];
   [maybe_idx, ] = find$(temp$1, temp$2, $c, [$p[0], $p[1]] as TypeTag[]);
   if (!std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EKEY_NOT_FOUND, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_NOT_FOUND, $c));
   }
   placement = std$_.option$_.extract$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
   end = std$_.vector$_.length$(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).sub(u64("1"));

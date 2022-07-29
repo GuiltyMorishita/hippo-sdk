@@ -5,6 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
 import * as stake$_ from "./stake";
 import * as system_addresses$_ from "./system_addresses";
@@ -36,12 +37,12 @@ export class Configuration
 
   epoch: U64;
   last_reconfiguration_time: U64;
-  events: std$_.event$_.EventHandle;
+  events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.epoch = proto['epoch'] as U64;
     this.last_reconfiguration_time = proto['last_reconfiguration_time'] as U64;
-    this.events = proto['events'] as std$_.event$_.EventHandle;
+    this.events = proto['events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static ConfigurationParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Configuration {
@@ -110,7 +111,7 @@ export function disable_reconfiguration$ (
 ): void {
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!reconfiguration_enabled$($c)) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(ECONFIGURATION, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(ECONFIGURATION, $c));
   }
   return $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), account, new DisableReconfiguration({  }, new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", [])));
 }
@@ -120,7 +121,7 @@ export function emit_genesis_reconfiguration_event$ (
 ): void {
   let temp$1, config_ref;
   if (!$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECONFIGURATION, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECONFIGURATION, $c));
   }
   config_ref = $c.borrow_global_mut<Configuration>(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"));
   if ($.copy(config_ref.epoch).eq(u64("0"))) {
@@ -130,10 +131,10 @@ export function emit_genesis_reconfiguration_event$ (
     temp$1 = false;
   }
   if (!temp$1) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(ECONFIGURATION, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(ECONFIGURATION, $c));
   }
   config_ref.epoch = u64("1");
-  std$_.event$_.emit_event$(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]);
   return;
 }
 
@@ -143,7 +144,7 @@ export function enable_reconfiguration$ (
 ): void {
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!reconfiguration_enabled$($c)) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(ECONFIGURATION, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(ECONFIGURATION, $c));
   }
   $c.move_from<DisableReconfiguration>(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), std$_.signer$_.address_of$(account, $c));
   return;
@@ -176,12 +177,12 @@ export function initialize$ (
   timestamp$_.assert_genesis$($c);
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECONFIGURATION, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECONFIGURATION, $c));
   }
-  if (!std$_.guid$_.get_next_creation_num$(std$_.signer$_.address_of$(account, $c), $c).eq(u64("2"))) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(EINVALID_GUID_FOR_EVENT, $c));
+  if (!std$_.guid$_.get_next_creation_num$(std$_.signer$_.address_of$(account, $c), $c).eq(u64("0"))) {
+    throw $.abortCode(std$_.error$_.invalid_state$(EINVALID_GUID_FOR_EVENT, $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), account, new Configuration({ epoch: u64("0"), last_reconfiguration_time: u64("0"), events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), account, new Configuration({ epoch: u64("0"), last_reconfiguration_time: u64("0"), events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", [])));
   return;
 }
 
@@ -234,11 +235,11 @@ export function reconfigure_$ (
   else{
   }
   if (!$.copy(current_time).gt($.copy(config_ref.last_reconfiguration_time))) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(EINVALID_BLOCK_TIME, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(EINVALID_BLOCK_TIME, $c));
   }
   config_ref.last_reconfiguration_time = $.copy(current_time);
   config_ref.epoch = $.copy(config_ref.epoch).add(u64("1"));
-  std$_.event$_.emit_event$(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]);
   return;
 }
 

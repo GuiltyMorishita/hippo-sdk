@@ -6,11 +6,12 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
 import * as aptos_framework$_ from "../aptos_framework";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
 import * as Book$_ from "./Book";
 import * as Caps$_ from "./Caps";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "Registry";
 
 export const E_NOT_COIN : U64 = u64("5");
@@ -496,14 +497,14 @@ export class MI
   { name: "q", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) },
   { name: "e", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) }];
 
-  b: aptos_framework$_.type_info$_.TypeInfo;
-  q: aptos_framework$_.type_info$_.TypeInfo;
-  e: aptos_framework$_.type_info$_.TypeInfo;
+  b: aptos_std$_.type_info$_.TypeInfo;
+  q: aptos_std$_.type_info$_.TypeInfo;
+  e: aptos_std$_.type_info$_.TypeInfo;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.b = proto['b'] as aptos_framework$_.type_info$_.TypeInfo;
-    this.q = proto['q'] as aptos_framework$_.type_info$_.TypeInfo;
-    this.e = proto['e'] as aptos_framework$_.type_info$_.TypeInfo;
+    this.b = proto['b'] as aptos_std$_.type_info$_.TypeInfo;
+    this.q = proto['q'] as aptos_std$_.type_info$_.TypeInfo;
+    this.e = proto['e'] as aptos_std$_.type_info$_.TypeInfo;
   }
 
   static MIParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : MI {
@@ -522,12 +523,12 @@ export class MR
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "t", typeTag: new StructTag(new HexString("0x1"), "iterable_table", "IterableTable", [new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []), AtomicTypeTag.Address]) }];
+  { name: "t", typeTag: new StructTag(new HexString("0x1"), "iterable_table", "IterableTable", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []), AtomicTypeTag.Address]) }];
 
-  t: aptos_framework$_.iterable_table$_.IterableTable;
+  t: aptos_std$_.iterable_table$_.IterableTable;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.t = proto['t'] as aptos_framework$_.iterable_table$_.IterableTable;
+    this.t = proto['t'] as aptos_std$_.iterable_table$_.IterableTable;
   }
 
   static MRParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : MR {
@@ -539,6 +540,15 @@ export class MR
     const result = await repo.loadResource(client, address, MR, typeParams);
     return result as unknown as MR;
   }
+
+  async getIterTableEntries_t(client: AptosClient, repo: AptosParserRepo) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    const iterTableField = MR.fields.filter(f=>f.name === 't')[0]
+    const typedIterTable = this.t.toTypedIterTable<MI,HexString>(iterTableField);
+    return await typedIterTable.fetchAll(client, repo);
+  }
+
 }
 export function init_registry$ (
   account: HexString,
@@ -546,13 +556,13 @@ export function init_registry$ (
 ): void {
   let addr;
   addr = std$_.signer$_.address_of$(account, $c);
-  if (!($.copy(addr).hex() === new HexString("0xc0deb00c").hex())) {
+  if (!($.copy(addr).hex() === new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  if (!!$c.exists(new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", []), $.copy(addr))) {
+  if (!!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", []), $.copy(addr))) {
     throw $.abortCode(E_REGISTRY_EXISTS);
   }
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", []), account, new MR({ t: aptos_framework$_.iterable_table$_.new__$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", [])));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", []), account, new MR({ t: aptos_std$_.iterable_table$_.new__$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[]) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", [])));
   return;
 }
 
@@ -561,13 +571,13 @@ export function is_registered$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): boolean {
   let m_i;
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", []), new HexString("0xc0deb00c"))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"))) {
     return false;
   }
   else{
   }
-  m_i = new MI({ b: aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]), q: aptos_framework$_.type_info$_.type_of$($c, [$p[1]] as TypeTag[]), e: aptos_framework$_.type_info$_.type_of$($c, [$p[2]] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []));
-  return aptos_framework$_.iterable_table$_.contains$($c.borrow_global<MR>(new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", []), new HexString("0xc0deb00c")).t, $.copy(m_i), $c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[]);
+  m_i = new MI({ b: aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]), q: aptos_std$_.type_info$_.type_of$($c, [$p[1]] as TypeTag[]), e: aptos_std$_.type_info$_.type_of$($c, [$p[2]] as TypeTag[]) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []));
+  return aptos_std$_.iterable_table$_.contains$($c.borrow_global<MR>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618")).t, $.copy(m_i), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[]);
 }
 
 export function register_market$ (
@@ -577,20 +587,20 @@ export function register_market$ (
 ): void {
   let temp$1, temp$2, temp$3, temp$4, temp$5, m_i, r_t;
   verify_market_types$($c, [$p[0], $p[1], $p[2]] as TypeTag[]);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", []), new HexString("0xc0deb00c"))) {
+  if (!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"))) {
     throw $.abortCode(E_NO_REGISTRY);
   }
-  m_i = new MI({ b: aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]), q: aptos_framework$_.type_info$_.type_of$($c, [$p[1]] as TypeTag[]), e: aptos_framework$_.type_info$_.type_of$($c, [$p[2]] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []));
-  r_t = $c.borrow_global_mut<MR>(new StructTag(new HexString("0xc0deb00c"), "Registry", "MR", []), new HexString("0xc0deb00c")).t;
+  m_i = new MI({ b: aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]), q: aptos_std$_.type_info$_.type_of$($c, [$p[1]] as TypeTag[]), e: aptos_std$_.type_info$_.type_of$($c, [$p[2]] as TypeTag[]) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []));
+  r_t = $c.borrow_global_mut<MR>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MR", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618")).t;
   [temp$1, temp$2] = [r_t, $.copy(m_i)];
-  if (!!aptos_framework$_.iterable_table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[])) {
+  if (!!aptos_std$_.iterable_table$_.contains$(temp$1, temp$2, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[])) {
     throw $.abortCode(E_REGISTERED);
   }
   temp$5 = host;
   temp$4 = scale_factor$($c, [$p[2]] as TypeTag[]);
   temp$3 = Caps$_.book_f_c$($c);
   Book$_.init_book$(temp$5, temp$4, temp$3, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
-  aptos_framework$_.iterable_table$_.add$(r_t, $.copy(m_i), std$_.signer$_.address_of$(host, $c), $c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[]);
+  aptos_std$_.iterable_table$_.add$(r_t, $.copy(m_i), std$_.signer$_.address_of$(host, $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "MI", []), AtomicTypeTag.Address] as TypeTag[]);
   return;
 }
 
@@ -600,137 +610,138 @@ export function buildPayload_register_market (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::Registry::register_market",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::register_market",
     typeParamStrings,
     []
   );
 
 }
+
 export function scale_factor$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <E>*/
 ): U64 {
   let temp$1, temp$10, temp$11, temp$12, temp$13, temp$14, temp$15, temp$16, temp$17, temp$18, temp$19, temp$2, temp$20, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, s_n, t_i;
-  t_i = aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  verify_address$(aptos_framework$_.type_info$_.account_address$(t_i, $c), new HexString("0xc0deb00c"), E_NOT_ECONIA, $c);
-  verify_bytestring$(aptos_framework$_.type_info$_.module_name$(t_i, $c), M_NAME, E_WRONG_MODULE, $c);
-  s_n = aptos_framework$_.type_info$_.struct_name$(t_i, $c);
-  temp$1 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E0", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$1, $c))) {
+  t_i = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  verify_address$(aptos_std$_.type_info$_.account_address$(t_i, $c), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), E_NOT_ECONIA, $c);
+  verify_bytestring$(aptos_std$_.type_info$_.module_name$(t_i, $c), M_NAME, E_WRONG_MODULE, $c);
+  s_n = aptos_std$_.type_info$_.struct_name$(t_i, $c);
+  temp$1 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E0", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$1, $c))) {
     return F0;
   }
   else{
   }
-  temp$2 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E1", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$2, $c))) {
+  temp$2 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E1", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$2, $c))) {
     return F1;
   }
   else{
   }
-  temp$3 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E2", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$3, $c))) {
+  temp$3 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E2", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$3, $c))) {
     return F2;
   }
   else{
   }
-  temp$4 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E3", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$4, $c))) {
+  temp$4 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E3", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$4, $c))) {
     return F3;
   }
   else{
   }
-  temp$5 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E4", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$5, $c))) {
+  temp$5 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E4", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$5, $c))) {
     return F4;
   }
   else{
   }
-  temp$6 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E5", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$6, $c))) {
+  temp$6 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E5", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$6, $c))) {
     return F5;
   }
   else{
   }
-  temp$7 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E6", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$7, $c))) {
+  temp$7 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E6", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$7, $c))) {
     return F6;
   }
   else{
   }
-  temp$8 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E7", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$8, $c))) {
+  temp$8 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E7", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$8, $c))) {
     return F7;
   }
   else{
   }
-  temp$9 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E8", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$9, $c))) {
+  temp$9 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E8", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$9, $c))) {
     return F8;
   }
   else{
   }
-  temp$10 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E9", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$10, $c))) {
+  temp$10 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E9", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$10, $c))) {
     return F9;
   }
   else{
   }
-  temp$11 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E10", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$11, $c))) {
+  temp$11 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E10", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$11, $c))) {
     return F10;
   }
   else{
   }
-  temp$12 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E11", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$12, $c))) {
+  temp$12 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E11", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$12, $c))) {
     return F11;
   }
   else{
   }
-  temp$13 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E12", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$13, $c))) {
+  temp$13 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E12", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$13, $c))) {
     return F12;
   }
   else{
   }
-  temp$14 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E13", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$14, $c))) {
+  temp$14 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E13", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$14, $c))) {
     return F13;
   }
   else{
   }
-  temp$15 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E14", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$15, $c))) {
+  temp$15 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E14", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$15, $c))) {
     return F14;
   }
   else{
   }
-  temp$16 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E15", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$16, $c))) {
+  temp$16 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E15", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$16, $c))) {
     return F15;
   }
   else{
   }
-  temp$17 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E16", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$17, $c))) {
+  temp$17 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E16", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$17, $c))) {
     return F16;
   }
   else{
   }
-  temp$18 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E17", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$18, $c))) {
+  temp$18 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E17", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$18, $c))) {
     return F17;
   }
   else{
   }
-  temp$19 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E18", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$19, $c))) {
+  temp$19 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E18", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$19, $c))) {
     return F18;
   }
   else{
   }
-  temp$20 = aptos_framework$_.type_info$_.type_of$($c, [new StructTag(new HexString("0xc0deb00c"), "Registry", "E19", [])] as TypeTag[]);
-  if ($.veq($.copy(s_n), aptos_framework$_.type_info$_.struct_name$(temp$20, $c))) {
+  temp$20 = aptos_std$_.type_info$_.type_of$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Registry", "E19", [])] as TypeTag[]);
+  if ($.veq($.copy(s_n), aptos_std$_.type_info$_.struct_name$(temp$20, $c))) {
     return F19;
   }
   else{
@@ -777,39 +788,39 @@ export function verify_market_types$ (
 }
 
 export function verify_t_i$ (
-  t1: aptos_framework$_.type_info$_.TypeInfo,
-  t2: aptos_framework$_.type_info$_.TypeInfo,
+  t1: aptos_std$_.type_info$_.TypeInfo,
+  t2: aptos_std$_.type_info$_.TypeInfo,
   e: U64,
   $c: AptosDataCache,
 ): void {
-  verify_address$(aptos_framework$_.type_info$_.account_address$(t1, $c), aptos_framework$_.type_info$_.account_address$(t2, $c), $.copy(e), $c);
-  verify_bytestring$(aptos_framework$_.type_info$_.module_name$(t1, $c), aptos_framework$_.type_info$_.module_name$(t2, $c), $.copy(e), $c);
-  verify_bytestring$(aptos_framework$_.type_info$_.struct_name$(t1, $c), aptos_framework$_.type_info$_.struct_name$(t2, $c), $.copy(e), $c);
+  verify_address$(aptos_std$_.type_info$_.account_address$(t1, $c), aptos_std$_.type_info$_.account_address$(t2, $c), $.copy(e), $c);
+  verify_bytestring$(aptos_std$_.type_info$_.module_name$(t1, $c), aptos_std$_.type_info$_.module_name$(t2, $c), $.copy(e), $c);
+  verify_bytestring$(aptos_std$_.type_info$_.struct_name$(t1, $c), aptos_std$_.type_info$_.struct_name$(t2, $c), $.copy(e), $c);
   return;
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::Registry::E0", E0.E0Parser);
-  repo.addParser("0xc0deb00c::Registry::E1", E1.E1Parser);
-  repo.addParser("0xc0deb00c::Registry::E10", E10.E10Parser);
-  repo.addParser("0xc0deb00c::Registry::E11", E11.E11Parser);
-  repo.addParser("0xc0deb00c::Registry::E12", E12.E12Parser);
-  repo.addParser("0xc0deb00c::Registry::E13", E13.E13Parser);
-  repo.addParser("0xc0deb00c::Registry::E14", E14.E14Parser);
-  repo.addParser("0xc0deb00c::Registry::E15", E15.E15Parser);
-  repo.addParser("0xc0deb00c::Registry::E16", E16.E16Parser);
-  repo.addParser("0xc0deb00c::Registry::E17", E17.E17Parser);
-  repo.addParser("0xc0deb00c::Registry::E18", E18.E18Parser);
-  repo.addParser("0xc0deb00c::Registry::E19", E19.E19Parser);
-  repo.addParser("0xc0deb00c::Registry::E2", E2.E2Parser);
-  repo.addParser("0xc0deb00c::Registry::E3", E3.E3Parser);
-  repo.addParser("0xc0deb00c::Registry::E4", E4.E4Parser);
-  repo.addParser("0xc0deb00c::Registry::E5", E5.E5Parser);
-  repo.addParser("0xc0deb00c::Registry::E6", E6.E6Parser);
-  repo.addParser("0xc0deb00c::Registry::E7", E7.E7Parser);
-  repo.addParser("0xc0deb00c::Registry::E8", E8.E8Parser);
-  repo.addParser("0xc0deb00c::Registry::E9", E9.E9Parser);
-  repo.addParser("0xc0deb00c::Registry::MI", MI.MIParser);
-  repo.addParser("0xc0deb00c::Registry::MR", MR.MRParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E0", E0.E0Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E1", E1.E1Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E10", E10.E10Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E11", E11.E11Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E12", E12.E12Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E13", E13.E13Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E14", E14.E14Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E15", E15.E15Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E16", E16.E16Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E17", E17.E17Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E18", E18.E18Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E19", E19.E19Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E2", E2.E2Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E3", E3.E3Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E4", E4.E4Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E5", E5.E5Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E6", E6.E6Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E7", E7.E7Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E8", E8.E8Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::E9", E9.E9Parser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::MI", MI.MIParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Registry::MR", MR.MRParser);
 }
 

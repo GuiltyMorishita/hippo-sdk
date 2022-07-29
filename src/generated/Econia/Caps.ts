@@ -9,7 +9,7 @@ import * as std$_ from "../std";
 import * as Book$_ from "./Book";
 import * as Orders$_ from "./Orders";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "Caps";
 
 export const E_FC_EXISTS : U64 = u64("1");
@@ -26,8 +26,8 @@ export class FC
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "b", typeTag: new StructTag(new HexString("0xc0deb00c"), "Book", "FriendCap", []) },
-  { name: "o", typeTag: new StructTag(new HexString("0xc0deb00c"), "Orders", "FriendCap", []) }];
+  { name: "b", typeTag: new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Book", "FriendCap", []) },
+  { name: "o", typeTag: new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "FriendCap", []) }];
 
   b: Book$_.FriendCap;
   o: Orders$_.FriendCap;
@@ -53,13 +53,13 @@ export function book_f_c$ (
   if (!has_f_c$($c)) {
     throw $.abortCode(E_NO_FC);
   }
-  return $.copy($c.borrow_global<FC>(new StructTag(new HexString("0xc0deb00c"), "Caps", "FC", []), new HexString("0xc0deb00c")).b);
+  return $.copy($c.borrow_global<FC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Caps", "FC", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618")).b);
 }
 
 export function has_f_c$ (
   $c: AptosDataCache,
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0xc0deb00c"), "Caps", "FC", []), new HexString("0xc0deb00c"));
+  return $c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Caps", "FC", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"));
 }
 
 export function init_caps$ (
@@ -68,13 +68,13 @@ export function init_caps$ (
 ): void {
   let addr;
   addr = std$_.signer$_.address_of$(account, $c);
-  if (!($.copy(addr).hex() === new HexString("0xc0deb00c").hex())) {
+  if (!($.copy(addr).hex() === new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  if (!!$c.exists(new StructTag(new HexString("0xc0deb00c"), "Caps", "FC", []), $.copy(addr))) {
+  if (!!$c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Caps", "FC", []), $.copy(addr))) {
     throw $.abortCode(E_FC_EXISTS);
   }
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Caps", "FC", []), account, new FC({ b: Book$_.get_friend_cap$(account, $c), o: Orders$_.get_friend_cap$(account, $c) }, new StructTag(new HexString("0xc0deb00c"), "Caps", "FC", [])));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Caps", "FC", []), account, new FC({ b: Book$_.get_friend_cap$(account, $c), o: Orders$_.get_friend_cap$(account, $c) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Caps", "FC", [])));
   return;
 }
 
@@ -84,10 +84,10 @@ export function orders_f_c$ (
   if (!has_f_c$($c)) {
     throw $.abortCode(E_NO_FC);
   }
-  return $.copy($c.borrow_global<FC>(new StructTag(new HexString("0xc0deb00c"), "Caps", "FC", []), new HexString("0xc0deb00c")).o);
+  return $.copy($c.borrow_global<FC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Caps", "FC", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618")).o);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::Caps::FC", FC.FCParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Caps::FC", FC.FCParser);
 }
 

@@ -7,7 +7,7 @@ import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-t
 import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "CritBit";
 
 export const E_BIT_NOT_0_OR_1 : U64 = u64("0");
@@ -39,8 +39,8 @@ export class CB
   ];
   static fields: FieldDeclType[] = [
   { name: "r", typeTag: AtomicTypeTag.U64 },
-  { name: "i", typeTag: new VectorTag(new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])) },
-  { name: "o", typeTag: new VectorTag(new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [new $.TypeParamIdx(0)])) }];
+  { name: "i", typeTag: new VectorTag(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])) },
+  { name: "o", typeTag: new VectorTag(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [new $.TypeParamIdx(0)])) }];
 
   r: U64;
   i: I[];
@@ -129,11 +129,11 @@ export function b_s_o$ (
 ): O {
   let temp$1, i_c, n;
   if (is_out$($.copy(cb.r), $c)) {
-    return std$_.vector$_.borrow$(cb.o, o_v$($.copy(cb.r), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+    return std$_.vector$_.borrow$(cb.o, o_v$($.copy(cb.r), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   }
   else{
   }
-  n = std$_.vector$_.borrow$(cb.i, $.copy(cb.r), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  n = std$_.vector$_.borrow$(cb.i, $.copy(cb.r), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   while (true) {
     if (is_set$($.copy(k), $.copy(n.c), $c)) {
       temp$1 = $.copy(n.r);
@@ -143,11 +143,11 @@ export function b_s_o$ (
     }
     i_c = temp$1;
     if (is_out$($.copy(i_c), $c)) {
-      return std$_.vector$_.borrow$(cb.o, o_v$($.copy(i_c), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+      return std$_.vector$_.borrow$(cb.o, o_v$($.copy(i_c), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
     }
     else{
     }
-    n = std$_.vector$_.borrow$(cb.i, $.copy(i_c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+    n = std$_.vector$_.borrow$(cb.i, $.copy(i_c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   }
 }
 
@@ -159,11 +159,11 @@ export function b_s_o_m$ (
 ): O {
   let temp$1, i_c, n;
   if (is_out$($.copy(cb.r), $c)) {
-    return std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(cb.r), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+    return std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(cb.r), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   }
   else{
   }
-  n = std$_.vector$_.borrow$(cb.i, $.copy(cb.r), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  n = std$_.vector$_.borrow$(cb.i, $.copy(cb.r), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   while (true) {
     if (is_set$($.copy(k), $.copy(n.c), $c)) {
       temp$1 = $.copy(n.r);
@@ -173,11 +173,11 @@ export function b_s_o_m$ (
     }
     i_c = temp$1;
     if (is_out$($.copy(i_c), $c)) {
-      return std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_c), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+      return std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_c), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
     }
     else{
     }
-    n = std$_.vector$_.borrow$(cb.i, $.copy(i_c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+    n = std$_.vector$_.borrow$(cb.i, $.copy(i_c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   }
 }
 
@@ -260,8 +260,8 @@ export function destroy_empty$ (
     throw $.abortCode(E_DESTROY_NOT_EMPTY);
   }
   let { i: i, o: o } = cb;
-  std$_.vector$_.destroy_empty$(i, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
-  std$_.vector$_.destroy_empty$(o, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  std$_.vector$_.destroy_empty$(i, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
+  std$_.vector$_.destroy_empty$(o, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   return;
 }
 
@@ -269,7 +269,7 @@ export function empty$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <V>*/
 ): CB {
-  return new CB({ r: u64("0"), i: std$_.vector$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]), o: std$_.vector$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [$p[0]]));
+  return new CB({ r: u64("0"), i: std$_.vector$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]), o: std$_.vector$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "CB", [$p[0]]));
 }
 
 export function has_key$ (
@@ -322,13 +322,13 @@ export function insert_above$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let i_n_r, n_r;
-  i_n_r = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(i_s_p), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).p);
+  i_n_r = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(i_s_p), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).p);
   while (true) {
     if ($.copy(i_n_r).eq(ROOT)) {
       return insert_above_root$(cb, $.copy(k), v, $.copy(n_o), $.copy(i_n_i), $.copy(c), $c, [$p[0]] as TypeTag[]);
     }
     else{
-      n_r = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_n_r), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+      n_r = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_n_r), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
       if ($.copy(c).lt($.copy(n_r.c))) {
         return insert_below_walk$(cb, $.copy(k), v, $.copy(n_o), $.copy(i_n_i), $.copy(i_n_r), $.copy(c), $c, [$p[0]] as TypeTag[]);
       }
@@ -351,7 +351,7 @@ export function insert_above_root$ (
 ): void {
   let i_o_r;
   i_o_r = $.copy(cb.r);
-  std$_.vector$_.borrow_mut$(cb.i, $.copy(i_o_r), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_n_i);
+  std$_.vector$_.borrow_mut$(cb.i, $.copy(i_o_r), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_n_i);
   cb.r = $.copy(i_n_i);
   push_back_insert_nodes$(cb, $.copy(k), v, $.copy(i_n_i), $.copy(c), ROOT, is_set$($.copy(k), $.copy(c), $c), $.copy(i_o_r), o_c$($.copy(n_o), $c), $c, [$p[0]] as TypeTag[]);
   return;
@@ -372,14 +372,14 @@ export function insert_below$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let s_p;
-  s_p = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_s_p), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  s_p = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_s_p), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   if ((s_s_o == L)) {
     s_p.l = $.copy(i_n_i);
   }
   else{
     s_p.r = $.copy(i_n_i);
   }
-  std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_s_o), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = $.copy(i_n_i);
+  std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_s_o), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = $.copy(i_n_i);
   push_back_insert_nodes$(cb, $.copy(k), v, $.copy(i_n_i), $.copy(c), $.copy(i_s_p), $.copy(k).lt($.copy(k_s_o)), o_c$($.copy(n_o), $c), $.copy(i_s_o), $c, [$p[0]] as TypeTag[]);
   return;
 }
@@ -396,7 +396,7 @@ export function insert_below_walk$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let temp$1, temp$2, i_w_c, n_r, s_w_c;
-  n_r = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_n_r), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  n_r = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_n_r), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   if (is_set$($.copy(k), $.copy(n_r.c), $c)) {
     [temp$1, temp$2] = [R, $.copy(n_r.r)];
   }
@@ -410,7 +410,7 @@ export function insert_below_walk$ (
   else{
     n_r.r = $.copy(i_n_i);
   }
-  std$_.vector$_.borrow_mut$(cb.i, $.copy(i_w_c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_n_i);
+  std$_.vector$_.borrow_mut$(cb.i, $.copy(i_w_c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_n_i);
   push_back_insert_nodes$(cb, $.copy(k), v, $.copy(i_n_i), $.copy(c), $.copy(i_n_r), is_set$($.copy(k), $.copy(c), $c), $.copy(i_w_c), o_c$($.copy(n_o), $c), $c, [$p[0]] as TypeTag[]);
   return;
 }
@@ -422,7 +422,7 @@ export function insert_empty$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <V>*/
 ): void {
-  std$_.vector$_.push_back$(cb.o, new O({ k: $.copy(k), v: v, p: ROOT }, new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  std$_.vector$_.push_back$(cb.o, new O({ k: $.copy(k), v: v, p: ROOT }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   cb.r = OUT.shl(N_TYPE);
   return;
 }
@@ -436,7 +436,7 @@ export function insert_general$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let temp$1, temp$2, c, i_n_i, i_s_o, i_s_p, k_s_o, s_p_c, s_s_o;
-  i_n_i = std$_.vector$_.length$(cb.i, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  i_n_i = std$_.vector$_.length$(cb.i, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   [temp$1, temp$2] = [cb, $.copy(k)];
   [i_s_o, s_s_o, k_s_o, i_s_p, s_p_c] = search_outer$(temp$1, temp$2, $c, [$p[0]] as TypeTag[]);
   if (!$.copy(k_s_o).neq($.copy(k))) {
@@ -460,14 +460,14 @@ export function insert_singleton$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let c, n;
-  n = std$_.vector$_.borrow$(cb.o, u64("0"), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  n = std$_.vector$_.borrow$(cb.o, u64("0"), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   if (!$.copy(k).neq($.copy(n.k))) {
     throw $.abortCode(E_HAS_K);
   }
   c = crit_bit$($.copy(n.k), $.copy(k), $c);
   push_back_insert_nodes$(cb, $.copy(k), v, u64("0"), $.copy(c), ROOT, $.copy(k).gt($.copy(n.k)), o_c$(u64("0"), $c), o_c$(u64("1"), $c), $c, [$p[0]] as TypeTag[]);
   cb.r = u64("0");
-  std$_.vector$_.borrow_mut$(cb.o, u64("0"), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = u64("0");
+  std$_.vector$_.borrow_mut$(cb.o, u64("0"), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = u64("0");
   return;
 }
 
@@ -476,7 +476,7 @@ export function is_empty$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <V>*/
 ): boolean {
-  return std$_.vector$_.is_empty$(cb.o, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  return std$_.vector$_.is_empty$(cb.o, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
 }
 
 export function is_out$ (
@@ -499,7 +499,7 @@ export function length$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <V>*/
 ): U64 {
-  return std$_.vector$_.length$(cb.o, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  return std$_.vector$_.length$(cb.o, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
 }
 
 export function max_key$ (
@@ -510,7 +510,7 @@ export function max_key$ (
   if (!!is_empty$(cb, $c, [$p[0]] as TypeTag[])) {
     throw $.abortCode(E_LOOKUP_EMPTY);
   }
-  return $.copy(std$_.vector$_.borrow$(cb.o, o_v$(max_node_c_i$(cb, $c, [$p[0]] as TypeTag[]), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).k);
+  return $.copy(std$_.vector$_.borrow$(cb.o, o_v$(max_node_c_i$(cb, $c, [$p[0]] as TypeTag[]), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).k);
 }
 
 export function max_node_c_i$ (
@@ -526,7 +526,7 @@ export function max_node_c_i$ (
     }
     else{
     }
-    i_n = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(i_n), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).r);
+    i_n = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(i_n), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).r);
   }
 }
 
@@ -538,7 +538,7 @@ export function min_key$ (
   if (!!is_empty$(cb, $c, [$p[0]] as TypeTag[])) {
     throw $.abortCode(E_LOOKUP_EMPTY);
   }
-  return $.copy(std$_.vector$_.borrow$(cb.o, o_v$(min_node_c_i$(cb, $c, [$p[0]] as TypeTag[]), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).k);
+  return $.copy(std$_.vector$_.borrow$(cb.o, o_v$(min_node_c_i$(cb, $c, [$p[0]] as TypeTag[]), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).k);
 }
 
 export function min_node_c_i$ (
@@ -554,7 +554,7 @@ export function min_node_c_i$ (
     }
     else{
     }
-    i_n = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(i_n), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).l);
+    i_n = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(i_n), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).l);
   }
 }
 
@@ -601,14 +601,14 @@ export function pop_destroy_nodes$ (
   $p: TypeTag[], /* <V>*/
 ): any {
   let n_i;
-  n_i = std$_.vector$_.length$(cb.i, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
-  std$_.vector$_.swap_remove$(cb.i, $.copy(i_i), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  n_i = std$_.vector$_.length$(cb.i, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
+  std$_.vector$_.swap_remove$(cb.i, $.copy(i_i), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   if ($.copy(i_i).lt($.copy(n_i).sub(u64("1")))) {
     stitch_swap_remove$(cb, $.copy(i_i), $.copy(n_i), $c, [$p[0]] as TypeTag[]);
   }
   else{
   }
-  let { v: v } = std$_.vector$_.swap_remove$(cb.o, o_v$($.copy(i_o), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  let { v: v } = std$_.vector$_.swap_remove$(cb.o, o_v$($.copy(i_o), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   if (o_v$($.copy(i_o), $c).lt($.copy(n_o).sub(u64("1")))) {
     stitch_swap_remove$(cb, $.copy(i_o), $.copy(n_o), $c, [$p[0]] as TypeTag[]);
   }
@@ -640,11 +640,11 @@ export function pop_singleton$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <V>*/
 ): any {
-  if (!$.copy(std$_.vector$_.borrow$(cb.o, u64("0"), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).k).eq($.copy(k))) {
+  if (!$.copy(std$_.vector$_.borrow$(cb.o, u64("0"), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).k).eq($.copy(k))) {
     throw $.abortCode(E_NOT_HAS_K);
   }
   cb.r = u64("0");
-  let { v: v } = std$_.vector$_.pop_back$(cb.o, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  let { v: v } = std$_.vector$_.pop_back$(cb.o, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   return v;
 }
 
@@ -656,7 +656,7 @@ export function pop_update_relationships$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let temp$1, g_p, i_p_p, i_s, p;
-  p = std$_.vector$_.borrow$(cb.i, $.copy(i_p), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  p = std$_.vector$_.borrow$(cb.i, $.copy(i_p), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   if ((s_c == L)) {
     temp$1 = $.copy(p.r);
   }
@@ -666,16 +666,16 @@ export function pop_update_relationships$ (
   i_s = temp$1;
   i_p_p = $.copy(p.p);
   if (is_out$($.copy(i_s), $c)) {
-    std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_s), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = $.copy(i_p_p);
+    std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_s), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = $.copy(i_p_p);
   }
   else{
-    std$_.vector$_.borrow_mut$(cb.i, $.copy(i_s), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_p_p);
+    std$_.vector$_.borrow_mut$(cb.i, $.copy(i_s), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_p_p);
   }
   if ($.copy(i_p_p).eq(ROOT)) {
     cb.r = $.copy(i_s);
   }
   else{
-    g_p = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_p_p), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+    g_p = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_p_p), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
     if ($.copy(g_p.l).eq($.copy(i_p))) {
       g_p.l = $.copy(i_s);
     }
@@ -707,8 +707,8 @@ export function push_back_insert_nodes$ (
     [temp$1, temp$2] = [$.copy(c2), $.copy(c1)];
   }
   [l, r] = [temp$1, temp$2];
-  std$_.vector$_.push_back$(cb.o, new O({ k: $.copy(k), v: v, p: $.copy(i_n_i) }, new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
-  std$_.vector$_.push_back$(cb.i, new I({ c: $.copy(c), p: $.copy(i_p), l: $.copy(l), r: $.copy(r) }, new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  std$_.vector$_.push_back$(cb.o, new O({ k: $.copy(k), v: v, p: $.copy(i_n_i) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  std$_.vector$_.push_back$(cb.i, new I({ c: $.copy(c), p: $.copy(i_p), l: $.copy(l), r: $.copy(r) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   return;
 }
 
@@ -719,7 +719,7 @@ export function search_outer$ (
   $p: TypeTag[], /* <V>*/
 ): [U64, boolean, U128, U64, U8] {
   let temp$1, temp$2, i, s, s_o, s_p;
-  s_p = std$_.vector$_.borrow$(cb.i, $.copy(cb.r), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  s_p = std$_.vector$_.borrow$(cb.i, $.copy(cb.r), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   while (true) {
     if (is_set$($.copy(k), $.copy(s_p.c), $c)) {
       [temp$1, temp$2] = [$.copy(s_p.r), R];
@@ -729,12 +729,12 @@ export function search_outer$ (
     }
     [i, s] = [temp$1, temp$2];
     if (is_out$($.copy(i), $c)) {
-      s_o = std$_.vector$_.borrow$(cb.o, o_v$($.copy(i), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+      s_o = std$_.vector$_.borrow$(cb.o, o_v$($.copy(i), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
       return [$.copy(i), s, $.copy(s_o.k), $.copy(s_o.p), $.copy(s_p.c)];
     }
     else{
     }
-    s_p = std$_.vector$_.borrow$(cb.i, $.copy(i), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+    s_p = std$_.vector$_.borrow$(cb.i, $.copy(i), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   }
 }
 
@@ -745,7 +745,7 @@ export function singleton$ (
   $p: TypeTag[], /* <V>*/
 ): CB {
   let cb;
-  cb = new CB({ r: u64("0"), i: std$_.vector$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]), o: std$_.vector$_.empty$($c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [$p[0]]));
+  cb = new CB({ r: u64("0"), i: std$_.vector$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]), o: std$_.vector$_.empty$($c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "CB", [$p[0]]));
   insert_empty$(cb, $.copy(k), v, $c, [$p[0]] as TypeTag[]);
   return cb;
 }
@@ -759,7 +759,7 @@ export function stitch_child_of_parent$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   let p;
-  p = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_p), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  p = std$_.vector$_.borrow_mut$(cb.i, $.copy(i_p), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   if ($.copy(p.l).eq($.copy(i_o))) {
     p.l = $.copy(i_n);
   }
@@ -777,10 +777,10 @@ export function stitch_parent_of_child$ (
   $p: TypeTag[], /* <V>*/
 ): void {
   if (is_out$($.copy(i_c), $c)) {
-    std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_c), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = $.copy(i_n);
+    std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_c), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).p = $.copy(i_n);
   }
   else{
-    std$_.vector$_.borrow_mut$(cb.i, $.copy(i_c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_n);
+    std$_.vector$_.borrow_mut$(cb.i, $.copy(i_c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).p = $.copy(i_n);
   }
   return;
 }
@@ -794,7 +794,7 @@ export function stitch_swap_remove$ (
 ): void {
   let i_l, i_p, i_p__1, i_r, n;
   if (is_out$($.copy(i_n), $c)) {
-    i_p = $.copy(std$_.vector$_.borrow$(cb.o, o_v$($.copy(i_n), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]).p);
+    i_p = $.copy(std$_.vector$_.borrow$(cb.o, o_v$($.copy(i_n), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]).p);
     if ($.copy(i_p).eq(ROOT)) {
       cb.r = $.copy(i_n);
       return;
@@ -804,7 +804,7 @@ export function stitch_swap_remove$ (
     stitch_child_of_parent$(cb, $.copy(i_n), $.copy(i_p), o_c$($.copy(n_n).sub(u64("1")), $c), $c, [$p[0]] as TypeTag[]);
   }
   else{
-    n = std$_.vector$_.borrow$(cb.i, $.copy(i_n), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+    n = std$_.vector$_.borrow$(cb.i, $.copy(i_n), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
     [i_p__1, i_l, i_r] = [$.copy(n.p), $.copy(n.l), $.copy(n.r)];
     stitch_parent_of_child$(cb, $.copy(i_n), $.copy(i_l), $c, [$p[0]] as TypeTag[]);
     stitch_parent_of_child$(cb, $.copy(i_n), $.copy(i_r), $c, [$p[0]] as TypeTag[]);
@@ -828,10 +828,10 @@ export function traverse_c_i$ (
   $p: TypeTag[], /* <V>*/
 ): U64 {
   let temp$1, temp$2, c_f, p;
-  p = std$_.vector$_.borrow$(cb.i, $.copy(p_f), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+  p = std$_.vector$_.borrow$(cb.i, $.copy(p_f), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
   while ((d != is_set$($.copy(k), $.copy(p.c), $c))) {
     {
-      p = std$_.vector$_.borrow$(cb.i, $.copy(p.p), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]);
+      p = std$_.vector$_.borrow$(cb.i, $.copy(p.p), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]);
     }
 
   }if ((d == L)) {
@@ -844,10 +844,10 @@ export function traverse_c_i$ (
   while (!is_out$($.copy(c_f), $c)) {
     {
       if ((d == L)) {
-        temp$2 = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(c_f), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).r);
+        temp$2 = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(c_f), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).r);
       }
       else{
-        temp$2 = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(c_f), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).l);
+        temp$2 = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(c_f), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).l);
       }
       c_f = temp$2;
     }
@@ -866,11 +866,11 @@ export function traverse_end_pop$ (
   let temp$1, n_s_c;
   if ($.copy(n_o).eq(u64("1"))) {
     cb.r = u64("0");
-    let { v: v } = std$_.vector$_.pop_back$(cb.o, $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+    let { v: v } = std$_.vector$_.pop_back$(cb.o, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
     temp$1 = v;
   }
   else{
-    n_s_c = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(p_f), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).l).eq($.copy(c_i));
+    n_s_c = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(p_f), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).l).eq($.copy(c_i));
     pop_update_relationships$(cb, n_s_c, $.copy(p_f), $c, [$p[0]] as TypeTag[]);
     temp$1 = pop_destroy_nodes$(cb, $.copy(p_f), $.copy(c_i), $.copy(n_o), $c, [$p[0]] as TypeTag[]);
   }
@@ -891,7 +891,7 @@ export function traverse_init_mut$ (
     temp$1 = min_node_c_i$(cb, $c, [$p[0]] as TypeTag[]);
   }
   i_n = temp$1;
-  n = std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_n), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  n = std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_n), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   return [$.copy(n.k), n.v, $.copy(n.p), $.copy(i_n)];
 }
 
@@ -906,7 +906,7 @@ export function traverse_mut$ (
   let temp$1, temp$2, temp$3, temp$4, i_t, t;
   [temp$1, temp$2, temp$3, temp$4] = [cb, $.copy(k), $.copy(p_f), d];
   i_t = traverse_c_i$(temp$1, temp$2, temp$3, temp$4, $c, [$p[0]] as TypeTag[]);
-  t = std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_t), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  t = std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_t), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   return [$.copy(t.k), t.v, $.copy(t.p), $.copy(i_t)];
 }
 
@@ -951,7 +951,7 @@ export function traverse_pop_mut$ (
   $p: TypeTag[], /* <V>*/
 ): [U128, any, U64, U64, any] {
   let temp$1, temp$2, temp$3, temp$4, i_t, s_s, s_v, t;
-  s_s = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(p_f), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "I", [])] as TypeTag[]).l).eq($.copy(c_i));
+  s_s = $.copy(std$_.vector$_.borrow$(cb.i, $.copy(p_f), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "I", [])] as TypeTag[]).l).eq($.copy(c_i));
   [temp$1, temp$2, temp$3, temp$4] = [cb, $.copy(k), $.copy(p_f), d];
   i_t = traverse_c_i$(temp$1, temp$2, temp$3, temp$4, $c, [$p[0]] as TypeTag[]);
   pop_update_relationships$(cb, s_s, $.copy(p_f), $c, [$p[0]] as TypeTag[]);
@@ -961,7 +961,7 @@ export function traverse_pop_mut$ (
   }
   else{
   }
-  t = std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_t), $c), $c, [new StructTag(new HexString("0xc0deb00c"), "CritBit", "O", [$p[0]])] as TypeTag[]);
+  t = std$_.vector$_.borrow_mut$(cb.o, o_v$($.copy(i_t), $c), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "O", [$p[0]])] as TypeTag[]);
   return [$.copy(t.k), t.v, $.copy(t.p), $.copy(i_t), s_v];
 }
 
@@ -996,8 +996,8 @@ export function traverse_s_pop_mut$ (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::CritBit::CB", CB.CBParser);
-  repo.addParser("0xc0deb00c::CritBit::I", I.IParser);
-  repo.addParser("0xc0deb00c::CritBit::O", O.OParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::CritBit::CB", CB.CBParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::CritBit::I", I.IParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::CritBit::O", O.OParser);
 }
 

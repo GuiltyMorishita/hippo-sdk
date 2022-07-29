@@ -13,16 +13,16 @@ export const moduleName = "transaction_fee";
 
 
 
-export class TestCoinCapabilities 
+export class AptosCoinCapabilities 
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
-  static structName: string = "TestCoinCapabilities";
+  static structName: string = "AptosCoinCapabilities";
   static typeParameters: TypeParamDeclType[] = [
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0x1"), "test_coin", "TestCoin", [])]) }];
+  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]) }];
 
   burn_cap: coin$_.BurnCapability;
 
@@ -30,14 +30,14 @@ export class TestCoinCapabilities
     this.burn_cap = proto['burn_cap'] as coin$_.BurnCapability;
   }
 
-  static TestCoinCapabilitiesParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : TestCoinCapabilities {
-    const proto = $.parseStructProto(data, typeTag, repo, TestCoinCapabilities);
-    return new TestCoinCapabilities(proto, typeTag);
+  static AptosCoinCapabilitiesParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : AptosCoinCapabilities {
+    const proto = $.parseStructProto(data, typeTag, repo, AptosCoinCapabilities);
+    return new AptosCoinCapabilities(proto, typeTag);
   }
 
   static async load(repo: AptosParserRepo, client: AptosClient, address: HexString, typeParams: TypeTag[]) {
-    const result = await repo.loadResource(client, address, TestCoinCapabilities, typeParams);
-    return result as unknown as TestCoinCapabilities;
+    const result = await repo.loadResource(client, address, AptosCoinCapabilities, typeParams);
+    return result as unknown as AptosCoinCapabilities;
   }
 }
 export function burn_fee$ (
@@ -45,20 +45,20 @@ export function burn_fee$ (
   fee: U64,
   $c: AptosDataCache,
 ): void {
-  coin$_.burn_from$($.copy(account), $.copy(fee), $c.borrow_global<TestCoinCapabilities>(new StructTag(new HexString("0x1"), "transaction_fee", "TestCoinCapabilities", []), new HexString("0x1")).burn_cap, $c, [new StructTag(new HexString("0x1"), "test_coin", "TestCoin", [])] as TypeTag[]);
+  coin$_.burn_from$($.copy(account), $.copy(fee), $c.borrow_global<AptosCoinCapabilities>(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), new HexString("0x1")).burn_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
   return;
 }
 
-export function store_test_coin_burn_cap$ (
+export function store_aptos_coin_burn_cap$ (
   account: HexString,
   burn_cap: coin$_.BurnCapability,
   $c: AptosDataCache,
 ): void {
   system_addresses$_.assert_aptos_framework$(account, $c);
-  return $c.move_to(new StructTag(new HexString("0x1"), "transaction_fee", "TestCoinCapabilities", []), account, new TestCoinCapabilities({ burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0x1"), "transaction_fee", "TestCoinCapabilities", [])));
+  return $c.move_to(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), account, new AptosCoinCapabilities({ burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", [])));
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0x1::transaction_fee::TestCoinCapabilities", TestCoinCapabilities.TestCoinCapabilitiesParser);
+  repo.addParser("0x1::transaction_fee::AptosCoinCapabilities", AptosCoinCapabilities.AptosCoinCapabilitiesParser);
 }
 

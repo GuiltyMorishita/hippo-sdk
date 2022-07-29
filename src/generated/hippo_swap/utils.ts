@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as aptos_framework$_ from "../aptos_framework";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
 export const packageName = "hippo-swap";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
@@ -93,12 +93,12 @@ export function is_tokens_sorted$ (
   $p: TypeTag[], /* <T0, T1>*/
 ): boolean {
   let temp$1, n0, n1, name_compare, r, s0, s1, t0, t1;
-  t0 = aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  n0 = aptos_framework$_.type_info$_.module_name$(t0, $c);
-  s0 = aptos_framework$_.type_info$_.struct_name$(t0, $c);
-  t1 = aptos_framework$_.type_info$_.type_of$($c, [$p[1]] as TypeTag[]);
-  n1 = aptos_framework$_.type_info$_.module_name$(t1, $c);
-  s1 = aptos_framework$_.type_info$_.struct_name$(t1, $c);
+  t0 = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  n0 = aptos_std$_.type_info$_.module_name$(t0, $c);
+  s0 = aptos_std$_.type_info$_.struct_name$(t0, $c);
+  t1 = aptos_std$_.type_info$_.type_of$($c, [$p[1]] as TypeTag[]);
+  n1 = aptos_std$_.type_info$_.module_name$(t1, $c);
+  s1 = aptos_std$_.type_info$_.struct_name$(t1, $c);
   name_compare = compare_vec$(n0, n1, $c);
   if ($.copy(name_compare).neq(COMPARE_EQUAL)) {
     temp$1 = $.copy(name_compare);

@@ -2,7 +2,7 @@ import { u64 } from '@manahippo/move-to-ts';
 import { TransactionPayload } from 'aptos/dist/api/data-contracts';
 import { piece_swap_script$_ } from '../generated/hippo_swap';
 import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
-import { TokenInfo } from '../generated/token_registry/token_registry';
+import { TokenInfo } from '../generated/coin_registry/coin_registry';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 
 export class HippoPieceSwapPool extends HippoPool {

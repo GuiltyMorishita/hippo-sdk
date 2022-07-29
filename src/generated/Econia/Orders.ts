@@ -8,7 +8,7 @@ import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
 import * as CritBit$_ from "./CritBit";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "Orders";
 
 export const ASK : boolean = true;
@@ -58,8 +58,8 @@ export class OO
   ];
   static fields: FieldDeclType[] = [
   { name: "f", typeTag: AtomicTypeTag.U64 },
-  { name: "a", typeTag: new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [AtomicTypeTag.U64]) },
-  { name: "b", typeTag: new StructTag(new HexString("0xc0deb00c"), "CritBit", "CB", [AtomicTypeTag.U64]) }];
+  { name: "a", typeTag: new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "CB", [AtomicTypeTag.U64]) },
+  { name: "b", typeTag: new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "CritBit", "CB", [AtomicTypeTag.U64]) }];
 
   f: U64;
   a: CritBit$_.CB;
@@ -124,7 +124,7 @@ export function add_order$ (
   if (!exists_orders$($.copy(addr), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_NO_ORDERS);
   }
-  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
   s_f = $.copy(o_o.f);
   base_subunits = u128($.copy(size)).mul(u128($.copy(s_f)));
   if (!!$.copy(base_subunits).gt(u128(HI_64))) {
@@ -174,7 +174,7 @@ export function cancel_order$ (
   if (!exists_orders$($.copy(addr), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_NO_ORDERS);
   }
-  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
+  o_o = $c.borrow_global_mut<OO>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr));
   if ((side == ASK)) {
     if (!CritBit$_.has_key$(o_o.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[])) {
       throw $.abortCode(E_NO_SUCH_ORDER);
@@ -200,10 +200,10 @@ export function decrement_order_size$ (
 ): void {
   let temp$1, order_size, tree;
   if ((side == ASK)) {
-    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).a;
+    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).a;
   }
   else{
-    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).b;
+    temp$1 = $c.borrow_global_mut<OO>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr)).b;
   }
   tree = temp$1;
   order_size = CritBit$_.borrow_mut$(tree, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
@@ -216,17 +216,17 @@ export function exists_orders$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(a));
+  return $c.exists(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(a));
 }
 
 export function get_friend_cap$ (
   account: HexString,
   $c: AptosDataCache,
 ): FriendCap {
-  if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0xc0deb00c").hex())) {
+  if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  return new FriendCap({  }, new StructTag(new HexString("0xc0deb00c"), "Orders", "FriendCap", []));
+  return new FriendCap({  }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "FriendCap", []));
 }
 
 export function init_orders$ (
@@ -240,8 +240,8 @@ export function init_orders$ (
   if (!!exists_orders$(std$_.signer$_.address_of$(user, $c), $c, [$p[0], $p[1], $p[2]] as TypeTag[])) {
     throw $.abortCode(E_ORDERS_EXISTS);
   }
-  o_o = new OO({ f: $.copy(f), a: CritBit$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]), b: CritBit$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]) }, new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]));
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), user, o_o);
+  o_o = new OO({ f: $.copy(f), a: CritBit$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]), b: CritBit$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]));
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), user, o_o);
   return;
 }
 
@@ -254,7 +254,7 @@ export function remove_order$ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let open_orders;
-  open_orders = $c.borrow_global_mut<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr));
+  open_orders = $c.borrow_global_mut<OO>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(user_addr));
   if ((side == ASK)) {
     CritBit$_.pop$(open_orders.a, $.copy(id), $c, [AtomicTypeTag.U64] as TypeTag[]);
   }
@@ -270,11 +270,11 @@ export function scale_factor$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): U64 {
-  return $.copy($c.borrow_global<OO>(new StructTag(new HexString("0xc0deb00c"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr)).f);
+  return $.copy($c.borrow_global<OO>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Orders", "OO", [$p[0], $p[1], $p[2]]), $.copy(addr)).f);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::Orders::FriendCap", FriendCap.FriendCapParser);
-  repo.addParser("0xc0deb00c::Orders::OO", OO.OOParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Orders::FriendCap", FriendCap.FriendCapParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Orders::OO", OO.OOParser);
 }
 

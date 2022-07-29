@@ -19,7 +19,7 @@ export function assert_aptos_framework$ (
   $c: AptosDataCache,
 ): void {
   if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0x1").hex())) {
-    throw $.abortCode(std$_.errors$_.requires_address$(ENOT_CORE_FRAMEWORK_ADDRESS, $c));
+    throw $.abortCode(std$_.error$_.permission_denied$(ENOT_CORE_FRAMEWORK_ADDRESS, $c));
   }
   return;
 }
@@ -36,7 +36,7 @@ export function assert_core_resource_address$ (
   $c: AptosDataCache,
 ): void {
   if (!is_core_resource_address$($.copy(addr), $c)) {
-    throw $.abortCode(std$_.errors$_.requires_address$(ENOT_CORE_RESOURCE_ADDRESS, $c));
+    throw $.abortCode(std$_.error$_.permission_denied$(ENOT_CORE_RESOURCE_ADDRESS, $c));
   }
   return;
 }
@@ -46,7 +46,7 @@ export function assert_vm$ (
   $c: AptosDataCache,
 ): void {
   if (!(std$_.signer$_.address_of$(account, $c).hex() === new HexString("0x0").hex())) {
-    throw $.abortCode(std$_.errors$_.requires_address$(EVM, $c));
+    throw $.abortCode(std$_.error$_.permission_denied$(EVM, $c));
   }
   return;
 }

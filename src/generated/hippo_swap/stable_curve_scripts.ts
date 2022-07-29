@@ -6,8 +6,8 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
 import * as aptos_framework$_ from "../aptos_framework";
+import * as coin_registry$_ from "../coin_registry";
 import * as std$_ from "../std";
-import * as token_registry$_ from "../token_registry";
 import * as math$_ from "./math";
 import * as mock_coin$_ from "./mock_coin";
 import * as mock_deploy$_ from "./mock_deploy";
@@ -54,6 +54,7 @@ export function buildPayload_add_liquidity (
   );
 
 }
+
 export function create_new_pool$ (
   sender: HexString,
   lp_name: U8[],
@@ -68,19 +69,19 @@ export function create_new_pool$ (
 ): void {
   let admin_addr, block_timestamp, decimals, decimals__1, future_time;
   admin_addr = std$_.signer$_.address_of$(sender, $c);
-  if (!token_registry$_.token_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
+  if (!coin_registry$_.coin_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
     throw $.abortCode(E_TOKEN_REGISTRY_NOT_INITIALIZED);
   }
-  if (!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [$p[0]] as TypeTag[])) {
+  if (!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [$p[0]] as TypeTag[])) {
     throw $.abortCode(E_TOKEN_X_NOT_REGISTERED);
   }
-  if (!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [$p[1]] as TypeTag[])) {
+  if (!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [$p[1]] as TypeTag[])) {
     throw $.abortCode(E_TOKEN_Y_NOT_REGISTERED);
   }
-  if (!!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[])) {
+  if (!!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[])) {
     throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
   }
-  if (!!token_registry$_.token_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[1], $p[0]])] as TypeTag[])) {
+  if (!!coin_registry$_.coin_registry$_.has_token$($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[1], $p[0]])] as TypeTag[])) {
     throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
   }
   block_timestamp = aptos_framework$_.timestamp$_.now_microseconds$($c);
@@ -88,7 +89,7 @@ export function create_new_pool$ (
   decimals = math$_.max$(u128(aptos_framework$_.coin$_.decimals$($c, [$p[0]] as TypeTag[])), u128(aptos_framework$_.coin$_.decimals$($c, [$p[1]] as TypeTag[])), $c);
   decimals__1 = u64($.copy(decimals));
   stable_curve_swap$_.initialize$(sender, std$_.string$_.utf8$($.copy(lp_name), $c), std$_.string$_.utf8$($.copy(lp_symbol), $c), $.copy(decimals__1), u64("60"), u64("80"), $.copy(block_timestamp), $.copy(future_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]] as TypeTag[]);
-  token_registry$_.token_registry$_.add_token$(sender, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8("8"), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[]);
+  coin_registry$_.coin_registry$_.add_token$(sender, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8("8"), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[]);
   return;
 }
 
@@ -111,7 +112,7 @@ export function mock_create_pair_and_add_liquidity$ (
   decimals = math$_.max$(u128(aptos_framework$_.coin$_.decimals$($c, [$p[0]] as TypeTag[])), u128(aptos_framework$_.coin$_.decimals$($c, [$p[1]] as TypeTag[])), $c);
   decimals__1 = u64($.copy(decimals));
   stable_curve_swap$_.initialize$(admin, $.copy(name), $.copy(name), $.copy(decimals__1), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]] as TypeTag[]);
-  token_registry$_.token_registry$_.add_token$(admin, $.copy(symbol), $.copy(symbol), $.copy(symbol), u8($.copy(decimals__1)), [], [], $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[]);
+  coin_registry$_.coin_registry$_.add_token$(admin, $.copy(symbol), $.copy(symbol), $.copy(symbol), u8($.copy(decimals__1)), [], [], $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])] as TypeTag[]);
   some_x = mock_coin$_.mint$($.copy(left_amt), $c, [$p[0]] as TypeTag[]);
   some_y = mock_coin$_.mint$($.copy(right_amt), $c, [$p[1]] as TypeTag[]);
   [unused_x, unused_y, some_lp] = stable_curve_swap$_.add_liquidity_direct$(some_x, some_y, $c, [$p[0], $p[1]] as TypeTag[]);
@@ -130,8 +131,8 @@ export function mock_deploy$ (
 ): void {
   let admin_addr, admin_fee, coin_amt, fee;
   admin_addr = std$_.signer$_.address_of$(admin, $c);
-  if (!token_registry$_.token_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
-    token_registry$_.token_registry$_.initialize$(admin, $c);
+  if (!coin_registry$_.coin_registry$_.is_registry_initialized$($.copy(admin_addr), $c)) {
+    coin_registry$_.coin_registry$_.initialize$(admin, $c);
   }
   else{
   }
@@ -164,6 +165,7 @@ export function buildPayload_mock_deploy_script (
   );
 
 }
+
 export function remove_liquidity$ (
   sender: HexString,
   liquidity: U64,
@@ -195,6 +197,7 @@ export function buildPayload_remove_liquidity (
   );
 
 }
+
 export function swap$ (
   sender: HexString,
   x_in: U64,
@@ -281,6 +284,7 @@ export function buildPayload_swap_script (
   );
 
 }
+
 export function loadParsers(repo: AptosParserRepo) {
 }
 

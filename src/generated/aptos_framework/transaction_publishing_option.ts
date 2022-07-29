@@ -55,7 +55,7 @@ export function initialize$ (
   timestamp$_.assert_genesis$($c);
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "transaction_publishing_option", "TransactionPublishingOption", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECONFIG, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECONFIG, $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "transaction_publishing_option", "TransactionPublishingOption", []), account, new TransactionPublishingOption({ script_allow_list: $.copy(script_allow_list), module_publishing_allowed: module_publishing_allowed }, new StructTag(new HexString("0x1"), "transaction_publishing_option", "TransactionPublishingOption", [])));
   return;

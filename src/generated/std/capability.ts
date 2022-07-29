@@ -8,7 +8,7 @@ import {HexString, AptosClient} from "aptos";
 import * as error$_ from "./error";
 import * as signer$_ from "./signer";
 import * as vector$_ from "./vector";
-export const packageName = "MoveNursery";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "capability";
 

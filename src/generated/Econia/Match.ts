@@ -13,7 +13,7 @@ import * as ID$_ from "./ID";
 import * as Orders$_ from "./Orders";
 import * as User$_ from "./User";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "Match";
 
 export const ASK : boolean = true;
@@ -137,7 +137,7 @@ export function buildPayload_submit_market_buy (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::Match::submit_market_buy",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Match::submit_market_buy",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -147,6 +147,7 @@ export function buildPayload_submit_market_buy (
   );
 
 }
+
 export function submit_market_order$ (
   user: HexString,
   host: HexString,
@@ -231,7 +232,7 @@ export function buildPayload_submit_market_sell (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::Match::submit_market_sell",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Match::submit_market_sell",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -240,6 +241,7 @@ export function buildPayload_submit_market_sell (
   );
 
 }
+
 export function swap$ (
   user: HexString,
   host: HexString,
@@ -312,7 +314,7 @@ export function buildPayload_swap_buy (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::Match::swap_buy",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Match::swap_buy",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -322,6 +324,7 @@ export function buildPayload_swap_buy (
   );
 
 }
+
 export function swap_sell$ (
   user: HexString,
   host: HexString,
@@ -347,7 +350,7 @@ export function buildPayload_swap_sell (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c::Match::swap_sell",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Match::swap_sell",
     typeParamStrings,
     [
       $.payloadArg(host),
@@ -356,6 +359,7 @@ export function buildPayload_swap_sell (
   );
 
 }
+
 export function loadParsers(repo: AptosParserRepo) {
 }
 

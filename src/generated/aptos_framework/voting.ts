@@ -5,17 +5,17 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
-import * as table$_ from "./table";
 import * as timestamp$_ from "./timestamp";
 import * as transaction_context$_ from "./transaction_context";
-import * as type_info$_ from "./type_info";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "voting";
 
 export const EPROPOSAL_ALREADY_RESOLVED : U64 = u64("3");
 export const EPROPOSAL_CANNOT_BE_RESOLVED : U64 = u64("2");
+export const EPROPOSAL_EMPTY_EXECUTION_HASH : U64 = u64("4");
 export const EPROPOSAL_EXECUTION_HASH_NOT_MATCHING : U64 = u64("1");
 export const PROPOSAL_STATE_FAILED : U64 = u64("3");
 export const PROPOSAL_STATE_PENDING : U64 = u64("0");
@@ -122,11 +122,11 @@ export class RegisterForumEvent
   { name: "proposal_type_info", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) }];
 
   hosting_account: HexString;
-  proposal_type_info: type_info$_.TypeInfo;
+  proposal_type_info: aptos_std$_.type_info$_.TypeInfo;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.hosting_account = proto['hosting_account'] as HexString;
-    this.proposal_type_info = proto['proposal_type_info'] as type_info$_.TypeInfo;
+    this.proposal_type_info = proto['proposal_type_info'] as aptos_std$_.type_info$_.TypeInfo;
   }
 
   static RegisterForumEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : RegisterForumEvent {
@@ -210,16 +210,16 @@ export class VotingEvents
   { name: "resolve_proposal_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])]) },
   { name: "vote_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])]) }];
 
-  create_proposal_events: std$_.event$_.EventHandle;
-  register_forum_events: std$_.event$_.EventHandle;
-  resolve_proposal_events: std$_.event$_.EventHandle;
-  vote_events: std$_.event$_.EventHandle;
+  create_proposal_events: aptos_std$_.event$_.EventHandle;
+  register_forum_events: aptos_std$_.event$_.EventHandle;
+  resolve_proposal_events: aptos_std$_.event$_.EventHandle;
+  vote_events: aptos_std$_.event$_.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.create_proposal_events = proto['create_proposal_events'] as std$_.event$_.EventHandle;
-    this.register_forum_events = proto['register_forum_events'] as std$_.event$_.EventHandle;
-    this.resolve_proposal_events = proto['resolve_proposal_events'] as std$_.event$_.EventHandle;
-    this.vote_events = proto['vote_events'] as std$_.event$_.EventHandle;
+    this.create_proposal_events = proto['create_proposal_events'] as aptos_std$_.event$_.EventHandle;
+    this.register_forum_events = proto['register_forum_events'] as aptos_std$_.event$_.EventHandle;
+    this.resolve_proposal_events = proto['resolve_proposal_events'] as aptos_std$_.event$_.EventHandle;
+    this.vote_events = proto['vote_events'] as aptos_std$_.event$_.EventHandle;
   }
 
   static VotingEventsParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : VotingEvents {
@@ -242,12 +242,12 @@ export class VotingForum
   { name: "events", typeTag: new StructTag(new HexString("0x1"), "voting", "VotingEvents", []) },
   { name: "next_proposal_id", typeTag: AtomicTypeTag.U64 }];
 
-  proposals: table$_.Table;
+  proposals: aptos_std$_.table$_.Table;
   events: VotingEvents;
   next_proposal_id: U64;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.proposals = proto['proposals'] as table$_.Table;
+    this.proposals = proto['proposals'] as aptos_std$_.table$_.Table;
     this.events = proto['events'] as VotingEvents;
     this.next_proposal_id = proto['next_proposal_id'] as U64;
   }
@@ -299,6 +299,9 @@ export function create_proposal$ (
   $p: TypeTag[], /* <ProposalType>*/
 ): U64 {
   let temp$1, temp$10, temp$11, temp$12, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, proposal_id, voting_forum;
+  if (!std$_.vector$_.length$(execution_hash, $c, [AtomicTypeTag.U8] as TypeTag[]).gt(u64("0"))) {
+    throw $.abortCode(std$_.error$_.invalid_argument$(EPROPOSAL_EMPTY_EXECUTION_HASH, $c));
+  }
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
   proposal_id = $.copy(voting_forum.next_proposal_id);
   voting_forum.next_proposal_id = $.copy(voting_forum.next_proposal_id).add(u64("1"));
@@ -314,8 +317,8 @@ export function create_proposal$ (
   temp$8 = u128("0");
   temp$9 = u128("0");
   temp$10 = false;
-  table$_.add$(temp$12, temp$11, new Proposal({ proposer: temp$1, execution_content: temp$3, creation_time_secs: temp$2, execution_hash: temp$4, min_vote_threshold: temp$5, expiration_secs: temp$6, early_resolution_vote_threshold: temp$7, yes_votes: temp$8, no_votes: temp$9, is_resolved: temp$10 }, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
-  std$_.event$_.emit_event$(voting_forum.events.create_proposal_events, new CreateProposalEvent({ proposal_id: $.copy(proposal_id), early_resolution_vote_threshold: $.copy(early_resolution_vote_threshold), execution_hash: $.copy(execution_hash), expiration_secs: $.copy(expiration_secs), min_vote_threshold: $.copy(min_vote_threshold) }, new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])] as TypeTag[]);
+  aptos_std$_.table$_.add$(temp$12, temp$11, new Proposal({ proposer: temp$1, execution_content: temp$3, creation_time_secs: temp$2, execution_hash: temp$4, min_vote_threshold: temp$5, expiration_secs: temp$6, early_resolution_vote_threshold: temp$7, yes_votes: temp$8, no_votes: temp$9, is_resolved: temp$10 }, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(voting_forum.events.create_proposal_events, new CreateProposalEvent({ proposal_id: $.copy(proposal_id), early_resolution_vote_threshold: $.copy(early_resolution_vote_threshold), execution_hash: $.copy(execution_hash), expiration_secs: $.copy(expiration_secs), min_vote_threshold: $.copy(min_vote_threshold) }, new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])] as TypeTag[]);
   return $.copy(proposal_id);
 }
 
@@ -327,7 +330,7 @@ export function get_proposal_expiration_secs$ (
 ): U64 {
   let proposal, voting_forum;
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+  proposal = aptos_std$_.table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
   return $.copy(proposal.expiration_secs);
 }
 
@@ -340,7 +343,7 @@ export function get_proposal_state$ (
   let temp$1, temp$2, temp$3, no_votes, proposal, voting_forum, yes_votes;
   if (is_voting_closed$($.copy(voting_forum_address), $.copy(proposal_id), $c, [$p[0]] as TypeTag[])) {
     voting_forum = $c.borrow_global<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-    proposal = table$_.borrow$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+    proposal = aptos_std$_.table$_.borrow$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
     yes_votes = $.copy(proposal.yes_votes);
     no_votes = $.copy(proposal.no_votes);
     if ($.copy(yes_votes).gt($.copy(no_votes))) {
@@ -371,7 +374,7 @@ export function is_voting_closed$ (
 ): boolean {
   let temp$1, proposal, voting_forum;
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+  proposal = aptos_std$_.table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
   if (can_be_resolved_early$(proposal, $c, [$p[0]] as TypeTag[])) {
     temp$1 = true;
   }
@@ -388,10 +391,10 @@ export function register$ (
 ): void {
   let temp$1, temp$2, temp$3, voting_forum;
   temp$1 = u64("0");
-  temp$2 = table$_.new__$($c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
-  temp$3 = new VotingEvents({ create_proposal_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])] as TypeTag[]), register_forum_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])] as TypeTag[]), resolve_proposal_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])] as TypeTag[]), vote_events: std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "voting", "VotingEvents", []));
+  temp$2 = aptos_std$_.table$_.new__$($c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+  temp$3 = new VotingEvents({ create_proposal_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])] as TypeTag[]), register_forum_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])] as TypeTag[]), resolve_proposal_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])] as TypeTag[]), vote_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "voting", "VotingEvents", []));
   voting_forum = new VotingForum({ proposals: temp$2, events: temp$3, next_proposal_id: temp$1 }, new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]));
-  std$_.event$_.emit_event$(voting_forum.events.register_forum_events, new RegisterForumEvent({ hosting_account: std$_.signer$_.address_of$(account, $c), proposal_type_info: type_info$_.type_of$($c, [$p[0]] as TypeTag[]) }, new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(voting_forum.events.register_forum_events, new RegisterForumEvent({ hosting_account: std$_.signer$_.address_of$(account, $c), proposal_type_info: aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]) }, new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])] as TypeTag[]);
   $c.move_to(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), account, voting_forum);
   return;
 }
@@ -405,19 +408,19 @@ export function resolve$ (
   let proposal, proposal_state, resolved_early, voting_forum;
   proposal_state = get_proposal_state$($.copy(voting_forum_address), $.copy(proposal_id), $c, [$p[0]] as TypeTag[]);
   if (!$.copy(proposal_state).eq(PROPOSAL_STATE_SUCCEEDED)) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EPROPOSAL_CANNOT_BE_RESOLVED, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EPROPOSAL_CANNOT_BE_RESOLVED, $c));
   }
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+  proposal = aptos_std$_.table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
   if (!!$.copy(proposal.is_resolved)) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EPROPOSAL_ALREADY_RESOLVED, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EPROPOSAL_ALREADY_RESOLVED, $c));
   }
   resolved_early = can_be_resolved_early$(proposal, $c, [$p[0]] as TypeTag[]);
   proposal.is_resolved = true;
   if (!$.veq(transaction_context$_.get_script_hash$($c), $.copy(proposal.execution_hash))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EPROPOSAL_EXECUTION_HASH_NOT_MATCHING, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EPROPOSAL_EXECUTION_HASH_NOT_MATCHING, $c));
   }
-  std$_.event$_.emit_event$(voting_forum.events.resolve_proposal_events, new ResolveProposal({ proposal_id: $.copy(proposal_id), yes_votes: $.copy(proposal.yes_votes), no_votes: $.copy(proposal.no_votes), resolved_early: resolved_early }, new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])), $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(voting_forum.events.resolve_proposal_events, new ResolveProposal({ proposal_id: $.copy(proposal_id), yes_votes: $.copy(proposal.yes_votes), no_votes: $.copy(proposal.no_votes), resolved_early: resolved_early }, new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])), $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])] as TypeTag[]);
   return std$_.option$_.extract$(proposal.execution_content, $c, [$p[0]] as TypeTag[]);
 }
 
@@ -432,14 +435,14 @@ export function vote$ (
 ): void {
   let proposal, voting_forum;
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
+  proposal = aptos_std$_.table$_.borrow_mut$(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])] as TypeTag[]);
   if (should_pass) {
     proposal.yes_votes = $.copy(proposal.yes_votes).add(u128($.copy(num_votes)));
   }
   else{
     proposal.no_votes = $.copy(proposal.no_votes).add(u128($.copy(num_votes)));
   }
-  std$_.event$_.emit_event$(voting_forum.events.vote_events, new VoteEvent({ proposal_id: $.copy(proposal_id), num_votes: $.copy(num_votes) }, new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])] as TypeTag[]);
+  aptos_std$_.event$_.emit_event$(voting_forum.events.vote_events, new VoteEvent({ proposal_id: $.copy(proposal_id), num_votes: $.copy(num_votes) }, new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])] as TypeTag[]);
   return;
 }
 

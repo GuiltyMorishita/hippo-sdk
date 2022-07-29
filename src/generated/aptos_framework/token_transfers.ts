@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
-import * as table$_ from "./table";
 import * as token$_ from "./token";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
@@ -25,10 +25,10 @@ export class TokenTransfers
   static fields: FieldDeclType[] = [
   { name: "pending_claims", typeTag: new StructTag(new HexString("0x1"), "table", "Table", [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])]) }];
 
-  pending_claims: table$_.Table;
+  pending_claims: aptos_std$_.table$_.Table;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.pending_claims = proto['pending_claims'] as table$_.Table;
+    this.pending_claims = proto['pending_claims'] as aptos_std$_.table$_.Table;
   }
 
   static TokenTransfersParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : TokenTransfers {
@@ -50,11 +50,11 @@ export function cancel_offer$ (
   let pending_claims, pending_tokens, real_pending_claims, sender_addr, token;
   sender_addr = std$_.signer$_.address_of$(sender, $c);
   pending_claims = $c.borrow_global_mut<TokenTransfers>(new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", []), $.copy(sender_addr)).pending_claims;
-  pending_tokens = table$_.borrow_mut$(pending_claims, $.copy(receiver), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
-  token = table$_.remove$(pending_tokens, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
-  if (table$_.length$(pending_tokens, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).eq(u64("0"))) {
-    real_pending_claims = table$_.remove$(pending_claims, $.copy(receiver), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
-    table$_.destroy_empty$(real_pending_claims, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  pending_tokens = aptos_std$_.table$_.borrow_mut$(pending_claims, $.copy(receiver), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
+  token = aptos_std$_.table$_.remove$(pending_tokens, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  if (aptos_std$_.table$_.length$(pending_tokens, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).eq(u64("0"))) {
+    real_pending_claims = aptos_std$_.table$_.remove$(pending_claims, $.copy(receiver), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
+    aptos_std$_.table$_.destroy_empty$(real_pending_claims, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
   }
   else{
   }
@@ -104,11 +104,11 @@ export function claim$ (
   let pending_claims, pending_tokens, real_pending_claims, receiver_addr, token;
   receiver_addr = std$_.signer$_.address_of$(receiver, $c);
   pending_claims = $c.borrow_global_mut<TokenTransfers>(new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", []), $.copy(sender)).pending_claims;
-  pending_tokens = table$_.borrow_mut$(pending_claims, $.copy(receiver_addr), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
-  token = table$_.remove$(pending_tokens, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
-  if (table$_.length$(pending_tokens, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).eq(u64("0"))) {
-    real_pending_claims = table$_.remove$(pending_claims, $.copy(receiver_addr), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
-    table$_.destroy_empty$(real_pending_claims, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  pending_tokens = aptos_std$_.table$_.borrow_mut$(pending_claims, $.copy(receiver_addr), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
+  token = aptos_std$_.table$_.remove$(pending_tokens, $.copy(token_id), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  if (aptos_std$_.table$_.length$(pending_tokens, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]).eq(u64("0"))) {
+    real_pending_claims = aptos_std$_.table$_.remove$(pending_claims, $.copy(receiver_addr), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
+    aptos_std$_.table$_.destroy_empty$(real_pending_claims, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
   }
   else{
   }
@@ -164,7 +164,7 @@ export function initialize_token_transfers$ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  return $c.move_to(new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", []), account, new TokenTransfers({ pending_claims: table$_.new__$($c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", [])));
+  return $c.move_to(new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", []), account, new TokenTransfers({ pending_claims: aptos_std$_.table$_.new__$($c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", [])));
 }
 
 export function offer$ (
@@ -183,21 +183,21 @@ export function offer$ (
   }
   pending_claims = $c.borrow_global_mut<TokenTransfers>(new StructTag(new HexString("0x1"), "token_transfers", "TokenTransfers", []), $.copy(sender_addr)).pending_claims;
   [temp$1, temp$2] = [pending_claims, $.copy(receiver)];
-  if (!table$_.contains$(temp$1, temp$2, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[])) {
-    table$_.add$(pending_claims, $.copy(receiver), table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
+  if (!aptos_std$_.table$_.contains$(temp$1, temp$2, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[])) {
+    aptos_std$_.table$_.add$(pending_claims, $.copy(receiver), aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
   }
   else{
   }
-  addr_pending_claims = table$_.borrow_mut$(pending_claims, $.copy(receiver), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
+  addr_pending_claims = aptos_std$_.table$_.borrow_mut$(pending_claims, $.copy(receiver), $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "table", "Table", [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])])] as TypeTag[]);
   token = token$_.withdraw_token$(sender, $.copy(token_id), $.copy(amount), $c);
   token_id__3 = $.copy(token$_.token_id$(token, $c));
   [temp$4, temp$5] = [addr_pending_claims, $.copy(token_id__3)];
-  if (table$_.contains$(temp$4, temp$5, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
-    dst_token = table$_.borrow_mut$(addr_pending_claims, $.copy(token_id__3), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+  if (aptos_std$_.table$_.contains$(temp$4, temp$5, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[])) {
+    dst_token = aptos_std$_.table$_.borrow_mut$(addr_pending_claims, $.copy(token_id__3), $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
     token$_.merge$(dst_token, token, $c);
   }
   else{
-    table$_.add$(addr_pending_claims, $.copy(token_id__3), token, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
+    aptos_std$_.table$_.add$(addr_pending_claims, $.copy(token_id__3), token, $c, [new StructTag(new HexString("0x1"), "token", "TokenId", []), new StructTag(new HexString("0x1"), "token", "Token", [])] as TypeTag[]);
   }
   return;
 }

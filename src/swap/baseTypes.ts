@@ -2,7 +2,7 @@ import { getTypeTagFullname, StructTag, u64, u8 } from "@manahippo/move-to-ts";
 import { Types } from "aptos";
 import bigInt from "big-integer";
 import { router$_ } from "../generated/hippo_swap";
-import { TokenInfo } from "../generated/token_registry/token_registry";
+import { TokenInfo } from "../generated/coin_registry/coin_registry";
 import { typeInfoToTypeTag } from "../utils";
 
 export type UITokenAmount = number;

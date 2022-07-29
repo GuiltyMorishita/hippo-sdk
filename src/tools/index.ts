@@ -1,9 +1,9 @@
-import { AptosParserRepo, getTypeTagFullname, StructTag, u64, strToU8, u8str, DummyCache } from "@manahippo/move-to-ts";
+import { AptosParserRepo, getTypeTagFullname, StructTag, u8, u64, strToU8, u8str, DummyCache } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { Command } from "commander";
 import { getProjectRepo } from "../generated";
 import { aptos_framework, hippo_swap } from "../generated/";
-import { token_registry$_ } from "../generated/token_registry";
+import { coin_registry$_ } from "../generated/coin_registry";
 import { isTypeInfoSame, printResource, printResources, typeInfoToTypeTag, typeTagToTypeInfo } from "../utils";
 import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
@@ -18,7 +18,7 @@ import { get_price_levels$ } from "../generated/Econia/Book";
 const actionShowTokenRegistry = async () => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokens = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokens = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   for(const tokInfo of tokens.token_info_list) {
     console.log(`########${tokInfo.symbol.str()}#######`);
     console.log(`name: ${tokInfo.name.str()}`);
@@ -36,7 +36,7 @@ const actionShowTokenRegistry = async () => {
 const actionShowPools = async () => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokens = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokens = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const tokenList = tokens.token_info_list;
   for(const pi of tokenList) {
     const structTag = typeInfoToTypeTag(pi.token_type);
@@ -70,7 +70,7 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: a
   const amount = u64(rawAmount);
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const registry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if (ti.delisted) {
       continue;
@@ -89,7 +89,7 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: a
 const actionShowWallet = async() => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const registry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if(ti.delisted) {
       continue;
@@ -112,7 +112,7 @@ const getFromToAndLps = async(
   fromSymbol: string,
   toSymbol: string
 ) => {
-  const registry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -539,29 +539,29 @@ const checkTestCoin = async () => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
   const testCoinTag = new StructTag(
-    aptos_framework.test_coin$_.moduleAddress,
-    aptos_framework.test_coin$_.moduleName,
-    aptos_framework.test_coin$_.TestCoin.structName,
+    aptos_framework.aptos_coin$_.moduleAddress,
+    aptos_framework.aptos_coin$_.moduleName,
+    aptos_framework.aptos_coin$_.AptosCoin.structName,
     []
   );
-  const testCoinInfo = await CoinInfo.load(repo, client, aptos_framework.test_coin$_.moduleAddress, [testCoinTag])
+  const testCoinInfo = await CoinInfo.load(repo, client, aptos_framework.aptos_coin$_.moduleAddress, [testCoinTag])
   printResource(testCoinInfo);
-  const registry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   for(const tokenInfo of registry.token_info_list) {
     if(tokenInfo.delisted) {
       continue;
     }
     const tag = typeInfoToTypeTag(tokenInfo.token_type);
     if(getTypeTagFullname(tag) === getTypeTagFullname(testCoinTag)) {
-      console.log("TestCoin already registered.");
+      console.log("Aptos already registered.");
       return;
     }
   }
-  const payload = token_registry$_.buildPayload_add_token_script(
-    strToU8("TestCoin"),
+  const payload = coin_registry$_.buildPayload_add_token_script(
+    strToU8("Aptos"),
     strToU8("APTOS"),
-    strToU8("Aptos TestCoin"),
-    testCoinInfo.decimals,
+    strToU8("Aptos Coin"),
+    u8(testCoinInfo.decimals.value),
     strToU8("https://miro.medium.com/max/3150/1*Gf747eyRywU8Img0tK5wvw.png"),
     strToU8("https://aptoslabs.com/"),
     [testCoinTag]
@@ -572,7 +572,7 @@ const checkTestCoin = async () => {
 
 const updateTokenRegistry = async (symbol: string, description: string, logo_url: string, project_url: string) => {
   const {client, account} = readConfig(program);
-  const payload = token_registry$_.buildPayload_update_token_info_script(
+  const payload = coin_registry$_.buildPayload_update_token_info_script(
     strToU8(symbol),
     strToU8(description),
     strToU8(logo_url),
@@ -631,7 +631,7 @@ const econiaListOrders = async (owner: string, base: string, quote: string) => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
   const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mii = econiaGetMi(tokRegistry, base, quote, "E0");
   if (!mii) {
     return;
@@ -659,7 +659,7 @@ const econiaListOrders = async (owner: string, base: string, quote: string) => {
 const econiaListLevels = async (owner: string, base: string, quote: string) => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mii = econiaGetMi(tokRegistry, base, quote, "E0");
   if (!mii) {
     return;
@@ -686,7 +686,7 @@ const econiaListLevels = async (owner: string, base: string, quote: string) => {
   console.log(`Did not find the market for ${base}-${quote} owned by ${owner}`);
 }
 
-function econiaGetTags(tokRegistry: token_registry$_.TokenRegistry, base: string, quote: string, exp: string) {
+function econiaGetTags(tokRegistry: coin_registry$_.TokenRegistry, base: string, quote: string, exp: string) {
   const tokenInfos = tokRegistry.token_info_list;
   const baseTokInfo = tokenInfos.filter(ti => ti.symbol.str() === base)[0] || null;
   const quoteTokInfo = tokenInfos.filter(ti => ti.symbol.str() === quote)[0] || null;
@@ -708,7 +708,7 @@ function econiaGetTags(tokRegistry: token_registry$_.TokenRegistry, base: string
   return [baseTag, quoteTag, expTag];
 }
 
-function econiaGetMi(tokRegistry: token_registry$_.TokenRegistry, base: string, quote: string, exp: string) {
+function econiaGetMi(tokRegistry: coin_registry$_.TokenRegistry, base: string, quote: string, exp: string) {
   const tags = econiaGetTags(tokRegistry, base, quote, exp);
   if (!tags) {
     return null;
@@ -725,7 +725,7 @@ function econiaGetMi(tokRegistry: token_registry$_.TokenRegistry, base: string, 
 const econiaRegisterMarket = async (base: string, quote: string, exp: string) => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const tags = econiaGetTags(tokRegistry, base, quote, exp);
   if(!tags){
     return;
@@ -739,7 +739,7 @@ const econiaRegisterMarket = async (base: string, quote: string, exp: string) =>
 const econiaSubmitBid = async (owner: string, base: string, quote: string, exp: string, price: string, size: string) => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mi = econiaGetMi(tokRegistry, base, quote, exp);
   if(!mi){
     return;
@@ -756,7 +756,7 @@ const econiaSubmitBid = async (owner: string, base: string, quote: string, exp: 
 const econiaSubmitAsk = async (owner: string, base: string, quote: string, exp: string, price: string, size: string) => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mi = econiaGetMi(tokRegistry, base, quote, exp);
   if(!mi){
     return;
@@ -779,7 +779,7 @@ const econiaInitUser = async () => {
 const econiaDeposit = async (base: string, quote: string, exp: string, baseAmt: string, quoteAmt: string) => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mi = econiaGetMi(tokRegistry, base, quote, exp);
   if(!mi){
     return;
@@ -792,7 +792,7 @@ const econiaDeposit = async (base: string, quote: string, exp: string, baseAmt: 
 const econiaWithdraw = async (base: string, quote: string, exp: string, baseAmt: string, quoteAmt: string) => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mi = econiaGetMi(tokRegistry, base, quote, exp);
   if(!mi){
     return;
@@ -805,7 +805,7 @@ const econiaWithdraw = async (base: string, quote: string, exp: string, baseAmt:
 const econiaInitContainers = async (base: string, quote: string, exp: string) => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokRegistry = await token_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
   const mi = econiaGetMi(tokRegistry, base, quote, exp);
   if(!mi){
     return;

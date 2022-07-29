@@ -7,7 +7,7 @@ import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-t
 import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
 import * as table$_ from "./table";
-export const packageName = "AptosFramework";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "big_vector";
 
@@ -163,7 +163,7 @@ export function destroy_empty$ (
   $p: TypeTag[], /* <T>*/
 ): void {
   if (!is_empty$(v, $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(ENOT_EMPTY, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(ENOT_EMPTY, $c));
   }
   shrink_to_fit$(v, $c, [$p[0]] as TypeTag[]);
   let { buckets: buckets } = v;
@@ -256,7 +256,7 @@ export function pop_back$ (
 ): any {
   let val;
   if (!!is_empty$(v, $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINDEX_OUT_OF_BOUNDS, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINDEX_OUT_OF_BOUNDS, $c));
   }
   decrement_index$(v.end_index, $.copy(v.bucket_size), $c);
   val = std$_.vector$_.pop_back$(table$_.borrow_mut$(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), $c, [$p[0]] as TypeTag[]);
@@ -287,7 +287,7 @@ export function push_back_no_grow$ (
   $p: TypeTag[], /* <T>*/
 ): void {
   if (!$.copy(v.end_index.bucket_index).lt($.copy(v.num_buckets))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EOUT_OF_CAPACITY, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EOUT_OF_CAPACITY, $c));
   }
   std$_.vector$_.push_back$(table$_.borrow_mut$(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), val, $c, [$p[0]] as TypeTag[]);
   increment_index$(v.end_index, $.copy(v.bucket_size), $c);

@@ -5,7 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-export const packageName = "AptosFramework";
+import * as std$_ from "../std";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "type_info";
 
@@ -38,6 +39,12 @@ export class TypeInfo
     const proto = $.parseStructProto(data, typeTag, repo, TypeInfo);
     return new TypeInfo(proto, typeTag);
   }
+  typeFullname(): string {
+    return `${this.account_address.toShortString()}::${$.u8str(this.module_name)}::${$.u8str(this.struct_name)}`;
+  }
+  toTypeTag() { return $.parseTypeTagOrThrow(this.typeFullname()); }
+  moduleName() { return (this.toTypeTag() as $.StructTag).module; }
+  structName() { return (this.toTypeTag() as $.StructTag).name; }
 
 }
 export function account_address$ (
@@ -61,11 +68,18 @@ export function struct_name$ (
   return $.copy(type_info.struct_name);
 }
 
+export function type_name$ (
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <T>*/
+): std$_.string$_.String {
+  return $.aptos_std_type_info_type_name($c, [$p[0]]);
+
+}
 export function type_of$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): TypeInfo {
-  return $.aptos_framework_type_info_type_of($c, [$p[0]]);
+  return $.aptos_std_type_info_type_of($c, [$p[0]]);
 
 }
 export function loadParsers(repo: AptosParserRepo) {

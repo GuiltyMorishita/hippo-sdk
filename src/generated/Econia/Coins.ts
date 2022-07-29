@@ -8,7 +8,7 @@ import {HexString, AptosClient} from "aptos";
 import * as aptos_framework$_ from "../aptos_framework";
 import * as std$_ from "../std";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c");
+export const moduleAddress = new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618");
 export const moduleName = "Coins";
 
 export const BCT_CN : U8[] = [u8("66"), u8("97"), u8("115"), u8("101")];
@@ -31,8 +31,8 @@ export class BCC
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "m", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0xc0deb00c"), "Coins", "BCT", [])]) },
-  { name: "b", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xc0deb00c"), "Coins", "BCT", [])]) }];
+  { name: "m", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCT", [])]) },
+  { name: "b", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCT", [])]) }];
 
   m: aptos_framework$_.coin$_.MintCapability;
   b: aptos_framework$_.coin$_.BurnCapability;
@@ -84,8 +84,8 @@ export class QCC
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "m", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0xc0deb00c"), "Coins", "QCT", [])]) },
-  { name: "b", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xc0deb00c"), "Coins", "QCT", [])]) }];
+  { name: "m", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCT", [])]) },
+  { name: "b", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCT", [])]) }];
 
   m: aptos_framework$_.coin$_.MintCapability;
   b: aptos_framework$_.coin$_.BurnCapability;
@@ -132,13 +132,13 @@ export function init_coin_types$ (
   $c: AptosDataCache,
 ): void {
   let b, b__2, m, m__1;
-  if (!(std$_.signer$_.address_of$(econia, $c).hex() === new HexString("0xc0deb00c").hex())) {
+  if (!(std$_.signer$_.address_of$(econia, $c).hex() === new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  [m, b] = aptos_framework$_.coin$_.initialize$(econia, std$_.string$_.utf8$(BCT_CN, $c), std$_.string$_.utf8$(BCT_CS, $c), BCT_D, false, $c, [new StructTag(new HexString("0xc0deb00c"), "Coins", "BCT", [])] as TypeTag[]);
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Coins", "BCC", []), econia, new BCC({ m: $.copy(m), b: $.copy(b) }, new StructTag(new HexString("0xc0deb00c"), "Coins", "BCC", [])));
-  [m__1, b__2] = aptos_framework$_.coin$_.initialize$(econia, std$_.string$_.utf8$(QCT_CN, $c), std$_.string$_.utf8$(QCT_CS, $c), QCT_D, false, $c, [new StructTag(new HexString("0xc0deb00c"), "Coins", "QCT", [])] as TypeTag[]);
-  $c.move_to(new StructTag(new HexString("0xc0deb00c"), "Coins", "QCC", []), econia, new QCC({ m: $.copy(m__1), b: $.copy(b__2) }, new StructTag(new HexString("0xc0deb00c"), "Coins", "QCC", [])));
+  [m, b] = aptos_framework$_.coin$_.initialize$(econia, std$_.string$_.utf8$(BCT_CN, $c), std$_.string$_.utf8$(BCT_CS, $c), BCT_D, false, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCT", [])] as TypeTag[]);
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCC", []), econia, new BCC({ m: $.copy(m), b: $.copy(b) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCC", [])));
+  [m__1, b__2] = aptos_framework$_.coin$_.initialize$(econia, std$_.string$_.utf8$(QCT_CN, $c), std$_.string$_.utf8$(QCT_CS, $c), QCT_D, false, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCT", [])] as TypeTag[]);
+  $c.move_to(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCC", []), econia, new QCC({ m: $.copy(m__1), b: $.copy(b__2) }, new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCC", [])));
   return;
 }
 
@@ -147,7 +147,7 @@ export function buildPayload_init_coin_types (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xc0deb00c::Coins::init_coin_types",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Coins::init_coin_types",
     typeParamStrings,
     []
   );
@@ -160,11 +160,11 @@ export function mint_to$ (
   val_qct: U64,
   $c: AptosDataCache,
 ): void {
-  if (!(std$_.signer$_.address_of$(econia, $c).hex() === new HexString("0xc0deb00c").hex())) {
+  if (!(std$_.signer$_.address_of$(econia, $c).hex() === new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618").hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  aptos_framework$_.coin$_.deposit$($.copy(user), aptos_framework$_.coin$_.mint$($.copy(val_bct), $c.borrow_global<BCC>(new StructTag(new HexString("0xc0deb00c"), "Coins", "BCC", []), new HexString("0xc0deb00c")).m, $c, [new StructTag(new HexString("0xc0deb00c"), "Coins", "BCT", [])] as TypeTag[]), $c, [new StructTag(new HexString("0xc0deb00c"), "Coins", "BCT", [])] as TypeTag[]);
-  aptos_framework$_.coin$_.deposit$($.copy(user), aptos_framework$_.coin$_.mint$($.copy(val_qct), $c.borrow_global<QCC>(new StructTag(new HexString("0xc0deb00c"), "Coins", "QCC", []), new HexString("0xc0deb00c")).m, $c, [new StructTag(new HexString("0xc0deb00c"), "Coins", "QCT", [])] as TypeTag[]), $c, [new StructTag(new HexString("0xc0deb00c"), "Coins", "QCT", [])] as TypeTag[]);
+  aptos_framework$_.coin$_.deposit$($.copy(user), aptos_framework$_.coin$_.mint$($.copy(val_bct), $c.borrow_global<BCC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCC", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618")).m, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCT", [])] as TypeTag[]), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "BCT", [])] as TypeTag[]);
+  aptos_framework$_.coin$_.deposit$($.copy(user), aptos_framework$_.coin$_.mint$($.copy(val_qct), $c.borrow_global<QCC>(new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCC", []), new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618")).m, $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCT", [])] as TypeTag[]), $c, [new StructTag(new HexString("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"), "Coins", "QCT", [])] as TypeTag[]);
   return;
 }
 
@@ -176,7 +176,7 @@ export function buildPayload_mint_to (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xc0deb00c::Coins::mint_to",
+    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Coins::mint_to",
     typeParamStrings,
     [
       $.payloadArg(user),
@@ -187,9 +187,9 @@ export function buildPayload_mint_to (
 
 }
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c::Coins::BCC", BCC.BCCParser);
-  repo.addParser("0xc0deb00c::Coins::BCT", BCT.BCTParser);
-  repo.addParser("0xc0deb00c::Coins::QCC", QCC.QCCParser);
-  repo.addParser("0xc0deb00c::Coins::QCT", QCT.QCTParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Coins::BCC", BCC.BCCParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Coins::BCT", BCT.BCTParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Coins::QCC", QCC.QCCParser);
+  repo.addParser("0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618::Coins::QCT", QCT.QCTParser);
 }
 

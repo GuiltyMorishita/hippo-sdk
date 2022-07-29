@@ -57,7 +57,7 @@ export function initialize$ (
   timestamp$_.assert_genesis$($c);
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), std$_.signer$_.address_of$(account, $c))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECHAIN_ID, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECHAIN_ID, $c));
   }
   return $c.move_to(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), account, new ChainId({ id: $.copy(id) }, new StructTag(new HexString("0x1"), "chain_id", "ChainId", [])));
 }

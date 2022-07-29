@@ -6,6 +6,7 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
 import * as aptos_framework$_ from "../aptos_framework";
+import * as aptos_std$_ from "../aptos_std";
 import * as std$_ from "../std";
 export const packageName = "hippo-swap";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
@@ -203,8 +204,8 @@ export function burn$ (
   $p: TypeTag[], /* <TokenType>*/
 ): void {
   let temp$1, addr, amt, cap;
-  temp$1 = aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  addr = aptos_framework$_.type_info$_.account_address$(temp$1, $c);
+  temp$1 = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  addr = aptos_std$_.type_info$_.account_address$(temp$1, $c);
   cap = $c.borrow_global<TokenSharedCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]]), $.copy(addr));
   amt = aptos_framework$_.coin$_.value$(tokens, $c, [$p[0]] as TypeTag[]);
   if ($.copy(amt).eq(u64("0"))) {
@@ -259,6 +260,7 @@ export function buildPayload_faucet_mint_to_script (
   );
 
 }
+
 export function initialize$ (
   account: HexString,
   decimals: U64,
@@ -266,8 +268,8 @@ export function initialize$ (
   $p: TypeTag[], /* <TokenType>*/
 ): void {
   let temp$1, burn_capability, mint_capability, name;
-  temp$1 = aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  name = std$_.string$_.utf8$(aptos_framework$_.type_info$_.struct_name$(temp$1, $c), $c);
+  temp$1 = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  name = std$_.string$_.utf8$(aptos_std$_.type_info$_.struct_name$(temp$1, $c), $c);
   [mint_capability, burn_capability] = aptos_framework$_.coin$_.initialize$(account, $.copy(name), $.copy(name), $.copy(decimals), true, $c, [$p[0]] as TypeTag[]);
   aptos_framework$_.coin$_.register_internal$(account, $c, [$p[0]] as TypeTag[]);
   $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]]), account, new TokenSharedCapability({ mint: $.copy(mint_capability), burn: $.copy(burn_capability) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]])));
@@ -280,8 +282,8 @@ export function mint$ (
   $p: TypeTag[], /* <TokenType>*/
 ): aptos_framework$_.coin$_.Coin {
   let temp$1, addr, cap;
-  temp$1 = aptos_framework$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  addr = aptos_framework$_.type_info$_.account_address$(temp$1, $c);
+  temp$1 = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
+  addr = aptos_std$_.type_info$_.account_address$(temp$1, $c);
   cap = $c.borrow_global<TokenSharedCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]]), $.copy(addr));
   return aptos_framework$_.coin$_.mint$($.copy(amount), cap.mint, $c, [$p[0]] as TypeTag[]);
 }

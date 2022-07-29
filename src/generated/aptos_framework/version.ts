@@ -52,7 +52,7 @@ export function initialize$ (
   timestamp$_.assert_genesis$($c);
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECONFIG, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECONFIG, $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "version", "Version", []), account, new Version({ major: $.copy(initial_version) }, new StructTag(new HexString("0x1"), "version", "Version", [])));
   return;
@@ -66,11 +66,11 @@ export function set_version$ (
   let config, old_major;
   system_addresses$_.assert_core_resource$(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ECONFIG, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ECONFIG, $c));
   }
   old_major = $.copy($c.borrow_global<Version>(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1")).major);
   if (!$.copy(old_major).lt($.copy(major))) {
-    throw $.abortCode(std$_.errors$_.invalid_argument$(EINVALID_MAJOR_VERSION_NUMBER, $c));
+    throw $.abortCode(std$_.error$_.invalid_argument$(EINVALID_MAJOR_VERSION_NUMBER, $c));
   }
   config = $c.borrow_global_mut<Version>(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"));
   config.major = $.copy(major);

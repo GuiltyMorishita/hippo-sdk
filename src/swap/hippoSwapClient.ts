@@ -3,7 +3,7 @@ import { AptosClient, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
 import { cp_swap$_, stable_curve_swap$_, piece_swap$_ } from "../generated/hippo_swap";
-import { token_registry$_ } from "../generated/token_registry";
+import { coin_registry$_ } from "../generated/coin_registry";
 import { CoinInfo } from "../generated/aptos_framework/coin";
 import { typeInfoToTypeTag } from "../utils";
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
@@ -15,7 +15,7 @@ import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
 
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
   const resources = await client.getAccountResources(netConf.contractAddress);
-  let registry: token_registry$_.TokenRegistry | null = null;
+  let registry: coin_registry$_.TokenRegistry | null = null;
   const cpMetas: cp_swap$_.TokenPairMetadata[] = [];
   const stablePoolInfos: stable_curve_swap$_.StableCurvePoolInfo[] = [];
   const piecePoolInfos: PieceSwapPoolInfo[] = [];
@@ -23,7 +23,7 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
     try{
       const typeTag = parseTypeTagOrThrow(resource.type);
       const parsed = repo.parse(resource.data, typeTag);
-      if (parsed instanceof token_registry$_.TokenRegistry) {
+      if (parsed instanceof coin_registry$_.TokenRegistry) {
         registry = parsed;
       }
       else if(parsed instanceof cp_swap$_.TokenPairMetadata) {
@@ -64,11 +64,11 @@ export class PoolSet {
 
 export class HippoSwapClient {
   // supported single tokens
-  public singleTokens: token_registry$_.TokenInfo[];
+  public singleTokens: coin_registry$_.TokenInfo[];
   // maps TokenInfo.symbol to TokenInfo
-  public symbolToTokenInfo: Record<string, token_registry$_.TokenInfo>;
+  public symbolToTokenInfo: Record<string, coin_registry$_.TokenInfo>;
   // maps token-struct-fullname to TokenInfo
-  public tokenFullnameToTokenInfo: Record<string, token_registry$_.TokenInfo>;
+  public tokenFullnameToTokenInfo: Record<string, coin_registry$_.TokenInfo>;
   // maps `${xToken-struct-fullname}<->${yToken-struct-fullname}` to HippoPool[]
   public xyFullnameToPoolSet: Record<string, PoolSet>;
   public contractAddress: HexString;
@@ -88,7 +88,7 @@ export class HippoSwapClient {
   constructor(
     public netConfig: NetworkConfiguration,
     public aptosClient: AptosClient,
-    public tokenList:  token_registry$_.TokenInfo[],
+    public tokenList:  coin_registry$_.TokenInfo[],
     public cpMetas: cp_swap$_.TokenPairMetadata[],
     public stablePoolInfos: stable_curve_swap$_.StableCurvePoolInfo[],
     public piecePoolInfos: piece_swap$_.PieceSwapPoolInfo[],
@@ -394,7 +394,7 @@ export class HippoSwapClient {
     return `${xFullname}<->${yFullname}`;
   }
 
-  async getTokenTotalSupply(tokenInfo: token_registry$_.TokenInfo) {
+  async getTokenTotalSupply(tokenInfo: coin_registry$_.TokenInfo) {
     const coinTag = typeInfoToTypeTag(tokenInfo.token_type);
     const coinInfo = await CoinInfo.load(this.repo, this.aptosClient, this.netConfig.contractAddress, [coinTag]);
     if (coinInfo.supply.vec.length > 0) {

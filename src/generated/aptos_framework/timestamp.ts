@@ -48,7 +48,7 @@ export function assert_genesis$ (
   $c: AptosDataCache,
 ): void {
   if (!is_genesis$($c)) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(ENOT_GENESIS, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(ENOT_GENESIS, $c));
   }
   return;
 }
@@ -57,7 +57,7 @@ export function assert_operating$ (
   $c: AptosDataCache,
 ): void {
   if (!is_operating$($c)) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(ENOT_OPERATING, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(ENOT_OPERATING, $c));
   }
   return;
 }
@@ -112,12 +112,12 @@ export function update_global_time$ (
   now = $.copy(global_timer.microseconds);
   if (($.copy(proposer).hex() === new HexString("0x0").hex())) {
     if (!$.copy(now).eq($.copy(timestamp))) {
-      throw $.abortCode(std$_.errors$_.invalid_argument$(ETIMESTAMP, $c));
+      throw $.abortCode(std$_.error$_.invalid_argument$(ETIMESTAMP, $c));
     }
   }
   else{
     if (!$.copy(now).lt($.copy(timestamp))) {
-      throw $.abortCode(std$_.errors$_.invalid_argument$(ETIMESTAMP, $c));
+      throw $.abortCode(std$_.error$_.invalid_argument$(ETIMESTAMP, $c));
     }
   }
   global_timer.microseconds = $.copy(timestamp);

@@ -6,7 +6,7 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
 import * as std$_ from "../std";
-export const packageName = "AptosFramework";
+export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "table";
 
@@ -89,7 +89,7 @@ export function add_box$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): void {
-  return $.aptos_framework_table_add_box(table, key, val, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_add_box(table, key, val, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function borrow$ (
@@ -107,7 +107,7 @@ export function borrow_box$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): Box {
-  return $.aptos_framework_table_borrow_box(table, key, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_borrow_box(table, key, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function borrow_box_mut$ (
@@ -116,7 +116,7 @@ export function borrow_box_mut$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): Box {
-  return $.aptos_framework_table_borrow_box_mut(table, key, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_borrow_box_mut(table, key, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function borrow_mut$ (
@@ -160,7 +160,7 @@ export function contains_box$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): boolean {
-  return $.aptos_framework_table_contains_box(table, key, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_contains_box(table, key, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function destroy_empty$ (
@@ -169,7 +169,7 @@ export function destroy_empty$ (
   $p: TypeTag[], /* <K, V>*/
 ): void {
   if (!$.copy(table.length).eq(u64("0"))) {
-    throw $.abortCode(std$_.errors$_.invalid_state$(ENOT_EMPTY, $c));
+    throw $.abortCode(std$_.error$_.invalid_state$(ENOT_EMPTY, $c));
   }
   destroy_empty_box$(table, $c, [$p[0], $p[1], new StructTag(new HexString("0x1"), "table", "Box", [$p[1]])] as TypeTag[]);
   return drop_unchecked_box$(table, $c, [$p[0], $p[1], new StructTag(new HexString("0x1"), "table", "Box", [$p[1]])] as TypeTag[]);
@@ -180,7 +180,7 @@ export function destroy_empty_box$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): void {
-  return $.aptos_framework_table_destroy_empty_box(table, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_destroy_empty_box(table, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function drop_unchecked_box$ (
@@ -188,7 +188,7 @@ export function drop_unchecked_box$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): void {
-  return $.aptos_framework_table_drop_unchecked_box(table, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_drop_unchecked_box(table, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function empty$ (
@@ -218,7 +218,7 @@ export function new_table_handle$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V>*/
 ): U128 {
-  return $.aptos_framework_table_new_table_handle($c, [$p[0], $p[1]]);
+  return $.aptos_std_table_new_table_handle($c, [$p[0], $p[1]]);
 
 }
 export function remove$ (
@@ -238,7 +238,7 @@ export function remove_box$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V, B>*/
 ): Box {
-  return $.aptos_framework_table_remove_box(table, key, $c, [$p[0], $p[1], $p[2]]);
+  return $.aptos_std_table_remove_box(table, key, $c, [$p[0], $p[1], $p[2]]);
 
 }
 export function loadParsers(repo: AptosParserRepo) {

@@ -1,7 +1,7 @@
 import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, u64 } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
-import { token_registry$_ } from "../generated/token_registry";
+import { coin_registry$_ } from "../generated/coin_registry";
 import { mock_coin$_ } from "../generated/hippo_swap";
 import * as AptosFramework from "../generated/aptos_framework";
 import { typeInfoToTypeTag } from "../utils";
@@ -38,14 +38,14 @@ export async function getCoinStoresForAddress(client: AptosClient, address: HexS
 export class HippoWalletClient {
   public symbolToCoinStore: Record<string, AptosFramework.coin$_.CoinStore>;
   public fullnameToCoinStore: Record<string, AptosFramework.coin$_.CoinStore>;
-  public fullnameToTokenInfo: Record<string, token_registry$_.TokenInfo>;
-  public symbolToTokenInfo: Record<string, token_registry$_.TokenInfo>;
+  public fullnameToTokenInfo: Record<string, coin_registry$_.TokenInfo>;
+  public symbolToTokenInfo: Record<string, coin_registry$_.TokenInfo>;
   public mockCoinSymbols: string[];
   constructor(
     public netConf: NetworkConfiguration,
     public aptosClient: AptosClient,
     public repo: AptosParserRepo,
-    public registry: token_registry$_.TokenRegistry,
+    public registry: coin_registry$_.TokenRegistry,
     public walletAddress: HexString,
     public coinStores: AptosFramework.coin$_.CoinStore[],
   ) {
@@ -108,7 +108,7 @@ export class HippoWalletClient {
     repo: AptosParserRepo, 
     walletAddress: HexString
   ) {
-    const registry = await token_registry$_.TokenRegistry.load(repo, aptosClient, netConf.contractAddress, []);
+    const registry = await coin_registry$_.TokenRegistry.load(repo, aptosClient, netConf.contractAddress, []);
     const stores = await getCoinStoresForAddress(aptosClient, walletAddress, repo);
     return new HippoWalletClient(netConf, aptosClient, repo, registry, walletAddress, stores);
   }

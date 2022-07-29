@@ -53,7 +53,7 @@ export function burn$ (
   let account_addr, capabilities, to_burn;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ENO_CAPABILITIES, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ENO_CAPABILITIES, $c));
   }
   capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr));
   to_burn = coin$_.withdraw$(account, $.copy(amount), $c, [$p[0]] as TypeTag[]);
@@ -122,7 +122,7 @@ export function mint$ (
   let account_addr, capabilities, coins_minted;
   account_addr = std$_.signer$_.address_of$(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr))) {
-    throw $.abortCode(std$_.errors$_.not_published$(ENO_CAPABILITIES, $c));
+    throw $.abortCode(std$_.error$_.not_found$(ENO_CAPABILITIES, $c));
   }
   capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr));
   coins_minted = coin$_.mint$($.copy(amount), capabilities.mint_cap, $c, [$p[0]] as TypeTag[]);

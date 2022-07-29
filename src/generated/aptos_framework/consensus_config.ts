@@ -50,7 +50,7 @@ export function initialize$ (
   timestamp$_.assert_genesis$($c);
   system_addresses$_.assert_aptos_framework$(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.errors$_.already_published$(ECONFIG, $c));
+    throw $.abortCode(std$_.error$_.already_exists$(ECONFIG, $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), account, new ConsensusConfig({ config: std$_.vector$_.empty$($c, [AtomicTypeTag.U8] as TypeTag[]) }, new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", [])));
   return;
