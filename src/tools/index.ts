@@ -1,7 +1,7 @@
 import { AptosParserRepo, getTypeTagFullname, StructTag, u8, u64, strToU8, u8str, DummyCache } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { Command } from "commander";
-import { getProjectRepo } from "../generated";
+import { Econia, getProjectRepo } from "../generated";
 import { aptos_framework, hippo_swap } from "../generated/";
 import { coin_registry$_ } from "../generated/coin_registry";
 import { isTypeInfoSame, printResource, printResources, typeInfoToTypeTag, typeTagToTypeInfo } from "../utils";
@@ -13,6 +13,8 @@ import { PoolType } from "../swap/baseTypes";
 import { EconiaClient } from "../aggregator/econia";
 import { MI, MR } from "../generated/Econia/Registry";
 import { get_price_levels$ } from "../generated/Econia/Book";
+import { TradeAggregator } from "../aggregator/aggregator";
+import { DEX_TYPE_NAME } from "../aggregator/types";
 
 
 const actionShowTokenRegistry = async () => {
@@ -225,7 +227,6 @@ const actionMockDeploy = async () => {
   const pieceSwapPayload = await hippo_swap.piece_swap_script$_.buildPayload_mock_deploy_script()
   await sendPayloadTx(client, account, pieceSwapPayload, 10000);
   console.log('PieceSwap')
-  // skip stable-curve for now
 }
 
 
@@ -611,7 +612,7 @@ program.addCommand(others);
 
 // for econia
 
-const ECONIA_ADDR_DEV = new HexString("0xf538533414430323ccd2d8f8d7ce33819653cac5a7634a80cd2429ab904b6659");
+const ECONIA_ADDR_DEV = Econia.Book$_.moduleAddress;
 
 const econiaListMarkets = async () => {
   const {client} = readConfig(program);
@@ -893,5 +894,140 @@ econia
   .action(econiaInitUser)
 
 program.addCommand(econia);
+
+
+const aggListTradingPools = async () => {
+  const {client, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  for (const pool of agg.allPools) {
+    console.log("###########");
+    console.log(`Pair: ${pool.xTokenInfo.symbol.str()} - ${pool.yTokenInfo.symbol.str()}`);
+    console.log(`Dex: ${DEX_TYPE_NAME[pool.dexType]}`);
+    console.log(`PoolType: ${pool.poolType.toJsNumber()}`);
+    console.log();
+  }
+}
+
+const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
+  const {client, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
+  if (xTokInfos.length !== 1) {
+    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
+  }
+  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
+  if (yTokInfos.length !== 1) {
+    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
+  }
+  const routes = agg.getAllRoutes(xTokInfos[0], yTokInfos[0]);
+  for (const route of routes) {
+    console.log("###########");
+    route.debugPrint();
+  }
+}
+
+const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
+  const {client, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
+  if (xTokInfos.length !== 1) {
+    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
+  }
+  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
+  if (yTokInfos.length !== 1) {
+    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
+  }
+  const inputAmt = parseFloat(inputUiAmt);
+  const quotes = agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  for (const quote of quotes) {
+    console.log("###########");
+    quote.route.debugPrint();
+    console.log(`Quote input: ${quote.quote.inputUiAmt}`);
+    console.log(`Quote output: ${quote.quote.outputUiAmt}`);
+  }
+}
+
+const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
+  const {client, account, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
+  if (xTokInfos.length !== 1) {
+    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
+  }
+  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
+  if (yTokInfos.length !== 1) {
+    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
+  }
+  const inputAmt = parseFloat(inputUiAmt);
+  const quotes = agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  if (quotes.length === 0) {
+    console.log("No route available");
+    return;
+  }
+  const payload = quotes[0].route.makePaylod(inputAmt, 0);
+  await sendPayloadTx(client, account, payload);
+  await testWalletClient();
+}
+
+const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string) => {
+  const {client, account, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
+  if (xTokInfos.length !== 1) {
+    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
+  }
+  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
+  if (yTokInfos.length !== 1) {
+    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
+  }
+  const inputAmt = parseFloat(inputUiAmt);
+  const minOutUiAmt = parseFloat(minOutAmt);
+  const quotes = agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  if (quotes.length === 0) {
+    console.log("No route available");
+    return;
+  }
+  const payload = quotes[0].route.makePaylod(inputAmt, minOutUiAmt);
+  const simResult = await simulatePayloadTx(client, account, payload);
+  printResource(simResult);
+  await testWalletClient();
+}
+
+
+const agg = new Command('agg').description("aggregator");
+
+agg
+  .command("list-trading-pools")
+  .action(aggListTradingPools);
+
+agg
+  .command("list-routes")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .action(aggListRoutes);
+
+agg
+  .command("list-quotes")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .action(aggListQuotes);
+
+agg
+  .command("swap")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .action(aggSwap);
+
+agg
+  .command("simulate-swap")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .argument("<minOutUiAmt>")
+  .action(aggSimulateSwap);
+
+program.addCommand(agg);
 
 program.parse();

@@ -16,7 +16,7 @@ import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
 export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
   const resources = await client.getAccountResources(netConf.contractAddress);
   let registry: coin_registry$_.TokenRegistry | null = null;
-  const cpMetas: cp_swap$_.TokenPairMetadata[] = [];
+  const cpPoolInfos: cp_swap$_.TokenPairMetadata[] = [];
   const stablePoolInfos: stable_curve_swap$_.StableCurvePoolInfo[] = [];
   const piecePoolInfos: PieceSwapPoolInfo[] = [];
   for(const resource of resources) {
@@ -27,7 +27,7 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
         registry = parsed;
       }
       else if(parsed instanceof cp_swap$_.TokenPairMetadata) {
-        cpMetas.push(parsed);
+        cpPoolInfos.push(parsed);
       }
       else if(parsed instanceof stable_curve_swap$_.StableCurvePoolInfo) {
         stablePoolInfos.push(parsed);
@@ -43,7 +43,7 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
   if(!registry) {
     throw new Error(`Failed to load TokenRegistry from contract account: ${netConf.contractAddress.hex()}`);
   }
-  return {registry, cpMetas, stablePoolInfos, piecePoolInfos}
+  return {registry, cpPoolInfos, stablePoolInfos, piecePoolInfos}
 }
 
 export class PoolSet {
@@ -74,12 +74,12 @@ export class HippoSwapClient {
   public contractAddress: HexString;
 
   static async createInOneCall(netConfig: NetworkConfiguration, aptosClient: AptosClient, repo: AptosParserRepo) {
-    const {registry, cpMetas, stablePoolInfos, piecePoolInfos} = await loadContractResources(netConfig, aptosClient, repo);
+    const {registry, cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadContractResources(netConfig, aptosClient, repo);
     return new HippoSwapClient(
       netConfig, 
       aptosClient, 
       registry.token_info_list, 
-      cpMetas, 
+      cpPoolInfos, 
       stablePoolInfos, 
       piecePoolInfos, 
       repo
@@ -89,7 +89,7 @@ export class HippoSwapClient {
     public netConfig: NetworkConfiguration,
     public aptosClient: AptosClient,
     public tokenList:  coin_registry$_.TokenInfo[],
-    public cpMetas: cp_swap$_.TokenPairMetadata[],
+    public cpPoolInfos: cp_swap$_.TokenPairMetadata[],
     public stablePoolInfos: stable_curve_swap$_.StableCurvePoolInfo[],
     public piecePoolInfos: piece_swap$_.PieceSwapPoolInfo[],
     public repo: AptosParserRepo,
@@ -130,7 +130,7 @@ export class HippoSwapClient {
       }
     }
     // add CP pools
-    for(const cpMeta of this.cpMetas) {
+    for(const cpMeta of this.cpPoolInfos) {
       this.setCPPool(cpMeta);
     }
     // add stable-curve pools
@@ -376,10 +376,11 @@ export class HippoSwapClient {
   }
 
   async reloadAllPools() {
-    const {registry, cpMetas, stablePoolInfos} = await loadContractResources(this.netConfig, this.aptosClient, this.repo);
+    const {registry, cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadContractResources(this.netConfig, this.aptosClient, this.repo);
     this.tokenList = registry.token_info_list;
-    this.cpMetas = cpMetas;
+    this.cpPoolInfos = cpPoolInfos;
     this.stablePoolInfos = stablePoolInfos;
+    this.piecePoolInfos = piecePoolInfos;
     this.buildCache();
   }
 
