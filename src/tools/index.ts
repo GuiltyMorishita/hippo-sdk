@@ -938,7 +938,7 @@ const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: s
     throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
   }
   const inputAmt = parseFloat(inputUiAmt);
-  const quotes = agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
   for (const quote of quotes) {
     console.log("###########");
     quote.route.debugPrint();
@@ -959,7 +959,7 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
     throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
   }
   const inputAmt = parseFloat(inputUiAmt);
-  const quotes = agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
   if (quotes.length === 0) {
     console.log("No route available");
     return;
@@ -982,7 +982,7 @@ const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt:
   }
   const inputAmt = parseFloat(inputUiAmt);
   const minOutUiAmt = parseFloat(minOutAmt);
-  const quotes = agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
   if (quotes.length === 0) {
     console.log("No route available");
     return;

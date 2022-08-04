@@ -219,9 +219,6 @@ export class TradeRoute {
     this.steps.forEach((step, i) => {
       console.log(`Step ${i}: ${step.xTokenInfo.symbol.str()} -> ${step.yTokenInfo.symbol.str()} (via ${DEX_TYPE_NAME[step.pool.dexType]})`);
     }) ;
-    const price = this.getPrice();
-    console.log(`x-to-y: ${price.xToY}`);
-    console.log(`y-to-x: ${price.yToX}`);
   }
 }
 

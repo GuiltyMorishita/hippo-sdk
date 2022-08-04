@@ -1,5 +1,10 @@
 # hippo-sdk
 
+`hippo-sdk` provides the following TypeScript interface:
+- Hippo's trade aggregator
+- Hippo Swap
+- Token registry
+
 # Directories
 - `src/config`: node configuration, allows us to specify which network/fullnode/contract to use.
 - `src/generated`: TypeScript interface generated using [move-to-ts](https://github.com/hippospace/move-to-ts)

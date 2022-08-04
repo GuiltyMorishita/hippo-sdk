@@ -12,6 +12,7 @@ export class TradeAggregator {
   public xToAnyPools: Map<TokenTypeFullname, TradingPool[]>;
   constructor(
     public registryClient: TokenRegistryClient,
+    public aptosClient: AptosClient,
     public readonly poolProviders: TradingPoolProvider[],
   ) {
     this.allPools = [];
@@ -24,15 +25,15 @@ export class TradeAggregator {
     const registryClient = new TokenRegistryClient(registry);
     const hippoProvider = new HippoPoolProvider();
     const econiaProvider = new EconiaPoolProvider(registryClient);
-    const aggregator = new TradeAggregator(registryClient, [hippoProvider, econiaProvider]);
-    await aggregator.loadAllPoolLists(client);
+    const aggregator = new TradeAggregator(registryClient, client, [hippoProvider, econiaProvider]);
+    await aggregator.loadAllPoolLists();
     return aggregator;
   }
 
-  async loadAllPoolLists(client: AptosClient) {
+  async loadAllPoolLists() {
     const promises = [];
     for (const provider of this.poolProviders) {
-      promises.push(provider.loadPoolList(client));
+      promises.push(provider.loadPoolList(this.aptosClient));
     }
     const allResult = await Promise.all(promises);
     this.allPools = allResult.flat();
@@ -167,8 +168,16 @@ export class TradeAggregator {
     }
   }
 
-  getQuotes(inputUiAmt: number, x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip=false): RouteAndQuote[] {
+  async getQuotes(inputUiAmt: number, x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, reloadState=true, allowRoundTrip=false): Promise<RouteAndQuote[]> {
     const routes = this.getAllRoutes(x, y, maxSteps, allowRoundTrip);
+    const poolSet = new Set(routes.flatMap(r => r.steps).map(s => s.pool));
+    const promises: Promise<void>[] = [];
+    for (const pool of poolSet) {
+      if(!pool.isStateLoaded || reloadState) {
+        promises.push(pool.reloadState(this.aptosClient));
+      }
+    }
+    await Promise.all(promises);
     const result =  routes.map(route => {
       return {
         route: route,
@@ -179,8 +188,8 @@ export class TradeAggregator {
     return result;
   }
 
-  getBestQuote(inputUiAmt: number, x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip=false) {
-    const quotes = this.getQuotes(inputUiAmt, x, y, maxSteps, allowRoundTrip);
+  async getBestQuote(inputUiAmt: number, x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, reloadState=true, allowRoundTrip=false) {
+    const quotes = await this.getQuotes(inputUiAmt, x, y, maxSteps, reloadState, allowRoundTrip);
     if (quotes.length === 0) {
       return null;
     }

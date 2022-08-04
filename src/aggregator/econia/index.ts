@@ -19,7 +19,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
   constructor(
     public xInfo: TokenInfo,
     public yInfo: TokenInfo,
-    public orderBook: OB,
+    public orderBook: OB | null,
     public mi: MI,
     public owner: HexString,
     public repo: AptosParserRepo,
@@ -35,7 +35,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
   get xTag() { return this.xTokenInfo.token_type.toTypeTag(); }
   get yTag() { return this.yTokenInfo.token_type.toTypeTag(); }
   // functions that depend on pool's onchain state
-  isStateLoaded() { return true; }
+  isStateLoaded() { return !!this.orderBook; }
   async reloadState(client: AptosClient): Promise<void> {
     this.orderBook = await OB.load(this.repo, client, this.owner, this.getMiTags())
   }
@@ -47,6 +47,9 @@ export class EconiaTradingPoolV1 extends TradingPool {
     ];
   }
   getUiPrice(rawPrice: U64) {
+    if (!this.orderBook) {
+      throw new Error("Econia Orderbook not loaded. cannot compute price");
+    }
     const xFactor = Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
     const yFactor = Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
     const scaleFactor = this.orderBook.f.toJsNumber(); 
@@ -54,6 +57,9 @@ export class EconiaTradingPoolV1 extends TradingPool {
     return rawPrice.toJsNumber() / yFactor / (scaleFactor / xFactor);
   }
   getPrice(): PriceType {
+    if (!this.orderBook) {
+      throw new Error("Econia Orderbook not loaded. cannot compute price");
+    }
     // use top-of-book price
     let xToY = 0;
     let yToX = 0;
@@ -75,6 +81,9 @@ export class EconiaTradingPoolV1 extends TradingPool {
     }
   }
   getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
+    if (!this.orderBook) {
+      throw new Error("Econia Orderbook not loaded. cannot compute quote");
+    }
     const cache = new AptosLocalCache();
     cache.move_to(this.orderBook.typeTag, this.owner, copy(this.orderBook));
     const asks = get_orders$(this.owner, true, cache, this.getMiTags());
@@ -155,18 +164,14 @@ export class EconiaPoolProvider extends TradingPoolProvider {
     const promises: Promise<void>[] = [];
     markets.forEach(([mi, owner]) => {
       if(this.registry.hasTokenType(mi.b) && this.registry.hasTokenType(mi.q)) {
-        const loader = async () => {
-          const ob = await OB.load(repo, client, owner, [mi.b.toTypeTag(), mi.q.toTypeTag(), mi.e.toTypeTag()]);
-          pools.push(new EconiaTradingPoolV1(
-            this.registry.getTokenInfoByType(mi.b),
-            this.registry.getTokenInfoByType(mi.q),
-            ob,
-            mi,
-            owner,
-            repo,
-          ));
-        };
-        promises.push(loader());
+        pools.push(new EconiaTradingPoolV1(
+          this.registry.getTokenInfoByType(mi.b),
+          this.registry.getTokenInfoByType(mi.q),
+          null,
+          mi,
+          owner,
+          repo,
+        ));
       }
     });
     await Promise.all(promises);

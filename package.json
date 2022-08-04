@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/hippo-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Hippo SDK for Aptos",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
