@@ -6,3 +6,4 @@ scripts/
 .idea/
 coverage
 yarn-error.log
+.DS_Store

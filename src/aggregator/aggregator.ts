@@ -1,5 +1,5 @@
 import { getProjectRepo } from "../generated";
-import { TokenRegistry, TokenInfo } from "../generated/coin_registry/coin_registry";
+import { TokenInfo } from "../generated/coin_registry/coin_registry";
 import { NetworkConfiguration } from "../config";
 import { TokenRegistryClient } from "../tokenRegistry";
 import { EconiaPoolProvider } from "./econia";
@@ -21,8 +21,7 @@ export class TradeAggregator {
 
   static async create(client: AptosClient, netConfig: NetworkConfiguration) {
     const repo = getProjectRepo();
-    const registry = await TokenRegistry.load(repo, client, netConfig.contractAddress, []);
-    const registryClient = new TokenRegistryClient(registry);
+    const registryClient =  await TokenRegistryClient.load(repo, client, netConfig);
     const hippoProvider = new HippoPoolProvider();
     const econiaProvider = new EconiaPoolProvider(registryClient);
     const aggregator = new TradeAggregator(registryClient, client, [hippoProvider, econiaProvider]);
