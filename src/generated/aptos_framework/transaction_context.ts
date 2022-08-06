@@ -10,7 +10,7 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "transaction_context";
 
 
-export function get_script_hash$ (
+export function get_script_hash_ (
   $c: AptosDataCache,
 ): U8[] {
   return $.aptos_framework_transaction_context_get_script_hash($c);

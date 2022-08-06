@@ -11,36 +11,36 @@ export const moduleName = "safe_math";
 
 export const ERROR_UNDERFLOW : U64 = u64("0");
 
-export function add$ (
+export function add_ (
   a: U128,
   b: U128,
   $c: AptosDataCache,
 ): U128 {
-  return $.copy(a).add($.copy(b));
+  return ($.copy(a)).add($.copy(b));
 }
 
-export function div$ (
+export function div_ (
   a: U128,
   b: U128,
   $c: AptosDataCache,
 ): U128 {
-  return $.copy(a).div($.copy(b));
+  return ($.copy(a)).div($.copy(b));
 }
 
-export function mul$ (
+export function mul_ (
   a: U128,
   b: U128,
   $c: AptosDataCache,
 ): U128 {
-  return $.copy(a).mul($.copy(b));
+  return ($.copy(a)).mul($.copy(b));
 }
 
-export function sub$ (
+export function sub_ (
   a: U128,
   b: U128,
   $c: AptosDataCache,
 ): U128 {
-  return $.copy(a).sub($.copy(b));
+  return ($.copy(a)).sub($.copy(b));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

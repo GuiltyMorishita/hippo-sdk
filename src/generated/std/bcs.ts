@@ -10,7 +10,7 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "bcs";
 
 
-export function to_bytes$ (
+export function to_bytes_ (
   v: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <MoveValue>*/

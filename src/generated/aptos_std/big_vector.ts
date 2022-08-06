@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as table$_ from "./table";
+import * as Std from "../std";
+import * as Table_with_length from "./table_with_length";
 export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "big_vector";
@@ -25,18 +25,18 @@ export class BigVector
     { name: "T", isPhantom: false }
   ];
   static fields: FieldDeclType[] = [
-  { name: "buckets", typeTag: new StructTag(new HexString("0x1"), "table", "Table", [AtomicTypeTag.U64, new VectorTag(new $.TypeParamIdx(0))]) },
+  { name: "buckets", typeTag: new StructTag(new HexString("0x1"), "table_with_length", "TableWithLength", [AtomicTypeTag.U64, new VectorTag(new $.TypeParamIdx(0))]) },
   { name: "end_index", typeTag: new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", []) },
   { name: "num_buckets", typeTag: AtomicTypeTag.U64 },
   { name: "bucket_size", typeTag: AtomicTypeTag.U64 }];
 
-  buckets: table$_.Table;
+  buckets: Table_with_length.TableWithLength;
   end_index: BigVectorIndex;
   num_buckets: U64;
   bucket_size: U64;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.buckets = proto['buckets'] as table$_.Table;
+    this.buckets = proto['buckets'] as Table_with_length.TableWithLength;
     this.end_index = proto['end_index'] as BigVectorIndex;
     this.num_buckets = proto['num_buckets'] as U64;
     this.bucket_size = proto['bucket_size'] as U64;
@@ -75,37 +75,37 @@ export class BigVectorIndex
   }
 
 }
-export function borrow$ (
+export function borrow_ (
   v: BigVector,
   index: BigVectorIndex,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): any {
-  return std$_.vector$_.borrow$(table$_.borrow$(v.buckets, $.copy(index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), $.copy(index.vec_index), $c, [$p[0]] as TypeTag[]);
+  return Std.Vector.borrow_(Table_with_length.borrow_(v.buckets, $.copy(index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), $.copy(index.vec_index), $c, [$p[0]]);
 }
 
-export function borrow_mut$ (
+export function borrow_mut_ (
   v: BigVector,
   index: BigVectorIndex,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): any {
-  return std$_.vector$_.borrow_mut$(table$_.borrow_mut$(v.buckets, $.copy(index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), $.copy(index.vec_index), $c, [$p[0]] as TypeTag[]);
+  return Std.Vector.borrow_mut_(Table_with_length.borrow_mut_(v.buckets, $.copy(index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), $.copy(index.vec_index), $c, [$p[0]]);
 }
 
-export function bucket_index$ (
+export function bucket_index_ (
   v: BigVector,
   i: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): BigVectorIndex {
-  if (!$.copy(i).lt(length$(v, $c, [$p[0]] as TypeTag[]))) {
+  if (!($.copy(i)).lt(length_(v, $c, [$p[0]]))) {
     throw $.abortCode(EINDEX_OUT_OF_BOUNDS);
   }
-  return new BigVectorIndex({ bucket_index: $.copy(i).div($.copy(v.bucket_size)), vec_index: $.copy(i).mod($.copy(v.bucket_size)) }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", []));
+  return new BigVectorIndex({ bucket_index: ($.copy(i)).div($.copy(v.bucket_size)), vec_index: ($.copy(i)).mod($.copy(v.bucket_size)) }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", []));
 }
 
-export function bucket_size$ (
+export function bucket_size_ (
   v: BigVector,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
@@ -113,80 +113,80 @@ export function bucket_size$ (
   return $.copy(v.bucket_size);
 }
 
-export function buckets_required$ (
+export function buckets_required_ (
   end_index: BigVectorIndex,
   $c: AptosDataCache,
 ): U64 {
   let temp$1, additional;
-  if ($.copy(end_index.vec_index).eq(u64("0"))) {
+  if (($.copy(end_index.vec_index)).eq((u64("0")))) {
     temp$1 = u64("0");
   }
   else{
     temp$1 = u64("1");
   }
   additional = temp$1;
-  return $.copy(end_index.bucket_index).add($.copy(additional));
+  return ($.copy(end_index.bucket_index)).add($.copy(additional));
 }
 
-export function contains$ (
+export function contains_ (
   v: BigVector,
   val: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): boolean {
   let exist;
-  [exist, ] = index_of$(v, val, $c, [$p[0]] as TypeTag[]);
+  [exist, ] = index_of_(v, val, $c, [$p[0]]);
   return exist;
 }
 
-export function decrement_index$ (
+export function decrement_index_ (
   index: BigVectorIndex,
   bucket_size: U64,
   $c: AptosDataCache,
 ): void {
-  if ($.copy(index.vec_index).eq(u64("0"))) {
-    if (!$.copy(index.bucket_index).gt(u64("0"))) {
+  if (($.copy(index.vec_index)).eq((u64("0")))) {
+    if (!($.copy(index.bucket_index)).gt(u64("0"))) {
       throw $.abortCode(EINDEX_OUT_OF_BOUNDS);
     }
-    index.bucket_index = $.copy(index.bucket_index).sub(u64("1"));
-    index.vec_index = $.copy(bucket_size).sub(u64("1"));
+    index.bucket_index = ($.copy(index.bucket_index)).sub(u64("1"));
+    index.vec_index = ($.copy(bucket_size)).sub(u64("1"));
   }
   else{
-    index.vec_index = $.copy(index.vec_index).sub(u64("1"));
+    index.vec_index = ($.copy(index.vec_index)).sub(u64("1"));
   }
   return;
 }
 
-export function destroy_empty$ (
+export function destroy_empty_ (
   v: BigVector,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): void {
-  if (!is_empty$(v, $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(ENOT_EMPTY, $c));
+  if (!is_empty_(v, $c, [$p[0]])) {
+    throw $.abortCode(Std.Error.invalid_argument_(ENOT_EMPTY, $c));
   }
-  shrink_to_fit$(v, $c, [$p[0]] as TypeTag[]);
+  shrink_to_fit_(v, $c, [$p[0]]);
   let { buckets: buckets } = v;
-  table$_.destroy_empty$(buckets, $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]);
+  Table_with_length.destroy_empty_(buckets, $c, [AtomicTypeTag.U64, new VectorTag($p[0])]);
   return;
 }
 
-export function increment_index$ (
+export function increment_index_ (
   index: BigVectorIndex,
   bucket_size: U64,
   $c: AptosDataCache,
 ): void {
-  if ($.copy(index.vec_index).add(u64("1")).eq($.copy(bucket_size))) {
-    index.bucket_index = $.copy(index.bucket_index).add(u64("1"));
+  if ((($.copy(index.vec_index)).add(u64("1"))).eq(($.copy(bucket_size)))) {
+    index.bucket_index = ($.copy(index.bucket_index)).add(u64("1"));
     index.vec_index = u64("0");
   }
   else{
-    index.vec_index = $.copy(index.vec_index).add(u64("1"));
+    index.vec_index = ($.copy(index.vec_index)).add(u64("1"));
   }
   return;
 }
 
-export function index_of$ (
+export function index_of_ (
   v: BigVector,
   val: any,
   $c: AptosDataCache,
@@ -194,148 +194,148 @@ export function index_of$ (
 ): [boolean, U64] {
   let i, index, len;
   i = u64("0");
-  len = length$(v, $c, [$p[0]] as TypeTag[]);
-  index = bucket_index$(v, u64("0"), $c, [$p[0]] as TypeTag[]);
-  while ($.copy(i).lt($.copy(len))) {
+  len = length_(v, $c, [$p[0]]);
+  index = bucket_index_(v, u64("0"), $c, [$p[0]]);
+  while (($.copy(i)).lt($.copy(len))) {
     {
-      if ($.dyn_eq($p[0], borrow$(v, index, $c, [$p[0]] as TypeTag[]), val)) {
+      if ($.dyn_eq($p[0], borrow_(v, index, $c, [$p[0]]), val)) {
         return [true, $.copy(i)];
       }
       else{
       }
-      i = $.copy(i).add(u64("1"));
-      increment_index$(index, $.copy(v.bucket_size), $c);
+      i = ($.copy(i)).add(u64("1"));
+      increment_index_(index, $.copy(v.bucket_size), $c);
     }
 
   }return [false, u64("0")];
 }
 
-export function is_empty$ (
+export function is_empty_ (
   v: BigVector,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): boolean {
-  return length$(v, $c, [$p[0]] as TypeTag[]).eq(u64("0"));
+  return (length_(v, $c, [$p[0]])).eq((u64("0")));
 }
 
-export function length$ (
+export function length_ (
   v: BigVector,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): U64 {
-  return $.copy(v.end_index.bucket_index).mul($.copy(v.bucket_size)).add($.copy(v.end_index.vec_index));
+  return (($.copy(v.end_index.bucket_index)).mul($.copy(v.bucket_size))).add($.copy(v.end_index.vec_index));
 }
 
-export function new__$ (
+export function new___ (
   bucket_size: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): BigVector {
-  if (!$.copy(bucket_size).gt(u64("0"))) {
+  if (!($.copy(bucket_size)).gt(u64("0"))) {
     throw $.abortCode(u64("0"));
   }
-  return new BigVector({ buckets: table$_.new__$($c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), end_index: new BigVectorIndex({ bucket_index: u64("0"), vec_index: u64("0") }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", [])), num_buckets: u64("0"), bucket_size: $.copy(bucket_size) }, new StructTag(new HexString("0x1"), "big_vector", "BigVector", [$p[0]]));
+  return new BigVector({ buckets: Table_with_length.new___($c, [AtomicTypeTag.U64, new VectorTag($p[0])]), end_index: new BigVectorIndex({ bucket_index: u64("0"), vec_index: u64("0") }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", [])), num_buckets: u64("0"), bucket_size: $.copy(bucket_size) }, new StructTag(new HexString("0x1"), "big_vector", "BigVector", [$p[0]]));
 }
 
-export function new_with_capacity$ (
+export function new_with_capacity_ (
   bucket_size: U64,
   num_buckets: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): BigVector {
   let v;
-  v = new__$($.copy(bucket_size), $c, [$p[0]] as TypeTag[]);
-  reserve$(v, $.copy(num_buckets), $c, [$p[0]] as TypeTag[]);
+  v = new___($.copy(bucket_size), $c, [$p[0]]);
+  reserve_(v, $.copy(num_buckets), $c, [$p[0]]);
   return v;
 }
 
-export function pop_back$ (
+export function pop_back_ (
   v: BigVector,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): any {
   let val;
-  if (!!is_empty$(v, $c, [$p[0]] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EINDEX_OUT_OF_BOUNDS, $c));
+  if (!!is_empty_(v, $c, [$p[0]])) {
+    throw $.abortCode(Std.Error.invalid_argument_(EINDEX_OUT_OF_BOUNDS, $c));
   }
-  decrement_index$(v.end_index, $.copy(v.bucket_size), $c);
-  val = std$_.vector$_.pop_back$(table$_.borrow_mut$(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), $c, [$p[0]] as TypeTag[]);
+  decrement_index_(v.end_index, $.copy(v.bucket_size), $c);
+  val = Std.Vector.pop_back_(Table_with_length.borrow_mut_(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), $c, [$p[0]]);
   return val;
 }
 
-export function push_back$ (
+export function push_back_ (
   v: BigVector,
   val: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): void {
-  if ($.copy(v.end_index.bucket_index).eq($.copy(v.num_buckets))) {
-    table$_.add$(v.buckets, $.copy(v.num_buckets), std$_.vector$_.empty$($c, [$p[0]] as TypeTag[]), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]);
-    v.num_buckets = $.copy(v.num_buckets).add(u64("1"));
+  if (($.copy(v.end_index.bucket_index)).eq(($.copy(v.num_buckets)))) {
+    Table_with_length.add_(v.buckets, $.copy(v.num_buckets), Std.Vector.empty_($c, [$p[0]]), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]);
+    v.num_buckets = ($.copy(v.num_buckets)).add(u64("1"));
   }
   else{
   }
-  std$_.vector$_.push_back$(table$_.borrow_mut$(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), val, $c, [$p[0]] as TypeTag[]);
-  increment_index$(v.end_index, $.copy(v.bucket_size), $c);
+  Std.Vector.push_back_(Table_with_length.borrow_mut_(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), val, $c, [$p[0]]);
+  increment_index_(v.end_index, $.copy(v.bucket_size), $c);
   return;
 }
 
-export function push_back_no_grow$ (
+export function push_back_no_grow_ (
   v: BigVector,
   val: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): void {
-  if (!$.copy(v.end_index.bucket_index).lt($.copy(v.num_buckets))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EOUT_OF_CAPACITY, $c));
+  if (!($.copy(v.end_index.bucket_index)).lt($.copy(v.num_buckets))) {
+    throw $.abortCode(Std.Error.invalid_argument_(EOUT_OF_CAPACITY, $c));
   }
-  std$_.vector$_.push_back$(table$_.borrow_mut$(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]), val, $c, [$p[0]] as TypeTag[]);
-  increment_index$(v.end_index, $.copy(v.bucket_size), $c);
+  Std.Vector.push_back_(Table_with_length.borrow_mut_(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), val, $c, [$p[0]]);
+  increment_index_(v.end_index, $.copy(v.bucket_size), $c);
   return;
 }
 
-export function reserve$ (
+export function reserve_ (
   v: BigVector,
   additional_buckets: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): void {
-  while ($.copy(additional_buckets).gt(u64("0"))) {
+  while (($.copy(additional_buckets)).gt(u64("0"))) {
     {
-      table$_.add$(v.buckets, $.copy(v.num_buckets), std$_.vector$_.empty$($c, [$p[0]] as TypeTag[]), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]);
-      v.num_buckets = $.copy(v.num_buckets).add(u64("1"));
-      additional_buckets = $.copy(additional_buckets).sub(u64("1"));
+      Table_with_length.add_(v.buckets, $.copy(v.num_buckets), Std.Vector.empty_($c, [$p[0]]), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]);
+      v.num_buckets = ($.copy(v.num_buckets)).add(u64("1"));
+      additional_buckets = ($.copy(additional_buckets)).sub(u64("1"));
     }
 
   }return;
 }
 
-export function shrink_to_fit$ (
+export function shrink_to_fit_ (
   v: BigVector,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): void {
   let v__1;
-  while ($.copy(v.num_buckets).gt(buckets_required$(v.end_index, $c))) {
+  while (($.copy(v.num_buckets)).gt(buckets_required_(v.end_index, $c))) {
     {
-      v.num_buckets = $.copy(v.num_buckets).sub(u64("1"));
-      v__1 = table$_.remove$(v.buckets, $.copy(v.num_buckets), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]);
-      std$_.vector$_.destroy_empty$(v__1, $c, [$p[0]] as TypeTag[]);
+      v.num_buckets = ($.copy(v.num_buckets)).sub(u64("1"));
+      v__1 = Table_with_length.remove_(v.buckets, $.copy(v.num_buckets), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]);
+      Std.Vector.destroy_empty_(v__1, $c, [$p[0]]);
     }
 
   }return;
 }
 
-export function swap_remove$ (
+export function swap_remove_ (
   v: BigVector,
   index: BigVectorIndex,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): any {
   let temp$1, bucket, bucket_len, last_val, val;
-  last_val = pop_back$(v, $c, [$p[0]] as TypeTag[]);
-  if ($.copy(v.end_index.bucket_index).eq($.copy(index.bucket_index))) {
-    temp$1 = $.copy(v.end_index.vec_index).eq($.copy(index.vec_index));
+  last_val = pop_back_(v, $c, [$p[0]]);
+  if (($.copy(v.end_index.bucket_index)).eq(($.copy(index.bucket_index)))) {
+    temp$1 = ($.copy(v.end_index.vec_index)).eq(($.copy(index.vec_index)));
   }
   else{
     temp$1 = false;
@@ -345,11 +345,11 @@ export function swap_remove$ (
   }
   else{
   }
-  bucket = table$_.borrow_mut$(v.buckets, $.copy(index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])] as TypeTag[]);
-  bucket_len = std$_.vector$_.length$(bucket, $c, [$p[0]] as TypeTag[]);
-  val = std$_.vector$_.swap_remove$(bucket, $.copy(index.vec_index), $c, [$p[0]] as TypeTag[]);
-  std$_.vector$_.push_back$(bucket, last_val, $c, [$p[0]] as TypeTag[]);
-  std$_.vector$_.swap$(bucket, $.copy(index.vec_index), $.copy(bucket_len).sub(u64("1")), $c, [$p[0]] as TypeTag[]);
+  bucket = Table_with_length.borrow_mut_(v.buckets, $.copy(index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]);
+  bucket_len = Std.Vector.length_(bucket, $c, [$p[0]]);
+  val = Std.Vector.swap_remove_(bucket, $.copy(index.vec_index), $c, [$p[0]]);
+  Std.Vector.push_back_(bucket, last_val, $c, [$p[0]]);
+  Std.Vector.swap_(bucket, $.copy(index.vec_index), ($.copy(bucket_len)).sub(u64("1")), $c, [$p[0]]);
   return val;
 }
 

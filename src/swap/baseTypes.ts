@@ -1,7 +1,7 @@
 import { getTypeTagFullname, StructTag, u64, u8 } from "@manahippo/move-to-ts";
 import { Types } from "aptos";
 import bigInt from "big-integer";
-import { router$_ } from "../generated/hippo_swap";
+import { Router } from "../generated/hippo_swap";
 import { TokenInfo } from "../generated/coin_registry/coin_registry";
 import { typeInfoToTypeTag } from "../utils";
 
@@ -219,7 +219,7 @@ export class SteppedRoute extends TradeRoute {
       const toTokenInfo = this.steps[1].rhsTokenInfo();
       const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
       const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
-      return Promise.resolve(router$_.buildPayload_two_step_route_script(
+      return Promise.resolve(Router.buildPayload_two_step_route_script(
         u8(this.steps[0].pool.getPoolType()),
         this.steps[0].isXtoY,
         u8(this.steps[1].pool.getPoolType()),
@@ -239,7 +239,7 @@ export class SteppedRoute extends TradeRoute {
       const toTokenInfo = this.steps[2].rhsTokenInfo();
       const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
       const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
-      return Promise.resolve(router$_.buildPayload_three_step_route_script(
+      return Promise.resolve(Router.buildPayload_three_step_route_script(
         u8(this.steps[0].pool.getPoolType()),
         this.steps[0].isXtoY,
         u8(this.steps[1].pool.getPoolType()),

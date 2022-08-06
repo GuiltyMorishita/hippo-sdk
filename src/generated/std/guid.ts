@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as signer$_ from "./signer";
+import * as Signer from "./signer";
 export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "guid";
@@ -119,21 +119,21 @@ export class ID
   }
 
 }
-export function create$ (
+export function create_ (
   account: HexString,
   $c: AptosDataCache,
 ): GUID {
   let addr;
-  addr = signer$_.address_of$(account, $c);
+  addr = Signer.address_of_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
     $c.move_to(new StructTag(new HexString("0x1"), "guid", "Generator", []), account, new Generator({ counter: u64("0") }, new StructTag(new HexString("0x1"), "guid", "Generator", [])));
   }
   else{
   }
-  return create_impl$($.copy(addr), $c);
+  return create_impl_($.copy(addr), $c);
 }
 
-export function create_id$ (
+export function create_id_ (
   addr: HexString,
   creation_num: U64,
   $c: AptosDataCache,
@@ -141,18 +141,18 @@ export function create_id$ (
   return new ID({ creation_num: $.copy(creation_num), addr: $.copy(addr) }, new StructTag(new HexString("0x1"), "guid", "ID", []));
 }
 
-export function create_impl$ (
+export function create_impl_ (
   addr: HexString,
   $c: AptosDataCache,
 ): GUID {
   let creation_num, generator;
   generator = $c.borrow_global_mut<Generator>(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr));
   creation_num = $.copy(generator.counter);
-  generator.counter = $.copy(creation_num).add(u64("1"));
+  generator.counter = ($.copy(creation_num)).add(u64("1"));
   return new GUID({ id: new ID({ creation_num: $.copy(creation_num), addr: $.copy(addr) }, new StructTag(new HexString("0x1"), "guid", "ID", [])) }, new StructTag(new HexString("0x1"), "guid", "GUID", []));
 }
 
-export function create_with_capability$ (
+export function create_with_capability_ (
   addr: HexString,
   _cap: CreateCapability,
   $c: AptosDataCache,
@@ -160,24 +160,24 @@ export function create_with_capability$ (
   if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
     throw $.abortCode(EGUID_GENERATOR_NOT_PUBLISHED);
   }
-  return create_impl$($.copy(addr), $c);
+  return create_impl_($.copy(addr), $c);
 }
 
-export function creation_num$ (
+export function creation_num_ (
   guid: GUID,
   $c: AptosDataCache,
 ): U64 {
   return $.copy(guid.id.creation_num);
 }
 
-export function creator_address$ (
+export function creator_address_ (
   guid: GUID,
   $c: AptosDataCache,
 ): HexString {
   return $.copy(guid.id.addr);
 }
 
-export function eq_id$ (
+export function eq_id_ (
   guid: GUID,
   id: ID,
   $c: AptosDataCache,
@@ -185,12 +185,12 @@ export function eq_id$ (
   return $.deep_eq(guid.id, id);
 }
 
-export function gen_create_capability$ (
+export function gen_create_capability_ (
   account: HexString,
   $c: AptosDataCache,
 ): CreateCapability {
   let addr;
-  addr = signer$_.address_of$(account, $c);
+  addr = Signer.address_of_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
     $c.move_to(new StructTag(new HexString("0x1"), "guid", "Generator", []), account, new Generator({ counter: u64("0") }, new StructTag(new HexString("0x1"), "guid", "Generator", [])));
   }
@@ -199,7 +199,7 @@ export function gen_create_capability$ (
   return new CreateCapability({ addr: $.copy(addr) }, new StructTag(new HexString("0x1"), "guid", "CreateCapability", []));
 }
 
-export function get_next_creation_num$ (
+export function get_next_creation_num_ (
   addr: HexString,
   $c: AptosDataCache,
 ): U64 {
@@ -213,28 +213,28 @@ export function get_next_creation_num$ (
   return temp$1;
 }
 
-export function id$ (
+export function id_ (
   guid: GUID,
   $c: AptosDataCache,
 ): ID {
   return $.copy(guid.id);
 }
 
-export function id_creation_num$ (
+export function id_creation_num_ (
   id: ID,
   $c: AptosDataCache,
 ): U64 {
   return $.copy(id.creation_num);
 }
 
-export function id_creator_address$ (
+export function id_creator_address_ (
   id: ID,
   $c: AptosDataCache,
 ): HexString {
   return $.copy(id.addr);
 }
 
-export function publish_generator$ (
+export function publish_generator_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {

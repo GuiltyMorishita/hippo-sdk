@@ -1,6 +1,4 @@
 import { AptosAccount, AptosClient, HexString, Types } from "aptos";
-import { AptosError, UserTransaction } from "aptos/dist/api/data-contracts";
-import { ContentType } from "aptos/dist/api/http-client";
 import { Command } from "commander";
 import * as fs from "fs";
 import * as yaml from "yaml";
@@ -41,11 +39,16 @@ export async function sendPayloadTx(
   payload: Types.TransactionPayload, 
   max_gas=1000
 ){
+  console.log("Building tx...");
   const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: `${max_gas}`});
+  console.log("Built tx");
   const signedTxn = await client.signTransaction(account, txnRequest);
+  console.log("Submitting...");
   const txnResult = await client.submitTransaction(signedTxn);
+  console.log("Submitted");
   await client.waitForTransaction(txnResult.hash);
-  const txDetails = (await client.getTransaction(txnResult.hash)) as Types.UserTransaction;
+  console.log("Confirmed");
+  const txDetails = (await client.getTransactionByHash(txnResult.hash)) as Types.UserTransaction;
   console.log(txDetails);
 }
 
@@ -56,33 +59,6 @@ export async function simulatePayloadTx(
   max_gas=1000
 ){
   const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: `${max_gas}`});
-  const signedTxn = makeSimulationTx(account, txnRequest);
-  const http = client.transactions.http;
-
-  const response = await http.request<UserTransaction, AptosError>({
-    path: `/transactions/simulate`,
-    method: "POST",
-    body: signedTxn,
-    type: ContentType.Json,
-    format: "json",
-  });
-  console.log(response.status);
-  return response.data;
-}
-
-export function makeSimulationTx(
-  accountFrom: AptosAccount,
-  txnRequest: Types.UserTransactionRequest,
-): Types.SubmitTransactionRequest {
-  
-  const invalidSignatureBytes = new Uint8Array(64);
-  const invalidSignature = HexString.fromUint8Array(invalidSignatureBytes);
-
-  const transactionSignature: Types.TransactionSignature = {
-    type: "ed25519_signature",
-    public_key: accountFrom.pubKey().hex(),
-    signature: invalidSignature.hex(),
-  };
-
-  return { signature: transactionSignature, ...txnRequest };
+  const outputs = await client.simulateTransaction(account, txnRequest);
+  return outputs[0];
 }

@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
+import * as Std from "../std";
 export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "type_info";
@@ -47,35 +47,35 @@ export class TypeInfo
   structName() { return (this.toTypeTag() as $.StructTag).name; }
 
 }
-export function account_address$ (
+export function account_address_ (
   type_info: TypeInfo,
   $c: AptosDataCache,
 ): HexString {
   return $.copy(type_info.account_address);
 }
 
-export function module_name$ (
+export function module_name_ (
   type_info: TypeInfo,
   $c: AptosDataCache,
 ): U8[] {
   return $.copy(type_info.module_name);
 }
 
-export function struct_name$ (
+export function struct_name_ (
   type_info: TypeInfo,
   $c: AptosDataCache,
 ): U8[] {
   return $.copy(type_info.struct_name);
 }
 
-export function type_name$ (
+export function type_name_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
-): std$_.string$_.String {
+): Std.String.String {
   return $.aptos_std_type_info_type_name($c, [$p[0]]);
 
 }
-export function type_of$ (
+export function type_of_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): TypeInfo {

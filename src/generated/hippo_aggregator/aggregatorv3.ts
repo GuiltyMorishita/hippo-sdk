@@ -5,10 +5,10 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as Econia$_ from "../Econia";
-import * as aptos_framework$_ from "../aptos_framework";
-import * as hippo_swap$_ from "../hippo_swap";
-import * as std$_ from "../std";
+import * as Aptos_framework from "../aptos_framework";
+import * as Econia from "../econia";
+import * as Hippo_swap from "../hippo_swap";
+import * as Std from "../std";
 export const packageName = "HippoAggregator";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
 export const moduleName = "aggregatorv3";
@@ -37,10 +37,10 @@ export class SignerStore
   static fields: FieldDeclType[] = [
   { name: "signer_cap", typeTag: new StructTag(new HexString("0x1"), "account", "SignerCapability", []) }];
 
-  signer_cap: aptos_framework$_.account$_.SignerCapability;
+  signer_cap: Aptos_framework.Account.SignerCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.signer_cap = proto['signer_cap'] as aptos_framework$_.account$_.SignerCapability;
+    this.signer_cap = proto['signer_cap'] as Aptos_framework.Account.SignerCapability;
   }
 
   static SignerStoreParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SignerStore {
@@ -53,118 +53,130 @@ export class SignerStore
     return result as unknown as SignerStore;
   }
 }
-export function get_intermediate_output$ (
+export function check_and_deposit_ (
+  sender: HexString,
+  coin_opt: Std.Option.Option,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X>*/
+): void {
+  let coin, sender_addr;
+  if (Std.Option.is_some_(coin_opt, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])])) {
+    coin = Std.Option.extract_(coin_opt, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+    sender_addr = Std.Signer.address_of_(sender, $c);
+    if (!Aptos_framework.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[0]])) {
+      Aptos_framework.Coins.register_internal_(sender, $c, [$p[0]]);
+    }
+    else{
+    }
+    Aptos_framework.Coin.deposit_($.copy(sender_addr), coin, $c, [$p[0]]);
+  }
+  else{
+  }
+  return Std.Option.destroy_none_(coin_opt, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+}
+
+export function get_intermediate_output_ (
   dex_type: U8,
   pool_type: U8,
   is_x_to_y: boolean,
-  x_in: aptos_framework$_.coin$_.Coin,
+  x_in: Aptos_framework.Coin.Coin,
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, E>*/
-): aptos_framework$_.coin$_.Coin {
-  let temp$11, temp$12, temp$13, temp$14, temp$16, temp$17, temp$18, temp$3, temp$8, hippo_signer, hippo_signer_addr, store, x_out, x_out__2, x_size, y_amt, y_init_balance, y_out, y_out__1, y_out__10, y_out__15, y_out__4, y_out__6, y_out__9, zero, zero__5, zero2, zero2__7;
-  if ($.copy(dex_type).eq(DEX_HIPPO)) {
-    if ($.copy(pool_type).eq(HIPPO_CONSTANT_PRODUCT)) {
+): [Std.Option.Option, Aptos_framework.Coin.Coin] {
+  let temp$10, temp$13, temp$14, temp$15, temp$16, temp$17, temp$18, temp$19, temp$20, temp$22, temp$23, temp$24, temp$25, temp$26, temp$27, temp$28, temp$29, temp$3, temp$4, temp$9, x_out, x_out__2, y_out, y_out__1, y_out__11, y_out__12, y_out__21, y_out__5, y_out__7, zero, zero__6, zero2, zero2__8;
+  if (($.copy(dex_type)).eq((DEX_HIPPO))) {
+    if (($.copy(pool_type)).eq((HIPPO_CONSTANT_PRODUCT))) {
       if (is_x_to_y) {
-        [x_out, y_out] = hippo_swap$_.cp_swap$_.swap_x_to_exact_y_direct$(x_in, $c, [$p[0], $p[1]] as TypeTag[]);
-        aptos_framework$_.coin$_.destroy_zero$(x_out, $c, [$p[0]] as TypeTag[]);
-        temp$3 = y_out;
+        [x_out, y_out] = Hippo_swap.Cp_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
+        Aptos_framework.Coin.destroy_zero_(x_out, $c, [$p[0]]);
+        [temp$3, temp$4] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out];
       }
       else{
-        [y_out__1, x_out__2] = hippo_swap$_.cp_swap$_.swap_y_to_exact_x_direct$(x_in, $c, [$p[1], $p[0]] as TypeTag[]);
-        aptos_framework$_.coin$_.destroy_zero$(x_out__2, $c, [$p[0]] as TypeTag[]);
-        temp$3 = y_out__1;
+        [y_out__1, x_out__2] = Hippo_swap.Cp_swap.swap_y_to_exact_x_direct_(x_in, $c, [$p[1], $p[0]]);
+        Aptos_framework.Coin.destroy_zero_(x_out__2, $c, [$p[0]]);
+        [temp$3, temp$4] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__1];
       }
-      temp$14 = temp$3;
+      [temp$19, temp$20] = [temp$3, temp$4];
     }
     else{
-      if ($.copy(pool_type).eq(HIPPO_STABLE_CURVE)) {
+      if (($.copy(pool_type)).eq((HIPPO_STABLE_CURVE))) {
         if (is_x_to_y) {
-          [zero, zero2, y_out__4] = hippo_swap$_.stable_curve_swap$_.swap_x_to_exact_y_direct$(x_in, $c, [$p[0], $p[1]] as TypeTag[]);
-          aptos_framework$_.coin$_.destroy_zero$(zero, $c, [$p[0]] as TypeTag[]);
-          aptos_framework$_.coin$_.destroy_zero$(zero2, $c, [$p[0]] as TypeTag[]);
-          temp$8 = y_out__4;
+          [zero, zero2, y_out__5] = Hippo_swap.Stable_curve_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
+          Aptos_framework.Coin.destroy_zero_(zero, $c, [$p[0]]);
+          Aptos_framework.Coin.destroy_zero_(zero2, $c, [$p[0]]);
+          [temp$9, temp$10] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__5];
         }
         else{
-          [zero__5, y_out__6, zero2__7] = hippo_swap$_.stable_curve_swap$_.swap_y_to_exact_x_direct$(x_in, $c, [$p[1], $p[0]] as TypeTag[]);
-          aptos_framework$_.coin$_.destroy_zero$(zero__5, $c, [$p[0]] as TypeTag[]);
-          aptos_framework$_.coin$_.destroy_zero$(zero2__7, $c, [$p[0]] as TypeTag[]);
-          temp$8 = y_out__6;
+          [zero__6, y_out__7, zero2__8] = Hippo_swap.Stable_curve_swap.swap_y_to_exact_x_direct_(x_in, $c, [$p[1], $p[0]]);
+          Aptos_framework.Coin.destroy_zero_(zero__6, $c, [$p[0]]);
+          Aptos_framework.Coin.destroy_zero_(zero2__8, $c, [$p[0]]);
+          [temp$9, temp$10] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__7];
         }
-        temp$13 = temp$8;
+        [temp$17, temp$18] = [temp$9, temp$10];
       }
       else{
-        if ($.copy(pool_type).eq(HIPPO_PIECEWISE)) {
+        if (($.copy(pool_type)).eq((HIPPO_PIECEWISE))) {
           if (is_x_to_y) {
-            y_out__9 = hippo_swap$_.piece_swap$_.swap_x_to_y_direct$(x_in, $c, [$p[0], $p[1]] as TypeTag[]);
-            temp$11 = y_out__9;
+            y_out__11 = Hippo_swap.Piece_swap.swap_x_to_y_direct_(x_in, $c, [$p[0], $p[1]]);
+            [temp$13, temp$14] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__11];
           }
           else{
-            y_out__10 = hippo_swap$_.piece_swap$_.swap_y_to_x_direct$(x_in, $c, [$p[1], $p[0]] as TypeTag[]);
-            temp$11 = y_out__10;
+            y_out__12 = Hippo_swap.Piece_swap.swap_y_to_x_direct_(x_in, $c, [$p[1], $p[0]]);
+            [temp$13, temp$14] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__12];
           }
-          temp$12 = temp$11;
+          [temp$15, temp$16] = [temp$13, temp$14];
         }
         else{
           throw $.abortCode(E_UNKNOWN_POOL_TYPE);
         }
-        temp$13 = temp$12;
+        [temp$17, temp$18] = [temp$15, temp$16];
       }
-      temp$14 = temp$13;
+      [temp$19, temp$20] = [temp$17, temp$18];
     }
-    temp$18 = temp$14;
+    [temp$28, temp$29] = [temp$19, temp$20];
   }
   else{
-    if ($.copy(dex_type).eq(DEX_ECONIA)) {
-      if ($.copy(pool_type).eq(ECONIA_V1)) {
-        store = $c.borrow_global<SignerStore>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv3", "SignerStore", []), new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"));
-        hippo_signer = aptos_framework$_.account$_.create_signer_with_capability$(store.signer_cap, $c);
-        hippo_signer_addr = std$_.signer$_.address_of$(hippo_signer, $c);
-        if (!aptos_framework$_.coin$_.is_account_registered$($.copy(hippo_signer_addr), $c, [$p[0]] as TypeTag[])) {
-          aptos_framework$_.coin$_.register_internal$(hippo_signer, $c, [$p[0]] as TypeTag[]);
-        }
-        else{
-        }
-        if (!aptos_framework$_.coin$_.is_account_registered$($.copy(hippo_signer_addr), $c, [$p[1]] as TypeTag[])) {
-          aptos_framework$_.coin$_.register_internal$(hippo_signer, $c, [$p[1]] as TypeTag[]);
-        }
-        else{
-        }
-        y_init_balance = aptos_framework$_.coin$_.balance$($.copy(hippo_signer_addr), $c, [$p[1]] as TypeTag[]);
-        x_size = aptos_framework$_.coin$_.value$(x_in, $c, [$p[0]] as TypeTag[]);
-        aptos_framework$_.coin$_.deposit$($.copy(hippo_signer_addr), x_in, $c, [$p[0]] as TypeTag[]);
+    if (($.copy(dex_type)).eq((DEX_ECONIA))) {
+      if (($.copy(pool_type)).eq((ECONIA_V1))) {
+        y_out__21 = Aptos_framework.Coin.zero_($c, [$p[1]]);
         if (is_x_to_y) {
-          Econia$_.Match$_.swap_sell$(hippo_signer, new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), $.copy(x_size), $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
+          Econia.Market.swap_(false, new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), x_in, y_out__21, $c, [$p[0], $p[1], $p[2]]);
         }
         else{
-          Econia$_.Match$_.swap_buy$(hippo_signer, new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), MAX_SIZE, $.copy(x_size), $c, [$p[1], $p[0], $p[2]] as TypeTag[]);
+          Econia.Market.swap_(true, new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), y_out__21, x_in, $c, [$p[1], $p[0], $p[2]]);
         }
-        y_amt = aptos_framework$_.coin$_.balance$($.copy(hippo_signer_addr), $c, [$p[1]] as TypeTag[]);
-        y_out__15 = aptos_framework$_.coin$_.withdraw$(hippo_signer, $.copy(y_amt).sub($.copy(y_init_balance)), $c, [$p[1]] as TypeTag[]);
-        temp$16 = y_out__15;
+        if ((Aptos_framework.Coin.value_(x_in, $c, [$p[0]])).eq((u64("0")))) {
+          Aptos_framework.Coin.destroy_zero_(x_in, $c, [$p[0]]);
+          [temp$22, temp$23] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__21];
+        }
+        else{
+          [temp$22, temp$23] = [Std.Option.some_(x_in, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__21];
+        }
+        [temp$24, temp$25] = [temp$22, temp$23];
       }
       else{
         throw $.abortCode(E_UNKNOWN_POOL_TYPE);
       }
-      temp$17 = temp$16;
+      [temp$26, temp$27] = [temp$24, temp$25];
     }
     else{
       throw $.abortCode(E_UNKNOWN_DEX);
     }
-    temp$18 = temp$17;
+    [temp$28, temp$29] = [temp$26, temp$27];
   }
-  return temp$18;
+  return [temp$28, temp$29];
 }
 
-export function initialize$ (
+export function initialize_ (
   admin: HexString,
   $c: AptosDataCache,
 ): void {
   let admin_addr, signer_cap;
-  admin_addr = std$_.signer$_.address_of$(admin, $c);
-  if (!($.copy(admin_addr).hex() === new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a").hex())) {
+  admin_addr = Std.Signer.address_of_(admin, $c);
+  if (!(($.copy(admin_addr)).hex() === (new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a")).hex())) {
     throw $.abortCode(E_NOT_ADMIN);
   }
-  [, signer_cap] = aptos_framework$_.account$_.create_resource_account$(admin, [u8("115"), u8("105"), u8("103"), u8("110"), u8("101"), u8("114"), u8("118"), u8("51")], $c);
+  [, signer_cap] = Aptos_framework.Account.create_resource_account_(admin, [u8("115"), u8("105"), u8("103"), u8("110"), u8("101"), u8("114"), u8("118"), u8("51")], $c);
   $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv3", "SignerStore", []), admin, new SignerStore({ signer_cap: signer_cap }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv3", "SignerStore", [])));
   return;
 }
@@ -181,7 +193,7 @@ export function buildPayload_initialize (
 
 }
 
-export function one_step_route$ (
+export function one_step_route_ (
   sender: HexString,
   first_dex_type: U8,
   first_pool_type: U8,
@@ -191,13 +203,14 @@ export function one_step_route$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, E>*/
 ): void {
-  let coin_in, coin_out;
-  coin_in = aptos_framework$_.coin$_.withdraw$(sender, $.copy(x_in), $c, [$p[0]] as TypeTag[]);
-  coin_out = get_intermediate_output$($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_in, $c, [$p[0], $p[1], $p[2]] as TypeTag[]);
-  if (!aptos_framework$_.coin$_.value$(coin_out, $c, [$p[1]] as TypeTag[]).ge($.copy(y_min_out))) {
+  let coin_in, coin_out, coin_remain_opt;
+  coin_in = Aptos_framework.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
+  [coin_remain_opt, coin_out] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_in, $c, [$p[0], $p[1], $p[2]]);
+  if (!(Aptos_framework.Coin.value_(coin_out, $c, [$p[1]])).ge($.copy(y_min_out))) {
     throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
   }
-  aptos_framework$_.coin$_.deposit$(std$_.signer$_.address_of$(sender, $c), coin_out, $c, [$p[1]] as TypeTag[]);
+  Aptos_framework.Coin.deposit_(Std.Signer.address_of_(sender, $c), coin_out, $c, [$p[1]]);
+  check_and_deposit_(sender, coin_remain_opt, $c, [$p[0]]);
   return;
 }
 
@@ -225,7 +238,7 @@ export function buildPayload_one_step_route (
 
 }
 
-export function three_step_route$ (
+export function three_step_route_ (
   sender: HexString,
   first_dex_type: U8,
   first_pool_type: U8,
@@ -241,15 +254,18 @@ export function three_step_route$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, Z, M, E1, E2, E3>*/
 ): void {
-  let coin_m, coin_x, coin_y, coin_z;
-  coin_x = aptos_framework$_.coin$_.withdraw$(sender, $.copy(x_in), $c, [$p[0]] as TypeTag[]);
-  coin_y = get_intermediate_output$($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[4]] as TypeTag[]);
-  coin_z = get_intermediate_output$($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[5]] as TypeTag[]);
-  coin_m = get_intermediate_output$($.copy(third_dex_type), $.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3], $p[6]] as TypeTag[]);
-  if (!aptos_framework$_.coin$_.value$(coin_m, $c, [$p[3]] as TypeTag[]).ge($.copy(m_min_out))) {
+  let coin_m, coin_x, coin_x_remain, coin_y, coin_y_remain, coin_z, coin_z_remain;
+  coin_x = Aptos_framework.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
+  [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[4]]);
+  [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[5]]);
+  [coin_z_remain, coin_m] = get_intermediate_output_($.copy(third_dex_type), $.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3], $p[6]]);
+  if (!(Aptos_framework.Coin.value_(coin_m, $c, [$p[3]])).ge($.copy(m_min_out))) {
     throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
   }
-  aptos_framework$_.coin$_.deposit$(std$_.signer$_.address_of$(sender, $c), coin_m, $c, [$p[3]] as TypeTag[]);
+  Aptos_framework.Coin.deposit_(Std.Signer.address_of_(sender, $c), coin_m, $c, [$p[3]]);
+  check_and_deposit_(sender, coin_x_remain, $c, [$p[0]]);
+  check_and_deposit_(sender, coin_y_remain, $c, [$p[1]]);
+  check_and_deposit_(sender, coin_z_remain, $c, [$p[2]]);
   return;
 }
 
@@ -289,7 +305,7 @@ export function buildPayload_three_step_route (
 
 }
 
-export function two_step_route$ (
+export function two_step_route_ (
   sender: HexString,
   first_dex_type: U8,
   first_pool_type: U8,
@@ -302,14 +318,16 @@ export function two_step_route$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, Z, E1, E2>*/
 ): void {
-  let coin_x, coin_y, coin_z;
-  coin_x = aptos_framework$_.coin$_.withdraw$(sender, $.copy(x_in), $c, [$p[0]] as TypeTag[]);
-  coin_y = get_intermediate_output$($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[3]] as TypeTag[]);
-  coin_z = get_intermediate_output$($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[4]] as TypeTag[]);
-  if (!aptos_framework$_.coin$_.value$(coin_z, $c, [$p[2]] as TypeTag[]).ge($.copy(z_min_out))) {
+  let coin_x, coin_x_remain, coin_y, coin_y_remain, coin_z;
+  coin_x = Aptos_framework.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
+  [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[3]]);
+  [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[4]]);
+  if (!(Aptos_framework.Coin.value_(coin_z, $c, [$p[2]])).ge($.copy(z_min_out))) {
     throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
   }
-  aptos_framework$_.coin$_.deposit$(std$_.signer$_.address_of$(sender, $c), coin_z, $c, [$p[2]] as TypeTag[]);
+  Aptos_framework.Coin.deposit_(Std.Signer.address_of_(sender, $c), coin_z, $c, [$p[2]]);
+  check_and_deposit_(sender, coin_x_remain, $c, [$p[0]]);
+  check_and_deposit_(sender, coin_y_remain, $c, [$p[1]]);
   return;
 }
 

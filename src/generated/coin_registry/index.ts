@@ -1,12 +1,12 @@
 
 import { AptosParserRepo } from "@manahippo/move-to-ts";
-import * as coin_registry$_ from './coin_registry';
+import * as Coin_registry from './coin_registry';
 
-export * as coin_registry$_ from './coin_registry';
+export * as Coin_registry from './coin_registry';
 
 
 export function loadParsers(repo: AptosParserRepo) {
-  coin_registry$_.loadParsers(repo);
+  Coin_registry.loadParsers(repo);
 }
 
 export function getPackageRepo(): AptosParserRepo {

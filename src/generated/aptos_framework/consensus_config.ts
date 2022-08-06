@@ -5,10 +5,10 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as reconfiguration$_ from "./reconfiguration";
-import * as system_addresses$_ from "./system_addresses";
-import * as timestamp$_ from "./timestamp";
+import * as Std from "../std";
+import * as Reconfiguration from "./reconfiguration";
+import * as System_addresses from "./system_addresses";
+import * as Timestamp from "./timestamp";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "consensus_config";
@@ -43,29 +43,29 @@ export class ConsensusConfig
     return result as unknown as ConsensusConfig;
   }
 }
-export function initialize$ (
+export function initialize_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  timestamp$_.assert_genesis$($c);
-  system_addresses$_.assert_aptos_framework$(account, $c);
+  Timestamp.assert_genesis_($c);
+  System_addresses.assert_aptos_framework_(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.error$_.already_exists$(ECONFIG, $c));
+    throw $.abortCode(Std.Error.already_exists_(ECONFIG, $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), account, new ConsensusConfig({ config: std$_.vector$_.empty$($c, [AtomicTypeTag.U8] as TypeTag[]) }, new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), account, new ConsensusConfig({ config: Std.Vector.empty_($c, [AtomicTypeTag.U8]) }, new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", [])));
   return;
 }
 
-export function set$ (
+export function set_ (
   account: HexString,
   config: U8[],
   $c: AptosDataCache,
 ): void {
   let config_ref;
-  system_addresses$_.assert_aptos_framework$(account, $c);
+  System_addresses.assert_aptos_framework_(account, $c);
   config_ref = $c.borrow_global_mut<ConsensusConfig>(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), new HexString("0x1")).config;
   $.set(config_ref, $.copy(config));
-  reconfiguration$_.reconfigure$($c);
+  Reconfiguration.reconfigure_($c);
   return;
 }
 

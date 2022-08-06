@@ -10,13 +10,13 @@ export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b
 export const moduleName = "math";
 
 
-export function max$ (
+export function max_ (
   a: U128,
   b: U128,
   $c: AptosDataCache,
 ): U128 {
   let temp$1;
-  if ($.copy(a).lt($.copy(b))) {
+  if (($.copy(a)).lt($.copy(b))) {
     temp$1 = $.copy(b);
   }
   else{
@@ -25,13 +25,13 @@ export function max$ (
   return temp$1;
 }
 
-export function max_u64$ (
+export function max_u64_ (
   a: U64,
   b: U64,
   $c: AptosDataCache,
 ): U64 {
   let temp$1;
-  if ($.copy(a).lt($.copy(b))) {
+  if (($.copy(a)).lt($.copy(b))) {
     temp$1 = $.copy(b);
   }
   else{
@@ -40,13 +40,13 @@ export function max_u64$ (
   return temp$1;
 }
 
-export function min$ (
+export function min_ (
   a: U128,
   b: U128,
   $c: AptosDataCache,
 ): U128 {
   let temp$1;
-  if ($.copy(a).gt($.copy(b))) {
+  if (($.copy(a)).gt($.copy(b))) {
     temp$1 = $.copy(b);
   }
   else{
@@ -55,7 +55,7 @@ export function min$ (
   return temp$1;
 }
 
-export function pow$ (
+export function pow_ (
   base: U128,
   exp: U8,
   $c: AptosDataCache,
@@ -63,14 +63,14 @@ export function pow$ (
   let result;
   result = u128("1");
   while (true) {
-    if ($.copy(exp).and(u8("1")).eq(u8("1"))) {
-      result = $.copy(result).mul($.copy(base));
+    if ((($.copy(exp)).and(u8("1"))).eq((u8("1")))) {
+      result = ($.copy(result)).mul($.copy(base));
     }
     else{
     }
-    exp = $.copy(exp).shr(u8("1"));
-    base = $.copy(base).mul($.copy(base));
-    if ($.copy(exp).eq(u8("0"))) {
+    exp = ($.copy(exp)).shr(u8("1"));
+    base = ($.copy(base)).mul($.copy(base));
+    if (($.copy(exp)).eq((u8("0")))) {
       break;
     }
     else{
@@ -79,13 +79,13 @@ export function pow$ (
   return $.copy(result);
 }
 
-export function sqrt$ (
+export function sqrt_ (
   y: U128,
   $c: AptosDataCache,
 ): U128 {
   let temp$1, temp$2, x, z;
-  if ($.copy(y).lt(u128("4"))) {
-    if ($.copy(y).eq(u128("0"))) {
+  if (($.copy(y)).lt(u128("4"))) {
+    if (($.copy(y)).eq((u128("0")))) {
       temp$1 = u128("0");
     }
     else{
@@ -95,11 +95,11 @@ export function sqrt$ (
   }
   else{
     z = $.copy(y);
-    x = $.copy(y).div(u128("2")).add(u128("1"));
-    while ($.copy(x).lt($.copy(z))) {
+    x = (($.copy(y)).div(u128("2"))).add(u128("1"));
+    while (($.copy(x)).lt($.copy(z))) {
       {
         z = $.copy(x);
-        x = $.copy(y).div($.copy(x)).add($.copy(x)).div(u128("2"));
+        x = ((($.copy(y)).div($.copy(x))).add($.copy(x))).div(u128("2"));
       }
 
     }temp$2 = $.copy(z);

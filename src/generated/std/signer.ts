@@ -10,14 +10,14 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "signer";
 
 
-export function address_of$ (
+export function address_of_ (
   s: HexString,
   $c: AptosDataCache,
 ): HexString {
-  return $.copy(borrow_address$(s, $c));
+  return $.copy(borrow_address_(s, $c));
 }
 
-export function borrow_address$ (
+export function borrow_address_ (
   s: HexString,
   $c: AptosDataCache,
 ): HexString {

@@ -5,13 +5,13 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as chain_id$_ from "./chain_id";
-import * as coin$_ from "./coin";
-import * as system_addresses$_ from "./system_addresses";
-import * as timestamp$_ from "./timestamp";
-import * as transaction_fee$_ from "./transaction_fee";
-import * as transaction_publishing_option$_ from "./transaction_publishing_option";
+import * as Aptos_std from "../aptos_std";
+import * as Std from "../std";
+import * as Chain_id from "./chain_id";
+import * as Coin from "./coin";
+import * as System_addresses from "./system_addresses";
+import * as Timestamp from "./timestamp";
+import * as Transaction_fee from "./transaction_fee";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "account";
@@ -54,16 +54,19 @@ export class Account
   static fields: FieldDeclType[] = [
   { name: "authentication_key", typeTag: new VectorTag(AtomicTypeTag.U8) },
   { name: "sequence_number", typeTag: AtomicTypeTag.U64 },
-  { name: "self_address", typeTag: AtomicTypeTag.Address }];
+  { name: "self_address", typeTag: AtomicTypeTag.Address },
+  { name: "coin_register_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]) }];
 
   authentication_key: U8[];
   sequence_number: U64;
   self_address: HexString;
+  coin_register_events: Aptos_std.Event.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.authentication_key = proto['authentication_key'] as U8[];
     this.sequence_number = proto['sequence_number'] as U64;
     this.self_address = proto['self_address'] as HexString;
+    this.coin_register_events = proto['coin_register_events'] as Aptos_std.Event.EventHandle;
   }
 
   static AccountParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Account {
@@ -93,8 +96,7 @@ export class ChainSpecificAccountInfo
   { name: "writeset_prologue_name", typeTag: new VectorTag(AtomicTypeTag.U8) },
   { name: "multi_agent_prologue_name", typeTag: new VectorTag(AtomicTypeTag.U8) },
   { name: "user_epilogue_name", typeTag: new VectorTag(AtomicTypeTag.U8) },
-  { name: "writeset_epilogue_name", typeTag: new VectorTag(AtomicTypeTag.U8) },
-  { name: "currency_code_required", typeTag: AtomicTypeTag.Bool }];
+  { name: "writeset_epilogue_name", typeTag: new VectorTag(AtomicTypeTag.U8) }];
 
   module_addr: HexString;
   module_name: U8[];
@@ -104,7 +106,6 @@ export class ChainSpecificAccountInfo
   multi_agent_prologue_name: U8[];
   user_epilogue_name: U8[];
   writeset_epilogue_name: U8[];
-  currency_code_required: boolean;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.module_addr = proto['module_addr'] as HexString;
@@ -115,7 +116,6 @@ export class ChainSpecificAccountInfo
     this.multi_agent_prologue_name = proto['multi_agent_prologue_name'] as U8[];
     this.user_epilogue_name = proto['user_epilogue_name'] as U8[];
     this.writeset_epilogue_name = proto['writeset_epilogue_name'] as U8[];
-    this.currency_code_required = proto['currency_code_required'] as boolean;
   }
 
   static ChainSpecificAccountInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : ChainSpecificAccountInfo {
@@ -127,6 +127,30 @@ export class ChainSpecificAccountInfo
     const result = await repo.loadResource(client, address, ChainSpecificAccountInfo, typeParams);
     return result as unknown as ChainSpecificAccountInfo;
   }
+}
+
+export class CoinRegisterEvent 
+{
+  static moduleAddress = moduleAddress;
+  static moduleName = moduleName;
+  static structName: string = "CoinRegisterEvent";
+  static typeParameters: TypeParamDeclType[] = [
+
+  ];
+  static fields: FieldDeclType[] = [
+  { name: "type_info", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) }];
+
+  type_info: Aptos_std.Type_info.TypeInfo;
+
+  constructor(proto: any, public typeTag: TypeTag) {
+    this.type_info = proto['type_info'] as Aptos_std.Type_info.TypeInfo;
+  }
+
+  static CoinRegisterEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : CoinRegisterEvent {
+    const proto = $.parseStructProto(data, typeTag, repo, CoinRegisterEvent);
+    return new CoinRegisterEvent(proto, typeTag);
+  }
+
 }
 
 export class SignerCapability 
@@ -152,13 +176,14 @@ export class SignerCapability
   }
 
 }
-export function create_account$ (
+export function create_account_ (
   auth_key: HexString,
   $c: AptosDataCache,
 ): void {
   let signer;
-  signer = create_account_internal$($.copy(auth_key), $c);
-  coin$_.register$(signer, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+  signer = create_account_internal_($.copy(auth_key), $c);
+  Coin.register_(signer, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  register_coin_($.copy(auth_key), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   return;
 }
 
@@ -176,99 +201,99 @@ export function buildPayload_create_account (
   );
 
 }
-export function create_account_internal$ (
+export function create_account_internal_ (
   new_address: HexString,
   $c: AptosDataCache,
 ): HexString {
   if (!!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(new_address))) {
-    throw $.abortCode(std$_.error$_.already_exists$(EACCOUNT, $c));
+    throw $.abortCode(Std.Error.already_exists_(EACCOUNT, $c));
   }
-  if (!($.copy(new_address).hex() !== new HexString("0x0").hex())) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(ECANNOT_CREATE_AT_VM_RESERVED, $c));
+  if (!(($.copy(new_address)).hex() !== (new HexString("0x0")).hex())) {
+    throw $.abortCode(Std.Error.invalid_argument_(ECANNOT_CREATE_AT_VM_RESERVED, $c));
   }
-  if (!($.copy(new_address).hex() !== new HexString("0x1").hex())) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(ECANNOT_CREATE_AT_CORE_CODE, $c));
+  if (!(($.copy(new_address)).hex() !== (new HexString("0x1")).hex())) {
+    throw $.abortCode(Std.Error.invalid_argument_(ECANNOT_CREATE_AT_CORE_CODE, $c));
   }
-  return create_account_unchecked$($.copy(new_address), $c);
+  return create_account_unchecked_($.copy(new_address), $c);
 }
 
-export function create_account_unchecked$ (
+export function create_account_unchecked_ (
   new_address: HexString,
   $c: AptosDataCache,
 ): HexString {
   let authentication_key, new_account;
-  new_account = create_signer$($.copy(new_address), $c);
-  authentication_key = std$_.bcs$_.to_bytes$(new_address, $c, [AtomicTypeTag.Address] as TypeTag[]);
-  if (!std$_.vector$_.length$(authentication_key, $c, [AtomicTypeTag.U8] as TypeTag[]).eq(u64("32"))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EMALFORMED_AUTHENTICATION_KEY, $c));
+  new_account = create_signer_($.copy(new_address), $c);
+  authentication_key = Std.Bcs.to_bytes_(new_address, $c, [AtomicTypeTag.Address]);
+  if (!(Std.Vector.length_(authentication_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
+    throw $.abortCode(Std.Error.invalid_argument_(EMALFORMED_AUTHENTICATION_KEY, $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "account", "Account", []), new_account, new Account({ authentication_key: $.copy(authentication_key), sequence_number: u64("0"), self_address: $.copy(new_address) }, new StructTag(new HexString("0x1"), "account", "Account", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "account", "Account", []), new_account, new Account({ authentication_key: $.copy(authentication_key), sequence_number: u64("0"), self_address: $.copy(new_address), coin_register_events: Aptos_std.Event.new_event_handle_(new_account, $c, [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]) }, new StructTag(new HexString("0x1"), "account", "Account", [])));
   return new_account;
 }
 
-export function create_address$ (
+export function create_address_ (
   bytes: U8[],
   $c: AptosDataCache,
 ): HexString {
   return $.aptos_framework_account_create_address(bytes, $c);
 
 }
-export function create_authentication_key$ (
+export function create_authentication_key_ (
   account: HexString,
   auth_key_prefix: U8[],
   $c: AptosDataCache,
 ): U8[] {
   let authentication_key;
   authentication_key = $.copy(auth_key_prefix);
-  std$_.vector$_.append$(authentication_key, std$_.bcs$_.to_bytes$(std$_.signer$_.borrow_address$(account, $c), $c, [AtomicTypeTag.Address] as TypeTag[]), $c, [AtomicTypeTag.U8] as TypeTag[]);
-  if (!std$_.vector$_.length$(authentication_key, $c, [AtomicTypeTag.U8] as TypeTag[]).eq(u64("32"))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EMALFORMED_AUTHENTICATION_KEY, $c));
+  Std.Vector.append_(authentication_key, Std.Bcs.to_bytes_(Std.Signer.borrow_address_(account, $c), $c, [AtomicTypeTag.Address]), $c, [AtomicTypeTag.U8]);
+  if (!(Std.Vector.length_(authentication_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
+    throw $.abortCode(Std.Error.invalid_argument_(EMALFORMED_AUTHENTICATION_KEY, $c));
   }
   return $.copy(authentication_key);
 }
 
-export function create_core_framework_account$ (
+export function create_core_framework_account_ (
   $c: AptosDataCache,
 ): [HexString, SignerCapability] {
   let signer, signer_cap;
-  timestamp$_.assert_genesis$($c);
-  signer = create_account_unchecked$(new HexString("0x1"), $c);
+  Timestamp.assert_genesis_($c);
+  signer = create_account_unchecked_(new HexString("0x1"), $c);
   signer_cap = new SignerCapability({ account: new HexString("0x1") }, new StructTag(new HexString("0x1"), "account", "SignerCapability", []));
   return [signer, signer_cap];
 }
 
-export function create_resource_account$ (
+export function create_resource_account_ (
   source: HexString,
   seed: U8[],
   $c: AptosDataCache,
 ): [HexString, SignerCapability] {
   let temp$1, addr, bytes, signer, signer_cap;
-  temp$1 = std$_.signer$_.address_of$(source, $c);
-  bytes = std$_.bcs$_.to_bytes$(temp$1, $c, [AtomicTypeTag.Address] as TypeTag[]);
-  std$_.vector$_.append$(bytes, $.copy(seed), $c, [AtomicTypeTag.U8] as TypeTag[]);
-  addr = create_address$(std$_.hash$_.sha3_256$($.copy(bytes), $c), $c);
-  signer = create_account_internal$($.copy(addr), $c);
+  temp$1 = Std.Signer.address_of_(source, $c);
+  bytes = Std.Bcs.to_bytes_(temp$1, $c, [AtomicTypeTag.Address]);
+  Std.Vector.append_(bytes, $.copy(seed), $c, [AtomicTypeTag.U8]);
+  addr = create_address_(Std.Hash.sha3_256_($.copy(bytes), $c), $c);
+  signer = create_account_internal_($.copy(addr), $c);
   signer_cap = new SignerCapability({ account: $.copy(addr) }, new StructTag(new HexString("0x1"), "account", "SignerCapability", []));
   return [signer, signer_cap];
 }
 
-export function create_signer$ (
+export function create_signer_ (
   addr: HexString,
   $c: AptosDataCache,
 ): HexString {
   return $.aptos_framework_account_create_signer(addr, $c);
 
 }
-export function create_signer_with_capability$ (
+export function create_signer_with_capability_ (
   capability: SignerCapability,
   $c: AptosDataCache,
 ): HexString {
   let addr;
   addr = capability.account;
-  return create_signer$($.copy(addr), $c);
+  return create_signer_($.copy(addr), $c);
 }
 
-export function epilogue$ (
+export function epilogue_ (
   account: HexString,
   _txn_sequence_number: U64,
   txn_gas_price: U64,
@@ -277,50 +302,50 @@ export function epilogue$ (
   $c: AptosDataCache,
 ): void {
   let account_resource, addr, gas_used, old_sequence_number, transaction_fee_amount;
-  if (!$.copy(txn_max_gas_units).ge($.copy(gas_units_remaining))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EGAS, $c));
+  if (!($.copy(txn_max_gas_units)).ge($.copy(gas_units_remaining))) {
+    throw $.abortCode(Std.Error.invalid_argument_(EGAS, $c));
   }
-  gas_used = $.copy(txn_max_gas_units).sub($.copy(gas_units_remaining));
-  if (!u128($.copy(txn_gas_price)).mul(u128($.copy(gas_used))).le(MAX_U64)) {
-    throw $.abortCode(std$_.error$_.out_of_range$(EGAS, $c));
+  gas_used = ($.copy(txn_max_gas_units)).sub($.copy(gas_units_remaining));
+  if (!((u128($.copy(txn_gas_price))).mul(u128($.copy(gas_used)))).le(MAX_U64)) {
+    throw $.abortCode(Std.Error.out_of_range_(EGAS, $c));
   }
-  transaction_fee_amount = $.copy(txn_gas_price).mul($.copy(gas_used));
-  addr = std$_.signer$_.address_of$(account, $c);
-  if (!coin$_.balance$($.copy(addr), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]).ge($.copy(transaction_fee_amount))) {
-    throw $.abortCode(std$_.error$_.out_of_range$(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
+  transaction_fee_amount = ($.copy(txn_gas_price)).mul($.copy(gas_used));
+  addr = Std.Signer.address_of_(account, $c);
+  if (!(Coin.balance_($.copy(addr), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])])).ge($.copy(transaction_fee_amount))) {
+    throw $.abortCode(Std.Error.out_of_range_(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
   }
-  transaction_fee$_.burn_fee$($.copy(addr), $.copy(transaction_fee_amount), $c);
-  old_sequence_number = get_sequence_number$($.copy(addr), $c);
-  if (!u128($.copy(old_sequence_number)).lt(MAX_U64)) {
-    throw $.abortCode(std$_.error$_.out_of_range$(ESEQUENCE_NUMBER_TOO_BIG, $c));
+  Transaction_fee.burn_fee_($.copy(addr), $.copy(transaction_fee_amount), $c);
+  old_sequence_number = get_sequence_number_($.copy(addr), $c);
+  if (!(u128($.copy(old_sequence_number))).lt(MAX_U64)) {
+    throw $.abortCode(Std.Error.out_of_range_(ESEQUENCE_NUMBER_TOO_BIG, $c));
   }
   account_resource = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
-  account_resource.sequence_number = $.copy(old_sequence_number).add(u64("1"));
+  account_resource.sequence_number = ($.copy(old_sequence_number)).add(u64("1"));
   return;
 }
 
-export function exists_at$ (
+export function exists_at_ (
   addr: HexString,
   $c: AptosDataCache,
 ): boolean {
   return $c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
 }
 
-export function get_authentication_key$ (
+export function get_authentication_key_ (
   addr: HexString,
   $c: AptosDataCache,
 ): U8[] {
   return $.copy($c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr)).authentication_key);
 }
 
-export function get_sequence_number$ (
+export function get_sequence_number_ (
   addr: HexString,
   $c: AptosDataCache,
 ): U64 {
   return $.copy($c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr)).sequence_number);
 }
 
-export function initialize$ (
+export function initialize_ (
   account: HexString,
   module_addr: HexString,
   module_name: U8[],
@@ -330,15 +355,14 @@ export function initialize$ (
   multi_agent_prologue_name: U8[],
   user_epilogue_name: U8[],
   writeset_epilogue_name: U8[],
-  currency_code_required: boolean,
   $c: AptosDataCache,
 ): void {
-  system_addresses$_.assert_aptos_framework$(account, $c);
-  $c.move_to(new StructTag(new HexString("0x1"), "account", "ChainSpecificAccountInfo", []), account, new ChainSpecificAccountInfo({ module_addr: $.copy(module_addr), module_name: $.copy(module_name), script_prologue_name: $.copy(script_prologue_name), module_prologue_name: $.copy(module_prologue_name), writeset_prologue_name: $.copy(writeset_prologue_name), multi_agent_prologue_name: $.copy(multi_agent_prologue_name), user_epilogue_name: $.copy(user_epilogue_name), writeset_epilogue_name: $.copy(writeset_epilogue_name), currency_code_required: currency_code_required }, new StructTag(new HexString("0x1"), "account", "ChainSpecificAccountInfo", [])));
+  System_addresses.assert_aptos_framework_(account, $c);
+  $c.move_to(new StructTag(new HexString("0x1"), "account", "ChainSpecificAccountInfo", []), account, new ChainSpecificAccountInfo({ module_addr: $.copy(module_addr), module_name: $.copy(module_name), script_prologue_name: $.copy(script_prologue_name), module_prologue_name: $.copy(module_prologue_name), writeset_prologue_name: $.copy(writeset_prologue_name), multi_agent_prologue_name: $.copy(multi_agent_prologue_name), user_epilogue_name: $.copy(user_epilogue_name), writeset_epilogue_name: $.copy(writeset_epilogue_name) }, new StructTag(new HexString("0x1"), "account", "ChainSpecificAccountInfo", [])));
   return;
 }
 
-export function module_prologue$ (
+export function module_prologue_ (
   sender: HexString,
   txn_sequence_number: U64,
   txn_public_key: U8[],
@@ -348,13 +372,10 @@ export function module_prologue$ (
   chain_id: U8,
   $c: AptosDataCache,
 ): void {
-  if (!transaction_publishing_option$_.is_module_allowed$($c)) {
-    throw $.abortCode(std$_.error$_.invalid_state$(PROLOGUE_EMODULE_NOT_ALLOWED, $c));
-  }
-  return prologue_common$(sender, $.copy(txn_sequence_number), $.copy(txn_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
+  return prologue_common_(sender, $.copy(txn_sequence_number), $.copy(txn_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
 }
 
-export function multi_agent_script_prologue$ (
+export function multi_agent_script_prologue_ (
   sender: HexString,
   txn_sequence_number: U64,
   txn_sender_public_key: U8[],
@@ -367,30 +388,30 @@ export function multi_agent_script_prologue$ (
   $c: AptosDataCache,
 ): void {
   let i, num_secondary_signers, secondary_address, signer_account, signer_public_key_hash;
-  prologue_common$(sender, $.copy(txn_sequence_number), $.copy(txn_sender_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
-  num_secondary_signers = std$_.vector$_.length$(secondary_signer_addresses, $c, [AtomicTypeTag.Address] as TypeTag[]);
-  if (!std$_.vector$_.length$(secondary_signer_public_key_hashes, $c, [new VectorTag(AtomicTypeTag.U8)] as TypeTag[]).eq($.copy(num_secondary_signers))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_ESECONDARY_KEYS_ADDRESSES_COUNT_MISMATCH, $c));
+  prologue_common_(sender, $.copy(txn_sequence_number), $.copy(txn_sender_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
+  num_secondary_signers = Std.Vector.length_(secondary_signer_addresses, $c, [AtomicTypeTag.Address]);
+  if (!(Std.Vector.length_(secondary_signer_public_key_hashes, $c, [new VectorTag(AtomicTypeTag.U8)])).eq(($.copy(num_secondary_signers)))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ESECONDARY_KEYS_ADDRESSES_COUNT_MISMATCH, $c));
   }
   i = u64("0");
-  while ($.copy(i).lt($.copy(num_secondary_signers))) {
+  while (($.copy(i)).lt($.copy(num_secondary_signers))) {
     {
-      secondary_address = $.copy(std$_.vector$_.borrow$(secondary_signer_addresses, $.copy(i), $c, [AtomicTypeTag.Address] as TypeTag[]));
-      if (!exists_at$($.copy(secondary_address), $c)) {
-        throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_EACCOUNT_DNE, $c));
+      secondary_address = $.copy(Std.Vector.borrow_(secondary_signer_addresses, $.copy(i), $c, [AtomicTypeTag.Address]));
+      if (!exists_at_($.copy(secondary_address), $c)) {
+        throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EACCOUNT_DNE, $c));
       }
       signer_account = $c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(secondary_address));
-      signer_public_key_hash = $.copy(std$_.vector$_.borrow$(secondary_signer_public_key_hashes, $.copy(i), $c, [new VectorTag(AtomicTypeTag.U8)] as TypeTag[]));
+      signer_public_key_hash = $.copy(Std.Vector.borrow_(secondary_signer_public_key_hashes, $.copy(i), $c, [new VectorTag(AtomicTypeTag.U8)]));
       if (!$.veq($.copy(signer_public_key_hash), $.copy(signer_account.authentication_key))) {
-        throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY, $c));
+        throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY, $c));
       }
-      i = $.copy(i).add(u64("1"));
+      i = ($.copy(i)).add(u64("1"));
     }
 
   }return;
 }
 
-export function prologue_common$ (
+export function prologue_common_ (
   sender: HexString,
   txn_sequence_number: U64,
   txn_public_key: U8[],
@@ -401,46 +422,57 @@ export function prologue_common$ (
   $c: AptosDataCache,
 ): void {
   let balance, max_transaction_fee, sender_account, transaction_sender;
-  if (!timestamp$_.now_seconds$($c).lt($.copy(txn_expiration_time))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_ETRANSACTION_EXPIRED, $c));
+  if (!(Timestamp.now_seconds_($c)).lt($.copy(txn_expiration_time))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ETRANSACTION_EXPIRED, $c));
   }
-  transaction_sender = std$_.signer$_.address_of$(sender, $c);
-  if (!chain_id$_.get$($c).eq($.copy(chain_id))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_EBAD_CHAIN_ID, $c));
+  transaction_sender = Std.Signer.address_of_(sender, $c);
+  if (!(Chain_id.get_($c)).eq(($.copy(chain_id)))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EBAD_CHAIN_ID, $c));
   }
   if (!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(transaction_sender))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_EACCOUNT_DNE, $c));
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EACCOUNT_DNE, $c));
   }
   sender_account = $c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(transaction_sender));
-  if (!$.veq(std$_.hash$_.sha3_256$($.copy(txn_public_key), $c), $.copy(sender_account.authentication_key))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY, $c));
+  if (!$.veq(Std.Hash.sha3_256_($.copy(txn_public_key), $c), $.copy(sender_account.authentication_key))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY, $c));
   }
-  if (!u128($.copy(txn_sequence_number)).lt(MAX_U64)) {
-    throw $.abortCode(std$_.error$_.out_of_range$(PROLOGUE_ESEQUENCE_NUMBER_TOO_BIG, $c));
+  if (!(u128($.copy(txn_sequence_number))).lt(MAX_U64)) {
+    throw $.abortCode(Std.Error.out_of_range_(PROLOGUE_ESEQUENCE_NUMBER_TOO_BIG, $c));
   }
-  if (!$.copy(txn_sequence_number).ge($.copy(sender_account.sequence_number))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_ESEQUENCE_NUMBER_TOO_OLD, $c));
+  if (!($.copy(txn_sequence_number)).ge($.copy(sender_account.sequence_number))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ESEQUENCE_NUMBER_TOO_OLD, $c));
   }
-  if (!$.copy(txn_sequence_number).eq($.copy(sender_account.sequence_number))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_ESEQUENCE_NUMBER_TOO_NEW, $c));
+  if (!($.copy(txn_sequence_number)).eq(($.copy(sender_account.sequence_number)))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ESEQUENCE_NUMBER_TOO_NEW, $c));
   }
-  max_transaction_fee = $.copy(txn_gas_price).mul($.copy(txn_max_gas_units));
-  if (!coin$_.is_account_registered$($.copy(transaction_sender), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
+  max_transaction_fee = ($.copy(txn_gas_price)).mul($.copy(txn_max_gas_units));
+  if (!Coin.is_account_registered_($.copy(transaction_sender), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])])) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
   }
-  balance = coin$_.balance$($.copy(transaction_sender), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
-  if (!$.copy(balance).ge($.copy(max_transaction_fee))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
+  balance = Coin.balance_($.copy(transaction_sender), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  if (!($.copy(balance)).ge($.copy(max_transaction_fee))) {
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
   }
   return;
 }
 
-export function rotate_authentication_key$ (
+export function register_coin_ (
+  account_addr: HexString,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <CoinType>*/
+): void {
+  let account;
+  account = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(account_addr));
+  Aptos_std.Event.emit_event_(account.coin_register_events, new CoinRegisterEvent({ type_info: Aptos_std.Type_info.type_of_($c, [$p[0]]) }, new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])), $c, [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]);
+  return;
+}
+
+export function rotate_authentication_key_ (
   account: HexString,
   new_auth_key: U8[],
   $c: AptosDataCache,
 ): void {
-  rotate_authentication_key_internal$(account, $.copy(new_auth_key), $c);
+  rotate_authentication_key_internal_(account, $.copy(new_auth_key), $c);
   return;
 }
 
@@ -458,25 +490,25 @@ export function buildPayload_rotate_authentication_key (
   );
 
 }
-export function rotate_authentication_key_internal$ (
+export function rotate_authentication_key_internal_ (
   account: HexString,
   new_auth_key: U8[],
   $c: AptosDataCache,
 ): void {
   let account_resource, addr;
-  addr = std$_.signer$_.address_of$(account, $c);
-  if (!exists_at$($.copy(addr), $c)) {
-    throw $.abortCode(std$_.error$_.not_found$(EACCOUNT, $c));
+  addr = Std.Signer.address_of_(account, $c);
+  if (!exists_at_($.copy(addr), $c)) {
+    throw $.abortCode(Std.Error.not_found_(EACCOUNT, $c));
   }
-  if (!std$_.vector$_.length$(new_auth_key, $c, [AtomicTypeTag.U8] as TypeTag[]).eq(u64("32"))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EMALFORMED_AUTHENTICATION_KEY, $c));
+  if (!(Std.Vector.length_(new_auth_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
+    throw $.abortCode(Std.Error.invalid_argument_(EMALFORMED_AUTHENTICATION_KEY, $c));
   }
   account_resource = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
   account_resource.authentication_key = $.copy(new_auth_key);
   return;
 }
 
-export function script_prologue$ (
+export function script_prologue_ (
   sender: HexString,
   txn_sequence_number: U64,
   txn_public_key: U8[],
@@ -484,27 +516,24 @@ export function script_prologue$ (
   txn_max_gas_units: U64,
   txn_expiration_time: U64,
   chain_id: U8,
-  script_hash: U8[],
+  _script_hash: U8[],
   $c: AptosDataCache,
 ): void {
-  if (!transaction_publishing_option$_.is_script_allowed$(script_hash, $c)) {
-    throw $.abortCode(std$_.error$_.invalid_state$(PROLOGUE_ESCRIPT_NOT_ALLOWED, $c));
-  }
-  return prologue_common$(sender, $.copy(txn_sequence_number), $.copy(txn_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
+  return prologue_common_(sender, $.copy(txn_sequence_number), $.copy(txn_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
 }
 
-export function transfer$ (
+export function transfer_ (
   source: HexString,
   to: HexString,
   amount: U64,
   $c: AptosDataCache,
 ): void {
   if (!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(to))) {
-    create_account$($.copy(to), $c);
+    create_account_($.copy(to), $c);
   }
   else{
   }
-  return coin$_.transfer$(source, $.copy(to), $.copy(amount), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+  return Coin.transfer_(source, $.copy(to), $.copy(amount), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
 }
 
 
@@ -523,19 +552,19 @@ export function buildPayload_transfer (
   );
 
 }
-export function writeset_epilogue$ (
+export function writeset_epilogue_ (
   _core_resource: HexString,
   _txn_sequence_number: U64,
   _should_trigger_reconfiguration: boolean,
   $c: AptosDataCache,
 ): void {
   if (!false) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EWRITESET_NOT_ALLOWED, $c));
+    throw $.abortCode(Std.Error.invalid_argument_(EWRITESET_NOT_ALLOWED, $c));
   }
   return;
 }
 
-export function writeset_prologue$ (
+export function writeset_prologue_ (
   _sender: HexString,
   _txn_sequence_number: U64,
   _txn_public_key: U8[],
@@ -544,7 +573,7 @@ export function writeset_prologue$ (
   $c: AptosDataCache,
 ): void {
   if (!false) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(PROLOGUE_EINVALID_WRITESET_SENDER, $c));
+    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EINVALID_WRITESET_SENDER, $c));
   }
   return;
 }
@@ -552,6 +581,7 @@ export function writeset_prologue$ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::account::Account", Account.AccountParser);
   repo.addParser("0x1::account::ChainSpecificAccountInfo", ChainSpecificAccountInfo.ChainSpecificAccountInfoParser);
+  repo.addParser("0x1::account::CoinRegisterEvent", CoinRegisterEvent.CoinRegisterEventParser);
   repo.addParser("0x1::account::SignerCapability", SignerCapability.SignerCapabilityParser);
 }
 

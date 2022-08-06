@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
+import * as Std from "../std";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "governance_proposal";
@@ -25,12 +25,12 @@ export class GovernanceProposal
   { name: "metadata_location", typeTag: new StructTag(new HexString("0x1"), "string", "String", []) },
   { name: "metadata_hash", typeTag: new StructTag(new HexString("0x1"), "string", "String", []) }];
 
-  metadata_location: std$_.string$_.String;
-  metadata_hash: std$_.string$_.String;
+  metadata_location: Std.String.String;
+  metadata_hash: Std.String.String;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.metadata_location = proto['metadata_location'] as std$_.string$_.String;
-    this.metadata_hash = proto['metadata_hash'] as std$_.string$_.String;
+    this.metadata_location = proto['metadata_location'] as Std.String.String;
+    this.metadata_hash = proto['metadata_hash'] as Std.String.String;
   }
 
   static GovernanceProposalParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : GovernanceProposal {
@@ -39,22 +39,22 @@ export class GovernanceProposal
   }
 
 }
-export function create_empty_proposal$ (
+export function create_empty_proposal_ (
   $c: AptosDataCache,
 ): GovernanceProposal {
-  return create_proposal$(std$_.string$_.utf8$([], $c), std$_.string$_.utf8$([], $c), $c);
+  return create_proposal_(Std.String.utf8_([], $c), Std.String.utf8_([], $c), $c);
 }
 
-export function create_proposal$ (
-  metadata_location: std$_.string$_.String,
-  metadata_hash: std$_.string$_.String,
+export function create_proposal_ (
+  metadata_location: Std.String.String,
+  metadata_hash: Std.String.String,
   $c: AptosDataCache,
 ): GovernanceProposal {
-  if (!std$_.string$_.length$(metadata_location, $c).le(u64("256"))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(ETOO_LONG, $c));
+  if (!(Std.String.length_(metadata_location, $c)).le(u64("256"))) {
+    throw $.abortCode(Std.Error.invalid_argument_(ETOO_LONG, $c));
   }
-  if (!std$_.string$_.length$(metadata_hash, $c).le(u64("256"))) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(ETOO_LONG, $c));
+  if (!(Std.String.length_(metadata_hash, $c)).le(u64("256"))) {
+    throw $.abortCode(Std.Error.invalid_argument_(ETOO_LONG, $c));
   }
   return new GovernanceProposal({ metadata_location: $.copy(metadata_location), metadata_hash: $.copy(metadata_hash) }, new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", []));
 }

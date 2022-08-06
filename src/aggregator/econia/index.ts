@@ -1,13 +1,13 @@
-import { AptosLocalCache, AptosParserRepo, copy, TypeTag, u64, U64, u8 } from "@manahippo/move-to-ts";
+import { AptosLocalCache, AptosParserRepo, TypeTag, u64, U64, u8 } from "@manahippo/move-to-ts";
 import { AptosClient, HexString, Types } from "aptos";
 import { getProjectRepo } from "../../generated";
 import { EconiaClient } from "./EconiaClient";
-import { Registry$_ } from "../../generated/Econia";
 import { TokenInfo } from "../../generated/coin_registry/coin_registry";
-import { get_orders$, OB } from "../../generated/Econia/Book";
-import { MI } from "../../generated/Econia/Registry";
+import { get_orders_sdk_, OrderBook } from "../../generated/econia/market";
+import { MarketInfo } from "../../generated/econia/registry";
 import { TokenRegistryClient } from "../../tokenRegistry";
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from "../types";
+import { Registry } from "../../generated/econia";
 
 export * from "./EconiaClient";
 
@@ -19,8 +19,8 @@ export class EconiaTradingPoolV1 extends TradingPool {
   constructor(
     public xInfo: TokenInfo,
     public yInfo: TokenInfo,
-    public orderBook: OB | null,
-    public mi: MI,
+    public orderBook: OrderBook | null,
+    public mi: MarketInfo,
     public owner: HexString,
     public repo: AptosParserRepo,
   ) {
@@ -37,13 +37,13 @@ export class EconiaTradingPoolV1 extends TradingPool {
   // functions that depend on pool's onchain state
   isStateLoaded() { return !!this.orderBook; }
   async reloadState(client: AptosClient): Promise<void> {
-    this.orderBook = await OB.load(this.repo, client, this.owner, this.getMiTags())
+    this.orderBook = await OrderBook.load(this.repo, client, this.owner, this.getMiTags())
   }
   getMiTags(): TypeTag[] {
     return [
-      this.mi.b.toTypeTag(),
-      this.mi.q.toTypeTag(),
-      this.mi.e.toTypeTag(),
+      this.mi.base_coin_type.toTypeTag(),
+      this.mi.quote_coin_type.toTypeTag(),
+      this.mi.scale_exponent_type.toTypeTag(),
     ];
   }
   getUiPrice(rawPrice: U64) {
@@ -52,7 +52,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
     }
     const xFactor = Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
     const yFactor = Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
-    const scaleFactor = this.orderBook.f.toJsNumber(); 
+    const scaleFactor = this.orderBook.scale_factor.toJsNumber(); 
     // yToX price
     return rawPrice.toJsNumber() / yFactor / (scaleFactor / xFactor);
   }
@@ -61,12 +61,11 @@ export class EconiaTradingPoolV1 extends TradingPool {
       throw new Error("Econia Orderbook not loaded. cannot compute price");
     }
     // use top-of-book price
+    const cache = new AptosLocalCache();
     let xToY = 0;
     let yToX = 0;
-    const cache = new AptosLocalCache();
-    cache.move_to(this.orderBook.typeTag, this.owner, copy(this.orderBook));
-    const asks = get_orders$(this.owner, true, cache, this.getMiTags());
-    const bids = get_orders$(this.owner, false, cache, this.getMiTags());
+    const asks = get_orders_sdk_(this.orderBook, true, cache, this.getMiTags());
+    const bids = get_orders_sdk_(this.orderBook, false, cache, this.getMiTags());
     if (asks.length > 0) {
       // y to x is buying, hits asks
       yToX = this.getUiPrice(asks[0].price);
@@ -85,9 +84,8 @@ export class EconiaTradingPoolV1 extends TradingPool {
       throw new Error("Econia Orderbook not loaded. cannot compute quote");
     }
     const cache = new AptosLocalCache();
-    cache.move_to(this.orderBook.typeTag, this.owner, copy(this.orderBook));
-    const asks = get_orders$(this.owner, true, cache, this.getMiTags());
-    const bids = get_orders$(this.owner, false, cache, this.getMiTags());
+    const asks = get_orders_sdk_(this.orderBook, true, cache, this.getMiTags());
+    const bids = get_orders_sdk_(this.orderBook, false, cache, this.getMiTags());
     if (isXtoY) {
       // selling
       let soldBaseSize = u64(0);
@@ -97,12 +95,12 @@ export class EconiaTradingPoolV1 extends TradingPool {
         if (remainingBaseSize.eq(u64(0))) {
           break;
         }
-        const bidBaseSize = bid.size.mul(this.orderBook.f);
+        const bidBaseSize = bid.base_parcels.mul(this.orderBook.scale_factor);
         const fillBaseSize = remainingBaseSize.gt(bidBaseSize) ? bidBaseSize : remainingBaseSize;
         if (fillBaseSize.gt(u64(0))) {
           soldBaseSize = soldBaseSize.add(fillBaseSize);
           remainingBaseSize = remainingBaseSize.sub(fillBaseSize);
-          gotQuoteSize = gotQuoteSize.add(fillBaseSize.div(this.orderBook.f).mul(bid.price));
+          gotQuoteSize = gotQuoteSize.add(fillBaseSize.div(this.orderBook.scale_factor).mul(bid.price));
         }
       }
       // has partial unfilled
@@ -122,12 +120,12 @@ export class EconiaTradingPoolV1 extends TradingPool {
           if (remainingQuoteSize.eq(u64(0))) {
             break;
           }
-          const askQuoteSize = ask.size.mul(ask.price);
+          const askQuoteSize = ask.base_parcels.mul(ask.price);
           const fillQuoteSize = remainingQuoteSize.gt(askQuoteSize)? askQuoteSize : remainingQuoteSize;
           if (fillQuoteSize.gt(u64(0))) {
             soldQuoteSize = soldQuoteSize.add(fillQuoteSize);
             remainingQuoteSize = remainingQuoteSize.sub(fillQuoteSize);
-            gotBaseSize = gotBaseSize.add(fillQuoteSize.div(ask.price).mul(this.orderBook.f));
+            gotBaseSize = gotBaseSize.add(fillQuoteSize.div(ask.price).mul(this.orderBook.scale_factor));
           }
         }
         return {
@@ -140,7 +138,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
   }
 
   getTagE(): TypeTag {
-    return this.mi.e.toTypeTag();
+    return this.mi.scale_exponent_type.toTypeTag();
   }
 
   // build payload directly if not routable
@@ -157,16 +155,16 @@ export class EconiaPoolProvider extends TradingPoolProvider {
     super();
   }
   async loadPoolList(client: AptosClient): Promise<TradingPool[]> {
-    const econiaClient = new EconiaClient(client, Registry$_.moduleAddress);
+    const econiaClient = new EconiaClient(client, Registry.moduleAddress);
     const repo = getProjectRepo();
     const markets = await econiaClient.getMarkets();
     const pools : TradingPool[] = [];
     const promises: Promise<void>[] = [];
     markets.forEach(([mi, owner]) => {
-      if(this.registry.hasTokenType(mi.b) && this.registry.hasTokenType(mi.q)) {
+      if(this.registry.hasTokenType(mi.base_coin_type) && this.registry.hasTokenType(mi.quote_coin_type)) {
         pools.push(new EconiaTradingPoolV1(
-          this.registry.getTokenInfoByType(mi.b),
-          this.registry.getTokenInfoByType(mi.q),
+          this.registry.getTokenInfoByType(mi.base_coin_type),
+          this.registry.getTokenInfoByType(mi.quote_coin_type),
           null,
           mi,
           owner,

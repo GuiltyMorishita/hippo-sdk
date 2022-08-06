@@ -5,11 +5,11 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as aptos_std$_ from "../aptos_std";
-import * as std$_ from "../std";
-import * as stake$_ from "./stake";
-import * as system_addresses$_ from "./system_addresses";
-import * as timestamp$_ from "./timestamp";
+import * as Aptos_std from "../aptos_std";
+import * as Std from "../std";
+import * as Stake from "./stake";
+import * as System_addresses from "./system_addresses";
+import * as Timestamp from "./timestamp";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "reconfiguration";
@@ -37,12 +37,12 @@ export class Configuration
 
   epoch: U64;
   last_reconfiguration_time: U64;
-  events: aptos_std$_.event$_.EventHandle;
+  events: Aptos_std.Event.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.epoch = proto['epoch'] as U64;
     this.last_reconfiguration_time = proto['last_reconfiguration_time'] as U64;
-    this.events = proto['events'] as aptos_std$_.event$_.EventHandle;
+    this.events = proto['events'] as Aptos_std.Event.EventHandle;
   }
 
   static ConfigurationParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Configuration {
@@ -105,57 +105,57 @@ export class NewEpochEvent
   }
 
 }
-export function disable_reconfiguration$ (
+export function disable_reconfiguration_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  system_addresses$_.assert_aptos_framework$(account, $c);
-  if (!reconfiguration_enabled$($c)) {
-    throw $.abortCode(std$_.error$_.invalid_state$(ECONFIGURATION, $c));
+  System_addresses.assert_aptos_framework_(account, $c);
+  if (!reconfiguration_enabled_($c)) {
+    throw $.abortCode(Std.Error.invalid_state_(ECONFIGURATION, $c));
   }
   return $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), account, new DisableReconfiguration({  }, new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", [])));
 }
 
-export function emit_genesis_reconfiguration_event$ (
+export function emit_genesis_reconfiguration_event_ (
   $c: AptosDataCache,
 ): void {
   let temp$1, config_ref;
   if (!$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.error$_.not_found$(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.not_found_(ECONFIGURATION, $c));
   }
   config_ref = $c.borrow_global_mut<Configuration>(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"));
-  if ($.copy(config_ref.epoch).eq(u64("0"))) {
-    temp$1 = $.copy(config_ref.last_reconfiguration_time).eq(u64("0"));
+  if (($.copy(config_ref.epoch)).eq((u64("0")))) {
+    temp$1 = ($.copy(config_ref.last_reconfiguration_time)).eq((u64("0")));
   }
   else{
     temp$1 = false;
   }
   if (!temp$1) {
-    throw $.abortCode(std$_.error$_.invalid_state$(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.invalid_state_(ECONFIGURATION, $c));
   }
   config_ref.epoch = u64("1");
-  aptos_std$_.event$_.emit_event$(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]);
+  Aptos_std.Event.emit_event_(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])]);
   return;
 }
 
-export function enable_reconfiguration$ (
+export function enable_reconfiguration_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  system_addresses$_.assert_aptos_framework$(account, $c);
-  if (!!reconfiguration_enabled$($c)) {
-    throw $.abortCode(std$_.error$_.invalid_state$(ECONFIGURATION, $c));
+  System_addresses.assert_aptos_framework_(account, $c);
+  if (!!reconfiguration_enabled_($c)) {
+    throw $.abortCode(Std.Error.invalid_state_(ECONFIGURATION, $c));
   }
-  $c.move_from<DisableReconfiguration>(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), std$_.signer$_.address_of$(account, $c));
+  $c.move_from<DisableReconfiguration>(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), Std.Signer.address_of_(account, $c));
   return;
 }
 
-export function force_reconfigure$ (
+export function force_reconfigure_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  system_addresses$_.assert_aptos_framework$(account, $c);
-  reconfigure$($c);
+  System_addresses.assert_aptos_framework_(account, $c);
+  reconfigure_($c);
   return;
 }
 
@@ -170,57 +170,57 @@ export function buildPayload_force_reconfigure (
   );
 
 }
-export function initialize$ (
+export function initialize_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  timestamp$_.assert_genesis$($c);
-  system_addresses$_.assert_aptos_framework$(account, $c);
+  Timestamp.assert_genesis_($c);
+  System_addresses.assert_aptos_framework_(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"))) {
-    throw $.abortCode(std$_.error$_.already_exists$(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.already_exists_(ECONFIGURATION, $c));
   }
-  if (!std$_.guid$_.get_next_creation_num$(std$_.signer$_.address_of$(account, $c), $c).eq(u64("0"))) {
-    throw $.abortCode(std$_.error$_.invalid_state$(EINVALID_GUID_FOR_EVENT, $c));
+  if (!(Std.Guid.get_next_creation_num_(Std.Signer.address_of_(account, $c), $c)).eq((u64("1")))) {
+    throw $.abortCode(Std.Error.invalid_state_(EINVALID_GUID_FOR_EVENT, $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), account, new Configuration({ epoch: u64("0"), last_reconfiguration_time: u64("0"), events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), account, new Configuration({ epoch: u64("0"), last_reconfiguration_time: u64("0"), events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])]) }, new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", [])));
   return;
 }
 
-export function last_reconfiguration_time$ (
+export function last_reconfiguration_time_ (
   $c: AptosDataCache,
 ): U64 {
   return $.copy($c.borrow_global<Configuration>(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1")).last_reconfiguration_time);
 }
 
-export function reconfiguration_enabled$ (
+export function reconfiguration_enabled_ (
   $c: AptosDataCache,
 ): boolean {
   return !$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), new HexString("0x1"));
 }
 
-export function reconfigure$ (
+export function reconfigure_ (
   $c: AptosDataCache,
 ): void {
-  stake$_.on_new_epoch$($c);
-  reconfigure_$($c);
+  Stake.on_new_epoch_($c);
+  reconfigure__($c);
   return;
 }
 
-export function reconfigure_$ (
+export function reconfigure__ (
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2, config_ref, current_time;
-  if (timestamp$_.is_genesis$($c)) {
+  if (Timestamp.is_genesis_($c)) {
     temp$1 = true;
   }
   else{
-    temp$1 = timestamp$_.now_microseconds$($c).eq(u64("0"));
+    temp$1 = (Timestamp.now_microseconds_($c)).eq((u64("0")));
   }
   if (temp$1) {
     temp$2 = true;
   }
   else{
-    temp$2 = !reconfiguration_enabled$($c);
+    temp$2 = !reconfiguration_enabled_($c);
   }
   if (temp$2) {
     return;
@@ -228,18 +228,18 @@ export function reconfigure_$ (
   else{
   }
   config_ref = $c.borrow_global_mut<Configuration>(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"));
-  current_time = timestamp$_.now_microseconds$($c);
-  if ($.copy(current_time).eq($.copy(config_ref.last_reconfiguration_time))) {
+  current_time = Timestamp.now_microseconds_($c);
+  if (($.copy(current_time)).eq(($.copy(config_ref.last_reconfiguration_time)))) {
     return;
   }
   else{
   }
-  if (!$.copy(current_time).gt($.copy(config_ref.last_reconfiguration_time))) {
-    throw $.abortCode(std$_.error$_.invalid_state$(EINVALID_BLOCK_TIME, $c));
+  if (!($.copy(current_time)).gt($.copy(config_ref.last_reconfiguration_time))) {
+    throw $.abortCode(Std.Error.invalid_state_(EINVALID_BLOCK_TIME, $c));
   }
   config_ref.last_reconfiguration_time = $.copy(current_time);
-  config_ref.epoch = $.copy(config_ref.epoch).add(u64("1"));
-  aptos_std$_.event$_.emit_event$(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])] as TypeTag[]);
+  config_ref.epoch = ($.copy(config_ref.epoch)).add(u64("1"));
+  Aptos_std.Event.emit_event_(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])]);
   return;
 }
 

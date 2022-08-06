@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as coin$_ from "./coin";
-import * as system_addresses$_ from "./system_addresses";
+import * as Coin from "./coin";
+import * as System_addresses from "./system_addresses";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "transaction_fee";
@@ -24,10 +24,10 @@ export class AptosCoinCapabilities
   static fields: FieldDeclType[] = [
   { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]) }];
 
-  burn_cap: coin$_.BurnCapability;
+  burn_cap: Coin.BurnCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.burn_cap = proto['burn_cap'] as coin$_.BurnCapability;
+    this.burn_cap = proto['burn_cap'] as Coin.BurnCapability;
   }
 
   static AptosCoinCapabilitiesParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : AptosCoinCapabilities {
@@ -40,21 +40,21 @@ export class AptosCoinCapabilities
     return result as unknown as AptosCoinCapabilities;
   }
 }
-export function burn_fee$ (
+export function burn_fee_ (
   account: HexString,
   fee: U64,
   $c: AptosDataCache,
 ): void {
-  coin$_.burn_from$($.copy(account), $.copy(fee), $c.borrow_global<AptosCoinCapabilities>(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), new HexString("0x1")).burn_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+  Coin.burn_from_($.copy(account), $.copy(fee), $c.borrow_global<AptosCoinCapabilities>(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), new HexString("0x1")).burn_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   return;
 }
 
-export function store_aptos_coin_burn_cap$ (
+export function store_aptos_coin_burn_cap_ (
   account: HexString,
-  burn_cap: coin$_.BurnCapability,
+  burn_cap: Coin.BurnCapability,
   $c: AptosDataCache,
 ): void {
-  system_addresses$_.assert_aptos_framework$(account, $c);
+  System_addresses.assert_aptos_framework_(account, $c);
   return $c.move_to(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), account, new AptosCoinCapabilities({ burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", [])));
 }
 

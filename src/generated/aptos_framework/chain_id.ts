@@ -5,9 +5,9 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as system_addresses$_ from "./system_addresses";
-import * as timestamp$_ from "./timestamp";
+import * as Std from "../std";
+import * as System_addresses from "./system_addresses";
+import * as Timestamp from "./timestamp";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "chain_id";
@@ -42,22 +42,22 @@ export class ChainId
     return result as unknown as ChainId;
   }
 }
-export function get$ (
+export function get_ (
   $c: AptosDataCache,
 ): U8 {
-  timestamp$_.assert_operating$($c);
+  Timestamp.assert_operating_($c);
   return $.copy($c.borrow_global<ChainId>(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), new HexString("0x1")).id);
 }
 
-export function initialize$ (
+export function initialize_ (
   account: HexString,
   id: U8,
   $c: AptosDataCache,
 ): void {
-  timestamp$_.assert_genesis$($c);
-  system_addresses$_.assert_aptos_framework$(account, $c);
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), std$_.signer$_.address_of$(account, $c))) {
-    throw $.abortCode(std$_.error$_.already_exists$(ECHAIN_ID, $c));
+  Timestamp.assert_genesis_($c);
+  System_addresses.assert_aptos_framework_(account, $c);
+  if (!!$c.exists(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), Std.Signer.address_of_(account, $c))) {
+    throw $.abortCode(Std.Error.already_exists_(ECHAIN_ID, $c));
   }
   return $c.move_to(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), account, new ChainId({ id: $.copy(id) }, new StructTag(new HexString("0x1"), "chain_id", "ChainId", [])));
 }

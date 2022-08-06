@@ -10,21 +10,21 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "hash";
 
 
-export function sha2_256$ (
+export function sha2_256_ (
   data: U8[],
   $c: AptosDataCache,
 ): U8[] {
   return $.std_hash_sha2_256(data, $c);
 
 }
-export function sha3_256$ (
+export function sha3_256_ (
   data: U8[],
   $c: AptosDataCache,
 ): U8[] {
   return $.std_hash_sha3_256(data, $c);
 
 }
-export function sip_hash$ (
+export function sip_hash_ (
   v: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <MoveValue>*/

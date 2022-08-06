@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
+import * as Std from "../std";
 export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "event";
@@ -25,11 +25,11 @@ export class EventHandle
   { name: "guid", typeTag: new StructTag(new HexString("0x1"), "guid", "GUID", []) }];
 
   counter: U64;
-  guid: std$_.guid$_.GUID;
+  guid: Std.Guid.GUID;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.counter = proto['counter'] as U64;
-    this.guid = proto['guid'] as std$_.guid$_.GUID;
+    this.guid = proto['guid'] as Std.Guid.GUID;
   }
 
   static EventHandleParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : EventHandle {
@@ -69,7 +69,15 @@ export class EventHandleGenerator
     return result as unknown as EventHandleGenerator;
   }
 }
-export function destroy_handle$ (
+export function counter_ (
+  handle_ref: EventHandle,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <T>*/
+): U64 {
+  return $.copy(handle_ref.counter);
+}
+
+export function destroy_handle_ (
   handle: EventHandle,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
@@ -78,34 +86,34 @@ export function destroy_handle$ (
   return;
 }
 
-export function emit_event$ (
+export function emit_event_ (
   handle_ref: EventHandle,
   msg: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): void {
-  write_to_event_store$(std$_.bcs$_.to_bytes$(handle_ref.guid, $c, [new StructTag(new HexString("0x1"), "guid", "GUID", [])] as TypeTag[]), $.copy(handle_ref.counter), msg, $c, [$p[0]] as TypeTag[]);
-  handle_ref.counter = $.copy(handle_ref.counter).add(u64("1"));
+  write_to_event_store_(Std.Bcs.to_bytes_(handle_ref.guid, $c, [new StructTag(new HexString("0x1"), "guid", "GUID", [])]), $.copy(handle_ref.counter), msg, $c, [$p[0]]);
+  handle_ref.counter = ($.copy(handle_ref.counter)).add(u64("1"));
   return;
 }
 
-export function guid$ (
+export function guid_ (
   handle_ref: EventHandle,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
-): std$_.guid$_.GUID {
+): Std.Guid.GUID {
   return handle_ref.guid;
 }
 
-export function new_event_handle$ (
+export function new_event_handle_ (
   account: HexString,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): EventHandle {
-  return new EventHandle({ counter: u64("0"), guid: std$_.guid$_.create$(account, $c) }, new StructTag(new HexString("0x1"), "event", "EventHandle", [$p[0]]));
+  return new EventHandle({ counter: u64("0"), guid: Std.Guid.create_(account, $c) }, new StructTag(new HexString("0x1"), "event", "EventHandle", [$p[0]]));
 }
 
-export function write_to_event_store$ (
+export function write_to_event_store_ (
   guid: U8[],
   count: U64,
   msg: any,

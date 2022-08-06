@@ -23,96 +23,96 @@ export const RESOURCE_EXHAUSTED : U64 = u64("9");
 export const UNAUTHENTICATED : U64 = u64("4");
 export const UNAVAILABLE : U64 = u64("13");
 
-export function aborted$ (
+export function aborted_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(ABORTED, $.copy(r), $c);
+  return canonical_(ABORTED, $.copy(r), $c);
 }
 
-export function already_exists$ (
+export function already_exists_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(ALREADY_EXISTS, $.copy(r), $c);
+  return canonical_(ALREADY_EXISTS, $.copy(r), $c);
 }
 
-export function canonical$ (
+export function canonical_ (
   category: U64,
   reason: U64,
   $c: AptosDataCache,
 ): U64 {
-  return $.copy(category).shl(u8("16")).add($.copy(reason));
+  return (($.copy(category)).shl(u8("16"))).add($.copy(reason));
 }
 
-export function internal$ (
+export function internal_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(INTERNAL, $.copy(r), $c);
+  return canonical_(INTERNAL, $.copy(r), $c);
 }
 
-export function invalid_argument$ (
+export function invalid_argument_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(INVALID_ARGUMENT, $.copy(r), $c);
+  return canonical_(INVALID_ARGUMENT, $.copy(r), $c);
 }
 
-export function invalid_state$ (
+export function invalid_state_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(INVALID_STATE, $.copy(r), $c);
+  return canonical_(INVALID_STATE, $.copy(r), $c);
 }
 
-export function not_found$ (
+export function not_found_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(NOT_FOUND, $.copy(r), $c);
+  return canonical_(NOT_FOUND, $.copy(r), $c);
 }
 
-export function not_implemented$ (
+export function not_implemented_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(NOT_IMPLEMENTED, $.copy(r), $c);
+  return canonical_(NOT_IMPLEMENTED, $.copy(r), $c);
 }
 
-export function out_of_range$ (
+export function out_of_range_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(OUT_OF_RANGE, $.copy(r), $c);
+  return canonical_(OUT_OF_RANGE, $.copy(r), $c);
 }
 
-export function permission_denied$ (
+export function permission_denied_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(PERMISSION_DENIED, $.copy(r), $c);
+  return canonical_(PERMISSION_DENIED, $.copy(r), $c);
 }
 
-export function resource_exhausted$ (
+export function resource_exhausted_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(RESOURCE_EXHAUSTED, $.copy(r), $c);
+  return canonical_(RESOURCE_EXHAUSTED, $.copy(r), $c);
 }
 
-export function unauthenticated$ (
+export function unauthenticated_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(UNAUTHENTICATED, $.copy(r), $c);
+  return canonical_(UNAUTHENTICATED, $.copy(r), $c);
 }
 
-export function unavailable$ (
+export function unavailable_ (
   r: U64,
   $c: AptosDataCache,
 ): U64 {
-  return canonical$(UNAVAILABLE, $.copy(r), $c);
+  return canonical_(UNAVAILABLE, $.copy(r), $c);
 }
 
 export function loadParsers(repo: AptosParserRepo) {

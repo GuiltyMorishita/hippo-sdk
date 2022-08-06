@@ -10,7 +10,7 @@ export const moduleAddress = new HexString("0x1");
 export const moduleName = "debug";
 
 
-export function print$ (
+export function print_ (
   x: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
@@ -18,7 +18,7 @@ export function print$ (
   return $.std_debug_print(x, $c, [$p[0]]);
 
 }
-export function print_stack_trace$ (
+export function print_stack_trace_ (
   $c: AptosDataCache,
 ): void {
   return $.std_debug_print_stack_trace($c);

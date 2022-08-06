@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as error$_ from "./error";
-import * as vector$_ from "./vector";
+import * as Error from "./error";
+import * as Vector from "./vector";
 export const packageName = "MoveStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "acl";
@@ -38,57 +38,57 @@ export class ACL
   }
 
 }
-export function add$ (
+export function add_ (
   acl: ACL,
   addr: HexString,
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2;
   [temp$1, temp$2] = [acl.list, addr];
-  if (!!vector$_.contains$(temp$1, temp$2, $c, [AtomicTypeTag.Address] as TypeTag[])) {
-    throw $.abortCode(error$_.invalid_argument$(ECONTAIN, $c));
+  if (!!Vector.contains_(temp$1, temp$2, $c, [AtomicTypeTag.Address])) {
+    throw $.abortCode(Error.invalid_argument_(ECONTAIN, $c));
   }
-  vector$_.push_back$(acl.list, $.copy(addr), $c, [AtomicTypeTag.Address] as TypeTag[]);
+  Vector.push_back_(acl.list, $.copy(addr), $c, [AtomicTypeTag.Address]);
   return;
 }
 
-export function assert_contains$ (
+export function assert_contains_ (
   acl: ACL,
   addr: HexString,
   $c: AptosDataCache,
 ): void {
-  if (!contains$(acl, $.copy(addr), $c)) {
-    throw $.abortCode(error$_.invalid_argument$(ENOT_CONTAIN, $c));
+  if (!contains_(acl, $.copy(addr), $c)) {
+    throw $.abortCode(Error.invalid_argument_(ENOT_CONTAIN, $c));
   }
   return;
 }
 
-export function contains$ (
+export function contains_ (
   acl: ACL,
   addr: HexString,
   $c: AptosDataCache,
 ): boolean {
-  return vector$_.contains$(acl.list, addr, $c, [AtomicTypeTag.Address] as TypeTag[]);
+  return Vector.contains_(acl.list, addr, $c, [AtomicTypeTag.Address]);
 }
 
-export function empty$ (
+export function empty_ (
   $c: AptosDataCache,
 ): ACL {
-  return new ACL({ list: vector$_.empty$($c, [AtomicTypeTag.Address] as TypeTag[]) }, new StructTag(new HexString("0x1"), "acl", "ACL", []));
+  return new ACL({ list: Vector.empty_($c, [AtomicTypeTag.Address]) }, new StructTag(new HexString("0x1"), "acl", "ACL", []));
 }
 
-export function remove$ (
+export function remove_ (
   acl: ACL,
   addr: HexString,
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2, found, index;
   [temp$1, temp$2] = [acl.list, addr];
-  [found, index] = vector$_.index_of$(temp$1, temp$2, $c, [AtomicTypeTag.Address] as TypeTag[]);
+  [found, index] = Vector.index_of_(temp$1, temp$2, $c, [AtomicTypeTag.Address]);
   if (!found) {
-    throw $.abortCode(error$_.invalid_argument$(ENOT_CONTAIN, $c));
+    throw $.abortCode(Error.invalid_argument_(ENOT_CONTAIN, $c));
   }
-  vector$_.remove$(acl.list, $.copy(index), $c, [AtomicTypeTag.Address] as TypeTag[]);
+  Vector.remove_(acl.list, $.copy(index), $c, [AtomicTypeTag.Address]);
   return;
 }
 

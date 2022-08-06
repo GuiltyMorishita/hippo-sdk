@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as aptos_std$_ from "../aptos_std";
-import * as std$_ from "../std";
+import * as Aptos_std from "../aptos_std";
+import * as Std from "../std";
 export const packageName = "CoinRegistry";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
 export const moduleName = "coin_registry";
@@ -36,24 +36,24 @@ export class TokenInfo
   { name: "delisted", typeTag: AtomicTypeTag.Bool },
   { name: "token_type", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) }];
 
-  name: std$_.string$_.String;
-  symbol: std$_.string$_.String;
-  description: std$_.string$_.String;
+  name: Std.String.String;
+  symbol: Std.String.String;
+  description: Std.String.String;
   decimals: U8;
-  logo_url: std$_.string$_.String;
-  project_url: std$_.string$_.String;
+  logo_url: Std.String.String;
+  project_url: Std.String.String;
   delisted: boolean;
-  token_type: aptos_std$_.type_info$_.TypeInfo;
+  token_type: Aptos_std.Type_info.TypeInfo;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.name = proto['name'] as std$_.string$_.String;
-    this.symbol = proto['symbol'] as std$_.string$_.String;
-    this.description = proto['description'] as std$_.string$_.String;
+    this.name = proto['name'] as Std.String.String;
+    this.symbol = proto['symbol'] as Std.String.String;
+    this.description = proto['description'] as Std.String.String;
     this.decimals = proto['decimals'] as U8;
-    this.logo_url = proto['logo_url'] as std$_.string$_.String;
-    this.project_url = proto['project_url'] as std$_.string$_.String;
+    this.logo_url = proto['logo_url'] as Std.String.String;
+    this.project_url = proto['project_url'] as Std.String.String;
     this.delisted = proto['delisted'] as boolean;
-    this.token_type = proto['token_type'] as aptos_std$_.type_info$_.TypeInfo;
+    this.token_type = proto['token_type'] as Aptos_std.Type_info.TypeInfo;
   }
 
   static TokenInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : TokenInfo {
@@ -79,16 +79,16 @@ export class TokenRegistry
   { name: "token_info_list", typeTag: new VectorTag(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])) }];
 
   admin: HexString;
-  symbol_to_token_info: aptos_std$_.table$_.Table;
-  type_info_to_symbol: aptos_std$_.table$_.Table;
-  symbol_to_list_idx: aptos_std$_.table$_.Table;
+  symbol_to_token_info: Aptos_std.Table.Table;
+  type_info_to_symbol: Aptos_std.Table.Table;
+  symbol_to_list_idx: Aptos_std.Table.Table;
   token_info_list: TokenInfo[];
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.admin = proto['admin'] as HexString;
-    this.symbol_to_token_info = proto['symbol_to_token_info'] as aptos_std$_.table$_.Table;
-    this.type_info_to_symbol = proto['type_info_to_symbol'] as aptos_std$_.table$_.Table;
-    this.symbol_to_list_idx = proto['symbol_to_list_idx'] as aptos_std$_.table$_.Table;
+    this.symbol_to_token_info = proto['symbol_to_token_info'] as Aptos_std.Table.Table;
+    this.type_info_to_symbol = proto['type_info_to_symbol'] as Aptos_std.Table.Table;
+    this.symbol_to_list_idx = proto['symbol_to_list_idx'] as Aptos_std.Table.Table;
     this.token_info_list = proto['token_info_list'] as TokenInfo[];
   }
 
@@ -102,7 +102,7 @@ export class TokenRegistry
     return result as unknown as TokenRegistry;
   }
 }
-export function add_token$ (
+export function add_token_ (
   admin: HexString,
   name: U8[],
   symbol: U8[],
@@ -114,25 +114,25 @@ export function add_token$ (
   $p: TypeTag[], /* <TokenType>*/
 ): void {
   let admin_addr, index, registry, token_info, type_info;
-  admin_addr = std$_.signer$_.address_of$(admin, $c);
+  admin_addr = Std.Signer.address_of_(admin, $c);
   registry = $c.borrow_global_mut<TokenRegistry>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr));
-  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  token_info = new TokenInfo({ name: std$_.string$_.utf8$($.copy(name), $c), symbol: std$_.string$_.utf8$($.copy(symbol), $c), description: std$_.string$_.utf8$($.copy(description), $c), decimals: $.copy(decimals), logo_url: std$_.string$_.utf8$($.copy(logo_url), $c), project_url: std$_.string$_.utf8$($.copy(project_url), $c), delisted: false, token_type: $.copy(type_info) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", []));
-  if (!!aptos_std$_.table$_.contains$(registry.symbol_to_token_info, $.copy(token_info.symbol), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[])) {
+  type_info = Aptos_std.Type_info.type_of_($c, [$p[0]]);
+  token_info = new TokenInfo({ name: Std.String.utf8_($.copy(name), $c), symbol: Std.String.utf8_($.copy(symbol), $c), description: Std.String.utf8_($.copy(description), $c), decimals: $.copy(decimals), logo_url: Std.String.utf8_($.copy(logo_url), $c), project_url: Std.String.utf8_($.copy(project_url), $c), delisted: false, token_type: $.copy(type_info) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", []));
+  if (!!Aptos_std.Table.contains_(registry.symbol_to_token_info, $.copy(token_info.symbol), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])])) {
     throw $.abortCode(E_SYMBOL_ALREADY_EXISTS);
   }
-  if (!!aptos_std$_.table$_.contains$(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[])) {
+  if (!!Aptos_std.Table.contains_(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])])) {
     throw $.abortCode(E_TYPE_ALREADY_EXISTS);
   }
-  aptos_std$_.table$_.add$(registry.symbol_to_token_info, $.copy(token_info.symbol), $.copy(token_info), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  aptos_std$_.table$_.add$(registry.type_info_to_symbol, $.copy(type_info), $.copy(token_info.symbol), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[]);
-  index = std$_.vector$_.length$(registry.token_info_list, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  std$_.vector$_.push_back$(registry.token_info_list, $.copy(token_info), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  aptos_std$_.table$_.add$(registry.symbol_to_list_idx, $.copy(token_info.symbol), $.copy(index), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64] as TypeTag[]);
+  Aptos_std.Table.add_(registry.symbol_to_token_info, $.copy(token_info.symbol), $.copy(token_info), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  Aptos_std.Table.add_(registry.type_info_to_symbol, $.copy(type_info), $.copy(token_info.symbol), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])]);
+  index = Std.Vector.length_(registry.token_info_list, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  Std.Vector.push_back_(registry.token_info_list, $.copy(token_info), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  Aptos_std.Table.add_(registry.symbol_to_list_idx, $.copy(token_info.symbol), $.copy(index), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]);
   return;
 }
 
-export function add_token_script$ (
+export function add_token_script_ (
   admin: HexString,
   name: U8[],
   symbol: U8[],
@@ -143,7 +143,7 @@ export function add_token_script$ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <TokenType>*/
 ): void {
-  return add_token$(admin, $.copy(name), $.copy(symbol), $.copy(description), $.copy(decimals), $.copy(logo_url), $.copy(project_url), $c, [$p[0]] as TypeTag[]);
+  return add_token_(admin, $.copy(name), $.copy(symbol), $.copy(description), $.copy(decimals), $.copy(logo_url), $.copy(project_url), $c, [$p[0]]);
 }
 
 
@@ -172,33 +172,33 @@ export function buildPayload_add_token_script (
 
 }
 
-export function delist_token$ (
+export function delist_token_ (
   admin: HexString,
   symbol: U8[],
   $c: AptosDataCache,
 ): void {
   let admin_addr, index, registry, symbol_str, type_info;
-  admin_addr = std$_.signer$_.address_of$(admin, $c);
+  admin_addr = Std.Signer.address_of_(admin, $c);
   registry = $c.borrow_global_mut<TokenRegistry>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr));
-  symbol_str = std$_.string$_.utf8$($.copy(symbol), $c);
-  if (!aptos_std$_.table$_.contains$(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[])) {
+  symbol_str = Std.String.utf8_($.copy(symbol), $c);
+  if (!Aptos_std.Table.contains_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])])) {
     throw $.abortCode(E_SYMBOL_DOES_NOT_EXIST);
   }
-  index = $.copy(aptos_std$_.table$_.borrow$(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64] as TypeTag[]));
-  type_info = $.copy(aptos_std$_.table$_.borrow$(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]).token_type);
-  std$_.vector$_.borrow_mut$(registry.token_info_list, $.copy(index), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]).delisted = true;
-  aptos_std$_.table$_.remove$(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64] as TypeTag[]);
-  aptos_std$_.table$_.remove$(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  aptos_std$_.table$_.remove$(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[]);
+  index = $.copy(Aptos_std.Table.borrow_(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]));
+  type_info = $.copy(Aptos_std.Table.borrow_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]).token_type);
+  Std.Vector.borrow_mut_(registry.token_info_list, $.copy(index), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]).delisted = true;
+  Aptos_std.Table.remove_(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]);
+  Aptos_std.Table.remove_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  Aptos_std.Table.remove_(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])]);
   return;
 }
 
-export function delist_token_script$ (
+export function delist_token_script_ (
   admin: HexString,
   symbol: U8[],
   $c: AptosDataCache,
 ): void {
-  delist_token$(admin, $.copy(symbol), $c);
+  delist_token_(admin, $.copy(symbol), $c);
   return;
 }
 
@@ -217,41 +217,41 @@ export function buildPayload_delist_token_script (
 
 }
 
-export function has_token$ (
+export function has_token_ (
   admin: HexString,
   $c: AptosDataCache,
   $p: TypeTag[], /* <TokenType>*/
 ): boolean {
   let registry, type_info;
   registry = $c.borrow_global<TokenRegistry>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin));
-  type_info = aptos_std$_.type_info$_.type_of$($c, [$p[0]] as TypeTag[]);
-  return aptos_std$_.table$_.contains$(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[]);
+  type_info = Aptos_std.Type_info.type_of_($c, [$p[0]]);
+  return Aptos_std.Table.contains_(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])]);
 }
 
-export function initialize$ (
+export function initialize_ (
   admin: HexString,
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, admin_addr;
-  admin_addr = std$_.signer$_.address_of$(admin, $c);
+  admin_addr = Std.Signer.address_of_(admin, $c);
   if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr))) {
     throw $.abortCode(E_ALREADY_INITIALIZED);
   }
   temp$6 = admin;
   temp$1 = $.copy(admin_addr);
-  temp$2 = aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  temp$3 = aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[]);
-  temp$4 = std$_.vector$_.empty$($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  temp$5 = aptos_std$_.table$_.new__$($c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64] as TypeTag[]);
+  temp$2 = Aptos_std.Table.new___($c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  temp$3 = Aptos_std.Table.new___($c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])]);
+  temp$4 = Std.Vector.empty_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  temp$5 = Aptos_std.Table.new___($c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]);
   $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), temp$6, new TokenRegistry({ admin: temp$1, symbol_to_token_info: temp$2, type_info_to_symbol: temp$3, symbol_to_list_idx: temp$5, token_info_list: temp$4 }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", [])));
   return;
 }
 
-export function initialize_script$ (
+export function initialize_script_ (
   admin: HexString,
   $c: AptosDataCache,
 ): void {
-  initialize$(admin, $c);
+  initialize_(admin, $c);
   return;
 }
 
@@ -267,14 +267,14 @@ export function buildPayload_initialize_script (
 
 }
 
-export function is_registry_initialized$ (
+export function is_registry_initialized_ (
   admin: HexString,
   $c: AptosDataCache,
 ): boolean {
   return $c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin));
 }
 
-export function update_token_info$ (
+export function update_token_info_ (
   admin: HexString,
   symbol: U8[],
   description: U8[],
@@ -283,25 +283,25 @@ export function update_token_info$ (
   $c: AptosDataCache,
 ): void {
   let admin_addr, index, list_token_info, registry, symbol_str, table_token_info;
-  admin_addr = std$_.signer$_.address_of$(admin, $c);
+  admin_addr = Std.Signer.address_of_(admin, $c);
   registry = $c.borrow_global_mut<TokenRegistry>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr));
-  symbol_str = std$_.string$_.utf8$($.copy(symbol), $c);
-  if (!aptos_std$_.table$_.contains$(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[])) {
+  symbol_str = Std.String.utf8_($.copy(symbol), $c);
+  if (!Aptos_std.Table.contains_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])])) {
     throw $.abortCode(E_SYMBOL_DOES_NOT_EXIST);
   }
-  index = $.copy(aptos_std$_.table$_.borrow$(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64] as TypeTag[]));
-  list_token_info = std$_.vector$_.borrow_mut$(registry.token_info_list, $.copy(index), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  list_token_info.description = std$_.string$_.utf8$($.copy(description), $c);
-  list_token_info.logo_url = std$_.string$_.utf8$($.copy(logo_url), $c);
-  list_token_info.project_url = std$_.string$_.utf8$($.copy(project_url), $c);
-  table_token_info = aptos_std$_.table$_.borrow_mut$(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])] as TypeTag[]);
-  table_token_info.description = std$_.string$_.utf8$($.copy(description), $c);
-  table_token_info.logo_url = std$_.string$_.utf8$($.copy(logo_url), $c);
-  table_token_info.project_url = std$_.string$_.utf8$($.copy(project_url), $c);
+  index = $.copy(Aptos_std.Table.borrow_(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]));
+  list_token_info = Std.Vector.borrow_mut_(registry.token_info_list, $.copy(index), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  list_token_info.description = Std.String.utf8_($.copy(description), $c);
+  list_token_info.logo_url = Std.String.utf8_($.copy(logo_url), $c);
+  list_token_info.project_url = Std.String.utf8_($.copy(project_url), $c);
+  table_token_info = Aptos_std.Table.borrow_mut_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
+  table_token_info.description = Std.String.utf8_($.copy(description), $c);
+  table_token_info.logo_url = Std.String.utf8_($.copy(logo_url), $c);
+  table_token_info.project_url = Std.String.utf8_($.copy(project_url), $c);
   return;
 }
 
-export function update_token_info_script$ (
+export function update_token_info_script_ (
   admin: HexString,
   symbol: U8[],
   description: U8[],
@@ -309,7 +309,7 @@ export function update_token_info_script$ (
   project_url: U8[],
   $c: AptosDataCache,
 ): void {
-  update_token_info$(admin, $.copy(symbol), $.copy(description), $.copy(logo_url), $.copy(project_url), $c);
+  update_token_info_(admin, $.copy(symbol), $.copy(description), $.copy(logo_url), $.copy(project_url), $c);
   return;
 }
 

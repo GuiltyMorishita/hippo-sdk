@@ -1,26 +1,24 @@
-import { AptosParserRepo, getTypeTagFullname, StructTag, u8, u64, strToU8, u8str, DummyCache } from "@manahippo/move-to-ts";
+import { AptosParserRepo, getTypeTagFullname, StructTag, u8, u64, strToU8, u8str, DummyCache, parseTypeTagOrThrow, buildPayload, parseMoveStructTag } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { Command } from "commander";
-import { Econia, getProjectRepo } from "../generated";
+import { getProjectRepo } from "../generated";
 import { aptos_framework, hippo_swap } from "../generated/";
-import { coin_registry$_ } from "../generated/coin_registry";
-import { isTypeInfoSame, printResource, printResources, typeInfoToTypeTag, typeTagToTypeInfo } from "../utils";
+import { Coin_registry } from "../generated/coin_registry";
+import { printResource, printResources, typeInfoToTypeTag } from "../utils";
 import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/aptos_framework/coin";
 import { PoolType } from "../swap/baseTypes";
-import { EconiaClient } from "../aggregator/econia";
-import { MI, MR } from "../generated/Econia/Registry";
-import { get_price_levels$ } from "../generated/Econia/Book";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
+import { TokenRegistryClient } from "../tokenRegistry";
 
 
 const actionShowTokenRegistry = async () => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokens = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokens = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
   for(const tokInfo of tokens.token_info_list) {
     console.log(`########${tokInfo.symbol.str()}#######`);
     console.log(`name: ${tokInfo.name.str()}`);
@@ -38,31 +36,31 @@ const actionShowTokenRegistry = async () => {
 const actionShowPools = async () => {
   const {client, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const tokens = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const tokens = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
   const tokenList = tokens.token_info_list;
   for(const pi of tokenList) {
     const structTag = typeInfoToTypeTag(pi.token_type);
     if (
       structTag instanceof StructTag &&
       structTag.address.hex() === contractAddress.hex() &&
-      structTag.module === hippo_swap.cp_swap$_.moduleName &&
-      structTag.name === hippo_swap.cp_swap$_.LPToken.structName
+      structTag.module === hippo_swap.Cp_swap.moduleName &&
+      structTag.name === hippo_swap.Cp_swap.LPToken.structName
     ) {
       // found our LPToken!
       console.log(structTag.typeParams);
-      const poolMeta = await hippo_swap.cp_swap$_.TokenPairMetadata.load(repo, client, contractAddress, structTag.typeParams);
+      const poolMeta = await hippo_swap.Cp_swap.TokenPairMetadata.load(repo, client, contractAddress, structTag.typeParams);
       printResource(poolMeta);
-      const poolReserve = await hippo_swap.cp_swap$_.TokenPairReserve.load(repo, client, contractAddress, structTag.typeParams);
+      const poolReserve = await hippo_swap.Cp_swap.TokenPairReserve.load(repo, client, contractAddress, structTag.typeParams);
       printResource(poolReserve);
     }
     else if (
       structTag instanceof StructTag &&
       structTag.address.hex() == contractAddress.hex() &&
-      structTag.module === hippo_swap.stable_curve_swap$_.moduleName &&
-      structTag.name === hippo_swap.stable_curve_swap$_.LPToken.structName
+      structTag.module === hippo_swap.Stable_curve_swap.moduleName &&
+      structTag.name === hippo_swap.Stable_curve_swap.LPToken.structName
     ){
       console.log(structTag.typeParams)
-      const poolMeta = await hippo_swap.stable_curve_swap$_.StableCurvePoolInfo.load(repo, client, contractAddress, structTag.typeParams);
+      const poolMeta = await hippo_swap.Stable_curve_swap.StableCurvePoolInfo.load(repo, client, contractAddress, structTag.typeParams);
       printResource(poolMeta);
     }
   }
@@ -72,14 +70,14 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: a
   const amount = u64(rawAmount);
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if (ti.delisted) {
       continue;
     }
     if (ti.symbol.str() === coinSymbol) {
       const coinTypeTag = typeInfoToTypeTag(ti.token_type);
-      const payload = hippo_swap.mock_coin$_.buildPayload_faucet_mint_to_script(amount, [coinTypeTag]);
+      const payload = hippo_swap.Mock_coin.buildPayload_faucet_mint_to_script(amount, [coinTypeTag]);
       const result = sendPayloadTx(client, account, payload);
       console.log(result);
       return;
@@ -91,14 +89,14 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: a
 const actionShowWallet = async() => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
-  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
   for(const ti of registry.token_info_list) {
     if(ti.delisted) {
       continue;
     }
     const coinTypeTag = typeInfoToTypeTag(ti.token_type);
     try{
-      const coin = await aptos_framework.coin$_.CoinStore.load(repo, client, account.address(), [coinTypeTag])
+      const coin = await aptos_framework.Coin.CoinStore.load(repo, client, account.address(), [coinTypeTag])
       console.log(`${ti.symbol}: ${coin.coin.value}`);
     }
     catch(e) {
@@ -114,7 +112,7 @@ const getFromToAndLps = async(
   fromSymbol: string,
   toSymbol: string
 ) => {
-  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -135,8 +133,8 @@ const getFromToAndLps = async(
     if (
       coinTypeTag instanceof StructTag &&
       coinTypeTag.address.hex() === contractAddress.hex() &&
-      coinTypeTag.module === hippo_swap.cp_swap$_.moduleName &&
-      coinTypeTag.name === hippo_swap.cp_swap$_.LPToken.structName
+      coinTypeTag.module === hippo_swap.Cp_swap.moduleName &&
+      coinTypeTag.name === hippo_swap.Cp_swap.LPToken.structName
     ) {
       lpTokenTags.push(coinTypeTag);
     }
@@ -163,13 +161,13 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
     const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
     const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
     if(lhsFullname === fromFullname && rhsFullname === toFullname) {
-      const payload = hippo_swap.cp_scripts$_.buildPayload_swap_script(amount, u64(0), u64(0), u64(0), lpTag.typeParams);
+      const payload = hippo_swap.Cp_scripts.buildPayload_swap_script(amount, u64(0), u64(0), u64(0), lpTag.typeParams);
       const result = sendPayloadTx(client, account, payload);
       console.log(result);
       return;
     }
     else if(rhsFullname === fromFullname && lhsFullname === toFullname) {
-      const payload = hippo_swap.cp_scripts$_.buildPayload_swap_script(u64(0), amount, u64(0), u64(0), lpTag.typeParams);
+      const payload = hippo_swap.Cp_scripts.buildPayload_swap_script(u64(0), amount, u64(0), u64(0), lpTag.typeParams);
       const result = await sendPayloadTx(client, account, payload);
       console.log(result);
       return;
@@ -190,7 +188,7 @@ const actionAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsAmtIn:
     const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
     const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
     if(lhsFullname === fromFullname && rhsFullname === toFullname) {
-      const payload = await hippo_swap.cp_scripts$_.buildPayload_add_liquidity_script(lhsAmt, rhsAmt, lpTag.typeParams);
+      const payload = await hippo_swap.Cp_scripts.buildPayload_add_liquidity_script(lhsAmt, rhsAmt, lpTag.typeParams);
       const result = await sendPayloadTx(client, account, payload);
       console.log(result);
       return;
@@ -210,7 +208,7 @@ const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, remove
     const lhsFullname = getTypeTagFullname(lpTag.typeParams[0]);
     const rhsFullname = getTypeTagFullname(lpTag.typeParams[1]);
     if(lhsFullname === fromFullname && rhsFullname === toFullname) {
-      const payload = hippo_swap.cp_scripts$_.buildPayload_remove_liquidity_script(removeAmt, u64(0), u64(0), lpTag.typeParams);
+      const payload = hippo_swap.Cp_scripts.buildPayload_remove_liquidity_script(removeAmt, u64(0), u64(0), lpTag.typeParams);
       const result = await sendPayloadTx(client, account, payload);
       console.log(result);
       return;
@@ -221,10 +219,10 @@ const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, remove
 
 const actionMockDeploy = async () => {
   const {client, account} = readConfig(program);
-  const payload = await hippo_swap.cp_scripts$_.buildPayload_mock_deploy_script();
+  const payload = await hippo_swap.Cp_scripts.buildPayload_mock_deploy_script();
   await sendPayloadTx(client, account, payload, 10000);
   console.log('CPSwap')
-  const pieceSwapPayload = await hippo_swap.piece_swap_script$_.buildPayload_mock_deploy_script()
+  const pieceSwapPayload = await hippo_swap.Piece_swap_script.buildPayload_mock_deploy_script()
   await sendPayloadTx(client, account, pieceSwapPayload, 10000);
   console.log('PieceSwap')
 }
@@ -233,7 +231,6 @@ const actionMockDeploy = async () => {
 const actionListModules = async () => {
   const {client, contractAddress} = readConfig(program);
   try{
-    console.log(client.nodeUrl);
     const result = await client.getAccountModules(contractAddress);
     printResources(result);
   }
@@ -540,14 +537,14 @@ const checkTestCoin = async () => {
   const {client, account, contractAddress} = readConfig(program);
   const repo = getProjectRepo();
   const testCoinTag = new StructTag(
-    aptos_framework.aptos_coin$_.moduleAddress,
-    aptos_framework.aptos_coin$_.moduleName,
-    aptos_framework.aptos_coin$_.AptosCoin.structName,
+    aptos_framework.Aptos_coin.moduleAddress,
+    aptos_framework.Aptos_coin.moduleName,
+    aptos_framework.Aptos_coin.AptosCoin.structName,
     []
   );
-  const testCoinInfo = await CoinInfo.load(repo, client, aptos_framework.aptos_coin$_.moduleAddress, [testCoinTag])
+  const testCoinInfo = await CoinInfo.load(repo, client, aptos_framework.Aptos_coin.moduleAddress, [testCoinTag])
   printResource(testCoinInfo);
-  const registry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
   for(const tokenInfo of registry.token_info_list) {
     if(tokenInfo.delisted) {
       continue;
@@ -558,7 +555,7 @@ const checkTestCoin = async () => {
       return;
     }
   }
-  const payload = coin_registry$_.buildPayload_add_token_script(
+  const payload = Coin_registry.buildPayload_add_token_script(
     strToU8("Aptos"),
     strToU8("APTOS"),
     strToU8("Aptos Coin"),
@@ -573,7 +570,7 @@ const checkTestCoin = async () => {
 
 const updateTokenRegistry = async (symbol: string, description: string, logo_url: string, project_url: string) => {
   const {client, account} = readConfig(program);
-  const payload = coin_registry$_.buildPayload_update_token_info_script(
+  const payload = Coin_registry.buildPayload_update_token_info_script(
     strToU8(symbol),
     strToU8(description),
     strToU8(logo_url),
@@ -610,290 +607,101 @@ others
 
 program.addCommand(others);
 
-// for econia
-
-const ECONIA_ADDR_DEV = Econia.Book$_.moduleAddress;
-
-const econiaListMarkets = async () => {
-  const {client} = readConfig(program);
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const markets = await econia.getMarkets();
-  console.log(`Number of markets: ${markets.length}`);
-  for (const entry of markets) {
-    const [key, value] = entry;
-    console.log(`MARKET###############`);
-    console.log(`LHS: ${u8str(key.b.struct_name)}`);
-    console.log(`RHS: ${u8str(key.q.struct_name)}`);
-    console.log(`owner: ${value}`);
-  }
-}
-
-const econiaListOrders = async (owner: string, base: string, quote: string) => {
-  const {client, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mii = econiaGetMi(tokRegistry, base, quote, "E0");
-  if (!mii) {
-    return;
-  }
-  const markets = await econia.getMarkets();
-  for(const entry of markets) {
-    const [mi, ownerHex] = entry;
-    if (ownerHex.hex() === owner && isTypeInfoSame(mii.b, mi.b) && isTypeInfoSame(mii.q, mi.q) ) {
-      const asks = await econia.getOrders(ownerHex, true, mi);
-      const bids = await econia.getOrders(ownerHex, false, mi);
-      console.log(`Num asks: ${asks.length}`);
-      for(const ask of asks.slice(0, 10).reverse()) {
-        console.log(ask);
-      }
-      console.log(`Num bids: ${bids.length}`);
-      for(const bid of bids.slice(0, 10)) {
-        console.log(bid);
-      }
-      return;
+const pontemListPools = async () => {
+  const {client, netConf} = readConfig(program);
+  const pontemAddr = netConf.pontemAddress;
+  const resources = await client.getAccountResources(pontemAddr);
+  for(const resource of resources) {
+    if (resource.type.module === 'liquidity_pool' && resource.type.name === 'LiquidityPool') {
+      console.log("##########");
+      const tag = parseMoveStructTag(resource.type);
+      console.log(`LHS: ${(tag.typeParams[0] as StructTag).getFullname()}`);
+      console.log(`RHS: ${(tag.typeParams[1] as StructTag).getFullname()}`);
+      console.log(`LP: ${(tag.typeParams[2] as StructTag).getFullname()}`);
     }
   }
-  console.log(`Did not find the market for ${base}-${quote} owned by ${owner}`);
 }
 
-const econiaListLevels = async (owner: string, base: string, quote: string) => {
-  const {client, contractAddress} = readConfig(program);
+const pontemRegisterPoolAddLiquidity = async (lhsSymbol: string, rhsSymbol: string, lhsAmt: string, rhsAmt: string) => {
+  const {client, account, contractAddress, netConf} = readConfig(program);
+  const pontemAddr = netConf.pontemAddress;
   const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mii = econiaGetMi(tokRegistry, base, quote, "E0");
-  if (!mii) {
+  const tokens = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
+  const registry = new TokenRegistryClient(tokens);
+  const lhsTokenInfo = registry.getTokenInfoBySymbol(lhsSymbol)[0];
+  const rhsTokenInfo = registry.getTokenInfoBySymbol(rhsSymbol)[0];
+  if (!lhsTokenInfo) {
+    console.log(`${lhsSymbol} is not a valid symbol`);
     return;
   }
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const markets = await econia.getMarkets();
-  const cache = new DummyCache();
-  for(const entry of markets) {
-    const [mi, ownerHex] = entry;
-    if (ownerHex.hex() === owner && isTypeInfoSame(mii.b, mi.b) && isTypeInfoSame(mii.q, mi.q) ) {
-      const asks = await econia.getOrders(ownerHex, true, mi);
-      const bids = await econia.getOrders(ownerHex, false, mi);
-      const askLevels = get_price_levels$(asks, cache);
-      const bidLevels = get_price_levels$(bids, cache);
-      for(const askLevel of askLevels.reverse()) {
-        console.log(`ASK: ${askLevel.price.toJsNumber()}  | ${askLevel.size.toJsNumber()}`);
-      }
-      for(const bidLevel of bidLevels) {
-        console.log(`BID: ${bidLevel.price.toJsNumber()}  | ${bidLevel.size.toJsNumber()}`);
-      }
-      return;
-    }
-  }
-  console.log(`Did not find the market for ${base}-${quote} owned by ${owner}`);
-}
-
-function econiaGetTags(tokRegistry: coin_registry$_.TokenRegistry, base: string, quote: string, exp: string) {
-  const tokenInfos = tokRegistry.token_info_list;
-  const baseTokInfo = tokenInfos.filter(ti => ti.symbol.str() === base)[0] || null;
-  const quoteTokInfo = tokenInfos.filter(ti => ti.symbol.str() === quote)[0] || null;
-  if (!baseTokInfo) {
-    console.log(`${base} not found from our TokenRegistry`);
-    return null;
-  }
-  if (!quoteTokInfo) {
-    console.log(`${quote} not found from our TokenRegistry`);
-    return null;
-  }
-  if (!(exp.length >= 2 && exp.length <= 3 && exp.charAt(0) === "E" && parseInt(exp.substr(1)) <= 19)) {
-    console.log(`Invalid exp: ${exp}, only allow E0 to E19`);
-    return null;
-  }
-  const baseTag = typeInfoToTypeTag(baseTokInfo.token_type);
-  const quoteTag = typeInfoToTypeTag(quoteTokInfo.token_type);
-  const expTag = new StructTag(MR.moduleAddress, MR.moduleName, exp, []);
-  return [baseTag, quoteTag, expTag];
-}
-
-function econiaGetMi(tokRegistry: coin_registry$_.TokenRegistry, base: string, quote: string, exp: string) {
-  const tags = econiaGetTags(tokRegistry, base, quote, exp);
-  if (!tags) {
-    return null;
-  }
-  const [baseTag, quoteTag, expTag] = tags;
-  const mi = new MI({
-    b: typeTagToTypeInfo(baseTag),
-    q: typeTagToTypeInfo(quoteTag),
-    e: typeTagToTypeInfo(expTag),
-  }, new StructTag(MI.moduleAddress, MI.moduleName, MI.structName, []))
-  return mi;
-}
-
-const econiaRegisterMarket = async (base: string, quote: string, exp: string) => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const tags = econiaGetTags(tokRegistry, base, quote, exp);
-  if(!tags){
+  if (!rhsTokenInfo) {
+    console.log(`${rhsSymbol} is not a valid symbol`);
     return;
   }
-  const [baseTag, quoteTag, expTag] = tags;
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const payload = econia.buildPayloadRegisterMarket(baseTag, quoteTag, expTag);
-  await sendPayloadTx(client, account, payload);
-}
-
-const econiaSubmitBid = async (owner: string, base: string, quote: string, exp: string, price: string, size: string) => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mi = econiaGetMi(tokRegistry, base, quote, exp);
-  if(!mi){
+  const lhsSize = parseInt(lhsAmt);
+  const rhsSize = parseInt(rhsAmt);
+  if (lhsSize <= 0 || rhsSize <= 0) {
+    console.log("amounts need to be larger than 0"); 
     return;
   }
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const ownerHex = new HexString(owner);
-  const p = u64(price);
-  const s = u64(size);
-  const payload = econia.buildPayloadSubmitBid(ownerHex, p, s, mi);
-  console.log(JSON.stringify(payload, null, 2));
-  await sendPayloadTx(client, account, payload);
+  const payload = buildPayload(
+    `${pontemAddr.toShortString()}::scripts::register_pool_and_add_liquidity`,
+    [
+      lhsTokenInfo.token_type.typeFullname(),
+      rhsTokenInfo.token_type.typeFullname(),
+      `${pontemAddr.toShortString()}::lp::LP<${lhsTokenInfo.token_type.typeFullname()}, ${rhsTokenInfo.token_type.typeFullname()}>`,
+
+    ],
+    [
+      2, // 1 for stable pools, 2 for constant-product pools
+      lhsSize.toString(),
+      (0).toString(),    // min-lhsSize
+      rhsSize.toString(),
+      (0).toString(),    // min-rhsSize
+    ]
+  )
+  await sendPayloadTx(client, account, payload, 2000);
 }
 
-const econiaSubmitAsk = async (owner: string, base: string, quote: string, exp: string, price: string, size: string) => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mi = econiaGetMi(tokRegistry, base, quote, exp);
-  if(!mi){
-    return;
-  }
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const ownerHex = new HexString(owner);
-  const p = u64(price);
-  const s = u64(size);
-  const payload = econia.buildPayloadSubmitAsk(ownerHex, p, s, mi);
-  await sendPayloadTx(client, account, payload);
-}
+const pontem = new Command('potem').description("potem DEX");
 
-const econiaInitUser = async () => {
-  const {client, account} = readConfig(program);
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const payload = econia.buildPayloadInitUser();
-  await sendPayloadTx(client, account, payload);
-}
+pontem
+  .command("list-pools")
+  .action(pontemListPools);
 
-const econiaDeposit = async (base: string, quote: string, exp: string, baseAmt: string, quoteAmt: string) => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mi = econiaGetMi(tokRegistry, base, quote, exp);
-  if(!mi){
-    return;
-  }
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const payload = econia.buildPayloadDeposit(u64(baseAmt), u64(quoteAmt), mi);
-  await sendPayloadTx(client, account, payload);
-}
+pontem
+  .command("create-pool-add-liquidity")
+  .argument("<LHS_SYMBOL>")
+  .argument("<RHS_SYMBOL>")
+  .argument("<LHS_amount>")
+  .argument("<rHS_amount>")
+  .action(pontemRegisterPoolAddLiquidity);
 
-const econiaWithdraw = async (base: string, quote: string, exp: string, baseAmt: string, quoteAmt: string) => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mi = econiaGetMi(tokRegistry, base, quote, exp);
-  if(!mi){
-    return;
-  }
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const payload = econia.buildPayloadWithdraw(u64(baseAmt), u64(quoteAmt), mi);
-  await sendPayloadTx(client, account, payload);
-}
+/*
+pontem
+  .command("quote")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .action(pontemQuote);
 
-const econiaInitContainers = async (base: string, quote: string, exp: string) => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokRegistry = await coin_registry$_.TokenRegistry.load(repo, client, contractAddress, []);
-  const mi = econiaGetMi(tokRegistry, base, quote, exp);
-  if(!mi){
-    return;
-  }
-  const econia = new EconiaClient(client, ECONIA_ADDR_DEV);
-  const payload = econia.buildPayloadInitContainers(mi);
-  await sendPayloadTx(client, account, payload);
-}
+pontem
+  .command("swap")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .action(pontemSwap);
 
+pontem
+  .command("simulate-swap")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .argument("<minOutUiAmt>")
+  .action(pontemSimulateSwap);
+*/
 
-const econia = new Command('econia');
-
-econia
-  .command("list-markets")
-  .action(econiaListMarkets)
-
-econia
-  .command("list-orders")
-  .argument("<OWNER_ADDRESS>")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .action(econiaListOrders)
-
-econia
-  .command("list-levels")
-  .argument("<OWNER_ADDRESS>")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .action(econiaListLevels)
-
-econia
-  .command("register-market")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .argument("<EXP>")
-  .action(econiaRegisterMarket)
-
-econia
-  .command("submit-bid")
-  .argument("<OWNER_ADDRESS>")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .argument("<EXP>")
-  .argument("<price>")
-  .argument("<size>")
-  .action(econiaSubmitBid)
-
-econia
-  .command("submit-ask")
-  .argument("<OWNER_ADDRESS>")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .argument("<EXP>")
-  .argument("<price>")
-  .argument("<size>")
-  .action(econiaSubmitAsk)
-
-econia
-  .command("deposit")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .argument("<EXP>")
-  .argument("<base-amt>")
-  .argument("<quote-qmt>")
-  .action(econiaDeposit)
-
-econia
-  .command("withdraw")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .argument("<EXP>")
-  .argument("<base-amt>")
-  .argument("<quote-qmt>")
-  .action(econiaWithdraw)
-
-econia
-  .command("init-containers")
-  .argument("<BASE_SYMBOL>")
-  .argument("<QUOTE_SYMBOL>")
-  .argument("<EXP>")
-  .action(econiaInitContainers)
-
-econia
-  .command("init-user")
-  .action(econiaInitUser)
-
-program.addCommand(econia);
+program.addCommand(pontem);
 
 
 const aggListTradingPools = async () => {

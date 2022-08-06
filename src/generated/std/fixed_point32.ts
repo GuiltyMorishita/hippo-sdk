@@ -40,80 +40,80 @@ export class FixedPoint32
   }
 
 }
-export function create_from_rational$ (
+export function create_from_rational_ (
   numerator: U64,
   denominator: U64,
   $c: AptosDataCache,
 ): FixedPoint32 {
   let temp$1, quotient, scaled_denominator, scaled_numerator;
-  scaled_numerator = u128($.copy(numerator)).shl(u8("64"));
-  scaled_denominator = u128($.copy(denominator)).shl(u8("32"));
-  if (!$.copy(scaled_denominator).neq(u128("0"))) {
+  scaled_numerator = (u128($.copy(numerator))).shl(u8("64"));
+  scaled_denominator = (u128($.copy(denominator))).shl(u8("32"));
+  if (!($.copy(scaled_denominator)).neq(u128("0"))) {
     throw $.abortCode(EDENOMINATOR);
   }
-  quotient = $.copy(scaled_numerator).div($.copy(scaled_denominator));
-  if ($.copy(quotient).neq(u128("0"))) {
+  quotient = ($.copy(scaled_numerator)).div($.copy(scaled_denominator));
+  if (($.copy(quotient)).neq(u128("0"))) {
     temp$1 = true;
   }
   else{
-    temp$1 = $.copy(numerator).eq(u64("0"));
+    temp$1 = ($.copy(numerator)).eq((u64("0")));
   }
   if (!temp$1) {
     throw $.abortCode(ERATIO_OUT_OF_RANGE);
   }
-  if (!$.copy(quotient).le(MAX_U64)) {
+  if (!($.copy(quotient)).le(MAX_U64)) {
     throw $.abortCode(ERATIO_OUT_OF_RANGE);
   }
   return new FixedPoint32({ value: u64($.copy(quotient)) }, new StructTag(new HexString("0x1"), "fixed_point32", "FixedPoint32", []));
 }
 
-export function create_from_raw_value$ (
+export function create_from_raw_value_ (
   value: U64,
   $c: AptosDataCache,
 ): FixedPoint32 {
   return new FixedPoint32({ value: $.copy(value) }, new StructTag(new HexString("0x1"), "fixed_point32", "FixedPoint32", []));
 }
 
-export function divide_u64$ (
+export function divide_u64_ (
   val: U64,
   divisor: FixedPoint32,
   $c: AptosDataCache,
 ): U64 {
   let quotient, scaled_value;
-  if (!$.copy(divisor.value).neq(u64("0"))) {
+  if (!($.copy(divisor.value)).neq(u64("0"))) {
     throw $.abortCode(EDIVISION_BY_ZERO);
   }
-  scaled_value = u128($.copy(val)).shl(u8("32"));
-  quotient = $.copy(scaled_value).div(u128($.copy(divisor.value)));
-  if (!$.copy(quotient).le(MAX_U64)) {
+  scaled_value = (u128($.copy(val))).shl(u8("32"));
+  quotient = ($.copy(scaled_value)).div(u128($.copy(divisor.value)));
+  if (!($.copy(quotient)).le(MAX_U64)) {
     throw $.abortCode(EDIVISION);
   }
   return u64($.copy(quotient));
 }
 
-export function get_raw_value$ (
+export function get_raw_value_ (
   num: FixedPoint32,
   $c: AptosDataCache,
 ): U64 {
   return $.copy(num.value);
 }
 
-export function is_zero$ (
+export function is_zero_ (
   num: FixedPoint32,
   $c: AptosDataCache,
 ): boolean {
-  return $.copy(num.value).eq(u64("0"));
+  return ($.copy(num.value)).eq((u64("0")));
 }
 
-export function multiply_u64$ (
+export function multiply_u64_ (
   val: U64,
   multiplier: FixedPoint32,
   $c: AptosDataCache,
 ): U64 {
   let product, unscaled_product;
-  unscaled_product = u128($.copy(val)).mul(u128($.copy(multiplier.value)));
-  product = $.copy(unscaled_product).shr(u8("32"));
-  if (!$.copy(product).le(MAX_U64)) {
+  unscaled_product = (u128($.copy(val))).mul(u128($.copy(multiplier.value)));
+  product = ($.copy(unscaled_product)).shr(u8("32"));
+  if (!($.copy(product)).le(MAX_U64)) {
     throw $.abortCode(EMULTIPLICATION);
   }
   return u64($.copy(product));

@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as vector$_ from "./vector";
+import * as Vector from "./vector";
 export const packageName = "MoveStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "bit_vector";
@@ -42,140 +42,140 @@ export class BitVector
   }
 
 }
-export function is_index_set$ (
+export function is_index_set_ (
   bitvector: BitVector,
   bit_index: U64,
   $c: AptosDataCache,
 ): boolean {
-  if (!$.copy(bit_index).lt(vector$_.length$(bitvector.bit_field, $c, [AtomicTypeTag.Bool] as TypeTag[]))) {
+  if (!($.copy(bit_index)).lt(Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]))) {
     throw $.abortCode(EINDEX);
   }
-  return $.copy(vector$_.borrow$(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool] as TypeTag[]));
+  return $.copy(Vector.borrow_(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool]));
 }
 
-export function length$ (
+export function length_ (
   bitvector: BitVector,
   $c: AptosDataCache,
 ): U64 {
-  return vector$_.length$(bitvector.bit_field, $c, [AtomicTypeTag.Bool] as TypeTag[]);
+  return Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]);
 }
 
-export function longest_set_sequence_starting_at$ (
+export function longest_set_sequence_starting_at_ (
   bitvector: BitVector,
   start_index: U64,
   $c: AptosDataCache,
 ): U64 {
   let index;
-  if (!$.copy(start_index).lt($.copy(bitvector.length))) {
+  if (!($.copy(start_index)).lt($.copy(bitvector.length))) {
     throw $.abortCode(EINDEX);
   }
   index = $.copy(start_index);
-  while ($.copy(index).lt($.copy(bitvector.length))) {
+  while (($.copy(index)).lt($.copy(bitvector.length))) {
     {
-      if (!is_index_set$(bitvector, $.copy(index), $c)) {
+      if (!is_index_set_(bitvector, $.copy(index), $c)) {
         break;
       }
       else{
       }
-      index = $.copy(index).add(u64("1"));
+      index = ($.copy(index)).add(u64("1"));
     }
 
-  }return $.copy(index).sub($.copy(start_index));
+  }return ($.copy(index)).sub($.copy(start_index));
 }
 
-export function new__$ (
+export function new___ (
   length: U64,
   $c: AptosDataCache,
 ): BitVector {
   let bit_field, counter;
-  if (!$.copy(length).gt(u64("0"))) {
+  if (!($.copy(length)).gt(u64("0"))) {
     throw $.abortCode(ELENGTH);
   }
-  if (!$.copy(length).lt(MAX_SIZE)) {
+  if (!($.copy(length)).lt(MAX_SIZE)) {
     throw $.abortCode(ELENGTH);
   }
   counter = u64("0");
-  bit_field = vector$_.empty$($c, [AtomicTypeTag.Bool] as TypeTag[]);
+  bit_field = Vector.empty_($c, [AtomicTypeTag.Bool]);
   while (true) {
     {
       ;
     }
-    if (!($.copy(counter).lt($.copy(length)))) break;
+    if (!(($.copy(counter)).lt($.copy(length)))) break;
     {
-      vector$_.push_back$(bit_field, false, $c, [AtomicTypeTag.Bool] as TypeTag[]);
-      counter = $.copy(counter).add(u64("1"));
+      Vector.push_back_(bit_field, false, $c, [AtomicTypeTag.Bool]);
+      counter = ($.copy(counter)).add(u64("1"));
     }
 
   };
   return new BitVector({ length: $.copy(length), bit_field: $.copy(bit_field) }, new StructTag(new HexString("0x1"), "bit_vector", "BitVector", []));
 }
 
-export function set$ (
+export function set_ (
   bitvector: BitVector,
   bit_index: U64,
   $c: AptosDataCache,
 ): void {
   let x;
-  if (!$.copy(bit_index).lt(vector$_.length$(bitvector.bit_field, $c, [AtomicTypeTag.Bool] as TypeTag[]))) {
+  if (!($.copy(bit_index)).lt(Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]))) {
     throw $.abortCode(EINDEX);
   }
-  x = vector$_.borrow_mut$(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool] as TypeTag[]);
+  x = Vector.borrow_mut_(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool]);
   $.set(x, true);
   return;
 }
 
-export function shift_left$ (
+export function shift_left_ (
   bitvector: BitVector,
   amount: U64,
   $c: AptosDataCache,
 ): void {
   let temp$2, temp$3, elem, i, i__1, len;
-  if ($.copy(amount).ge($.copy(bitvector.length))) {
-    len = vector$_.length$(bitvector.bit_field, $c, [AtomicTypeTag.Bool] as TypeTag[]);
+  if (($.copy(amount)).ge($.copy(bitvector.length))) {
+    len = Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]);
     i = u64("0");
-    while ($.copy(i).lt($.copy(len))) {
+    while (($.copy(i)).lt($.copy(len))) {
       {
-        elem = vector$_.borrow_mut$(bitvector.bit_field, $.copy(i), $c, [AtomicTypeTag.Bool] as TypeTag[]);
+        elem = Vector.borrow_mut_(bitvector.bit_field, $.copy(i), $c, [AtomicTypeTag.Bool]);
         $.set(elem, false);
-        i = $.copy(i).add(u64("1"));
+        i = ($.copy(i)).add(u64("1"));
       }
 
     }}
   else{
     i__1 = $.copy(amount);
-    while ($.copy(i__1).lt($.copy(bitvector.length))) {
+    while (($.copy(i__1)).lt($.copy(bitvector.length))) {
       {
         [temp$2, temp$3] = [bitvector, $.copy(i__1)];
-        if (is_index_set$(temp$2, temp$3, $c)) {
-          set$(bitvector, $.copy(i__1).sub($.copy(amount)), $c);
+        if (is_index_set_(temp$2, temp$3, $c)) {
+          set_(bitvector, ($.copy(i__1)).sub($.copy(amount)), $c);
         }
         else{
-          unset$(bitvector, $.copy(i__1).sub($.copy(amount)), $c);
+          unset_(bitvector, ($.copy(i__1)).sub($.copy(amount)), $c);
         }
-        i__1 = $.copy(i__1).add(u64("1"));
+        i__1 = ($.copy(i__1)).add(u64("1"));
       }
 
-    }i__1 = $.copy(bitvector.length).sub($.copy(amount));
-    while ($.copy(i__1).lt($.copy(bitvector.length))) {
+    }i__1 = ($.copy(bitvector.length)).sub($.copy(amount));
+    while (($.copy(i__1)).lt($.copy(bitvector.length))) {
       {
-        unset$(bitvector, $.copy(i__1), $c);
-        i__1 = $.copy(i__1).add(u64("1"));
+        unset_(bitvector, $.copy(i__1), $c);
+        i__1 = ($.copy(i__1)).add(u64("1"));
       }
 
     }}
   return;
 }
 
-export function unset$ (
+export function unset_ (
   bitvector: BitVector,
   bit_index: U64,
   $c: AptosDataCache,
 ): void {
   let x;
-  if (!$.copy(bit_index).lt(vector$_.length$(bitvector.bit_field, $c, [AtomicTypeTag.Bool] as TypeTag[]))) {
+  if (!($.copy(bit_index)).lt(Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]))) {
     throw $.abortCode(EINDEX);
   }
-  x = vector$_.borrow_mut$(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool] as TypeTag[]);
+  x = Vector.borrow_mut_(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool]);
   $.set(x, false);
   return;
 }

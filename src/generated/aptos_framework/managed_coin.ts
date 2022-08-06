@@ -5,8 +5,9 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as coin$_ from "./coin";
+import * as Std from "../std";
+import * as Coin from "./coin";
+import * as Coins from "./coins";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "managed_coin";
@@ -26,12 +27,12 @@ export class Capabilities
   { name: "mint_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new $.TypeParamIdx(0)]) },
   { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new $.TypeParamIdx(0)]) }];
 
-  mint_cap: coin$_.MintCapability;
-  burn_cap: coin$_.BurnCapability;
+  mint_cap: Coin.MintCapability;
+  burn_cap: Coin.BurnCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.mint_cap = proto['mint_cap'] as coin$_.MintCapability;
-    this.burn_cap = proto['burn_cap'] as coin$_.BurnCapability;
+    this.mint_cap = proto['mint_cap'] as Coin.MintCapability;
+    this.burn_cap = proto['burn_cap'] as Coin.BurnCapability;
   }
 
   static CapabilitiesParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Capabilities {
@@ -44,20 +45,20 @@ export class Capabilities
     return result as unknown as Capabilities;
   }
 }
-export function burn$ (
+export function burn_ (
   account: HexString,
   amount: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let account_addr, capabilities, to_burn;
-  account_addr = std$_.signer$_.address_of$(account, $c);
+  account_addr = Std.Signer.address_of_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr))) {
-    throw $.abortCode(std$_.error$_.not_found$(ENO_CAPABILITIES, $c));
+    throw $.abortCode(Std.Error.not_found_(ENO_CAPABILITIES, $c));
   }
   capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr));
-  to_burn = coin$_.withdraw$(account, $.copy(amount), $c, [$p[0]] as TypeTag[]);
-  coin$_.burn$(to_burn, capabilities.burn_cap, $c, [$p[0]] as TypeTag[]);
+  to_burn = Coin.withdraw_(account, $.copy(amount), $c, [$p[0]]);
+  Coin.burn_(to_burn, capabilities.burn_cap, $c, [$p[0]]);
   return;
 }
 
@@ -76,7 +77,7 @@ export function buildPayload_burn (
   );
 
 }
-export function initialize$ (
+export function initialize_ (
   account: HexString,
   name: U8[],
   symbol: U8[],
@@ -86,7 +87,7 @@ export function initialize$ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let burn_cap, mint_cap;
-  [mint_cap, burn_cap] = coin$_.initialize$(account, std$_.string$_.utf8$($.copy(name), $c), std$_.string$_.utf8$($.copy(symbol), $c), $.copy(decimals), monitor_supply, $c, [$p[0]] as TypeTag[]);
+  [mint_cap, burn_cap] = Coin.initialize_(account, Std.String.utf8_($.copy(name), $c), Std.String.utf8_($.copy(symbol), $c), $.copy(decimals), monitor_supply, $c, [$p[0]]);
   $c.move_to(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), account, new Capabilities({ mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]])));
   return;
 }
@@ -112,7 +113,7 @@ export function buildPayload_initialize (
   );
 
 }
-export function mint$ (
+export function mint_ (
   account: HexString,
   dst_addr: HexString,
   amount: U64,
@@ -120,13 +121,13 @@ export function mint$ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let account_addr, capabilities, coins_minted;
-  account_addr = std$_.signer$_.address_of$(account, $c);
+  account_addr = Std.Signer.address_of_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr))) {
-    throw $.abortCode(std$_.error$_.not_found$(ENO_CAPABILITIES, $c));
+    throw $.abortCode(Std.Error.not_found_(ENO_CAPABILITIES, $c));
   }
   capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr));
-  coins_minted = coin$_.mint$($.copy(amount), capabilities.mint_cap, $c, [$p[0]] as TypeTag[]);
-  coin$_.deposit$($.copy(dst_addr), coins_minted, $c, [$p[0]] as TypeTag[]);
+  coins_minted = Coin.mint_($.copy(amount), capabilities.mint_cap, $c, [$p[0]]);
+  Coin.deposit_($.copy(dst_addr), coins_minted, $c, [$p[0]]);
   return;
 }
 
@@ -147,12 +148,12 @@ export function buildPayload_mint (
   );
 
 }
-export function register$ (
+export function register_ (
   account: HexString,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
 ): void {
-  coin$_.register$(account, $c, [$p[0]] as TypeTag[]);
+  Coins.register_(account, $c, [$p[0]]);
   return;
 }
 

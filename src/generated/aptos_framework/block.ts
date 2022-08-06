@@ -5,12 +5,12 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as aptos_std$_ from "../aptos_std";
-import * as std$_ from "../std";
-import * as reconfiguration$_ from "./reconfiguration";
-import * as stake$_ from "./stake";
-import * as system_addresses$_ from "./system_addresses";
-import * as timestamp$_ from "./timestamp";
+import * as Aptos_std from "../aptos_std";
+import * as Std from "../std";
+import * as Reconfiguration from "./reconfiguration";
+import * as Stake from "./stake";
+import * as System_addresses from "./system_addresses";
+import * as Timestamp from "./timestamp";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "block";
@@ -29,17 +29,17 @@ export class BlockMetadata
   ];
   static fields: FieldDeclType[] = [
   { name: "height", typeTag: AtomicTypeTag.U64 },
-  { name: "epoch_internal", typeTag: AtomicTypeTag.U64 },
+  { name: "epoch_interval", typeTag: AtomicTypeTag.U64 },
   { name: "new_block_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])]) }];
 
   height: U64;
-  epoch_internal: U64;
-  new_block_events: aptos_std$_.event$_.EventHandle;
+  epoch_interval: U64;
+  new_block_events: Aptos_std.Event.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.height = proto['height'] as U64;
-    this.epoch_internal = proto['epoch_internal'] as U64;
-    this.new_block_events = proto['new_block_events'] as aptos_std$_.event$_.EventHandle;
+    this.epoch_interval = proto['epoch_interval'] as U64;
+    this.new_block_events = proto['new_block_events'] as Aptos_std.Event.EventHandle;
   }
 
   static BlockMetadataParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : BlockMetadata {
@@ -94,7 +94,7 @@ export class NewBlockEvent
   }
 
 }
-export function block_prologue$ (
+export function block_prologue_ (
   vm: HexString,
   epoch: U64,
   round: U64,
@@ -105,93 +105,93 @@ export function block_prologue$ (
   timestamp: U64,
   $c: AptosDataCache,
 ): void {
-  let temp$1, block_metadata_ref, height, new_block_event;
-  timestamp$_.assert_operating$($c);
-  system_addresses$_.assert_vm$(vm, $c);
-  if (($.copy(proposer).hex() === new HexString("0x0").hex())) {
+  let temp$1, block_metadata_ref, new_block_event;
+  Timestamp.assert_operating_($c);
+  System_addresses.assert_vm_(vm, $c);
+  if ((($.copy(proposer)).hex() === (new HexString("0x0")).hex())) {
     temp$1 = true;
   }
   else{
-    temp$1 = stake$_.is_current_epoch_validator$($.copy(proposer), $c);
+    temp$1 = Stake.is_current_epoch_validator_($.copy(proposer), $c);
   }
   if (!temp$1) {
-    throw $.abortCode(std$_.error$_.permission_denied$(EVM_OR_VALIDATOR, $c));
+    throw $.abortCode(Std.Error.permission_denied_(EVM_OR_VALIDATOR, $c));
   }
-  height = $.copy($c.borrow_global_mut<BlockMetadata>(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), new HexString("0x1")).height);
-  new_block_event = new NewBlockEvent({ epoch: $.copy(epoch), round: $.copy(round), height: $.copy(height), previous_block_votes: $.copy(previous_block_votes), proposer: $.copy(proposer), failed_proposer_indices: $.copy(failed_proposer_indices), time_microseconds: $.copy(timestamp) }, new StructTag(new HexString("0x1"), "block", "NewBlockEvent", []));
-  emit_new_block_event$(vm, new_block_event, $c);
   block_metadata_ref = $c.borrow_global_mut<BlockMetadata>(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), new HexString("0x1"));
-  stake$_.update_performance_statistics$($.copy(missed_votes), $c);
-  if ($.copy(timestamp).sub(reconfiguration$_.last_reconfiguration_time$($c)).gt($.copy(block_metadata_ref.epoch_internal))) {
-    reconfiguration$_.reconfigure$($c);
+  block_metadata_ref.height = Aptos_std.Event.counter_(block_metadata_ref.new_block_events, $c, [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])]);
+  new_block_event = new NewBlockEvent({ epoch: $.copy(epoch), round: $.copy(round), height: $.copy(block_metadata_ref.height), previous_block_votes: $.copy(previous_block_votes), proposer: $.copy(proposer), failed_proposer_indices: $.copy(failed_proposer_indices), time_microseconds: $.copy(timestamp) }, new StructTag(new HexString("0x1"), "block", "NewBlockEvent", []));
+  emit_new_block_event_(vm, block_metadata_ref.new_block_events, new_block_event, $c);
+  Stake.update_performance_statistics_($.copy(missed_votes), $c);
+  if ((($.copy(timestamp)).sub(Reconfiguration.last_reconfiguration_time_($c))).gt($.copy(block_metadata_ref.epoch_interval))) {
+    Reconfiguration.reconfigure_($c);
   }
   else{
   }
   return;
 }
 
-export function emit_genesis_block_event$ (
+export function emit_genesis_block_event_ (
   vm: HexString,
-  $c: AptosDataCache,
-): void {
-  emit_new_block_event$(vm, new NewBlockEvent({ epoch: u64("0"), round: u64("0"), height: u64("0"), previous_block_votes: std$_.vector$_.empty$($c, [AtomicTypeTag.Bool] as TypeTag[]), proposer: new HexString("0x0"), failed_proposer_indices: std$_.vector$_.empty$($c, [AtomicTypeTag.U64] as TypeTag[]), time_microseconds: u64("0") }, new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])), $c);
-  return;
-}
-
-export function emit_new_block_event$ (
-  vm: HexString,
-  new_block_event: NewBlockEvent,
   $c: AptosDataCache,
 ): void {
   let block_metadata_ref;
   block_metadata_ref = $c.borrow_global_mut<BlockMetadata>(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), new HexString("0x1"));
-  if (!$.copy(block_metadata_ref.height).eq($.copy(new_block_event.height))) {
-    throw $.abortCode(std$_.error$_.invalid_state$(EBLOCK_METADATA, $c));
-  }
-  block_metadata_ref.height = $.copy(new_block_event.height).add(u64("1"));
-  timestamp$_.update_global_time$(vm, $.copy(new_block_event.proposer), $.copy(new_block_event.time_microseconds), $c);
-  aptos_std$_.event$_.emit_event$(block_metadata_ref.new_block_events, new_block_event, $c, [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])] as TypeTag[]);
+  emit_new_block_event_(vm, block_metadata_ref.new_block_events, new NewBlockEvent({ epoch: u64("0"), round: u64("0"), height: u64("0"), previous_block_votes: Std.Vector.empty_($c, [AtomicTypeTag.Bool]), proposer: new HexString("0x0"), failed_proposer_indices: Std.Vector.empty_($c, [AtomicTypeTag.U64]), time_microseconds: u64("0") }, new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])), $c);
   return;
 }
 
-export function get_current_block_height$ (
+export function emit_new_block_event_ (
+  vm: HexString,
+  event_handle: Aptos_std.Event.EventHandle,
+  new_block_event: NewBlockEvent,
+  $c: AptosDataCache,
+): void {
+  Timestamp.update_global_time_(vm, $.copy(new_block_event.proposer), $.copy(new_block_event.time_microseconds), $c);
+  if (!(Aptos_std.Event.counter_(event_handle, $c, [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])])).eq(($.copy(new_block_event.height)))) {
+    throw $.abortCode(Std.Error.invalid_argument_(EBLOCK_METADATA, $c));
+  }
+  Aptos_std.Event.emit_event_(event_handle, new_block_event, $c, [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])]);
+  return;
+}
+
+export function get_current_block_height_ (
   $c: AptosDataCache,
 ): U64 {
-  if (!is_initialized$($c)) {
-    throw $.abortCode(std$_.error$_.not_found$(EBLOCK_METADATA, $c));
+  if (!is_initialized_($c)) {
+    throw $.abortCode(Std.Error.not_found_(EBLOCK_METADATA, $c));
   }
   return $.copy($c.borrow_global<BlockMetadata>(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), new HexString("0x1")).height);
 }
 
-export function initialize_block_metadata$ (
+export function initialize_block_metadata_ (
   account: HexString,
-  epoch_internal: U64,
+  epoch_interval: U64,
   $c: AptosDataCache,
 ): void {
-  timestamp$_.assert_genesis$($c);
-  system_addresses$_.assert_aptos_framework$(account, $c);
-  if (!!is_initialized$($c)) {
-    throw $.abortCode(std$_.error$_.already_exists$(EBLOCK_METADATA, $c));
+  Timestamp.assert_genesis_($c);
+  System_addresses.assert_aptos_framework_(account, $c);
+  if (!!is_initialized_($c)) {
+    throw $.abortCode(Std.Error.already_exists_(EBLOCK_METADATA, $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), account, new BlockMetadata({ height: u64("0"), epoch_internal: $.copy(epoch_internal), new_block_events: aptos_std$_.event$_.new_event_handle$(account, $c, [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "block", "BlockMetadata", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), account, new BlockMetadata({ height: u64("0"), epoch_interval: $.copy(epoch_interval), new_block_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "block", "NewBlockEvent", [])]) }, new StructTag(new HexString("0x1"), "block", "BlockMetadata", [])));
   return;
 }
 
-export function is_initialized$ (
+export function is_initialized_ (
   $c: AptosDataCache,
 ): boolean {
   return $c.exists(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), new HexString("0x1"));
 }
 
-export function update_epoch_interval$ (
+export function update_epoch_interval_ (
   aptos_framework: HexString,
   new_epoch_interval: U64,
   $c: AptosDataCache,
 ): void {
   let block_metadata;
-  system_addresses$_.assert_aptos_framework$(aptos_framework, $c);
+  System_addresses.assert_aptos_framework_(aptos_framework, $c);
   block_metadata = $c.borrow_global_mut<BlockMetadata>(new StructTag(new HexString("0x1"), "block", "BlockMetadata", []), new HexString("0x1"));
-  block_metadata.epoch_internal = $.copy(new_epoch_interval);
+  block_metadata.epoch_interval = $.copy(new_epoch_interval);
   return;
 }
 

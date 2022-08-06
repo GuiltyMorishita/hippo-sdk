@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as comparator$_ from "./comparator";
+import * as Std from "../std";
+import * as Comparator from "./comparator";
 export const packageName = "AptosStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "simple_map";
@@ -67,7 +67,7 @@ export class SimpleMap
   }
 
 }
-export function add$ (
+export function add_ (
   map: SimpleMap,
   key: any,
   value: any,
@@ -76,38 +76,38 @@ export function add$ (
 ): void {
   let temp$1, temp$2, end, maybe_idx, maybe_placement, placement;
   [temp$1, temp$2] = [map, key];
-  [maybe_idx, maybe_placement] = find$(temp$1, temp$2, $c, [$p[0], $p[1]] as TypeTag[]);
-  if (!std$_.option$_.is_none$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_ALREADY_EXISTS, $c));
+  [maybe_idx, maybe_placement] = find_(temp$1, temp$2, $c, [$p[0], $p[1]]);
+  if (!Std.Option.is_none_(maybe_idx, $c, [AtomicTypeTag.U64])) {
+    throw $.abortCode(Std.Error.invalid_argument_(EKEY_ALREADY_EXISTS, $c));
   }
-  std$_.vector$_.push_back$(map.data, new Element({ key: key, value: value }, new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
-  placement = std$_.option$_.extract$(maybe_placement, $c, [AtomicTypeTag.U64] as TypeTag[]);
-  end = std$_.vector$_.length$(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).sub(u64("1"));
-  while ($.copy(placement).lt($.copy(end))) {
+  Std.Vector.push_back_(map.data, new Element({ key: key, value: value }, new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  placement = Std.Option.extract_(maybe_placement, $c, [AtomicTypeTag.U64]);
+  end = (Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])])).sub(u64("1"));
+  while (($.copy(placement)).lt($.copy(end))) {
     {
-      std$_.vector$_.swap$(map.data, $.copy(placement), $.copy(end), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
-      placement = $.copy(placement).add(u64("1"));
+      Std.Vector.swap_(map.data, $.copy(placement), $.copy(end), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+      placement = ($.copy(placement)).add(u64("1"));
     }
 
   }return;
 }
 
-export function borrow$ (
+export function borrow_ (
   map: SimpleMap,
   key: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): any {
   let idx, maybe_idx;
-  [maybe_idx, ] = find$(map, key, $c, [$p[0], $p[1]] as TypeTag[]);
-  if (!std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_NOT_FOUND, $c));
+  [maybe_idx, ] = find_(map, key, $c, [$p[0], $p[1]]);
+  if (!Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64])) {
+    throw $.abortCode(Std.Error.invalid_argument_(EKEY_NOT_FOUND, $c));
   }
-  idx = std$_.option$_.extract$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
-  return std$_.vector$_.borrow$(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).value;
+  idx = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
+  return Std.Vector.borrow_(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).value;
 }
 
-export function borrow_mut$ (
+export function borrow_mut_ (
   map: SimpleMap,
   key: any,
   $c: AptosDataCache,
@@ -115,94 +115,94 @@ export function borrow_mut$ (
 ): any {
   let temp$1, temp$2, idx, maybe_idx;
   [temp$1, temp$2] = [map, key];
-  [maybe_idx, ] = find$(temp$1, temp$2, $c, [$p[0], $p[1]] as TypeTag[]);
-  if (!std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_NOT_FOUND, $c));
+  [maybe_idx, ] = find_(temp$1, temp$2, $c, [$p[0], $p[1]]);
+  if (!Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64])) {
+    throw $.abortCode(Std.Error.invalid_argument_(EKEY_NOT_FOUND, $c));
   }
-  idx = std$_.option$_.extract$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
-  return std$_.vector$_.borrow_mut$(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).value;
+  idx = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
+  return Std.Vector.borrow_mut_(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).value;
 }
 
-export function contains_key$ (
+export function contains_key_ (
   map: SimpleMap,
   key: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): boolean {
   let maybe_idx;
-  [maybe_idx, ] = find$(map, key, $c, [$p[0], $p[1]] as TypeTag[]);
-  return std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
+  [maybe_idx, ] = find_(map, key, $c, [$p[0], $p[1]]);
+  return Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64]);
 }
 
-export function create$ (
+export function create_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): SimpleMap {
-  return new SimpleMap({ data: std$_.vector$_.empty$($c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "simple_map", "SimpleMap", [$p[0], $p[1]]));
+  return new SimpleMap({ data: Std.Vector.empty_($c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]) }, new StructTag(new HexString("0x1"), "simple_map", "SimpleMap", [$p[0], $p[1]]));
 }
 
-export function destroy_empty$ (
+export function destroy_empty_ (
   map: SimpleMap,
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): void {
   let { data: data } = map;
-  std$_.vector$_.destroy_empty$(data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
+  Std.Vector.destroy_empty_(data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
   return;
 }
 
-export function find$ (
+export function find_ (
   map: SimpleMap,
   key: any,
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
-): [std$_.option$_.Option, std$_.option$_.Option] {
+): [Std.Option.Option, Std.Option.Option] {
   let temp$1, temp$2, temp$3, temp$4, left, length, mid, potential_key, right;
-  length = std$_.vector$_.length$(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
-  if ($.copy(length).eq(u64("0"))) {
-    return [std$_.option$_.none$($c, [AtomicTypeTag.U64] as TypeTag[]), std$_.option$_.some$(u64("0"), $c, [AtomicTypeTag.U64] as TypeTag[])];
+  length = Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  if (($.copy(length)).eq((u64("0")))) {
+    return [Std.Option.none_($c, [AtomicTypeTag.U64]), Std.Option.some_(u64("0"), $c, [AtomicTypeTag.U64])];
   }
   else{
   }
   left = u64("0");
   right = $.copy(length);
-  while ($.copy(left).neq($.copy(right))) {
+  while (($.copy(left)).neq($.copy(right))) {
     {
-      mid = $.copy(left).add($.copy(right)).div(u64("2"));
-      potential_key = std$_.vector$_.borrow$(map.data, $.copy(mid), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).key;
-      temp$1 = comparator$_.compare$(potential_key, key, $c, [$p[0]] as TypeTag[]);
-      if (comparator$_.is_smaller_than$(temp$1, $c)) {
-        left = $.copy(mid).add(u64("1"));
+      mid = (($.copy(left)).add($.copy(right))).div(u64("2"));
+      potential_key = Std.Vector.borrow_(map.data, $.copy(mid), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).key;
+      temp$1 = Comparator.compare_(potential_key, key, $c, [$p[0]]);
+      if (Comparator.is_smaller_than_(temp$1, $c)) {
+        left = ($.copy(mid)).add(u64("1"));
       }
       else{
         right = $.copy(mid);
       }
     }
 
-  }if ($.copy(left).neq($.copy(length))) {
-    temp$2 = $.dyn_eq($p[0], key, std$_.vector$_.borrow$(map.data, $.copy(left), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).key);
+  }if (($.copy(left)).neq($.copy(length))) {
+    temp$2 = $.dyn_eq($p[0], key, Std.Vector.borrow_(map.data, $.copy(left), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).key);
   }
   else{
     temp$2 = false;
   }
   if (temp$2) {
-    [temp$3, temp$4] = [std$_.option$_.some$($.copy(left), $c, [AtomicTypeTag.U64] as TypeTag[]), std$_.option$_.none$($c, [AtomicTypeTag.U64] as TypeTag[])];
+    [temp$3, temp$4] = [Std.Option.some_($.copy(left), $c, [AtomicTypeTag.U64]), Std.Option.none_($c, [AtomicTypeTag.U64])];
   }
   else{
-    [temp$3, temp$4] = [std$_.option$_.none$($c, [AtomicTypeTag.U64] as TypeTag[]), std$_.option$_.some$($.copy(left), $c, [AtomicTypeTag.U64] as TypeTag[])];
+    [temp$3, temp$4] = [Std.Option.none_($c, [AtomicTypeTag.U64]), Std.Option.some_($.copy(left), $c, [AtomicTypeTag.U64])];
   }
   return [temp$3, temp$4];
 }
 
-export function length$ (
+export function length_ (
   map: SimpleMap,
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): U64 {
-  return std$_.vector$_.length$(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
+  return Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
 }
 
-export function remove$ (
+export function remove_ (
   map: SimpleMap,
   key: any,
   $c: AptosDataCache,
@@ -210,19 +210,19 @@ export function remove$ (
 ): [any, any] {
   let temp$1, temp$2, end, maybe_idx, placement;
   [temp$1, temp$2] = [map, key];
-  [maybe_idx, ] = find$(temp$1, temp$2, $c, [$p[0], $p[1]] as TypeTag[]);
-  if (!std$_.option$_.is_some$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[])) {
-    throw $.abortCode(std$_.error$_.invalid_argument$(EKEY_NOT_FOUND, $c));
+  [maybe_idx, ] = find_(temp$1, temp$2, $c, [$p[0], $p[1]]);
+  if (!Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64])) {
+    throw $.abortCode(Std.Error.invalid_argument_(EKEY_NOT_FOUND, $c));
   }
-  placement = std$_.option$_.extract$(maybe_idx, $c, [AtomicTypeTag.U64] as TypeTag[]);
-  end = std$_.vector$_.length$(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]).sub(u64("1"));
-  while ($.copy(placement).lt($.copy(end))) {
+  placement = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
+  end = (Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])])).sub(u64("1"));
+  while (($.copy(placement)).lt($.copy(end))) {
     {
-      std$_.vector$_.swap$(map.data, $.copy(placement), $.copy(placement).add(u64("1")), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
-      placement = $.copy(placement).add(u64("1"));
+      Std.Vector.swap_(map.data, $.copy(placement), ($.copy(placement)).add(u64("1")), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+      placement = ($.copy(placement)).add(u64("1"));
     }
 
-  }let { key: key__3, value: value } = std$_.vector$_.pop_back$(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])] as TypeTag[]);
+  }let { key: key__3, value: value } = Std.Vector.pop_back_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
   return [key__3, value];
 }
 

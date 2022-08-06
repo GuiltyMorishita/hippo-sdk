@@ -5,8 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as option$_ from "./option";
-import * as vector$_ from "./vector";
+import * as Option from "./option";
+import * as Vector from "./vector";
 export const packageName = "MoveStdlib";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "string";
@@ -39,38 +39,38 @@ export class String
   str(): string { return $.u8str(this.bytes); }
 
 }
-export function append$ (
+export function append_ (
   s: String,
   r: String,
   $c: AptosDataCache,
 ): void {
-  return vector$_.append$(s.bytes, $.copy(r.bytes), $c, [AtomicTypeTag.U8] as TypeTag[]);
+  return Vector.append_(s.bytes, $.copy(r.bytes), $c, [AtomicTypeTag.U8]);
 }
 
-export function append_utf8$ (
+export function append_utf8_ (
   s: String,
   bytes: U8[],
   $c: AptosDataCache,
 ): void {
-  return append$(s, utf8$($.copy(bytes), $c), $c);
+  return append_(s, utf8_($.copy(bytes), $c), $c);
 }
 
-export function bytes$ (
+export function bytes_ (
   s: String,
   $c: AptosDataCache,
 ): U8[] {
   return s.bytes;
 }
 
-export function index_of$ (
+export function index_of_ (
   s: String,
   r: String,
   $c: AptosDataCache,
 ): U64 {
-  return internal_index_of$(s.bytes, r.bytes, $c);
+  return internal_index_of_(s.bytes, r.bytes, $c);
 }
 
-export function insert$ (
+export function insert_ (
   s: String,
   at: U64,
   o: String,
@@ -78,8 +78,8 @@ export function insert$ (
 ): void {
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, bytes, end, front, l;
   bytes = s.bytes;
-  if ($.copy(at).le(vector$_.length$(bytes, $c, [AtomicTypeTag.U8] as TypeTag[]))) {
-    temp$1 = internal_is_char_boundary$(bytes, $.copy(at), $c);
+  if (($.copy(at)).le(Vector.length_(bytes, $c, [AtomicTypeTag.U8]))) {
+    temp$1 = internal_is_char_boundary_(bytes, $.copy(at), $c);
   }
   else{
     temp$1 = false;
@@ -87,25 +87,25 @@ export function insert$ (
   if (!temp$1) {
     throw $.abortCode(EINVALID_INDEX);
   }
-  l = length$(s, $c);
+  l = length_(s, $c);
   [temp$2, temp$3, temp$4] = [s, u64("0"), $.copy(at)];
-  front = sub_string$(temp$2, temp$3, temp$4, $c);
+  front = sub_string_(temp$2, temp$3, temp$4, $c);
   [temp$5, temp$6, temp$7] = [s, $.copy(at), $.copy(l)];
-  end = sub_string$(temp$5, temp$6, temp$7, $c);
-  append$(front, $.copy(o), $c);
-  append$(front, $.copy(end), $c);
+  end = sub_string_(temp$5, temp$6, temp$7, $c);
+  append_(front, $.copy(o), $c);
+  append_(front, $.copy(end), $c);
   $.set(s, $.copy(front));
   return;
 }
 
-export function internal_check_utf8$ (
+export function internal_check_utf8_ (
   v: U8[],
   $c: AptosDataCache,
 ): boolean {
   return $.std_string_internal_check_utf8(v, $c);
 
 }
-export function internal_index_of$ (
+export function internal_index_of_ (
   v: U8[],
   r: U8[],
   $c: AptosDataCache,
@@ -113,7 +113,7 @@ export function internal_index_of$ (
   return $.std_string_internal_index_of(v, r, $c);
 
 }
-export function internal_is_char_boundary$ (
+export function internal_is_char_boundary_ (
   v: U8[],
   i: U64,
   $c: AptosDataCache,
@@ -121,7 +121,7 @@ export function internal_is_char_boundary$ (
   return $.std_string_internal_is_char_boundary(v, i, $c);
 
 }
-export function internal_sub_string$ (
+export function internal_sub_string_ (
   v: U8[],
   i: U64,
   j: U64,
@@ -130,21 +130,21 @@ export function internal_sub_string$ (
   return $.std_string_internal_sub_string(v, i, j, $c);
 
 }
-export function is_empty$ (
+export function is_empty_ (
   s: String,
   $c: AptosDataCache,
 ): boolean {
-  return vector$_.is_empty$(s.bytes, $c, [AtomicTypeTag.U8] as TypeTag[]);
+  return Vector.is_empty_(s.bytes, $c, [AtomicTypeTag.U8]);
 }
 
-export function length$ (
+export function length_ (
   s: String,
   $c: AptosDataCache,
 ): U64 {
-  return vector$_.length$(s.bytes, $c, [AtomicTypeTag.U8] as TypeTag[]);
+  return Vector.length_(s.bytes, $c, [AtomicTypeTag.U8]);
 }
 
-export function sub_string$ (
+export function sub_string_ (
   s: String,
   i: U64,
   j: U64,
@@ -152,21 +152,21 @@ export function sub_string$ (
 ): String {
   let temp$1, temp$2, temp$3, bytes, l;
   bytes = s.bytes;
-  l = vector$_.length$(bytes, $c, [AtomicTypeTag.U8] as TypeTag[]);
-  if ($.copy(j).le($.copy(l))) {
-    temp$1 = $.copy(i).le($.copy(j));
+  l = Vector.length_(bytes, $c, [AtomicTypeTag.U8]);
+  if (($.copy(j)).le($.copy(l))) {
+    temp$1 = ($.copy(i)).le($.copy(j));
   }
   else{
     temp$1 = false;
   }
   if (temp$1) {
-    temp$2 = internal_is_char_boundary$(bytes, $.copy(i), $c);
+    temp$2 = internal_is_char_boundary_(bytes, $.copy(i), $c);
   }
   else{
     temp$2 = false;
   }
   if (temp$2) {
-    temp$3 = internal_is_char_boundary$(bytes, $.copy(j), $c);
+    temp$3 = internal_is_char_boundary_(bytes, $.copy(j), $c);
   }
   else{
     temp$3 = false;
@@ -174,28 +174,28 @@ export function sub_string$ (
   if (!temp$3) {
     throw $.abortCode(EINVALID_INDEX);
   }
-  return new String({ bytes: internal_sub_string$(bytes, $.copy(i), $.copy(j), $c) }, new StructTag(new HexString("0x1"), "string", "String", []));
+  return new String({ bytes: internal_sub_string_(bytes, $.copy(i), $.copy(j), $c) }, new StructTag(new HexString("0x1"), "string", "String", []));
 }
 
-export function try_utf8$ (
+export function try_utf8_ (
   bytes: U8[],
   $c: AptosDataCache,
-): option$_.Option {
+): Option.Option {
   let temp$1;
-  if (internal_check_utf8$(bytes, $c)) {
-    temp$1 = option$_.some$(new String({ bytes: $.copy(bytes) }, new StructTag(new HexString("0x1"), "string", "String", [])), $c, [new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[]);
+  if (internal_check_utf8_(bytes, $c)) {
+    temp$1 = Option.some_(new String({ bytes: $.copy(bytes) }, new StructTag(new HexString("0x1"), "string", "String", [])), $c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
   }
   else{
-    temp$1 = option$_.none$($c, [new StructTag(new HexString("0x1"), "string", "String", [])] as TypeTag[]);
+    temp$1 = Option.none_($c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
   }
   return temp$1;
 }
 
-export function utf8$ (
+export function utf8_ (
   bytes: U8[],
   $c: AptosDataCache,
 ): String {
-  if (!internal_check_utf8$(bytes, $c)) {
+  if (!internal_check_utf8_(bytes, $c)) {
     throw $.abortCode(EINVALID_UTF8);
   }
   return new String({ bytes: $.copy(bytes) }, new StructTag(new HexString("0x1"), "string", "String", []));

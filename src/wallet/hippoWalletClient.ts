@@ -1,29 +1,26 @@
-import { AptosParserRepo, getTypeTagFullname, parseTypeTagOrThrow, StructTag, u64 } from "@manahippo/move-to-ts";
+import { AptosParserRepo, getTypeTagFullname, parseMoveStructTag, parseTypeTagOrThrow, StructTag, u64 } from "@manahippo/move-to-ts";
 import { AptosClient, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
-import { coin_registry$_ } from "../generated/coin_registry";
-import { mock_coin$_ } from "../generated/hippo_swap";
+import { Coin_registry } from "../generated/coin_registry";
+import { Mock_coin } from "../generated/hippo_swap";
 import * as AptosFramework from "../generated/aptos_framework";
 import { typeInfoToTypeTag } from "../utils";
 
 export async function getCoinStoresForAddress(client: AptosClient, address: HexString, repo: AptosParserRepo) {
   const walletResources = await client.getAccountResources(address);
-  const stores: AptosFramework.coin$_.CoinStore[] = [];
+  const stores: AptosFramework.Coin.CoinStore[] = [];
   for(const resource of walletResources) {
     try{
-      const typeTag = parseTypeTagOrThrow(resource.type);
-      if(!(typeTag instanceof StructTag)) {
-        continue;
-      }
+      const typeTag = parseMoveStructTag(resource.type);
       // we only looking for 0x1::Coin::CoinStore
       if(
-        typeTag.address.hex() !== AptosFramework.coin$_.moduleAddress.hex() ||
-        typeTag.module !== AptosFramework.coin$_.moduleName ||
-        typeTag.name !== AptosFramework.coin$_.CoinStore.structName
+        typeTag.address.hex() !== AptosFramework.Coin.moduleAddress.hex() ||
+        typeTag.module !== AptosFramework.Coin.moduleName ||
+        typeTag.name !== AptosFramework.Coin.CoinStore.structName
       ) {
         continue;
       }
-      const store = repo.parse(resource.data, typeTag) as unknown as AptosFramework.coin$_.CoinStore;
+      const store = repo.parse(resource.data, typeTag) as unknown as AptosFramework.Coin.CoinStore;
       stores.push(store);
     }
     catch(e) {
@@ -36,18 +33,18 @@ export async function getCoinStoresForAddress(client: AptosClient, address: HexS
 
 
 export class HippoWalletClient {
-  public symbolToCoinStore: Record<string, AptosFramework.coin$_.CoinStore>;
-  public fullnameToCoinStore: Record<string, AptosFramework.coin$_.CoinStore>;
-  public fullnameToTokenInfo: Record<string, coin_registry$_.TokenInfo>;
-  public symbolToTokenInfo: Record<string, coin_registry$_.TokenInfo>;
+  public symbolToCoinStore: Record<string, AptosFramework.Coin.CoinStore>;
+  public fullnameToCoinStore: Record<string, AptosFramework.Coin.CoinStore>;
+  public fullnameToTokenInfo: Record<string, Coin_registry.TokenInfo>;
+  public symbolToTokenInfo: Record<string, Coin_registry.TokenInfo>;
   public mockCoinSymbols: string[];
   constructor(
     public netConf: NetworkConfiguration,
     public aptosClient: AptosClient,
     public repo: AptosParserRepo,
-    public registry: coin_registry$_.TokenRegistry,
+    public registry: Coin_registry.TokenRegistry,
     public walletAddress: HexString,
-    public coinStores: AptosFramework.coin$_.CoinStore[],
+    public coinStores: AptosFramework.Coin.CoinStore[],
   ) {
     this.symbolToCoinStore = {};
     this.fullnameToCoinStore = {};
@@ -72,8 +69,8 @@ export class HippoWalletClient {
         throw new Error();
       }
       if(
-        typeTag.address.hex() === mock_coin$_.moduleAddress.hex() &&
-        typeTag.module === mock_coin$_.moduleName
+        typeTag.address.hex() === Mock_coin.moduleAddress.hex() &&
+        typeTag.module === Mock_coin.moduleName
       ) {
         this.mockCoinSymbols.push(tokenInfo.symbol.str());
       }
@@ -108,7 +105,7 @@ export class HippoWalletClient {
     repo: AptosParserRepo, 
     walletAddress: HexString
   ) {
-    const registry = await coin_registry$_.TokenRegistry.load(repo, aptosClient, netConf.contractAddress, []);
+    const registry = await Coin_registry.TokenRegistry.load(repo, aptosClient, netConf.contractAddress, []);
     const stores = await getCoinStoresForAddress(aptosClient, walletAddress, repo);
     return new HippoWalletClient(netConf, aptosClient, repo, registry, walletAddress, stores);
   }
@@ -123,7 +120,7 @@ export class HippoWalletClient {
     }
     const rawAmount = u64(Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber())))
     const tokenTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
-    return mock_coin$_.buildPayload_faucet_mint_to_script(rawAmount, [tokenTypeTag])
+    return Mock_coin.buildPayload_faucet_mint_to_script(rawAmount, [tokenTypeTag])
   }
 
   debugPrint() {

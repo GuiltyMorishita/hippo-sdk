@@ -10,7 +10,7 @@ export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b
 export const moduleName = "hippo_config";
 
 
-export function admin_address$ (
+export function admin_address_ (
   $c: AptosDataCache,
 ): HexString {
   return new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");

@@ -5,9 +5,9 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient} from "aptos";
-import * as std$_ from "../std";
-import * as coin$_ from "./coin";
-import * as system_addresses$_ from "./system_addresses";
+import * as Std from "../std";
+import * as Coin from "./coin";
+import * as System_addresses from "./system_addresses";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "aptos_coin";
@@ -54,10 +54,10 @@ export class Capabilities
   static fields: FieldDeclType[] = [
   { name: "mint_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]) }];
 
-  mint_cap: coin$_.MintCapability;
+  mint_cap: Coin.MintCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.mint_cap = proto['mint_cap'] as coin$_.MintCapability;
+    this.mint_cap = proto['mint_cap'] as Coin.MintCapability;
   }
 
   static CapabilitiesParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Capabilities {
@@ -122,18 +122,18 @@ export class Delegations
     return result as unknown as Delegations;
   }
 }
-export function claim_mint_capability$ (
+export function claim_mint_capability_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
   let delegations, idx, maybe_index, mint_cap;
-  maybe_index = find_delegation$(std$_.signer$_.address_of$(account, $c), $c);
-  if (!std$_.option$_.is_some$(maybe_index, $c, [AtomicTypeTag.U64] as TypeTag[])) {
+  maybe_index = find_delegation_(Std.Signer.address_of_(account, $c), $c);
+  if (!Std.Option.is_some_(maybe_index, $c, [AtomicTypeTag.U64])) {
     throw $.abortCode(EDELEGATION_NOT_FOUND);
   }
-  idx = $.copy(std$_.option$_.borrow$(maybe_index, $c, [AtomicTypeTag.U64] as TypeTag[]));
+  idx = $.copy(Std.Option.borrow_(maybe_index, $c, [AtomicTypeTag.U64]));
   delegations = $c.borrow_global_mut<Delegations>(new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", []), new HexString("0xa550c18")).inner;
-  std$_.vector$_.swap_remove$(delegations, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]);
+  Std.Vector.swap_remove_(delegations, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]);
   mint_cap = $.copy($c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), new HexString("0xa550c18")).mint_cap);
   $c.move_to(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), account, new Capabilities({ mint_cap: $.copy(mint_cap) }, new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", [])));
   return;
@@ -150,26 +150,26 @@ export function buildPayload_claim_mint_capability (
   );
 
 }
-export function delegate_mint_capability$ (
+export function delegate_mint_capability_ (
   account: HexString,
   to: HexString,
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2, delegations, element, i;
-  system_addresses$_.assert_core_resource$(account, $c);
+  System_addresses.assert_core_resource_(account, $c);
   delegations = $c.borrow_global_mut<Delegations>(new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", []), new HexString("0xa550c18")).inner;
   i = u64("0");
-  while ($.copy(i).lt(std$_.vector$_.length$(delegations, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]))) {
+  while (($.copy(i)).lt(Std.Vector.length_(delegations, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]))) {
     {
       [temp$1, temp$2] = [delegations, $.copy(i)];
-      element = std$_.vector$_.borrow$(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]);
-      if (!($.copy(element.to).hex() !== $.copy(to).hex())) {
-        throw $.abortCode(std$_.error$_.invalid_argument$(EALREADY_DELEGATED, $c));
+      element = Std.Vector.borrow_(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]);
+      if (!(($.copy(element.to)).hex() !== ($.copy(to)).hex())) {
+        throw $.abortCode(Std.Error.invalid_argument_(EALREADY_DELEGATED, $c));
       }
-      i = $.copy(i).add(u64("1"));
+      i = ($.copy(i)).add(u64("1"));
     }
 
-  }std$_.vector$_.push_back$(delegations, new DelegatedMintCapability({ to: $.copy(to) }, new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]);
+  }Std.Vector.push_back_(delegations, new DelegatedMintCapability({ to: $.copy(to) }, new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]);
   return;
 }
 
@@ -187,61 +187,61 @@ export function buildPayload_delegate_mint_capability (
   );
 
 }
-export function find_delegation$ (
+export function find_delegation_ (
   addr: HexString,
   $c: AptosDataCache,
-): std$_.option$_.Option {
+): Std.Option.Option {
   let delegations, element, i, index, len;
   delegations = $c.borrow_global<Delegations>(new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", []), new HexString("0xa550c18")).inner;
   i = u64("0");
-  len = std$_.vector$_.length$(delegations, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]);
-  index = std$_.option$_.none$($c, [AtomicTypeTag.U64] as TypeTag[]);
-  while ($.copy(i).lt($.copy(len))) {
+  len = Std.Vector.length_(delegations, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]);
+  index = Std.Option.none_($c, [AtomicTypeTag.U64]);
+  while (($.copy(i)).lt($.copy(len))) {
     {
-      element = std$_.vector$_.borrow$(delegations, $.copy(i), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]);
-      if (($.copy(element.to).hex() === $.copy(addr).hex())) {
-        index = std$_.option$_.some$($.copy(i), $c, [AtomicTypeTag.U64] as TypeTag[]);
+      element = Std.Vector.borrow_(delegations, $.copy(i), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]);
+      if ((($.copy(element.to)).hex() === ($.copy(addr)).hex())) {
+        index = Std.Option.some_($.copy(i), $c, [AtomicTypeTag.U64]);
         break;
       }
       else{
       }
-      i = $.copy(i).add(u64("1"));
+      i = ($.copy(i)).add(u64("1"));
     }
 
   }return $.copy(index);
 }
 
-export function initialize$ (
+export function initialize_ (
   aptos_framework: HexString,
   core_resource: HexString,
   $c: AptosDataCache,
-): [coin$_.MintCapability, coin$_.BurnCapability] {
+): [Coin.MintCapability, Coin.BurnCapability] {
   let burn_cap, coins, mint_cap;
-  system_addresses$_.assert_aptos_framework$(aptos_framework, $c);
-  [mint_cap, burn_cap] = coin$_.initialize$(aptos_framework, std$_.string$_.utf8$([u8("65"), u8("112"), u8("116"), u8("111"), u8("115"), u8("32"), u8("67"), u8("111"), u8("105"), u8("110")], $c), std$_.string$_.utf8$([u8("65"), u8("80"), u8("84"), u8("79"), u8("83")], $c), u64("8"), false, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+  System_addresses.assert_aptos_framework_(aptos_framework, $c);
+  [mint_cap, burn_cap] = Coin.initialize_(aptos_framework, Std.String.utf8_([u8("65"), u8("112"), u8("116"), u8("111"), u8("115"), u8("32"), u8("67"), u8("111"), u8("105"), u8("110")], $c), Std.String.utf8_([u8("65"), u8("80"), u8("84"), u8("79"), u8("83")], $c), u64("8"), false, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   $c.move_to(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), aptos_framework, new Capabilities({ mint_cap: $.copy(mint_cap) }, new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", [])));
-  coin$_.register_internal$(core_resource, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
-  coins = coin$_.mint$(u64("18446744073709551615"), mint_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
-  coin$_.deposit$(std$_.signer$_.address_of$(core_resource, $c), coins, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+  Coin.register_(core_resource, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  coins = Coin.mint_(u64("18446744073709551615"), mint_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  Coin.deposit_(Std.Signer.address_of_(core_resource, $c), coins, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   $c.move_to(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), core_resource, new Capabilities({ mint_cap: $.copy(mint_cap) }, new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", [])));
-  $c.move_to(new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", []), core_resource, new Delegations({ inner: std$_.vector$_.empty$($c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])] as TypeTag[]) }, new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", []), core_resource, new Delegations({ inner: Std.Vector.empty_($c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]) }, new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", [])));
   return [$.copy(mint_cap), $.copy(burn_cap)];
 }
 
-export function mint$ (
+export function mint_ (
   account: HexString,
   dst_addr: HexString,
   amount: U64,
   $c: AptosDataCache,
 ): void {
   let account_addr, capabilities, coins_minted;
-  account_addr = std$_.signer$_.address_of$(account, $c);
+  account_addr = Std.Signer.address_of_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), $.copy(account_addr))) {
-    throw $.abortCode(std$_.error$_.not_found$(ENO_CAPABILITIES, $c));
+    throw $.abortCode(Std.Error.not_found_(ENO_CAPABILITIES, $c));
   }
   capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), $.copy(account_addr));
-  coins_minted = coin$_.mint$($.copy(amount), capabilities.mint_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
-  coin$_.deposit$($.copy(dst_addr), coins_minted, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])] as TypeTag[]);
+  coins_minted = Coin.mint_($.copy(amount), capabilities.mint_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  Coin.deposit_($.copy(dst_addr), coins_minted, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   return;
 }
 
