@@ -49,27 +49,20 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {
+    const inputTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
+    const outputTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
     const initialPrice = this.getCurrentPriceDirectional(isXtoY);
-    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000);
-    const outputUiAmt = get_swap_x_to_y_out(
-      this.xUiBalance(),
-      this.yUiBalance(),
-      inputUiAmt,
-      this.poolInfo.K.toJsNumber(),
-      this.poolInfo.K2.toJsNumber(),
-      this.poolInfo.Xa.toJsNumber(),
-      this.poolInfo.Xb.toJsNumber(),
-      this.poolInfo.m.toJsNumber(),
-      this.poolInfo.n.toJsNumber(),
-    ) * feeDiscountFactor;
+    const amountIn = u64(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
+    const amountOut = isXtoY ? this.poolInfo.quote_x_to_y_after_fees(amountIn) : this.poolInfo.quote_y_to_x_after_fees(amountIn);
+    const outputUiAmt = amountOut.toJsNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber())
     const finalPrice = this.getCurrentPriceDirectional(
       isXtoY, 
       isXtoY ? inputUiAmt : -outputUiAmt,
       isXtoY ? -outputUiAmt : inputUiAmt,
     );
     return {
-      inputSymbol: isXtoY ? this.xTokenInfo.symbol.str() : this.yTokenInfo.symbol.str(),
-      outputSymbol: isXtoY ? this.yTokenInfo.symbol.str() : this.xTokenInfo.symbol.str(),
+      inputSymbol: inputTokenInfo.symbol.str(),
+      outputSymbol: outputTokenInfo.symbol.str(),
       inputUiAmt: inputUiAmt,
       outputUiAmt: outputUiAmt,
       initialPrice: initialPrice.yToX,

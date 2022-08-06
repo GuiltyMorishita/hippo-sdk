@@ -118,6 +118,23 @@ export class TokenPairMetadata
     const result = await repo.loadResource(client, address, TokenPairMetadata, typeParams);
     return result as unknown as TokenPairMetadata;
   }
+
+  quote_x_to_y_after_fees(
+    amount_x_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_x_to_y_after_fees_(this, amount_x_in, cache, tags);
+  }
+
+  quote_y_to_x_after_fees(
+    amount_y_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_y_to_x_after_fees_(this, amount_y_in, cache, tags);
+  }
+
 }
 
 export class TokenPairReserve 
@@ -497,6 +514,28 @@ export function mint_lp_to_ (
   coins = Aptos_framework.Coin.mint_($.copy(amount), mint_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
   Aptos_framework.Coin.deposit_($.copy(to), coins, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
   return;
+}
+
+export function quote_x_to_y_after_fees_ (
+  pool: TokenPairMetadata,
+  amount_x_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let x_balance, y_balance;
+  [x_balance, y_balance] = token_balances_metadata_(pool, $c, [$p[0], $p[1]]);
+  return Cp_swap_utils.get_amount_out_($.copy(amount_x_in), $.copy(x_balance), $.copy(y_balance), $c);
+}
+
+export function quote_y_to_x_after_fees_ (
+  pool: TokenPairMetadata,
+  amount_y_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let x_balance, y_balance;
+  [x_balance, y_balance] = token_balances_metadata_(pool, $c, [$p[0], $p[1]]);
+  return Cp_swap_utils.get_amount_out_($.copy(amount_y_in), $.copy(y_balance), $.copy(x_balance), $c);
 }
 
 export function register_account_ (

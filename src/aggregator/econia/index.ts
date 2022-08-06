@@ -104,11 +104,14 @@ export class EconiaTradingPoolV1 extends TradingPool {
         }
       }
       // has partial unfilled
+      const actualInputUiAmt = soldBaseSize.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
+      const outputUiAmt = gotQuoteSize.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
       return {
         inputSymbol: this.xTokenInfo.symbol.str(),
         outputSymbol: this.yTokenInfo.symbol.str(),
-        inputUiAmt: soldBaseSize.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber()),
-        outputUiAmt: gotQuoteSize.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber()),
+        inputUiAmt: actualInputUiAmt,
+        outputUiAmt,
+        avgPrice: outputUiAmt / actualInputUiAmt,
       }
     }
     else {
@@ -128,11 +131,14 @@ export class EconiaTradingPoolV1 extends TradingPool {
             gotBaseSize = gotBaseSize.add(fillQuoteSize.div(ask.price).mul(this.orderBook.scale_factor));
           }
         }
+        const actualInputUiAmt = soldQuoteSize.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+        const outputUiAmt = gotBaseSize.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
         return {
           inputSymbol: this.xTokenInfo.symbol.str(),
           outputSymbol: this.yTokenInfo.symbol.str(),
-          inputUiAmt: soldQuoteSize.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber()),
-          outputUiAmt: gotBaseSize.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber()),
+          inputUiAmt: actualInputUiAmt,
+          outputUiAmt,
+          avgPrice: outputUiAmt / actualInputUiAmt,
         }
     }
   }

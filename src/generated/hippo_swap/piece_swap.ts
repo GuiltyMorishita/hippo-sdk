@@ -119,6 +119,39 @@ export class PieceSwapPoolInfo
     const result = await repo.loadResource(client, address, PieceSwapPoolInfo, typeParams);
     return result as unknown as PieceSwapPoolInfo;
   }
+
+  quote_x_to_y(
+    amount_x_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_x_to_y_(this, amount_x_in, cache, tags);
+  }
+
+  quote_x_to_y_after_fees(
+    amount_x_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_x_to_y_after_fees_(this, amount_x_in, cache, tags);
+  }
+
+  quote_y_to_x(
+    amount_y_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_y_to_x_(this, amount_y_in, cache, tags);
+  }
+
+  quote_y_to_x_after_fees(
+    amount_y_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_y_to_x_after_fees_(this, amount_y_in, cache, tags);
+  }
+
 }
 export function add_liquidity_ (
   sender: HexString,
@@ -295,6 +328,64 @@ export function mint_to_ (
   return;
 }
 
+export function quote_x_to_y_ (
+  pool: PieceSwapPoolInfo,
+  amount_x_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let actual_out_y, current_x, current_y, input_x, opt_output_y, x_value;
+  current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
+  current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
+  x_value = u128($.copy(amount_x_in));
+  input_x = ($.copy(x_value)).mul(u128($.copy(pool.x_deci_mult)));
+  opt_output_y = Piece_swap_math.get_swap_x_to_y_out_($.copy(current_x), $.copy(current_y), $.copy(input_x), $.copy(pool.K), $.copy(pool.K2), $.copy(pool.Xa), $.copy(pool.Xb), $.copy(pool.m), $.copy(pool.n), $c);
+  actual_out_y = u64(($.copy(opt_output_y)).div(u128($.copy(pool.y_deci_mult))));
+  return $.copy(actual_out_y);
+}
+
+export function quote_x_to_y_after_fees_ (
+  pool: PieceSwapPoolInfo,
+  amount_x_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let actual_out_y, out_y_after_fees, total_fees;
+  actual_out_y = quote_x_to_y_(pool, $.copy(amount_x_in), $c, [$p[0], $p[1]]);
+  total_fees = (($.copy(actual_out_y)).mul($.copy(pool.swap_fee_per_million))).div(u64("1000000"));
+  out_y_after_fees = ($.copy(actual_out_y)).sub($.copy(total_fees));
+  return $.copy(out_y_after_fees);
+}
+
+export function quote_y_to_x_ (
+  pool: PieceSwapPoolInfo,
+  amount_y_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let actual_out_x, current_x, current_y, input_y, opt_output_x, y_value;
+  current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
+  current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
+  y_value = u128($.copy(amount_y_in));
+  input_y = ($.copy(y_value)).mul(u128($.copy(pool.y_deci_mult)));
+  opt_output_x = Piece_swap_math.get_swap_y_to_x_out_($.copy(current_x), $.copy(current_y), $.copy(input_y), $.copy(pool.K), $.copy(pool.K2), $.copy(pool.Xa), $.copy(pool.Xb), $.copy(pool.m), $.copy(pool.n), $c);
+  actual_out_x = u64(($.copy(opt_output_x)).div(u128($.copy(pool.x_deci_mult))));
+  return $.copy(actual_out_x);
+}
+
+export function quote_y_to_x_after_fees_ (
+  pool: PieceSwapPoolInfo,
+  amount_y_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let actual_out_x, out_x_after_fees, total_fees;
+  actual_out_x = quote_y_to_x_(pool, $.copy(amount_y_in), $c, [$p[0], $p[1]]);
+  total_fees = (($.copy(actual_out_x)).mul($.copy(pool.swap_fee_per_million))).div(u64("1000000"));
+  out_x_after_fees = ($.copy(actual_out_x)).sub($.copy(total_fees));
+  return $.copy(out_x_after_fees);
+}
+
 export function remove_liquidity_ (
   sender: HexString,
   remove_lp_amt: U64,
@@ -354,15 +445,11 @@ export function swap_x_to_y_direct_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
-  let actual_out_y, coin_y, current_x, current_y, input_x, opt_output_y, out_y_after_fees, pool, protocol_fee_y, protocol_fees, total_fees, x_value;
+  let temp$1, temp$2, actual_out_y, coin_y, out_y_after_fees, pool, protocol_fee_y, protocol_fees, total_fees;
   pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
-  current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
-  current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
-  x_value = u128(Aptos_framework.Coin.value_(coin_x, $c, [$p[0]]));
+  [temp$1, temp$2] = [pool, Aptos_framework.Coin.value_(coin_x, $c, [$p[0]])];
+  actual_out_y = quote_x_to_y_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   Aptos_framework.Coin.merge_(pool.reserve_x, coin_x, $c, [$p[0]]);
-  input_x = ($.copy(x_value)).mul(u128($.copy(pool.x_deci_mult)));
-  opt_output_y = Piece_swap_math.get_swap_x_to_y_out_($.copy(current_x), $.copy(current_y), $.copy(input_x), $.copy(pool.K), $.copy(pool.K2), $.copy(pool.Xa), $.copy(pool.Xb), $.copy(pool.m), $.copy(pool.n), $c);
-  actual_out_y = u64(($.copy(opt_output_y)).div(u128($.copy(pool.y_deci_mult))));
   total_fees = (($.copy(actual_out_y)).mul($.copy(pool.swap_fee_per_million))).div(u64("1000000"));
   protocol_fees = (($.copy(total_fees)).mul($.copy(pool.protocol_fee_share_per_thousand))).div(u64("1000"));
   out_y_after_fees = ($.copy(actual_out_y)).sub($.copy(total_fees));
@@ -391,15 +478,11 @@ export function swap_y_to_x_direct_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
-  let actual_out_x, coin_x, current_x, current_y, input_y, opt_output_x, out_x_after_fees, pool, protocol_fee_x, protocol_fees, total_fees, y_value;
+  let temp$1, temp$2, actual_out_x, coin_x, out_x_after_fees, pool, protocol_fee_x, protocol_fees, total_fees;
   pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
-  current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
-  current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
-  y_value = u128(Aptos_framework.Coin.value_(coin_y, $c, [$p[1]]));
+  [temp$1, temp$2] = [pool, Aptos_framework.Coin.value_(coin_y, $c, [$p[1]])];
+  actual_out_x = quote_y_to_x_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   Aptos_framework.Coin.merge_(pool.reserve_y, coin_y, $c, [$p[1]]);
-  input_y = ($.copy(y_value)).mul(u128($.copy(pool.y_deci_mult)));
-  opt_output_x = Piece_swap_math.get_swap_y_to_x_out_($.copy(current_x), $.copy(current_y), $.copy(input_y), $.copy(pool.K), $.copy(pool.K2), $.copy(pool.Xa), $.copy(pool.Xb), $.copy(pool.m), $.copy(pool.n), $c);
-  actual_out_x = u64(($.copy(opt_output_x)).div(u128($.copy(pool.x_deci_mult))));
   total_fees = (($.copy(actual_out_x)).mul($.copy(pool.swap_fee_per_million))).div(u64("1000000"));
   protocol_fees = (($.copy(total_fees)).mul($.copy(pool.protocol_fee_share_per_thousand))).div(u64("1000"));
   out_x_after_fees = ($.copy(actual_out_x)).sub($.copy(total_fees));

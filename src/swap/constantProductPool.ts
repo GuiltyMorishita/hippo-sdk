@@ -42,19 +42,24 @@ export class HippoConstantProductPool extends HippoPool {
     if (isXtoY) {
       inputSymbol = this.xTokenInfo.symbol.str();
       outputSymbol = this.yTokenInfo.symbol.str();
+      const inputAmt = inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
+      const outputAmt = this.cpPoolMeta.quote_x_to_y_after_fees(u64(Math.floor(inputAmt))).toJsNumber();
+      outputUiAmt = outputAmt / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+
       // compute output in Y
       const newXUiBalance = xUiBalance + inputUiAmt;
       const newYUiBalance = k / newXUiBalance;
-      outputUiAmt = (yUiBalance - newYUiBalance) * this.getAfterFeeFactor();
       initialPrice = yUiBalance / xUiBalance;
       finalPrice = newYUiBalance / newXUiBalance;
     } else {
       inputSymbol = this.yTokenInfo.symbol.str();
       outputSymbol = this.xTokenInfo.symbol.str();
+      const inputAmt = inputUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+      const outputAmt = this.cpPoolMeta.quote_y_to_x_after_fees(u64(Math.floor(inputAmt))).toJsNumber();
+      outputUiAmt = outputAmt / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
       // compute output in X
       const newYUiBalance = yUiBalance + inputUiAmt;
       const newXUiBalance = k / newYUiBalance;
-      outputUiAmt = (xUiBalance - newXUiBalance) * this.getAfterFeeFactor();
       initialPrice = xUiBalance / yUiBalance;
       finalPrice = newXUiBalance / newYUiBalance;
     }

@@ -155,6 +155,23 @@ export class StableCurvePoolInfo
     const result = await repo.loadResource(client, address, StableCurvePoolInfo, typeParams);
     return result as unknown as StableCurvePoolInfo;
   }
+
+  quote_x_to_y_after_fees(
+    amount_x_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_x_to_y_after_fees_(this, amount_x_in, cache, tags);
+  }
+
+  quote_y_to_x_after_fees(
+    amount_y_in: U64,
+  ) {
+    const cache = new DummyCache();
+    const tags = (this.typeTag as StructTag).typeParams;
+    return quote_y_to_x_after_fees_(this, amount_y_in, cache, tags);
+  }
+
 }
 export function add_liquidity_ (
   sender: HexString,
@@ -433,6 +450,40 @@ export function mint_ (
   liquidity_cap = $c.borrow_global<LPCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPCapability", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   mint_token = Aptos_framework.Coin.mint_($.copy(amount), liquidity_cap.mint_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
   return mint_token;
+}
+
+export function quote_x_to_y_after_fees_ (
+  pool: StableCurvePoolInfo,
+  amount_x_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let amount_dy, amount_dy_fee, charged_amt_dy, dx_rated, reserve_amt_x, reserve_amt_y, xp, y, yp;
+  [reserve_amt_x, reserve_amt_y] = [Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]), Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]])];
+  [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(pool.multiplier_x), $.copy(pool.multiplier_y), $c);
+  dx_rated = ($.copy(amount_x_in)).mul($.copy(pool.multiplier_x));
+  y = get_y_(u64("0"), $.copy(dx_rated), $.copy(xp), $.copy(yp), $.copy(pool.initial_A), $.copy(pool.initial_A_time), $.copy(pool.future_A), $.copy(pool.future_A_time), $c);
+  amount_dy = ((($.copy(yp)).sub($.copy(y))).sub(u64("1"))).div($.copy(pool.multiplier_y));
+  amount_dy_fee = (($.copy(amount_dy)).mul($.copy(pool.fee))).div(u64(FEE_DENOMINATOR));
+  charged_amt_dy = ($.copy(amount_dy)).sub($.copy(amount_dy_fee));
+  return $.copy(charged_amt_dy);
+}
+
+export function quote_y_to_x_after_fees_ (
+  pool: StableCurvePoolInfo,
+  amount_y_in: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y>*/
+): U64 {
+  let amount_dx, amount_dx_fee, charged_amt_dx, dy_rated, reserve_amt_x, reserve_amt_y, x, xp, yp;
+  [reserve_amt_x, reserve_amt_y] = [Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]), Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]])];
+  [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(pool.multiplier_x), $.copy(pool.multiplier_y), $c);
+  dy_rated = ($.copy(amount_y_in)).mul($.copy(pool.multiplier_y));
+  x = get_y_(u64("0"), $.copy(dy_rated), $.copy(xp), $.copy(yp), $.copy(pool.initial_A), $.copy(pool.initial_A_time), $.copy(pool.future_A), $.copy(pool.future_A_time), $c);
+  amount_dx = ((($.copy(xp)).sub($.copy(x))).sub(u64("1"))).div($.copy(pool.multiplier_x));
+  amount_dx_fee = (($.copy(amount_dx)).mul($.copy(pool.fee))).div(u64(FEE_DENOMINATOR));
+  charged_amt_dx = ($.copy(amount_dx)).sub($.copy(amount_dx_fee));
+  return $.copy(charged_amt_dx);
 }
 
 export function ramp_A_ (
