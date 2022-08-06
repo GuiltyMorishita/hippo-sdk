@@ -16,8 +16,8 @@ export type QuoteType = {
   outputSymbol: string;
   inputUiAmt: UITokenAmount;
   outputUiAmt: UITokenAmount;
+  avgPrice: UITokenAmountRatio;
   initialPrice?: UITokenAmountRatio;
-  avgPrice?: UITokenAmountRatio;
   finalPrice?: UITokenAmountRatio; 
   priceImpact?: number;
 }
@@ -148,6 +148,7 @@ export class TradeRoute {
       outputSymbol: this.yTokenInfo.symbol.str(),
       inputUiAmt,
       outputUiAmt,
+      avgPrice: outputUiAmt / inputUiAmt,
     }
   }
 
