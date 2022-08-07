@@ -1,12 +1,12 @@
 
 import { AptosParserRepo } from "@manahippo/move-to-ts";
-import * as Aggregatorv3 from './aggregatorv3';
+import * as Aggregatorv0 from './aggregatorv0';
 
-export * as Aggregatorv3 from './aggregatorv3';
+export * as Aggregatorv0 from './aggregatorv0';
 
 
 export function loadParsers(repo: AptosParserRepo) {
-  Aggregatorv3.loadParsers(repo);
+  Aggregatorv0.loadParsers(repo);
 }
 
 export function getPackageRepo(): AptosParserRepo {

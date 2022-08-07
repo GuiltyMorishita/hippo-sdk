@@ -4,11 +4,11 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient} from "aptos";
+import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_std from "../aptos_std";
 import * as Std from "../std";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd");
+export const moduleAddress = new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7");
 export const moduleName = "open_table";
 
 
@@ -83,10 +83,10 @@ export function empty_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V>*/
 ): OpenTable {
-  return new OpenTable({ base_table: Aptos_std.Table.new___($c, [$p[0], $p[1]]), keys: Std.Vector.empty_($c, [$p[0]]) }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "open_table", "OpenTable", [$p[0], $p[1]]));
+  return new OpenTable({ base_table: Aptos_std.Table.new___($c, [$p[0], $p[1]]), keys: Std.Vector.empty_($c, [$p[0]]) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "open_table", "OpenTable", [$p[0], $p[1]]));
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::open_table::OpenTable", OpenTable.OpenTableParser);
+  repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::open_table::OpenTable", OpenTable.OpenTableParser);
 }
 

@@ -4,10 +4,10 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient} from "aptos";
+import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd");
+export const moduleAddress = new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7");
 export const moduleName = "capability";
 
 export const E_NOT_ECONIA : U64 = u64("0");
@@ -38,13 +38,13 @@ export function get_econia_capability_ (
   account: HexString,
   $c: AptosDataCache,
 ): EconiaCapability {
-  if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd")).hex())) {
+  if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
     throw $.abortCode(E_NOT_ECONIA);
   }
-  return new EconiaCapability({  }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "capability", "EconiaCapability", []));
+  return new EconiaCapability({  }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "capability", "EconiaCapability", []));
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::capability::EconiaCapability", EconiaCapability.EconiaCapabilityParser);
+  repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::capability::EconiaCapability", EconiaCapability.EconiaCapabilityParser);
 }
 

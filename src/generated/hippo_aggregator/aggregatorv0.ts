@@ -4,14 +4,14 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient} from "aptos";
+import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Econia from "../econia";
 import * as Hippo_swap from "../hippo_swap";
 import * as Std from "../std";
 export const packageName = "HippoAggregator";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
-export const moduleName = "aggregatorv3";
+export const moduleName = "aggregatorv0";
 
 export const DEX_ECONIA : U8 = u8("2");
 export const DEX_HIPPO : U8 = u8("1");
@@ -177,7 +177,7 @@ export function initialize_ (
     throw $.abortCode(E_NOT_ADMIN);
   }
   [, signer_cap] = Aptos_framework.Account.create_resource_account_(admin, [u8("115"), u8("105"), u8("103"), u8("110"), u8("101"), u8("114"), u8("118"), u8("51")], $c);
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv3", "SignerStore", []), admin, new SignerStore({ signer_cap: signer_cap }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv3", "SignerStore", [])));
+  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv0", "SignerStore", []), admin, new SignerStore({ signer_cap: signer_cap }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv0", "SignerStore", [])));
   return;
 }
 
@@ -186,7 +186,7 @@ export function buildPayload_initialize (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv3::initialize",
+    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv0::initialize",
     typeParamStrings,
     []
   );
@@ -225,7 +225,7 @@ export function buildPayload_one_step_route (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv3::one_step_route",
+    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv0::one_step_route",
     typeParamStrings,
     [
       $.payloadArg(first_dex_type),
@@ -286,7 +286,7 @@ export function buildPayload_three_step_route (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv3::three_step_route",
+    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv0::three_step_route",
     typeParamStrings,
     [
       $.payloadArg(first_dex_type),
@@ -345,7 +345,7 @@ export function buildPayload_two_step_route (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv3::two_step_route",
+    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv0::two_step_route",
     typeParamStrings,
     [
       $.payloadArg(first_dex_type),
@@ -362,6 +362,6 @@ export function buildPayload_two_step_route (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv3::SignerStore", SignerStore.SignerStoreParser);
+  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv0::SignerStore", SignerStore.SignerStoreParser);
 }
 

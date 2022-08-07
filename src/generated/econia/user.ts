@@ -4,7 +4,7 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient} from "aptos";
+import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Std from "../std";
 import * as Capability from "./capability";
@@ -13,7 +13,7 @@ import * as Open_table from "./open_table";
 import * as Order_id from "./order_id";
 import * as Registry from "./registry";
 export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd");
+export const moduleAddress = new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7");
 export const moduleName = "user";
 
 export const ASK : boolean = true;
@@ -45,7 +45,7 @@ export class Collateral
     { name: "CoinType", isPhantom: true }
   ];
   static fields: FieldDeclType[] = [
-  { name: "map", typeTag: new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "open_table", "OpenTable", [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(0)])]) }];
+  { name: "map", typeTag: new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "open_table", "OpenTable", [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(0)])]) }];
 
   map: Open_table.OpenTable;
 
@@ -74,8 +74,8 @@ export class MarketAccount
   ];
   static fields: FieldDeclType[] = [
   { name: "scale_factor", typeTag: AtomicTypeTag.U64 },
-  { name: "asks", typeTag: new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "critbit", "CritBitTree", [AtomicTypeTag.U64]) },
-  { name: "bids", typeTag: new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "critbit", "CritBitTree", [AtomicTypeTag.U64]) },
+  { name: "asks", typeTag: new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "critbit", "CritBitTree", [AtomicTypeTag.U64]) },
+  { name: "bids", typeTag: new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "critbit", "CritBitTree", [AtomicTypeTag.U64]) },
   { name: "base_coins_total", typeTag: AtomicTypeTag.U64 },
   { name: "base_coins_available", typeTag: AtomicTypeTag.U64 },
   { name: "quote_coins_total", typeTag: AtomicTypeTag.U64 },
@@ -115,7 +115,7 @@ export class MarketAccountInfo
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "market_info", typeTag: new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "registry", "MarketInfo", []) },
+  { name: "market_info", typeTag: new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []) },
   { name: "custodian_id", typeTag: AtomicTypeTag.U64 }];
 
   market_info: Registry.MarketInfo;
@@ -142,7 +142,7 @@ export class MarketAccounts
 
   ];
   static fields: FieldDeclType[] = [
-  { name: "map", typeTag: new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "open_table", "OpenTable", [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]) }];
+  { name: "map", typeTag: new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "open_table", "OpenTable", [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]) }];
 
   map: Open_table.OpenTable;
 
@@ -172,16 +172,16 @@ export function add_order_internal_ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let temp$1, temp$2, temp$3, temp$4, temp$5, base_to_fill, coins_available_ref_mut, coins_required, market_account, market_account_info, market_accounts_map, quote_to_fill, tree_ref_mut;
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user))) {
+  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user))) {
     throw $.abortCode(E_NO_MARKET_ACCOUNTS);
   }
   market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user)).map;
+  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user)).map;
   [temp$1, temp$2] = [market_accounts_map, $.copy(market_account_info)];
-  if (!Open_table.contains_(temp$1, temp$2, $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])])) {
+  if (!Open_table.contains_(temp$1, temp$2, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])])) {
     throw $.abortCode(E_NO_MARKET_ACCOUNT);
   }
-  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]);
+  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]);
   [base_to_fill, quote_to_fill] = range_check_order_fills_($.copy(market_account.scale_factor), $.copy(base_parcels), $.copy(price), $c);
   if ((side == ASK)) {
     [temp$3, temp$4, temp$5] = [market_account.asks, market_account.base_coins_available, $.copy(base_to_fill)];
@@ -206,7 +206,7 @@ export function borrow_coin_counts_mut_ (
 ): [U64, U64] {
   let temp$1, temp$2, is_base_coin, market_account;
   is_base_coin = Registry.coin_is_base_coin_(market_account_info.market_info, $c, [$p[0]]);
-  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]);
+  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]);
   if (is_base_coin) {
     [temp$1, temp$2] = [market_account.base_coins_total, market_account.base_coins_available];
   }
@@ -227,14 +227,53 @@ export function deposit_collateral_ (
   if (!exists_market_account_($.copy(market_account_info), $.copy(user), $c)) {
     throw $.abortCode(E_NO_MARKET_ACCOUNT);
   }
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user)).map;
+  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user)).map;
   [coins_total_ref_mut, coins_available_ref_mut] = borrow_coin_counts_mut_(market_accounts_map, $.copy(market_account_info), $c, [$p[0]]);
   $.set(coins_total_ref_mut, ($.copy(coins_total_ref_mut)).add(Aptos_framework.Coin.value_(coins, $c, [$p[0]])));
   $.set(coins_available_ref_mut, ($.copy(coins_available_ref_mut)).add(Aptos_framework.Coin.value_(coins, $c, [$p[0]])));
-  collateral_map = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]]), $.copy(user)).map;
-  collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+  collateral_map = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]]), $.copy(user)).map;
+  collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
   Aptos_framework.Coin.merge_(collateral, coins, $c, [$p[0]]);
   return;
+}
+
+export function deposit_collateral_coinstore_ (
+  user: HexString,
+  custodian_id: U64,
+  base: boolean,
+  amount: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <B, Q, E>*/
+): void {
+  let market_account_info;
+  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
+  if (base) {
+    deposit_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), Aptos_framework.Coin.withdraw_(user, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
+  }
+  else{
+    deposit_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), Aptos_framework.Coin.withdraw_(user, $.copy(amount), $c, [$p[1]]), $c, [$p[1]]);
+  }
+  return;
+}
+
+
+export function buildPayload_deposit_collateral_coinstore (
+  custodian_id: U64,
+  base: boolean,
+  amount: U64,
+  $p: TypeTag[], /* <B, Q, E>*/
+) {
+  const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
+  return $.buildPayload(
+    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::deposit_collateral_coinstore",
+    typeParamStrings,
+    [
+      $.payloadArg(custodian_id),
+      $.payloadArg(base),
+      $.payloadArg(amount),
+    ]
+  );
+
 }
 
 export function exists_market_account_ (
@@ -243,13 +282,13 @@ export function exists_market_account_ (
   $c: AptosDataCache,
 ): boolean {
   let market_accounts_map;
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user))) {
+  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user))) {
     return false;
   }
   else{
   }
-  market_accounts_map = $c.borrow_global<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user)).map;
-  return Open_table.contains_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]);
+  market_accounts_map = $c.borrow_global<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user)).map;
+  return Open_table.contains_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]);
 }
 
 export function fill_order_internal_ (
@@ -308,8 +347,8 @@ export function fill_order_route_collateral_single_ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let collateral_map_ref_mut, collateral_ref_mut;
-  collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]]), $.copy(user)).map;
-  collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+  collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]]), $.copy(user)).map;
+  collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
   if ((direction == IN)) {
     Aptos_framework.Coin.merge_(collateral_ref_mut, Aptos_framework.Coin.extract_(external_coins_ref_mut, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
   }
@@ -331,8 +370,8 @@ export function fill_order_update_market_account_ (
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, coins_in, coins_in_available_ref_mut, coins_in_total_ref_mut, coins_out, coins_out_total_ref_mut, market_account_ref_mut, market_accounts_map_ref_mut, order_base_parcels_ref_mut, order_tree_ref_mut;
-  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user)).map;
-  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]);
+  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user)).map;
+  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]);
   if ((side == ASK)) {
     [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6] = [market_account_ref_mut.asks, $.copy(quote_to_route), market_account_ref_mut.quote_coins_total, market_account_ref_mut.quote_coins_available, $.copy(base_to_route), market_account_ref_mut.base_coins_total];
   }
@@ -358,7 +397,7 @@ export function market_account_info_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): MarketAccountInfo {
-  return new MarketAccountInfo({ market_info: Registry.market_info_($c, [$p[0], $p[1], $p[2]]), custodian_id: $.copy(custodian_id) }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []));
+  return new MarketAccountInfo({ market_info: Registry.market_info_($c, [$p[0], $p[1], $p[2]]), custodian_id: $.copy(custodian_id) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []));
 }
 
 export function range_check_order_fills_ (
@@ -393,17 +432,17 @@ export function register_collateral_entry_ (
 ): void {
   let temp$1, temp$2, map, user_address;
   user_address = Std.Signer.address_of_(user, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]]), $.copy(user_address))) {
-    $c.move_to(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]]), user, new Collateral({ map: Open_table.empty_($c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]) }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]])));
+  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]]), $.copy(user_address))) {
+    $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]]), user, new Collateral({ map: Open_table.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]])));
   }
   else{
   }
-  map = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]]), $.copy(user_address)).map;
+  map = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]]), $.copy(user_address)).map;
   [temp$1, temp$2] = [map, $.copy(market_account_info)];
-  if (!!Open_table.contains_(temp$1, temp$2, $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])])) {
+  if (!!Open_table.contains_(temp$1, temp$2, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])])) {
     throw $.abortCode(E_MARKET_ACCOUNT_REGISTERED);
   }
-  Open_table.add_(map, $.copy(market_account_info), Aptos_framework.Coin.zero_($c, [$p[0]]), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+  Open_table.add_(map, $.copy(market_account_info), Aptos_framework.Coin.zero_($c, [$p[0]]), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
   return;
 }
 
@@ -421,7 +460,7 @@ export function register_market_account_ (
   if (!Registry.is_valid_custodian_id_($.copy(custodian_id), $c)) {
     throw $.abortCode(E_INVALID_CUSTODIAN_ID);
   }
-  market_account_info = new MarketAccountInfo({ market_info: $.copy(market_info), custodian_id: $.copy(custodian_id) }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []));
+  market_account_info = new MarketAccountInfo({ market_info: $.copy(market_info), custodian_id: $.copy(custodian_id) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []));
   register_market_accounts_entry_(user, $.copy(market_account_info), $c);
   register_collateral_entry_(user, $.copy(market_account_info), $c, [$p[0]]);
   register_collateral_entry_(user, $.copy(market_account_info), $c, [$p[1]]);
@@ -435,7 +474,7 @@ export function buildPayload_register_market_account (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::register_market_account",
+    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::register_market_account",
     typeParamStrings,
     [
       $.payloadArg(custodian_id),
@@ -451,18 +490,18 @@ export function register_market_accounts_entry_ (
 ): void {
   let temp$1, temp$2, map, scale_factor, user_address;
   user_address = Std.Signer.address_of_(user, $c);
-  if (!$c.exists(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user_address))) {
-    $c.move_to(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), user, new MarketAccounts({ map: Open_table.empty_($c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]) }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", [])));
+  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user_address))) {
+    $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), user, new MarketAccounts({ map: Open_table.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", [])));
   }
   else{
   }
-  map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user_address)).map;
+  map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user_address)).map;
   [temp$1, temp$2] = [map, $.copy(market_account_info)];
-  if (!!Open_table.contains_(temp$1, temp$2, $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])])) {
+  if (!!Open_table.contains_(temp$1, temp$2, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])])) {
     throw $.abortCode(E_MARKET_ACCOUNT_REGISTERED);
   }
   scale_factor = Registry.scale_factor_from_market_info_(market_account_info.market_info, $c);
-  Open_table.add_(map, $.copy(market_account_info), new MarketAccount({ scale_factor: $.copy(scale_factor), asks: Critbit.empty_($c, [AtomicTypeTag.U64]), bids: Critbit.empty_($c, [AtomicTypeTag.U64]), base_coins_total: u64("0"), base_coins_available: u64("0"), quote_coins_total: u64("0"), quote_coins_available: u64("0") }, new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]);
+  Open_table.add_(map, $.copy(market_account_info), new MarketAccount({ scale_factor: $.copy(scale_factor), asks: Critbit.empty_($c, [AtomicTypeTag.U64]), bids: Critbit.empty_($c, [AtomicTypeTag.U64]), base_coins_total: u64("0"), base_coins_available: u64("0"), quote_coins_total: u64("0"), quote_coins_available: u64("0") }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]);
   return;
 }
 
@@ -477,8 +516,8 @@ export function remove_order_internal_ (
 ): void {
   let temp$1, temp$2, temp$3, base_parcel_multiplier, base_parcels, coins_available_ref_mut, coins_unlocked, market_account, market_account_info, market_accounts_map, tree_ref_mut;
   market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user)).map;
-  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccount", [])]);
+  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user)).map;
+  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccount", [])]);
   if ((side == ASK)) {
     [temp$1, temp$2, temp$3] = [market_account.asks, market_account.base_coins_available, $.copy(market_account.scale_factor)];
   }
@@ -503,16 +542,55 @@ export function withdraw_collateral_ (
   if (!exists_market_account_($.copy(market_account_info), $.copy(user), $c)) {
     throw $.abortCode(E_NO_MARKET_ACCOUNT);
   }
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccounts", []), $.copy(user)).map;
+  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccounts", []), $.copy(user)).map;
   [coins_total_ref_mut, coins_available_ref_mut] = borrow_coin_counts_mut_(market_accounts_map, $.copy(market_account_info), $c, [$p[0]]);
   if (!($.copy(amount)).le($.copy(coins_available_ref_mut))) {
     throw $.abortCode(E_NOT_ENOUGH_COLLATERAL);
   }
   $.set(coins_total_ref_mut, ($.copy(coins_total_ref_mut)).sub($.copy(amount)));
   $.set(coins_available_ref_mut, ($.copy(coins_available_ref_mut)).sub($.copy(amount)));
-  collateral_map = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "Collateral", [$p[0]]), $.copy(user)).map;
-  collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+  collateral_map = $c.borrow_global_mut<Collateral>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "Collateral", [$p[0]]), $.copy(user)).map;
+  collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "user", "MarketAccountInfo", []), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
   return Aptos_framework.Coin.extract_(collateral, $.copy(amount), $c, [$p[0]]);
+}
+
+export function withdraw_collateral_coinstore_ (
+  user: HexString,
+  custodian_id: U64,
+  base: boolean,
+  amount: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <B, Q, E>*/
+): void {
+  let market_account_info;
+  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
+  if (base) {
+    Aptos_framework.Coin.deposit_(Std.Signer.address_of_(user, $c), withdraw_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
+  }
+  else{
+    Aptos_framework.Coin.deposit_(Std.Signer.address_of_(user, $c), withdraw_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[1]]), $c, [$p[1]]);
+  }
+  return;
+}
+
+
+export function buildPayload_withdraw_collateral_coinstore (
+  custodian_id: U64,
+  base: boolean,
+  amount: U64,
+  $p: TypeTag[], /* <B, Q, E>*/
+) {
+  const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
+  return $.buildPayload(
+    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::withdraw_collateral_coinstore",
+    typeParamStrings,
+    [
+      $.payloadArg(custodian_id),
+      $.payloadArg(base),
+      $.payloadArg(amount),
+    ]
+  );
+
 }
 
 export function withdraw_collateral_custodian_ (
@@ -554,9 +632,9 @@ export function withdraw_collateral_user_ (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::Collateral", Collateral.CollateralParser);
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::MarketAccount", MarketAccount.MarketAccountParser);
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::MarketAccountInfo", MarketAccountInfo.MarketAccountInfoParser);
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::MarketAccounts", MarketAccounts.MarketAccountsParser);
+  repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::Collateral", Collateral.CollateralParser);
+  repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::MarketAccount", MarketAccount.MarketAccountParser);
+  repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::MarketAccountInfo", MarketAccountInfo.MarketAccountInfoParser);
+  repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::MarketAccounts", MarketAccounts.MarketAccountsParser);
 }
 

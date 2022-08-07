@@ -17,8 +17,8 @@ export type QuoteType = {
   outputSymbol: string;
   inputUiAmt: UITokenAmount;
   outputUiAmt: UITokenAmount;
-  initialPrice: number;
   avgPrice: number;
+  initialPrice: number;
   finalPrice: number; 
   priceImpact: number;
 }
