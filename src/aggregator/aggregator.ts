@@ -6,6 +6,7 @@ import { EconiaPoolProvider } from "./econia";
 import { HippoPoolProvider } from "./hippo";
 import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from "./types";
 import { AptosClient } from "aptos";
+import { PontemPoolProvider } from "./pontem";
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -24,7 +25,14 @@ export class TradeAggregator {
     const registryClient =  await TokenRegistryClient.load(repo, client, netConfig);
     const hippoProvider = new HippoPoolProvider();
     const econiaProvider = new EconiaPoolProvider(registryClient);
-    const aggregator = new TradeAggregator(registryClient, client, [hippoProvider, econiaProvider]);
+    const pontemProvider = new PontemPoolProvider(registryClient);
+    const aggregator = new TradeAggregator(
+      registryClient, 
+      client, [
+        hippoProvider, 
+        econiaProvider,
+        pontemProvider
+      ]);
     await aggregator.loadAllPoolLists();
     return aggregator;
   }

@@ -607,10 +607,10 @@ others
 
 program.addCommand(others);
 
+/*
 const pontemListPools = async () => {
-  const {client, netConf} = readConfig(program);
-  const pontemAddr = netConf.pontemAddress;
-  const resources = await client.getAccountResources(pontemAddr);
+  const {client, contractAddress} = readConfig(program);
+  const resources = await client.getAccountResources(contractAddress);
   for(const resource of resources) {
     if (resource.type.module === 'liquidity_pool' && resource.type.name === 'LiquidityPool') {
       console.log("##########");
@@ -622,86 +622,14 @@ const pontemListPools = async () => {
   }
 }
 
-const pontemRegisterPoolAddLiquidity = async (lhsSymbol: string, rhsSymbol: string, lhsAmt: string, rhsAmt: string) => {
-  const {client, account, contractAddress, netConf} = readConfig(program);
-  const pontemAddr = netConf.pontemAddress;
-  const repo = getProjectRepo();
-  const tokens = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
-  const registry = new TokenRegistryClient(tokens);
-  const lhsTokenInfo = registry.getTokenInfoBySymbol(lhsSymbol)[0];
-  const rhsTokenInfo = registry.getTokenInfoBySymbol(rhsSymbol)[0];
-  if (!lhsTokenInfo) {
-    console.log(`${lhsSymbol} is not a valid symbol`);
-    return;
-  }
-  if (!rhsTokenInfo) {
-    console.log(`${rhsSymbol} is not a valid symbol`);
-    return;
-  }
-  const lhsSize = parseInt(lhsAmt);
-  const rhsSize = parseInt(rhsAmt);
-  if (lhsSize <= 0 || rhsSize <= 0) {
-    console.log("amounts need to be larger than 0"); 
-    return;
-  }
-  const payload = buildPayload(
-    `${pontemAddr.toShortString()}::scripts::register_pool_and_add_liquidity`,
-    [
-      lhsTokenInfo.token_type.typeFullname(),
-      rhsTokenInfo.token_type.typeFullname(),
-      `${pontemAddr.toShortString()}::lp::LP<${lhsTokenInfo.token_type.typeFullname()}, ${rhsTokenInfo.token_type.typeFullname()}>`,
-
-    ],
-    [
-      2, // 1 for stable pools, 2 for constant-product pools
-      lhsSize.toString(),
-      (0).toString(),    // min-lhsSize
-      rhsSize.toString(),
-      (0).toString(),    // min-rhsSize
-    ]
-  )
-  await sendPayloadTx(client, account, payload, 2000);
-}
-
-const pontem = new Command('potem').description("potem DEX");
+const pontem = new Command('pontem').description("pontem DEX");
 
 pontem
   .command("list-pools")
   .action(pontemListPools);
 
-pontem
-  .command("create-pool-add-liquidity")
-  .argument("<LHS_SYMBOL>")
-  .argument("<RHS_SYMBOL>")
-  .argument("<LHS_amount>")
-  .argument("<rHS_amount>")
-  .action(pontemRegisterPoolAddLiquidity);
-
-/*
-pontem
-  .command("quote")
-  .argument("<fromSymbol>")
-  .argument("<toSymbol>")
-  .argument("<inputUiAmt>")
-  .action(pontemQuote);
-
-pontem
-  .command("swap")
-  .argument("<fromSymbol>")
-  .argument("<toSymbol>")
-  .argument("<inputUiAmt>")
-  .action(pontemSwap);
-
-pontem
-  .command("simulate-swap")
-  .argument("<fromSymbol>")
-  .argument("<toSymbol>")
-  .argument("<inputUiAmt>")
-  .argument("<minOutUiAmt>")
-  .action(pontemSimulateSwap);
-*/
-
 program.addCommand(pontem);
+*/
 
 
 const aggListTradingPools = async () => {

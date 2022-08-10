@@ -25,10 +25,12 @@ export type QuoteType = {
 export enum DexType {
   Hippo = 1,
   Econia = 2,
+  Pontem = 3,
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo] : "Hippo",
   [DexType.Econia] : "Econia",
+  [DexType.Pontem] : "Pontem",
 }
 export type PoolType = U8;
 
