@@ -61,6 +61,10 @@ export class TokenInfo
     return new TokenInfo(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TokenInfo", []);
+  }
+
 }
 
 export class TokenRegistry 
@@ -101,6 +105,10 @@ export class TokenRegistry
     const result = await repo.loadResource(client, address, TokenRegistry, typeParams);
     return result as unknown as TokenRegistry;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TokenRegistry", []);
+  }
+
 }
 export function add_token_ (
   admin: HexString,
@@ -337,5 +345,45 @@ export function buildPayload_update_token_info_script (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::coin_registry::TokenInfo", TokenInfo.TokenInfoParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::coin_registry::TokenRegistry", TokenRegistry.TokenRegistryParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadTokenRegistry(
+    owner: HexString,
+  ) {
+    return TokenRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  add_token_script(
+    name: U8[],
+    symbol: U8[],
+    description: U8[],
+    decimals: U8,
+    logo_url: U8[],
+    project_url: U8[],
+    $p: TypeTag[], /* <TokenType>*/
+  ) {
+    return buildPayload_add_token_script(name, symbol, description, decimals, logo_url, project_url, $p);
+  }
+  delist_token_script(
+    symbol: U8[],
+  ) {
+    return buildPayload_delist_token_script(symbol);
+  }
+  initialize_script(
+  ) {
+    return buildPayload_initialize_script();
+  }
+  update_token_info_script(
+    symbol: U8[],
+    description: U8[],
+    logo_url: U8[],
+    project_url: U8[],
+  ) {
+    return buildPayload_update_token_info_script(symbol, description, logo_url, project_url);
+  }
 }
 

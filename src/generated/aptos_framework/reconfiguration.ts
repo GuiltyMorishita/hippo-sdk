@@ -54,6 +54,10 @@ export class Configuration
     const result = await repo.loadResource(client, address, Configuration, typeParams);
     return result as unknown as Configuration;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Configuration", []);
+  }
+
 }
 
 export class DisableReconfiguration 
@@ -80,6 +84,10 @@ export class DisableReconfiguration
     const result = await repo.loadResource(client, address, DisableReconfiguration, typeParams);
     return result as unknown as DisableReconfiguration;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "DisableReconfiguration", []);
+  }
+
 }
 
 export class NewEpochEvent 
@@ -102,6 +110,10 @@ export class NewEpochEvent
   static NewEpochEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : NewEpochEvent {
     const proto = $.parseStructProto(data, typeTag, repo, NewEpochEvent);
     return new NewEpochEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "NewEpochEvent", []);
   }
 
 }
@@ -247,5 +259,26 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::reconfiguration::Configuration", Configuration.ConfigurationParser);
   repo.addParser("0x1::reconfiguration::DisableReconfiguration", DisableReconfiguration.DisableReconfigurationParser);
   repo.addParser("0x1::reconfiguration::NewEpochEvent", NewEpochEvent.NewEpochEventParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadConfiguration(
+    owner: HexString,
+  ) {
+    return Configuration.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadDisableReconfiguration(
+    owner: HexString,
+  ) {
+    return DisableReconfiguration.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  force_reconfigure(
+  ) {
+    return buildPayload_force_reconfigure();
+  }
 }
 

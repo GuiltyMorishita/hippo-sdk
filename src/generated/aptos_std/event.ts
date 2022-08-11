@@ -37,6 +37,10 @@ export class EventHandle
     return new EventHandle(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "EventHandle", $p);
+  }
+
 }
 
 export class EventHandleGenerator 
@@ -68,6 +72,10 @@ export class EventHandleGenerator
     const result = await repo.loadResource(client, address, EventHandleGenerator, typeParams);
     return result as unknown as EventHandleGenerator;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "EventHandleGenerator", []);
+  }
+
 }
 export function counter_ (
   handle_ref: EventHandle,
@@ -126,5 +134,17 @@ export function write_to_event_store_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::event::EventHandle", EventHandle.EventHandleParser);
   repo.addParser("0x1::event::EventHandleGenerator", EventHandleGenerator.EventHandleGeneratorParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadEventHandleGenerator(
+    owner: HexString,
+  ) {
+    return EventHandleGenerator.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

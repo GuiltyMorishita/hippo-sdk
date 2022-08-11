@@ -41,6 +41,10 @@ export class Container
     const result = await repo.loadResource(client, address, Container, typeParams);
     return result as unknown as Container;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Container", []);
+  }
+
 }
 export function create_resource_account_ (
   origin: HexString,
@@ -114,5 +118,23 @@ export function retrieve_resource_account_cap_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::resource_account::Container", Container.ContainerParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadContainer(
+    owner: HexString,
+  ) {
+    return Container.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  create_resource_account(
+    seed: U8[],
+    optional_auth_key: U8[],
+  ) {
+    return buildPayload_create_resource_account(seed, optional_auth_key);
+  }
 }
 

@@ -37,6 +37,10 @@ export class PoolInfo
     return new PoolInfo(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "PoolInfo", []);
+  }
+
 }
 
 export class PoolList 
@@ -65,6 +69,10 @@ export class PoolList
     const result = await repo.loadResource(client, address, PoolList, typeParams);
     return result as unknown as PoolList;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "PoolList", []);
+  }
+
 }
 export function compute_pool_list_ (
   $c: AptosDataCache,
@@ -113,5 +121,21 @@ export async function query_get_pool_list(
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolInfo", PoolInfo.PoolInfoParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolList", PoolList.PoolListParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadPoolList(
+    owner: HexString,
+  ) {
+    return PoolList.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  get_pool_list(
+  ) {
+    return buildPayload_get_pool_list();
+  }
 }
 

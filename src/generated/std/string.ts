@@ -36,6 +36,10 @@ export class String
     const proto = $.parseStructProto(data, typeTag, repo, String);
     return new String(proto, typeTag);
   }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "String", []);
+  }
   str(): string { return $.u8str(this.bytes); }
 
 }
@@ -203,5 +207,12 @@ export function utf8_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::string::String", String.StringParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

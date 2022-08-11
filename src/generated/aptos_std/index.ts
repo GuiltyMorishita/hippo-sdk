@@ -1,4 +1,5 @@
 
+import { AptosClient } from "aptos";
 import { AptosParserRepo } from "@manahippo/move-to-ts";
 import * as Big_vector from './big_vector';
 import * as Comparator from './comparator';
@@ -38,4 +39,30 @@ export function getPackageRepo(): AptosParserRepo {
   loadParsers(repo);
   repo.addDefaultParsers();
   return repo;
+}
+
+export class App {
+  big_vector : Big_vector.App
+  comparator : Comparator.App
+  event : Event.App
+  iterable_table : Iterable_table.App
+  signature : Signature.App
+  simple_map : Simple_map.App
+  table : Table.App
+  table_with_length : Table_with_length.App
+  type_info : Type_info.App
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+    this.big_vector = new Big_vector.App(client, repo);
+    this.comparator = new Comparator.App(client, repo);
+    this.event = new Event.App(client, repo);
+    this.iterable_table = new Iterable_table.App(client, repo);
+    this.signature = new Signature.App(client, repo);
+    this.simple_map = new Simple_map.App(client, repo);
+    this.table = new Table.App(client, repo);
+    this.table_with_length = new Table_with_length.App(client, repo);
+    this.type_info = new Type_info.App(client, repo);
+  }
 }

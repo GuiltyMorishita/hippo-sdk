@@ -36,6 +36,10 @@ export class Option
     return new Option(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Option", $p);
+  }
+
 }
 export function borrow_ (
   t: Option,
@@ -251,5 +255,12 @@ export function to_vec_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::option::Option", Option.OptionParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

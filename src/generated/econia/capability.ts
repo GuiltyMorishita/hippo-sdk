@@ -33,6 +33,10 @@ export class EconiaCapability
     return new EconiaCapability(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "EconiaCapability", []);
+  }
+
 }
 export function get_econia_capability_ (
   account: HexString,
@@ -46,5 +50,12 @@ export function get_econia_capability_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::capability::EconiaCapability", EconiaCapability.EconiaCapabilityParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

@@ -39,6 +39,10 @@ export class OpenTable
     return new OpenTable(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "OpenTable", $p);
+  }
+
 }
 export function add_ (
   open_table: OpenTable,
@@ -88,5 +92,12 @@ export function empty_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::open_table::OpenTable", OpenTable.OpenTableParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

@@ -41,6 +41,10 @@ export class ChainId
     const result = await repo.loadResource(client, address, ChainId, typeParams);
     return result as unknown as ChainId;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ChainId", []);
+  }
+
 }
 export function get_ (
   $c: AptosDataCache,
@@ -64,5 +68,17 @@ export function initialize_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::chain_id::ChainId", ChainId.ChainIdParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadChainId(
+    owner: HexString,
+  ) {
+    return ChainId.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

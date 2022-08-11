@@ -62,6 +62,10 @@ export class LPToken
     const result = await repo.loadResource(client, address, LPToken, typeParams);
     return result as unknown as LPToken;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "LPToken", $p);
+  }
+
 }
 
 export class TokenPairMetadata 
@@ -118,6 +122,10 @@ export class TokenPairMetadata
     const result = await repo.loadResource(client, address, TokenPairMetadata, typeParams);
     return result as unknown as TokenPairMetadata;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TokenPairMetadata", $p);
+  }
+
 
   quote_x_to_y_after_fees(
     amount_x_in: U64,
@@ -170,6 +178,10 @@ export class TokenPairReserve
     const result = await repo.loadResource(client, address, TokenPairReserve, typeParams);
     return result as unknown as TokenPairReserve;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TokenPairReserve", $p);
+  }
+
 }
 export function add_liquidity_ (
   sender: HexString,
@@ -823,5 +835,30 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_swap::LPToken", LPToken.LPTokenParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_swap::TokenPairMetadata", TokenPairMetadata.TokenPairMetadataParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_swap::TokenPairReserve", TokenPairReserve.TokenPairReserveParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadLPToken(
+    owner: HexString,
+    $p: TypeTag[], /* <X, Y> */
+  ) {
+    return LPToken.load(this.repo, this.client, owner, $p);
+  }
+  async loadTokenPairMetadata(
+    owner: HexString,
+    $p: TypeTag[], /* <X, Y> */
+  ) {
+    return TokenPairMetadata.load(this.repo, this.client, owner, $p);
+  }
+  async loadTokenPairReserve(
+    owner: HexString,
+    $p: TypeTag[], /* <X, Y> */
+  ) {
+    return TokenPairReserve.load(this.repo, this.client, owner, $p);
+  }
 }
 

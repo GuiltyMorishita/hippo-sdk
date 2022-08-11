@@ -41,6 +41,10 @@ export class BitVector
     return new BitVector(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BitVector", []);
+  }
+
 }
 export function is_index_set_ (
   bitvector: BitVector,
@@ -182,5 +186,12 @@ export function unset_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::bit_vector::BitVector", BitVector.BitVectorParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

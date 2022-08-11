@@ -289,4 +289,35 @@ export function buildPayload_two_step_route_script (
 
 export function loadParsers(repo: AptosParserRepo) {
 }
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  three_step_route_script(
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    second_pool_type: U8,
+    second_is_x_to_y: boolean,
+    third_pool_type: U8,
+    third_is_x_to_y: boolean,
+    x_in: U64,
+    a_min_out: U64,
+    $p: TypeTag[], /* <X, Y, Z, A>*/
+  ) {
+    return buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p);
+  }
+  two_step_route_script(
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    second_pool_type: U8,
+    second_is_x_to_y: boolean,
+    x_in: U64,
+    z_min_out: U64,
+    $p: TypeTag[], /* <X, Y, Z>*/
+  ) {
+    return buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+  }
+}
 

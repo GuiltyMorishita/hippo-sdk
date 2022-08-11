@@ -57,6 +57,10 @@ export class CritBitTree
     return new CritBitTree(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CritBitTree", $p);
+  }
+
 }
 
 export class InnerNode 
@@ -90,6 +94,10 @@ export class InnerNode
     return new InnerNode(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "InnerNode", []);
+  }
+
 }
 
 export class OuterNode 
@@ -118,6 +126,10 @@ export class OuterNode
   static OuterNodeParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : OuterNode {
     const proto = $.parseStructProto(data, typeTag, repo, OuterNode);
     return new OuterNode(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "OuterNode", $p);
   }
 
 }
@@ -999,5 +1011,12 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::critbit::CritBitTree", CritBitTree.CritBitTreeParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::critbit::InnerNode", InnerNode.InnerNodeParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::critbit::OuterNode", OuterNode.OuterNodeParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

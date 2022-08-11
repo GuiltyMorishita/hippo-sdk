@@ -39,6 +39,10 @@ export class FixedPoint32
     return new FixedPoint32(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "FixedPoint32", []);
+  }
+
 }
 export function create_from_rational_ (
   numerator: U64,
@@ -121,5 +125,12 @@ export function multiply_u64_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::fixed_point32::FixedPoint32", FixedPoint32.FixedPoint32Parser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

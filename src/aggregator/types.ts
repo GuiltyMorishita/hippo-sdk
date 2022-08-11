@@ -1,7 +1,7 @@
 import { AtomicTypeTag, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
 import { AptosClient, Types } from "aptos";
 import { TokenInfo } from "../generated/coin_registry/coin_registry";
-import { Aggregatorv0 } from "../generated/hippo_aggregator";
+import { Aggregatorv6 } from "../generated/hippo_aggregator";
 
 export type UITokenAmount = number;
 export type UITokenAmountRatio = number;
@@ -161,11 +161,11 @@ export class TradeRoute {
   }
 
   makePaylod(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.TransactionPayload {
-    const inputSize = inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
-    const minOutputSize = minOutAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
+    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
     if (this.steps.length === 1) {
       const step0 = this.steps[0];
-      return Aggregatorv0.buildPayload_one_step_route(
+      return Aggregatorv6.buildPayload_one_step_route(
         u8(step0.pool.dexType), step0.pool.poolType, step0.isXtoY,
         u64(inputSize), u64(minOutputSize),
         [
@@ -178,7 +178,7 @@ export class TradeRoute {
     else if (this.steps.length === 2) {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
-      return Aggregatorv0.buildPayload_two_step_route(
+      return Aggregatorv6.buildPayload_two_step_route(
         u8(step0.pool.dexType), step0.pool.poolType, step0.isXtoY,
         u8(step1.pool.dexType), step1.pool.poolType, step1.isXtoY,
         u64(inputSize), u64(minOutputSize),
@@ -195,7 +195,7 @@ export class TradeRoute {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
       const step2 = this.steps[2];
-      return Aggregatorv0.buildPayload_three_step_route(
+      return Aggregatorv6.buildPayload_three_step_route(
         u8(step0.pool.dexType), step0.pool.poolType, step0.isXtoY,
         u8(step1.pool.dexType), step1.pool.poolType, step1.isXtoY,
         u8(step2.pool.dexType), step2.pool.poolType, step2.isXtoY,

@@ -64,6 +64,10 @@ export class LPCapability
     const result = await repo.loadResource(client, address, LPCapability, typeParams);
     return result as unknown as LPCapability;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "LPCapability", $p);
+  }
+
 }
 
 export class LPToken 
@@ -85,6 +89,10 @@ export class LPToken
   static LPTokenParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : LPToken {
     const proto = $.parseStructProto(data, typeTag, repo, LPToken);
     return new LPToken(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "LPToken", $p);
   }
 
 }
@@ -155,6 +163,10 @@ export class StableCurvePoolInfo
     const result = await repo.loadResource(client, address, StableCurvePoolInfo, typeParams);
     return result as unknown as StableCurvePoolInfo;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "StableCurvePoolInfo", $p);
+  }
+
 
   quote_x_to_y_after_fees(
     amount_x_in: U64,
@@ -677,5 +689,24 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::LPCapability", LPCapability.LPCapabilityParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::LPToken", LPToken.LPTokenParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::StableCurvePoolInfo", StableCurvePoolInfo.StableCurvePoolInfoParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadLPCapability(
+    owner: HexString,
+    $p: TypeTag[], /* <X, Y> */
+  ) {
+    return LPCapability.load(this.repo, this.client, owner, $p);
+  }
+  async loadStableCurvePoolInfo(
+    owner: HexString,
+    $p: TypeTag[], /* <X, Y> */
+  ) {
+    return StableCurvePoolInfo.load(this.repo, this.client, owner, $p);
+  }
 }
 

@@ -89,7 +89,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
     if (isXtoY) {
       // selling
       let soldBaseSize = u64(0);
-      let remainingBaseSize = u64(inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
+      let remainingBaseSize = u64(Math.floor(inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())));
       let gotQuoteSize = u64(0);
       for(const bid of bids) {
         if (remainingBaseSize.eq(u64(0))) {
@@ -118,7 +118,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
         // buying
         let gotBaseSize = u64(0);
         let soldQuoteSize = u64(0);
-        let remainingQuoteSize = u64(inputUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
+        let remainingQuoteSize = u64(Math.floor(inputUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())));
         for (const ask of asks) {
           if (remainingQuoteSize.eq(u64(0))) {
             break;

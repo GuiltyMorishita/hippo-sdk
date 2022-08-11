@@ -41,6 +41,10 @@ export class Element
     return new Element(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Element", $p);
+  }
+
 }
 
 export class SimpleMap 
@@ -64,6 +68,10 @@ export class SimpleMap
   static SimpleMapParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SimpleMap {
     const proto = $.parseStructProto(data, typeTag, repo, SimpleMap);
     return new SimpleMap(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "SimpleMap", $p);
   }
 
 }
@@ -229,5 +237,12 @@ export function remove_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::simple_map::Element", Element.ElementParser);
   repo.addParser("0x1::simple_map::SimpleMap", SimpleMap.SimpleMapParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

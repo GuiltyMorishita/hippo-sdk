@@ -44,6 +44,10 @@ export class Capabilities
     const result = await repo.loadResource(client, address, Capabilities, typeParams);
     return result as unknown as Capabilities;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Capabilities", $p);
+  }
+
 }
 export function burn_ (
   account: HexString,
@@ -171,5 +175,45 @@ export function buildPayload_register (
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::managed_coin::Capabilities", Capabilities.CapabilitiesParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadCapabilities(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return Capabilities.load(this.repo, this.client, owner, $p);
+  }
+  burn(
+    amount: U64,
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_burn(amount, $p);
+  }
+  initialize(
+    name: U8[],
+    symbol: U8[],
+    decimals: U64,
+    monitor_supply: boolean,
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_initialize(name, symbol, decimals, monitor_supply, $p);
+  }
+  mint(
+    dst_addr: HexString,
+    amount: U64,
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_mint(dst_addr, amount, $p);
+  }
+  register(
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_register($p);
+  }
 }
 

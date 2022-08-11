@@ -312,4 +312,51 @@ export function buildPayload_swap_script (
 
 export function loadParsers(repo: AptosParserRepo) {
 }
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  add_liquidity_script(
+    amount_x: U64,
+    amount_y: U64,
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_add_liquidity_script(amount_x, amount_y, $p);
+  }
+  create_new_pool_script(
+    fee_to: HexString,
+    fee_on: boolean,
+    lp_name: U8[],
+    lp_symbol: U8[],
+    lp_description: U8[],
+    lp_logo_url: U8[],
+    lp_project_url: U8[],
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_create_new_pool_script(fee_to, fee_on, lp_name, lp_symbol, lp_description, lp_logo_url, lp_project_url, $p);
+  }
+  mock_deploy_script(
+  ) {
+    return buildPayload_mock_deploy_script();
+  }
+  remove_liquidity_script(
+    liquidity: U64,
+    amount_x_min: U64,
+    amount_y_min: U64,
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_remove_liquidity_script(liquidity, amount_x_min, amount_y_min, $p);
+  }
+  swap_script(
+    x_in: U64,
+    y_in: U64,
+    x_min_out: U64,
+    y_min_out: U64,
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+  }
+}
 

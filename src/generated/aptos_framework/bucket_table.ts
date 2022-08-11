@@ -51,6 +51,10 @@ export class BucketTable
     return new BucketTable(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BucketTable", $p);
+  }
+
 }
 
 export class Entry 
@@ -80,6 +84,10 @@ export class Entry
   static EntryParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Entry {
     const proto = $.parseStructProto(data, typeTag, repo, Entry);
     return new Entry(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Entry", $p);
   }
 
 }
@@ -360,5 +368,12 @@ export function xor_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::bucket_table::BucketTable", BucketTable.BucketTableParser);
   repo.addParser("0x1::bucket_table::Entry", Entry.EntryParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

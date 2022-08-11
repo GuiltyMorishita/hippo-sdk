@@ -78,6 +78,10 @@ export class Account
     const result = await repo.loadResource(client, address, Account, typeParams);
     return result as unknown as Account;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Account", []);
+  }
+
 }
 
 export class ChainSpecificAccountInfo 
@@ -127,6 +131,10 @@ export class ChainSpecificAccountInfo
     const result = await repo.loadResource(client, address, ChainSpecificAccountInfo, typeParams);
     return result as unknown as ChainSpecificAccountInfo;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ChainSpecificAccountInfo", []);
+  }
+
 }
 
 export class CoinRegisterEvent 
@@ -151,6 +159,10 @@ export class CoinRegisterEvent
     return new CoinRegisterEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CoinRegisterEvent", []);
+  }
+
 }
 
 export class SignerCapability 
@@ -173,6 +185,10 @@ export class SignerCapability
   static SignerCapabilityParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SignerCapability {
     const proto = $.parseStructProto(data, typeTag, repo, SignerCapability);
     return new SignerCapability(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "SignerCapability", []);
   }
 
 }
@@ -583,5 +599,38 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::account::ChainSpecificAccountInfo", ChainSpecificAccountInfo.ChainSpecificAccountInfoParser);
   repo.addParser("0x1::account::CoinRegisterEvent", CoinRegisterEvent.CoinRegisterEventParser);
   repo.addParser("0x1::account::SignerCapability", SignerCapability.SignerCapabilityParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadAccount(
+    owner: HexString,
+  ) {
+    return Account.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadChainSpecificAccountInfo(
+    owner: HexString,
+  ) {
+    return ChainSpecificAccountInfo.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  create_account(
+    auth_key: HexString,
+  ) {
+    return buildPayload_create_account(auth_key);
+  }
+  rotate_authentication_key(
+    new_auth_key: U8[],
+  ) {
+    return buildPayload_rotate_authentication_key(new_auth_key);
+  }
+  transfer(
+    to: HexString,
+    amount: U64,
+  ) {
+    return buildPayload_transfer(to, amount);
+  }
 }
 

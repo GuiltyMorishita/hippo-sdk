@@ -69,6 +69,10 @@ export class GasConstants
     return new GasConstants(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GasConstants", []);
+  }
+
 }
 
 export class GasSchedule 
@@ -99,6 +103,10 @@ export class GasSchedule
     return new GasSchedule(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GasSchedule", []);
+  }
+
 }
 
 export class VMConfig 
@@ -127,6 +135,10 @@ export class VMConfig
     const result = await repo.loadResource(client, address, VMConfig, typeParams);
     return result as unknown as VMConfig;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "VMConfig", []);
+  }
+
 }
 export function initialize_ (
   account: HexString,
@@ -227,5 +239,32 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::vm_config::GasConstants", GasConstants.GasConstantsParser);
   repo.addParser("0x1::vm_config::GasSchedule", GasSchedule.GasScheduleParser);
   repo.addParser("0x1::vm_config::VMConfig", VMConfig.VMConfigParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadVMConfig(
+    owner: HexString,
+  ) {
+    return VMConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  set_gas_constants(
+    global_memory_per_byte_cost: U64,
+    global_memory_per_byte_write_cost: U64,
+    min_transaction_gas_units: U64,
+    large_transaction_cutoff: U64,
+    intrinsic_gas_per_byte: U64,
+    maximum_number_of_gas_units: U64,
+    min_price_per_gas_unit: U64,
+    max_price_per_gas_unit: U64,
+    max_transaction_size_in_bytes: U64,
+    gas_unit_scaling_factor: U64,
+    default_account_size: U64,
+  ) {
+    return buildPayload_set_gas_constants(global_memory_per_byte_cost, global_memory_per_byte_write_cost, min_transaction_gas_units, large_transaction_cutoff, intrinsic_gas_per_byte, maximum_number_of_gas_units, min_price_per_gas_unit, max_price_per_gas_unit, max_transaction_size_in_bytes, gas_unit_scaling_factor, default_account_size);
+  }
 }
 

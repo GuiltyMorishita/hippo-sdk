@@ -65,6 +65,10 @@ export class AddStakeEvent
     return new AddStakeEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "AddStakeEvent", []);
+  }
+
 }
 
 export class AptosCoinCapabilities 
@@ -93,6 +97,10 @@ export class AptosCoinCapabilities
     const result = await repo.loadResource(client, address, AptosCoinCapabilities, typeParams);
     return result as unknown as AptosCoinCapabilities;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "AptosCoinCapabilities", []);
+  }
+
 }
 
 export class DistributeRewardsEvent 
@@ -118,6 +126,10 @@ export class DistributeRewardsEvent
   static DistributeRewardsEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : DistributeRewardsEvent {
     const proto = $.parseStructProto(data, typeTag, repo, DistributeRewardsEvent);
     return new DistributeRewardsEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "DistributeRewardsEvent", []);
   }
 
 }
@@ -150,6 +162,10 @@ export class IncreaseLockupEvent
     return new IncreaseLockupEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "IncreaseLockupEvent", []);
+  }
+
 }
 
 export class JoinValidatorSetEvent 
@@ -174,6 +190,10 @@ export class JoinValidatorSetEvent
     return new JoinValidatorSetEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "JoinValidatorSetEvent", []);
+  }
+
 }
 
 export class LeaveValidatorSetEvent 
@@ -196,6 +216,10 @@ export class LeaveValidatorSetEvent
   static LeaveValidatorSetEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : LeaveValidatorSetEvent {
     const proto = $.parseStructProto(data, typeTag, repo, LeaveValidatorSetEvent);
     return new LeaveValidatorSetEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "LeaveValidatorSetEvent", []);
   }
 
 }
@@ -226,6 +250,10 @@ export class OwnerCapability
     const result = await repo.loadResource(client, address, OwnerCapability, typeParams);
     return result as unknown as OwnerCapability;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "OwnerCapability", []);
+  }
+
 }
 
 export class RegisterValidatorCandidateEvent 
@@ -248,6 +276,10 @@ export class RegisterValidatorCandidateEvent
   static RegisterValidatorCandidateEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : RegisterValidatorCandidateEvent {
     const proto = $.parseStructProto(data, typeTag, repo, RegisterValidatorCandidateEvent);
     return new RegisterValidatorCandidateEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "RegisterValidatorCandidateEvent", []);
   }
 
 }
@@ -280,6 +312,10 @@ export class RotateConsensusKeyEvent
     return new RotateConsensusKeyEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "RotateConsensusKeyEvent", []);
+  }
+
 }
 
 export class SetOperatorEvent 
@@ -308,6 +344,10 @@ export class SetOperatorEvent
   static SetOperatorEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SetOperatorEvent {
     const proto = $.parseStructProto(data, typeTag, repo, SetOperatorEvent);
     return new SetOperatorEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "SetOperatorEvent", []);
   }
 
 }
@@ -356,6 +396,10 @@ export class StakePool
     const result = await repo.loadResource(client, address, StakePool, typeParams);
     return result as unknown as StakePool;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "StakePool", []);
+  }
+
 }
 
 export class StakePoolEvents 
@@ -414,6 +458,10 @@ export class StakePoolEvents
     const result = await repo.loadResource(client, address, StakePoolEvents, typeParams);
     return result as unknown as StakePoolEvents;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "StakePoolEvents", []);
+  }
+
 }
 
 export class UnlockStakeEvent 
@@ -439,6 +487,10 @@ export class UnlockStakeEvent
   static UnlockStakeEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : UnlockStakeEvent {
     const proto = $.parseStructProto(data, typeTag, repo, UnlockStakeEvent);
     return new UnlockStakeEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "UnlockStakeEvent", []);
   }
 
 }
@@ -475,6 +527,10 @@ export class UpdateNetworkAndFullnodeAddressesEvent
   static UpdateNetworkAndFullnodeAddressesEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : UpdateNetworkAndFullnodeAddressesEvent {
     const proto = $.parseStructProto(data, typeTag, repo, UpdateNetworkAndFullnodeAddressesEvent);
     return new UpdateNetworkAndFullnodeAddressesEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "UpdateNetworkAndFullnodeAddressesEvent", []);
   }
 
 }
@@ -514,6 +570,10 @@ export class ValidatorConfig
     const result = await repo.loadResource(client, address, ValidatorConfig, typeParams);
     return result as unknown as ValidatorConfig;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ValidatorConfig", []);
+  }
+
 }
 
 export class ValidatorInfo 
@@ -542,6 +602,10 @@ export class ValidatorInfo
   static ValidatorInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : ValidatorInfo {
     const proto = $.parseStructProto(data, typeTag, repo, ValidatorInfo);
     return new ValidatorInfo(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ValidatorInfo", []);
   }
 
 }
@@ -575,6 +639,10 @@ export class ValidatorPerformance
     const result = await repo.loadResource(client, address, ValidatorPerformance, typeParams);
     return result as unknown as ValidatorPerformance;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ValidatorPerformance", []);
+  }
+
 }
 
 export class ValidatorSet 
@@ -612,6 +680,10 @@ export class ValidatorSet
     const result = await repo.loadResource(client, address, ValidatorSet, typeParams);
     return result as unknown as ValidatorSet;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ValidatorSet", []);
+  }
+
 }
 
 export class ValidatorSetConfiguration 
@@ -655,6 +727,10 @@ export class ValidatorSetConfiguration
     const result = await repo.loadResource(client, address, ValidatorSetConfiguration, typeParams);
     return result as unknown as ValidatorSetConfiguration;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ValidatorSetConfiguration", []);
+  }
+
 }
 
 export class WithdrawStakeEvent 
@@ -680,6 +756,10 @@ export class WithdrawStakeEvent
   static WithdrawStakeEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : WithdrawStakeEvent {
     const proto = $.parseStructProto(data, typeTag, repo, WithdrawStakeEvent);
     return new WithdrawStakeEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WithdrawStakeEvent", []);
   }
 
 }
@@ -1721,5 +1801,113 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::stake::ValidatorSet", ValidatorSet.ValidatorSetParser);
   repo.addParser("0x1::stake::ValidatorSetConfiguration", ValidatorSetConfiguration.ValidatorSetConfigurationParser);
   repo.addParser("0x1::stake::WithdrawStakeEvent", WithdrawStakeEvent.WithdrawStakeEventParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadAptosCoinCapabilities(
+    owner: HexString,
+  ) {
+    return AptosCoinCapabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadOwnerCapability(
+    owner: HexString,
+  ) {
+    return OwnerCapability.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadStakePool(
+    owner: HexString,
+  ) {
+    return StakePool.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadStakePoolEvents(
+    owner: HexString,
+  ) {
+    return StakePoolEvents.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadValidatorConfig(
+    owner: HexString,
+  ) {
+    return ValidatorConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadValidatorPerformance(
+    owner: HexString,
+  ) {
+    return ValidatorPerformance.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadValidatorSet(
+    owner: HexString,
+  ) {
+    return ValidatorSet.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadValidatorSetConfiguration(
+    owner: HexString,
+  ) {
+    return ValidatorSetConfiguration.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  add_stake(
+    amount: U64,
+  ) {
+    return buildPayload_add_stake(amount);
+  }
+  increase_lockup(
+  ) {
+    return buildPayload_increase_lockup();
+  }
+  join_validator_set(
+    pool_address: HexString,
+  ) {
+    return buildPayload_join_validator_set(pool_address);
+  }
+  leave_validator_set(
+    pool_address: HexString,
+  ) {
+    return buildPayload_leave_validator_set(pool_address);
+  }
+  register_validator_candidate(
+    consensus_pubkey: U8[],
+    proof_of_possession: U8[],
+    network_addresses: U8[],
+    fullnode_addresses: U8[],
+  ) {
+    return buildPayload_register_validator_candidate(consensus_pubkey, proof_of_possession, network_addresses, fullnode_addresses);
+  }
+  rotate_consensus_key(
+    pool_address: HexString,
+    new_consensus_pubkey: U8[],
+    proof_of_possession: U8[],
+  ) {
+    return buildPayload_rotate_consensus_key(pool_address, new_consensus_pubkey, proof_of_possession);
+  }
+  set_delegated_voter(
+    new_delegated_voter: HexString,
+  ) {
+    return buildPayload_set_delegated_voter(new_delegated_voter);
+  }
+  set_operator(
+    new_operator: HexString,
+  ) {
+    return buildPayload_set_operator(new_operator);
+  }
+  unlock(
+    amount: U64,
+  ) {
+    return buildPayload_unlock(amount);
+  }
+  update_network_and_fullnode_addresses(
+    pool_address: HexString,
+    new_network_addresses: U8[],
+    new_fullnode_addresses: U8[],
+  ) {
+    return buildPayload_update_network_and_fullnode_addresses(pool_address, new_network_addresses, new_fullnode_addresses);
+  }
+  withdraw(
+    withdraw_amount: U64,
+  ) {
+    return buildPayload_withdraw(withdraw_amount);
+  }
 }
 

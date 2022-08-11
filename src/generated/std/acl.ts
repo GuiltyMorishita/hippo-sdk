@@ -37,6 +37,10 @@ export class ACL
     return new ACL(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ACL", []);
+  }
+
 }
 export function add_ (
   acl: ACL,
@@ -94,5 +98,12 @@ export function remove_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::acl::ACL", ACL.ACLParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

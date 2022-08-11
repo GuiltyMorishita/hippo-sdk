@@ -63,6 +63,10 @@ export class CreateProposalEvent
     return new CreateProposalEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CreateProposalEvent", []);
+  }
+
 }
 
 export class GovernanceConfig 
@@ -97,6 +101,10 @@ export class GovernanceConfig
     const result = await repo.loadResource(client, address, GovernanceConfig, typeParams);
     return result as unknown as GovernanceConfig;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GovernanceConfig", []);
+  }
+
 }
 
 export class GovernanceEvents 
@@ -131,6 +139,10 @@ export class GovernanceEvents
     const result = await repo.loadResource(client, address, GovernanceEvents, typeParams);
     return result as unknown as GovernanceEvents;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GovernanceEvents", []);
+  }
+
 }
 
 export class GovernanceResponsbility 
@@ -159,6 +171,10 @@ export class GovernanceResponsbility
     const result = await repo.loadResource(client, address, GovernanceResponsbility, typeParams);
     return result as unknown as GovernanceResponsbility;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GovernanceResponsbility", []);
+  }
+
 }
 
 export class RecordKey 
@@ -184,6 +200,10 @@ export class RecordKey
   static RecordKeyParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : RecordKey {
     const proto = $.parseStructProto(data, typeTag, repo, RecordKey);
     return new RecordKey(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "RecordKey", []);
   }
 
 }
@@ -214,6 +234,10 @@ export class UpdateConfigEvent
   static UpdateConfigEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : UpdateConfigEvent {
     const proto = $.parseStructProto(data, typeTag, repo, UpdateConfigEvent);
     return new UpdateConfigEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "UpdateConfigEvent", []);
   }
 
 }
@@ -252,6 +276,10 @@ export class VoteEvent
     return new VoteEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "VoteEvent", []);
+  }
+
 }
 
 export class VotingRecords 
@@ -280,6 +308,10 @@ export class VotingRecords
     const result = await repo.loadResource(client, address, VotingRecords, typeParams);
     return result as unknown as VotingRecords;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "VotingRecords", []);
+  }
+
 }
 export function create_proposal_ (
   proposer: HexString,
@@ -469,5 +501,47 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::aptos_governance::UpdateConfigEvent", UpdateConfigEvent.UpdateConfigEventParser);
   repo.addParser("0x1::aptos_governance::VoteEvent", VoteEvent.VoteEventParser);
   repo.addParser("0x1::aptos_governance::VotingRecords", VotingRecords.VotingRecordsParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadGovernanceConfig(
+    owner: HexString,
+  ) {
+    return GovernanceConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadGovernanceEvents(
+    owner: HexString,
+  ) {
+    return GovernanceEvents.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadGovernanceResponsbility(
+    owner: HexString,
+  ) {
+    return GovernanceResponsbility.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadVotingRecords(
+    owner: HexString,
+  ) {
+    return VotingRecords.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  create_proposal(
+    stake_pool: HexString,
+    execution_hash: U8[],
+    metadata_location: U8[],
+    metadata_hash: U8[],
+  ) {
+    return buildPayload_create_proposal(stake_pool, execution_hash, metadata_location, metadata_hash);
+  }
+  vote(
+    stake_pool: HexString,
+    proposal_id: U64,
+    should_pass: boolean,
+  ) {
+    return buildPayload_vote(stake_pool, proposal_id, should_pass);
+  }
 }
 

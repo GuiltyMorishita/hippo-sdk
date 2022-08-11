@@ -62,6 +62,10 @@ export class Collateral
     const result = await repo.loadResource(client, address, Collateral, typeParams);
     return result as unknown as Collateral;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Collateral", $p);
+  }
+
 }
 
 export class MarketAccount 
@@ -104,6 +108,10 @@ export class MarketAccount
     return new MarketAccount(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "MarketAccount", []);
+  }
+
 }
 
 export class MarketAccountInfo 
@@ -129,6 +137,10 @@ export class MarketAccountInfo
   static MarketAccountInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : MarketAccountInfo {
     const proto = $.parseStructProto(data, typeTag, repo, MarketAccountInfo);
     return new MarketAccountInfo(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "MarketAccountInfo", []);
   }
 
 }
@@ -159,6 +171,10 @@ export class MarketAccounts
     const result = await repo.loadResource(client, address, MarketAccounts, typeParams);
     return result as unknown as MarketAccounts;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "MarketAccounts", []);
+  }
+
 }
 export function add_order_internal_ (
   user: HexString,
@@ -636,5 +652,45 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::MarketAccount", MarketAccount.MarketAccountParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::MarketAccountInfo", MarketAccountInfo.MarketAccountInfoParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::MarketAccounts", MarketAccounts.MarketAccountsParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadCollateral(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return Collateral.load(this.repo, this.client, owner, $p);
+  }
+  async loadMarketAccounts(
+    owner: HexString,
+  ) {
+    return MarketAccounts.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  deposit_collateral_coinstore(
+    custodian_id: U64,
+    base: boolean,
+    amount: U64,
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p);
+  }
+  register_market_account(
+    custodian_id: U64,
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_register_market_account(custodian_id, $p);
+  }
+  withdraw_collateral_coinstore(
+    custodian_id: U64,
+    base: boolean,
+    amount: U64,
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p);
+  }
 }
 

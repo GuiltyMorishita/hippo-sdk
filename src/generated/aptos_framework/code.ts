@@ -46,6 +46,10 @@ export class ModuleMetadata
     return new ModuleMetadata(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ModuleMetadata", []);
+  }
+
 }
 
 export class PackageMetadata 
@@ -79,6 +83,10 @@ export class PackageMetadata
     return new PackageMetadata(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "PackageMetadata", []);
+  }
+
 }
 
 export class PackageRegistry 
@@ -107,6 +115,10 @@ export class PackageRegistry
     const result = await repo.loadResource(client, address, PackageRegistry, typeParams);
     return result as unknown as PackageRegistry;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "PackageRegistry", []);
+  }
+
 }
 
 export class UpgradePolicy 
@@ -129,6 +141,10 @@ export class UpgradePolicy
   static UpgradePolicyParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : UpgradePolicy {
     const proto = $.parseStructProto(data, typeTag, repo, UpgradePolicy);
     return new UpgradePolicy(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "UpgradePolicy", []);
   }
 
 }
@@ -303,5 +319,23 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::code::PackageMetadata", PackageMetadata.PackageMetadataParser);
   repo.addParser("0x1::code::PackageRegistry", PackageRegistry.PackageRegistryParser);
   repo.addParser("0x1::code::UpgradePolicy", UpgradePolicy.UpgradePolicyParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadPackageRegistry(
+    owner: HexString,
+  ) {
+    return PackageRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  publish_package_txn(
+    pack_serialized: U8[],
+    code: U8[][],
+  ) {
+    return buildPayload_publish_package_txn(pack_serialized, code);
+  }
 }
 

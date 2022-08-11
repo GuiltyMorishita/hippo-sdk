@@ -43,6 +43,10 @@ export class CurrentTimeMicroseconds
     const result = await repo.loadResource(client, address, CurrentTimeMicroseconds, typeParams);
     return result as unknown as CurrentTimeMicroseconds;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CurrentTimeMicroseconds", []);
+  }
+
 }
 export function assert_genesis_ (
   $c: AptosDataCache,
@@ -126,5 +130,17 @@ export function update_global_time_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::timestamp::CurrentTimeMicroseconds", CurrentTimeMicroseconds.CurrentTimeMicrosecondsParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadCurrentTimeMicroseconds(
+    owner: HexString,
+  ) {
+    return CurrentTimeMicroseconds.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

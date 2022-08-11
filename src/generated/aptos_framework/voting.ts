@@ -56,6 +56,10 @@ export class CreateProposalEvent
     return new CreateProposalEvent(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CreateProposalEvent", []);
+  }
+
 }
 
 export class Proposal 
@@ -107,6 +111,10 @@ export class Proposal
     return new Proposal(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Proposal", $p);
+  }
+
 }
 
 export class RegisterForumEvent 
@@ -132,6 +140,10 @@ export class RegisterForumEvent
   static RegisterForumEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : RegisterForumEvent {
     const proto = $.parseStructProto(data, typeTag, repo, RegisterForumEvent);
     return new RegisterForumEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "RegisterForumEvent", []);
   }
 
 }
@@ -167,6 +179,10 @@ export class ResolveProposal
     return new ResolveProposal(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ResolveProposal", []);
+  }
+
 }
 
 export class VoteEvent 
@@ -192,6 +208,10 @@ export class VoteEvent
   static VoteEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : VoteEvent {
     const proto = $.parseStructProto(data, typeTag, repo, VoteEvent);
     return new VoteEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "VoteEvent", []);
   }
 
 }
@@ -225,6 +245,10 @@ export class VotingEvents
   static VotingEventsParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : VotingEvents {
     const proto = $.parseStructProto(data, typeTag, repo, VotingEvents);
     return new VotingEvents(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "VotingEvents", []);
   }
 
 }
@@ -261,6 +285,10 @@ export class VotingForum
     const result = await repo.loadResource(client, address, VotingForum, typeParams);
     return result as unknown as VotingForum;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "VotingForum", $p);
+  }
+
 }
 export function can_be_resolved_early_ (
   proposal: Proposal,
@@ -454,5 +482,18 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::voting::VoteEvent", VoteEvent.VoteEventParser);
   repo.addParser("0x1::voting::VotingEvents", VotingEvents.VotingEventsParser);
   repo.addParser("0x1::voting::VotingForum", VotingForum.VotingForumParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadVotingForum(
+    owner: HexString,
+    $p: TypeTag[], /* <ProposalType> */
+  ) {
+    return VotingForum.load(this.repo, this.client, owner, $p);
+  }
 }
 

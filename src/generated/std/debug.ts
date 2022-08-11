@@ -26,4 +26,11 @@ export function print_stack_trace_ (
 }
 export function loadParsers(repo: AptosParserRepo) {
 }
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+}
 

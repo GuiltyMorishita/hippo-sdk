@@ -1,4 +1,5 @@
 
+import { AptosClient } from "aptos";
 import { AptosParserRepo } from "@manahippo/move-to-ts";
 import * as Acl from './acl';
 import * as Bcs from './bcs';
@@ -50,4 +51,38 @@ export function getPackageRepo(): AptosParserRepo {
   loadParsers(repo);
   repo.addDefaultParsers();
   return repo;
+}
+
+export class App {
+  acl : Acl.App
+  bcs : Bcs.App
+  bit_vector : Bit_vector.App
+  capability : Capability.App
+  debug : Debug.App
+  error : Error.App
+  fixed_point32 : Fixed_point32.App
+  guid : Guid.App
+  hash : Hash.App
+  option : Option.App
+  signer : Signer.App
+  string : String.App
+  vector : Vector.App
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+    this.acl = new Acl.App(client, repo);
+    this.bcs = new Bcs.App(client, repo);
+    this.bit_vector = new Bit_vector.App(client, repo);
+    this.capability = new Capability.App(client, repo);
+    this.debug = new Debug.App(client, repo);
+    this.error = new Error.App(client, repo);
+    this.fixed_point32 = new Fixed_point32.App(client, repo);
+    this.guid = new Guid.App(client, repo);
+    this.hash = new Hash.App(client, repo);
+    this.option = new Option.App(client, repo);
+    this.signer = new Signer.App(client, repo);
+    this.string = new String.App(client, repo);
+    this.vector = new Vector.App(client, repo);
+  }
 }

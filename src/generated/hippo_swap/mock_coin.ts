@@ -43,6 +43,10 @@ export class TokenSharedCapability
     const result = await repo.loadResource(client, address, TokenSharedCapability, typeParams);
     return result as unknown as TokenSharedCapability;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TokenSharedCapability", $p);
+  }
+
 }
 
 export class WBTC 
@@ -63,6 +67,10 @@ export class WBTC
   static WBTCParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : WBTC {
     const proto = $.parseStructProto(data, typeTag, repo, WBTC);
     return new WBTC(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WBTC", []);
   }
 
 }
@@ -87,6 +95,10 @@ export class WDAI
     return new WDAI(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WDAI", []);
+  }
+
 }
 
 export class WDOT 
@@ -107,6 +119,10 @@ export class WDOT
   static WDOTParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : WDOT {
     const proto = $.parseStructProto(data, typeTag, repo, WDOT);
     return new WDOT(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WDOT", []);
   }
 
 }
@@ -131,6 +147,10 @@ export class WETH
     return new WETH(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WETH", []);
+  }
+
 }
 
 export class WSOL 
@@ -151,6 +171,10 @@ export class WSOL
   static WSOLParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : WSOL {
     const proto = $.parseStructProto(data, typeTag, repo, WSOL);
     return new WSOL(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WSOL", []);
   }
 
 }
@@ -175,6 +199,10 @@ export class WUSDC
     return new WUSDC(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WUSDC", []);
+  }
+
 }
 
 export class WUSDT 
@@ -195,6 +223,10 @@ export class WUSDT
   static WUSDTParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : WUSDT {
     const proto = $.parseStructProto(data, typeTag, repo, WUSDT);
     return new WUSDT(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WUSDT", []);
   }
 
 }
@@ -297,5 +329,24 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WSOL", WSOL.WSOLParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WUSDC", WUSDC.WUSDCParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::mock_coin::WUSDT", WUSDT.WUSDTParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadTokenSharedCapability(
+    owner: HexString,
+    $p: TypeTag[], /* <TokenType> */
+  ) {
+    return TokenSharedCapability.load(this.repo, this.client, owner, $p);
+  }
+  faucet_mint_to_script(
+    amount: U64,
+    $p: TypeTag[], /* <TokenType>*/
+  ) {
+    return buildPayload_faucet_mint_to_script(amount, $p);
+  }
 }
 

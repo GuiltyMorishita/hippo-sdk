@@ -37,6 +37,10 @@ export class Result
     return new Result(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Result", []);
+  }
+
 }
 export function compare_ (
   left: any,
@@ -123,5 +127,12 @@ export function is_smaller_than_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::comparator::Result", Result.ResultParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

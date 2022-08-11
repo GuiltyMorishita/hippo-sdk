@@ -39,6 +39,10 @@ export class TypeInfo
     const proto = $.parseStructProto(data, typeTag, repo, TypeInfo);
     return new TypeInfo(proto, typeTag);
   }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TypeInfo", []);
+  }
   typeFullname(): string {
     return `${this.account_address.toShortString()}::${$.u8str(this.module_name)}::${$.u8str(this.struct_name)}`;
   }
@@ -84,5 +88,12 @@ export function type_of_ (
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::type_info::TypeInfo", TypeInfo.TypeInfoParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

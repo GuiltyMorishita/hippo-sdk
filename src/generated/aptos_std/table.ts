@@ -39,6 +39,10 @@ export class Box
     const result = await repo.loadResource(client, address, Box, typeParams);
     return result as unknown as Box;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Box", $p);
+  }
+
 }
 
 export class Table 
@@ -62,6 +66,10 @@ export class Table
   static TableParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Table {
     const proto = $.parseStructProto(data, typeTag, repo, Table);
     return new Table(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Table", $p);
   }
 
 }
@@ -217,6 +225,19 @@ export function remove_box_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::table::Box", Box.BoxParser);
   repo.addParser("0x1::table::Table", Table.TableParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadBox(
+    owner: HexString,
+    $p: TypeTag[], /* <V> */
+  ) {
+    return Box.load(this.repo, this.client, owner, $p);
+  }
 }
 
 export class TypedTable<K, V> {

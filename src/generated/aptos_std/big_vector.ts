@@ -47,6 +47,10 @@ export class BigVector
     return new BigVector(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BigVector", $p);
+  }
+
 }
 
 export class BigVectorIndex 
@@ -72,6 +76,10 @@ export class BigVectorIndex
   static BigVectorIndexParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : BigVectorIndex {
     const proto = $.parseStructProto(data, typeTag, repo, BigVectorIndex);
     return new BigVectorIndex(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BigVectorIndex", []);
   }
 
 }
@@ -356,5 +364,12 @@ export function swap_remove_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::big_vector::BigVector", BigVector.BigVectorParser);
   repo.addParser("0x1::big_vector::BigVectorIndex", BigVectorIndex.BigVectorIndexParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

@@ -42,6 +42,10 @@ export class BC
     return new BC(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BC", []);
+  }
+
 }
 
 export class CoinCapabilities 
@@ -73,6 +77,10 @@ export class CoinCapabilities
     const result = await repo.loadResource(client, address, CoinCapabilities, typeParams);
     return result as unknown as CoinCapabilities;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CoinCapabilities", $p);
+  }
+
 }
 
 export class QC 
@@ -93,6 +101,10 @@ export class QC
   static QCParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : QC {
     const proto = $.parseStructProto(data, typeTag, repo, QC);
     return new QC(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "QC", []);
   }
 
 }
@@ -186,5 +198,28 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::coins::BC", BC.BCParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::coins::CoinCapabilities", CoinCapabilities.CoinCapabilitiesParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::coins::QC", QC.QCParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadCoinCapabilities(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return CoinCapabilities.load(this.repo, this.client, owner, $p);
+  }
+  init_coin_types(
+  ) {
+    return buildPayload_init_coin_types();
+  }
+  mint(
+    amount: U64,
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_mint(amount, $p);
+  }
 }
 

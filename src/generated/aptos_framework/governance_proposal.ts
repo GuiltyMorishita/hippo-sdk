@@ -38,6 +38,10 @@ export class GovernanceProposal
     return new GovernanceProposal(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GovernanceProposal", []);
+  }
+
 }
 export function create_empty_proposal_ (
   $c: AptosDataCache,
@@ -61,5 +65,12 @@ export function create_proposal_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::governance_proposal::GovernanceProposal", GovernanceProposal.GovernanceProposalParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

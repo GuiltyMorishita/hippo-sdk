@@ -39,6 +39,10 @@ export class AptosCoinCapabilities
     const result = await repo.loadResource(client, address, AptosCoinCapabilities, typeParams);
     return result as unknown as AptosCoinCapabilities;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "AptosCoinCapabilities", []);
+  }
+
 }
 export function burn_fee_ (
   account: HexString,
@@ -60,5 +64,17 @@ export function store_aptos_coin_burn_cap_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::transaction_fee::AptosCoinCapabilities", AptosCoinCapabilities.AptosCoinCapabilitiesParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadAptosCoinCapabilities(
+    owner: HexString,
+  ) {
+    return AptosCoinCapabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

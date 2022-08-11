@@ -42,6 +42,10 @@ export class ConsensusConfig
     const result = await repo.loadResource(client, address, ConsensusConfig, typeParams);
     return result as unknown as ConsensusConfig;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ConsensusConfig", []);
+  }
+
 }
 export function initialize_ (
   account: HexString,
@@ -71,5 +75,17 @@ export function set_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::consensus_config::ConsensusConfig", ConsensusConfig.ConsensusConfigParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadConsensusConfig(
+    owner: HexString,
+  ) {
+    return ConsensusConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

@@ -1,4 +1,5 @@
 
+import { AptosClient } from "aptos";
 import { AptosParserRepo } from "@manahippo/move-to-ts";
 import * as Cp_scripts from './cp_scripts';
 import * as Cp_swap from './cp_swap';
@@ -59,4 +60,44 @@ export function getPackageRepo(): AptosParserRepo {
   loadParsers(repo);
   repo.addDefaultParsers();
   return repo;
+}
+
+export class App {
+  cp_scripts : Cp_scripts.App
+  cp_swap : Cp_swap.App
+  cp_swap_utils : Cp_swap_utils.App
+  hippo_config : Hippo_config.App
+  math : Math.App
+  mock_coin : Mock_coin.App
+  mock_deploy : Mock_deploy.App
+  piece_swap : Piece_swap.App
+  piece_swap_math : Piece_swap_math.App
+  piece_swap_script : Piece_swap_script.App
+  router : Router.App
+  safe_math : Safe_math.App
+  stable_curve_numeral : Stable_curve_numeral.App
+  stable_curve_scripts : Stable_curve_scripts.App
+  stable_curve_swap : Stable_curve_swap.App
+  utils : Utils.App
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+    this.cp_scripts = new Cp_scripts.App(client, repo);
+    this.cp_swap = new Cp_swap.App(client, repo);
+    this.cp_swap_utils = new Cp_swap_utils.App(client, repo);
+    this.hippo_config = new Hippo_config.App(client, repo);
+    this.math = new Math.App(client, repo);
+    this.mock_coin = new Mock_coin.App(client, repo);
+    this.mock_deploy = new Mock_deploy.App(client, repo);
+    this.piece_swap = new Piece_swap.App(client, repo);
+    this.piece_swap_math = new Piece_swap_math.App(client, repo);
+    this.piece_swap_script = new Piece_swap_script.App(client, repo);
+    this.router = new Router.App(client, repo);
+    this.safe_math = new Safe_math.App(client, repo);
+    this.stable_curve_numeral = new Stable_curve_numeral.App(client, repo);
+    this.stable_curve_scripts = new Stable_curve_scripts.App(client, repo);
+    this.stable_curve_swap = new Stable_curve_swap.App(client, repo);
+    this.utils = new Utils.App(client, repo);
+  }
 }

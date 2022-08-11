@@ -43,6 +43,10 @@ export class Version
     const result = await repo.loadResource(client, address, Version, typeParams);
     return result as unknown as Version;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Version", []);
+  }
+
 }
 export function initialize_ (
   account: HexString,
@@ -94,5 +98,22 @@ export function buildPayload_set_version (
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::version::Version", Version.VersionParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadVersion(
+    owner: HexString,
+  ) {
+    return Version.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  set_version(
+    major: U64,
+  ) {
+    return buildPayload_set_version(major);
+  }
 }
 

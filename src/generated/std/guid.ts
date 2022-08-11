@@ -39,6 +39,10 @@ export class CreateCapability
     const result = await repo.loadResource(client, address, CreateCapability, typeParams);
     return result as unknown as CreateCapability;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CreateCapability", []);
+  }
+
 }
 
 export class GUID 
@@ -61,6 +65,10 @@ export class GUID
   static GUIDParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : GUID {
     const proto = $.parseStructProto(data, typeTag, repo, GUID);
     return new GUID(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "GUID", []);
   }
 
 }
@@ -91,6 +99,10 @@ export class Generator
     const result = await repo.loadResource(client, address, Generator, typeParams);
     return result as unknown as Generator;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Generator", []);
+  }
+
 }
 
 export class ID 
@@ -116,6 +128,10 @@ export class ID
   static IDParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : ID {
     const proto = $.parseStructProto(data, typeTag, repo, ID);
     return new ID(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "ID", []);
   }
 
 }
@@ -246,5 +262,22 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::guid::GUID", GUID.GUIDParser);
   repo.addParser("0x1::guid::Generator", Generator.GeneratorParser);
   repo.addParser("0x1::guid::ID", ID.IDParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadCreateCapability(
+    owner: HexString,
+  ) {
+    return CreateCapability.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadGenerator(
+    owner: HexString,
+  ) {
+    return Generator.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

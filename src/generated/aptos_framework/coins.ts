@@ -46,4 +46,16 @@ export function register_internal_ (
 
 export function loadParsers(repo: AptosParserRepo) {
 }
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  register(
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_register($p);
+  }
+}
 

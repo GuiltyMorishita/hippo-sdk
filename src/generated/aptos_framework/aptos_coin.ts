@@ -41,6 +41,10 @@ export class AptosCoin
     const result = await repo.loadResource(client, address, AptosCoin, typeParams);
     return result as unknown as AptosCoin;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "AptosCoin", []);
+  }
+
 }
 
 export class Capabilities 
@@ -69,6 +73,10 @@ export class Capabilities
     const result = await repo.loadResource(client, address, Capabilities, typeParams);
     return result as unknown as Capabilities;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Capabilities", []);
+  }
+
 }
 
 export class DelegatedMintCapability 
@@ -91,6 +99,10 @@ export class DelegatedMintCapability
   static DelegatedMintCapabilityParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : DelegatedMintCapability {
     const proto = $.parseStructProto(data, typeTag, repo, DelegatedMintCapability);
     return new DelegatedMintCapability(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "DelegatedMintCapability", []);
   }
 
 }
@@ -121,6 +133,10 @@ export class Delegations
     const result = await repo.loadResource(client, address, Delegations, typeParams);
     return result as unknown as Delegations;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Delegations", []);
+  }
+
 }
 export function claim_mint_capability_ (
   account: HexString,
@@ -266,5 +282,42 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::aptos_coin::Capabilities", Capabilities.CapabilitiesParser);
   repo.addParser("0x1::aptos_coin::DelegatedMintCapability", DelegatedMintCapability.DelegatedMintCapabilityParser);
   repo.addParser("0x1::aptos_coin::Delegations", Delegations.DelegationsParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadAptosCoin(
+    owner: HexString,
+  ) {
+    return AptosCoin.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadCapabilities(
+    owner: HexString,
+  ) {
+    return Capabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadDelegations(
+    owner: HexString,
+  ) {
+    return Delegations.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  claim_mint_capability(
+  ) {
+    return buildPayload_claim_mint_capability();
+  }
+  delegate_mint_capability(
+    to: HexString,
+  ) {
+    return buildPayload_delegate_mint_capability(to);
+  }
+  mint(
+    dst_addr: HexString,
+    amount: U64,
+  ) {
+    return buildPayload_mint(dst_addr, amount);
+  }
 }
 

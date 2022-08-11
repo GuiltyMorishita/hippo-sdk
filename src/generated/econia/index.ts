@@ -1,4 +1,5 @@
 
+import { AptosClient } from "aptos";
 import { AptosParserRepo } from "@manahippo/move-to-ts";
 import * as Capability from './capability';
 import * as Coins from './coins';
@@ -38,4 +39,30 @@ export function getPackageRepo(): AptosParserRepo {
   loadParsers(repo);
   repo.addDefaultParsers();
   return repo;
+}
+
+export class App {
+  capability : Capability.App
+  coins : Coins.App
+  critbit : Critbit.App
+  init : Init.App
+  market : Market.App
+  open_table : Open_table.App
+  order_id : Order_id.App
+  registry : Registry.App
+  user : User.App
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+    this.capability = new Capability.App(client, repo);
+    this.coins = new Coins.App(client, repo);
+    this.critbit = new Critbit.App(client, repo);
+    this.init = new Init.App(client, repo);
+    this.market = new Market.App(client, repo);
+    this.open_table = new Open_table.App(client, repo);
+    this.order_id = new Order_id.App(client, repo);
+    this.registry = new Registry.App(client, repo);
+    this.user = new User.App(client, repo);
+  }
 }

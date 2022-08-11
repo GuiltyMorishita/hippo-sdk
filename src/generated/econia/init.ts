@@ -40,4 +40,15 @@ export function buildPayload_init_econia (
 
 export function loadParsers(repo: AptosParserRepo) {
 }
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  init_econia(
+  ) {
+    return buildPayload_init_econia();
+  }
+}
 

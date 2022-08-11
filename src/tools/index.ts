@@ -607,7 +607,6 @@ others
 
 program.addCommand(others);
 
-/*
 const pontemListPools = async () => {
   const {client, contractAddress} = readConfig(program);
   const resources = await client.getAccountResources(contractAddress);
@@ -629,7 +628,6 @@ pontem
   .action(pontemListPools);
 
 program.addCommand(pontem);
-*/
 
 
 const aggListTradingPools = async () => {
@@ -705,6 +703,28 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
   await testWalletClient();
 }
 
+const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, routeIdx: string) => {
+  const {client, account, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
+  if (xTokInfos.length !== 1) {
+    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
+  }
+  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
+  if (yTokInfos.length !== 1) {
+    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
+  }
+  const inputAmt = parseFloat(inputUiAmt);
+  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  if (quotes.length === 0) {
+    console.log("No route available");
+    return;
+  }
+  const payload = quotes[parseInt(routeIdx)].route.makePaylod(inputAmt, 0);
+  await sendPayloadTx(client, account, payload);
+  await testWalletClient();
+}
+
 const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string) => {
   const {client, account, netConf} = readConfig(program);
   const agg = await TradeAggregator.create(client, netConf);
@@ -724,6 +744,30 @@ const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt:
     return;
   }
   const payload = quotes[0].route.makePaylod(inputAmt, minOutUiAmt);
+  const simResult = await simulatePayloadTx(client, account, payload);
+  printResource(simResult);
+  await testWalletClient();
+}
+
+const aggSimulateSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string, routeIdx: string) => {
+  const {client, account, netConf} = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
+  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
+  if (xTokInfos.length !== 1) {
+    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
+  }
+  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
+  if (yTokInfos.length !== 1) {
+    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
+  }
+  const inputAmt = parseFloat(inputUiAmt);
+  const minOutUiAmt = parseFloat(minOutAmt);
+  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  if (quotes.length === 0) {
+    console.log("No route available");
+    return;
+  }
+  const payload = quotes[parseInt(routeIdx)].route.makePaylod(inputAmt, minOutUiAmt);
   const simResult = await simulatePayloadTx(client, account, payload);
   printResource(simResult);
   await testWalletClient();
@@ -757,12 +801,29 @@ agg
   .action(aggSwap);
 
 agg
+  .command("swap-with-route")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .argument("<routeIdx>")
+  .action(aggSwapWithRoute);
+
+agg
   .command("simulate-swap")
   .argument("<fromSymbol>")
   .argument("<toSymbol>")
   .argument("<inputUiAmt>")
   .argument("<minOutUiAmt>")
   .action(aggSimulateSwap);
+
+agg
+  .command("simulate-swap-with-route")
+  .argument("<fromSymbol>")
+  .argument("<toSymbol>")
+  .argument("<inputUiAmt>")
+  .argument("<minOutUiAmt>")
+  .argument("<routeIdx>")
+  .action(aggSimulateSwapWithRoute);
 
 program.addCommand(agg);
 

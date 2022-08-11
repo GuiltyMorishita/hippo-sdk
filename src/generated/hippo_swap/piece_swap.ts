@@ -42,6 +42,10 @@ export class LPToken
     return new LPToken(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "LPToken", $p);
+  }
+
 }
 
 export class PieceSwapPoolInfo 
@@ -119,6 +123,10 @@ export class PieceSwapPoolInfo
     const result = await repo.loadResource(client, address, PieceSwapPoolInfo, typeParams);
     return result as unknown as PieceSwapPoolInfo;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "PieceSwapPoolInfo", $p);
+  }
+
 
   quote_x_to_y(
     amount_x_in: U64,
@@ -495,5 +503,18 @@ export function swap_y_to_x_direct_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap::LPToken", LPToken.LPTokenParser);
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap::PieceSwapPoolInfo", PieceSwapPoolInfo.PieceSwapPoolInfoParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadPieceSwapPoolInfo(
+    owner: HexString,
+    $p: TypeTag[], /* <X, Y> */
+  ) {
+    return PieceSwapPoolInfo.load(this.repo, this.client, owner, $p);
+  }
 }
 

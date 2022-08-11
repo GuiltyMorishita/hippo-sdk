@@ -287,4 +287,39 @@ export function buildPayload_swap_script (
 
 export function loadParsers(repo: AptosParserRepo) {
 }
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  add_liquidity(
+    amount_x: U64,
+    amount_y: U64,
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_add_liquidity(amount_x, amount_y, $p);
+  }
+  mock_deploy_script(
+  ) {
+    return buildPayload_mock_deploy_script();
+  }
+  remove_liquidity(
+    liquidity: U64,
+    min_amount_x: U64,
+    min_amount_y: U64,
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_remove_liquidity(liquidity, min_amount_x, min_amount_y, $p);
+  }
+  swap_script(
+    x_in: U64,
+    y_in: U64,
+    x_min_out: U64,
+    y_min_out: U64,
+    $p: TypeTag[], /* <X, Y>*/
+  ) {
+    return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+  }
+}
 

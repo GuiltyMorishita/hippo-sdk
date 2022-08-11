@@ -38,6 +38,10 @@ export class Cap
     return new Cap(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Cap", $p);
+  }
+
 }
 
 export class CapDelegateState 
@@ -66,6 +70,10 @@ export class CapDelegateState
     const result = await repo.loadResource(client, address, CapDelegateState, typeParams);
     return result as unknown as CapDelegateState;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CapDelegateState", $p);
+  }
+
 }
 
 export class CapState 
@@ -94,6 +102,10 @@ export class CapState
     const result = await repo.loadResource(client, address, CapState, typeParams);
     return result as unknown as CapState;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CapState", $p);
+  }
+
 }
 
 export class LinearCap 
@@ -116,6 +128,10 @@ export class LinearCap
   static LinearCapParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : LinearCap {
     const proto = $.parseStructProto(data, typeTag, repo, LinearCap);
     return new LinearCap(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "LinearCap", $p);
   }
 
 }
@@ -270,5 +286,24 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::capability::CapDelegateState", CapDelegateState.CapDelegateStateParser);
   repo.addParser("0x1::capability::CapState", CapState.CapStateParser);
   repo.addParser("0x1::capability::LinearCap", LinearCap.LinearCapParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadCapDelegateState(
+    owner: HexString,
+    $p: TypeTag[], /* <Feature> */
+  ) {
+    return CapDelegateState.load(this.repo, this.client, owner, $p);
+  }
+  async loadCapState(
+    owner: HexString,
+    $p: TypeTag[], /* <Feature> */
+  ) {
+    return CapState.load(this.repo, this.client, owner, $p);
+  }
 }
 

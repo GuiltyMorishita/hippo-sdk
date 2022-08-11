@@ -42,6 +42,10 @@ export class TableWithLength
     return new TableWithLength(proto, typeTag);
   }
 
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "TableWithLength", $p);
+  }
+
 }
 export function add_ (
   table: TableWithLength,
@@ -141,5 +145,12 @@ export function remove_ (
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::table_with_length::TableWithLength", TableWithLength.TableWithLengthParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 

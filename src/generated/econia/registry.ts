@@ -68,6 +68,10 @@ export class CustodianCapability
     return new CustodianCapability(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CustodianCapability", []);
+  }
+
 }
 
 export class E0 
@@ -88,6 +92,10 @@ export class E0
   static E0Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E0 {
     const proto = $.parseStructProto(data, typeTag, repo, E0);
     return new E0(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E0", []);
   }
 
 }
@@ -112,6 +120,10 @@ export class E1
     return new E1(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E1", []);
+  }
+
 }
 
 export class E10 
@@ -132,6 +144,10 @@ export class E10
   static E10Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E10 {
     const proto = $.parseStructProto(data, typeTag, repo, E10);
     return new E10(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E10", []);
   }
 
 }
@@ -156,6 +172,10 @@ export class E11
     return new E11(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E11", []);
+  }
+
 }
 
 export class E12 
@@ -176,6 +196,10 @@ export class E12
   static E12Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E12 {
     const proto = $.parseStructProto(data, typeTag, repo, E12);
     return new E12(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E12", []);
   }
 
 }
@@ -200,6 +224,10 @@ export class E13
     return new E13(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E13", []);
+  }
+
 }
 
 export class E14 
@@ -220,6 +248,10 @@ export class E14
   static E14Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E14 {
     const proto = $.parseStructProto(data, typeTag, repo, E14);
     return new E14(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E14", []);
   }
 
 }
@@ -244,6 +276,10 @@ export class E15
     return new E15(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E15", []);
+  }
+
 }
 
 export class E16 
@@ -264,6 +300,10 @@ export class E16
   static E16Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E16 {
     const proto = $.parseStructProto(data, typeTag, repo, E16);
     return new E16(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E16", []);
   }
 
 }
@@ -288,6 +328,10 @@ export class E17
     return new E17(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E17", []);
+  }
+
 }
 
 export class E18 
@@ -308,6 +352,10 @@ export class E18
   static E18Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E18 {
     const proto = $.parseStructProto(data, typeTag, repo, E18);
     return new E18(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E18", []);
   }
 
 }
@@ -332,6 +380,10 @@ export class E19
     return new E19(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E19", []);
+  }
+
 }
 
 export class E2 
@@ -352,6 +404,10 @@ export class E2
   static E2Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E2 {
     const proto = $.parseStructProto(data, typeTag, repo, E2);
     return new E2(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E2", []);
   }
 
 }
@@ -376,6 +432,10 @@ export class E3
     return new E3(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E3", []);
+  }
+
 }
 
 export class E4 
@@ -396,6 +456,10 @@ export class E4
   static E4Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E4 {
     const proto = $.parseStructProto(data, typeTag, repo, E4);
     return new E4(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E4", []);
   }
 
 }
@@ -420,6 +484,10 @@ export class E5
     return new E5(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E5", []);
+  }
+
 }
 
 export class E6 
@@ -440,6 +508,10 @@ export class E6
   static E6Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E6 {
     const proto = $.parseStructProto(data, typeTag, repo, E6);
     return new E6(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E6", []);
   }
 
 }
@@ -464,6 +536,10 @@ export class E7
     return new E7(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E7", []);
+  }
+
 }
 
 export class E8 
@@ -486,6 +562,10 @@ export class E8
     return new E8(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E8", []);
+  }
+
 }
 
 export class E9 
@@ -506,6 +586,10 @@ export class E9
   static E9Parser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : E9 {
     const proto = $.parseStructProto(data, typeTag, repo, E9);
     return new E9(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "E9", []);
   }
 
 }
@@ -536,6 +620,10 @@ export class MarketInfo
   static MarketInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : MarketInfo {
     const proto = $.parseStructProto(data, typeTag, repo, MarketInfo);
     return new MarketInfo(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "MarketInfo", []);
   }
 
 }
@@ -572,6 +660,10 @@ export class Registry
     const result = await repo.loadResource(client, address, Registry, typeParams);
     return result as unknown as Registry;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Registry", []);
+  }
+
 }
 export function coin_is_base_coin_ (
   market_info: MarketInfo,
@@ -801,5 +893,17 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::registry::E9", E9.E9Parser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::registry::MarketInfo", MarketInfo.MarketInfoParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::registry::Registry", Registry.RegistryParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadRegistry(
+    owner: HexString,
+  ) {
+    return Registry.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 

@@ -47,6 +47,10 @@ export class BurnCapability
     const result = await repo.loadResource(client, address, BurnCapability, typeParams);
     return result as unknown as BurnCapability;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BurnCapability", $p);
+  }
+
 }
 
 export class Coin 
@@ -69,6 +73,10 @@ export class Coin
   static CoinParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Coin {
     const proto = $.parseStructProto(data, typeTag, repo, Coin);
     return new Coin(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Coin", $p);
   }
 
 }
@@ -108,6 +116,10 @@ export class CoinInfo
     const result = await repo.loadResource(client, address, CoinInfo, typeParams);
     return result as unknown as CoinInfo;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CoinInfo", $p);
+  }
+
 }
 
 export class CoinStore 
@@ -142,6 +154,10 @@ export class CoinStore
     const result = await repo.loadResource(client, address, CoinStore, typeParams);
     return result as unknown as CoinStore;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "CoinStore", $p);
+  }
+
 }
 
 export class DepositEvent 
@@ -164,6 +180,10 @@ export class DepositEvent
   static DepositEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : DepositEvent {
     const proto = $.parseStructProto(data, typeTag, repo, DepositEvent);
     return new DepositEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "DepositEvent", []);
   }
 
 }
@@ -192,6 +212,10 @@ export class MintCapability
     const result = await repo.loadResource(client, address, MintCapability, typeParams);
     return result as unknown as MintCapability;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "MintCapability", $p);
+  }
+
 }
 
 export class WithdrawEvent 
@@ -214,6 +238,10 @@ export class WithdrawEvent
   static WithdrawEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : WithdrawEvent {
     const proto = $.parseStructProto(data, typeTag, repo, WithdrawEvent);
     return new WithdrawEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "WithdrawEvent", []);
   }
 
 }
@@ -535,5 +563,43 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::coin::DepositEvent", DepositEvent.DepositEventParser);
   repo.addParser("0x1::coin::MintCapability", MintCapability.MintCapabilityParser);
   repo.addParser("0x1::coin::WithdrawEvent", WithdrawEvent.WithdrawEventParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadBurnCapability(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return BurnCapability.load(this.repo, this.client, owner, $p);
+  }
+  async loadCoinInfo(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return CoinInfo.load(this.repo, this.client, owner, $p);
+  }
+  async loadCoinStore(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return CoinStore.load(this.repo, this.client, owner, $p);
+  }
+  async loadMintCapability(
+    owner: HexString,
+    $p: TypeTag[], /* <CoinType> */
+  ) {
+    return MintCapability.load(this.repo, this.client, owner, $p);
+  }
+  transfer(
+    to: HexString,
+    amount: U64,
+    $p: TypeTag[], /* <CoinType>*/
+  ) {
+    return buildPayload_transfer(to, amount, $p);
+  }
 }
 

@@ -63,6 +63,10 @@ export class EconiaCapabilityStore
     const result = await repo.loadResource(client, address, EconiaCapabilityStore, typeParams);
     return result as unknown as EconiaCapabilityStore;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "EconiaCapabilityStore", []);
+  }
+
 }
 
 export class Order 
@@ -91,6 +95,10 @@ export class Order
   static OrderParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Order {
     const proto = $.parseStructProto(data, typeTag, repo, Order);
     return new Order(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "Order", []);
   }
 
 }
@@ -138,6 +146,10 @@ export class OrderBook
     const result = await repo.loadResource(client, address, OrderBook, typeParams);
     return result as unknown as OrderBook;
   }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "OrderBook", $p);
+  }
+
 
   book_orders_sdk(
   ) {
@@ -197,6 +209,10 @@ export class PriceLevel
     return new PriceLevel(proto, typeTag);
   }
 
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "PriceLevel", []);
+  }
+
 }
 
 export class SimpleOrder 
@@ -222,6 +238,10 @@ export class SimpleOrder
   static SimpleOrderParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SimpleOrder {
     const proto = $.parseStructProto(data, typeTag, repo, SimpleOrder);
     return new SimpleOrder(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "SimpleOrder", []);
   }
 
 }
@@ -1011,5 +1031,54 @@ export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::OrderBook", OrderBook.OrderBookParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::PriceLevel", PriceLevel.PriceLevelParser);
   repo.addParser("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::SimpleOrder", SimpleOrder.SimpleOrderParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadEconiaCapabilityStore(
+    owner: HexString,
+  ) {
+    return EconiaCapabilityStore.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
+  async loadOrderBook(
+    owner: HexString,
+    $p: TypeTag[], /* <B, Q, E> */
+  ) {
+    return OrderBook.load(this.repo, this.client, owner, $p);
+  }
+  cancel_limit_order_user(
+    host: HexString,
+    side: boolean,
+    order_id: U128,
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_cancel_limit_order_user(host, side, order_id, $p);
+  }
+  fill_market_order_user(
+    host: HexString,
+    style: boolean,
+    max_base_parcels: U64,
+    max_quote_units: U64,
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_fill_market_order_user(host, style, max_base_parcels, max_quote_units, $p);
+  }
+  place_limit_order_user(
+    host: HexString,
+    side: boolean,
+    base_parcels: U64,
+    price: U64,
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_place_limit_order_user(host, side, base_parcels, price, $p);
+  }
+  register_market(
+    $p: TypeTag[], /* <B, Q, E>*/
+  ) {
+    return buildPayload_register_market($p);
+  }
 }
 

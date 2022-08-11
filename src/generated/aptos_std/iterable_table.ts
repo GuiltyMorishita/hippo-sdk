@@ -41,6 +41,10 @@ export class IterableTable
     const proto = $.parseStructProto(data, typeTag, repo, IterableTable);
     return new IterableTable(proto, typeTag);
   }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "IterableTable", $p);
+  }
   toTypedIterTable<K, V>(field: $.FieldDeclType) { return (TypedIterableTable<K, V>).buildFromField(this, field); }
 
 }
@@ -72,6 +76,10 @@ export class IterableValue
   static IterableValueParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : IterableValue {
     const proto = $.parseStructProto(data, typeTag, repo, IterableValue);
     return new IterableValue(proto, typeTag);
+  }
+
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, "IterableValue", $p);
   }
 
 }
@@ -286,6 +294,13 @@ export function tail_key_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::iterable_table::IterableTable", IterableTable.IterableTableParser);
   repo.addParser("0x1::iterable_table::IterableValue", IterableValue.IterableValueParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
 }
 
 export class TypedIterableTable<K, V> {

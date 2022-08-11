@@ -1,4 +1,5 @@
 
+import { AptosClient } from "aptos";
 import { AptosParserRepo } from "@manahippo/move-to-ts";
 import * as Account from './account';
 import * as Aptos_coin from './aptos_coin';
@@ -80,4 +81,58 @@ export function getPackageRepo(): AptosParserRepo {
   loadParsers(repo);
   repo.addDefaultParsers();
   return repo;
+}
+
+export class App {
+  account : Account.App
+  aptos_coin : Aptos_coin.App
+  aptos_governance : Aptos_governance.App
+  block : Block.App
+  bucket_table : Bucket_table.App
+  chain_id : Chain_id.App
+  code : Code.App
+  coin : Coin.App
+  coins : Coins.App
+  consensus_config : Consensus_config.App
+  genesis : Genesis.App
+  governance_proposal : Governance_proposal.App
+  managed_coin : Managed_coin.App
+  reconfiguration : Reconfiguration.App
+  resource_account : Resource_account.App
+  stake : Stake.App
+  system_addresses : System_addresses.App
+  timestamp : Timestamp.App
+  transaction_context : Transaction_context.App
+  transaction_fee : Transaction_fee.App
+  version : Version.App
+  vm_config : Vm_config.App
+  voting : Voting.App
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+    this.account = new Account.App(client, repo);
+    this.aptos_coin = new Aptos_coin.App(client, repo);
+    this.aptos_governance = new Aptos_governance.App(client, repo);
+    this.block = new Block.App(client, repo);
+    this.bucket_table = new Bucket_table.App(client, repo);
+    this.chain_id = new Chain_id.App(client, repo);
+    this.code = new Code.App(client, repo);
+    this.coin = new Coin.App(client, repo);
+    this.coins = new Coins.App(client, repo);
+    this.consensus_config = new Consensus_config.App(client, repo);
+    this.genesis = new Genesis.App(client, repo);
+    this.governance_proposal = new Governance_proposal.App(client, repo);
+    this.managed_coin = new Managed_coin.App(client, repo);
+    this.reconfiguration = new Reconfiguration.App(client, repo);
+    this.resource_account = new Resource_account.App(client, repo);
+    this.stake = new Stake.App(client, repo);
+    this.system_addresses = new System_addresses.App(client, repo);
+    this.timestamp = new Timestamp.App(client, repo);
+    this.transaction_context = new Transaction_context.App(client, repo);
+    this.transaction_fee = new Transaction_fee.App(client, repo);
+    this.version = new Version.App(client, repo);
+    this.vm_config = new Vm_config.App(client, repo);
+    this.voting = new Voting.App(client, repo);
+  }
 }

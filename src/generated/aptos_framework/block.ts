@@ -51,6 +51,10 @@ export class BlockMetadata
     const result = await repo.loadResource(client, address, BlockMetadata, typeParams);
     return result as unknown as BlockMetadata;
   }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "BlockMetadata", []);
+  }
+
 }
 
 export class NewBlockEvent 
@@ -91,6 +95,10 @@ export class NewBlockEvent
   static NewBlockEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : NewBlockEvent {
     const proto = $.parseStructProto(data, typeTag, repo, NewBlockEvent);
     return new NewBlockEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "NewBlockEvent", []);
   }
 
 }
@@ -198,5 +206,17 @@ export function update_epoch_interval_ (
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0x1::block::BlockMetadata", BlockMetadata.BlockMetadataParser);
   repo.addParser("0x1::block::NewBlockEvent", NewBlockEvent.NewBlockEventParser);
+}
+export class App {
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+  ) {
+  }
+  async loadBlockMetadata(
+    owner: HexString,
+  ) {
+    return BlockMetadata.load(this.repo, this.client, owner, [] as TypeTag[]);
+  }
 }
 
