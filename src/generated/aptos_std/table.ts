@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -17,6 +17,7 @@ export class Box
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Box";
   static typeParameters: TypeParamDeclType[] = [
     { name: "V", isPhantom: false }
@@ -39,8 +40,17 @@ export class Box
     const result = await repo.loadResource(client, address, Box, typeParams);
     return result as unknown as Box;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Box, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Box;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Box", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    if (this.val.typeTag instanceof StructTag) {await this.val.loadFullState(app);}
+    this.__app = app;
   }
 
 }
@@ -49,6 +59,7 @@ export class Table
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Table";
   static typeParameters: TypeParamDeclType[] = [
     { name: "K", isPhantom: true },
@@ -70,6 +81,12 @@ export class Table
 
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Table", $p);
+  }
+
+  toTypedTable<K = any, V = any>() { return TypedTable.fromTable<K, V>(this); }
+
+  async loadFullState(app: $.AppType) {
+    throw new Error('Cannot enumertate full state of Table');
   }
 
 }
@@ -230,19 +247,29 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Box() { return Box; }
   async loadBox(
     owner: HexString,
     $p: TypeTag[], /* <V> */
+    loadFull=true,
   ) {
-    return Box.load(this.repo, this.client, owner, $p);
+    const val = await Box.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get Table() { return Table; }
 }
 
-export class TypedTable<K, V> {
-  static buildFromField<K, V>(table: Table, field: FieldDeclType): TypedTable<K, V> {
-    const tag = field.typeTag;
+export class TypedTable<K=any, V=any> {
+  static fromTable<K=any, V=any>(table: Table): TypedTable<K, V> {
+    const tag = table.typeTag;
     if (!(tag instanceof StructTag)) {
       throw new Error();
     }
@@ -273,7 +300,7 @@ export class TypedTable<K, V> {
 
   async loadEntry(client: AptosClient, repo: AptosParserRepo, key: K): Promise<V> {
     const rawVal = await this.loadEntryRaw(client, key);
-    return repo.parse(rawVal.data, this.valueTag);
+    return repo.parse(rawVal, this.valueTag);
   }
 }
 

@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,6 +19,7 @@ export class ChainId
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ChainId";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -41,8 +42,16 @@ export class ChainId
     const result = await repo.loadResource(client, address, ChainId, typeParams);
     return result as unknown as ChainId;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, ChainId, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as ChainId;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ChainId", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -61,7 +70,7 @@ export function initialize_ (
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), Std.Signer.address_of_(account, $c))) {
-    throw $.abortCode(Std.Error.already_exists_(ECHAIN_ID, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(ECHAIN_ID), $c));
   }
   return $c.move_to(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), account, new ChainId({ id: $.copy(id) }, new StructTag(new HexString("0x1"), "chain_id", "ChainId", [])));
 }
@@ -73,12 +82,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get ChainId() { return ChainId; }
   async loadChainId(
     owner: HexString,
+    loadFull=true,
   ) {
-    return ChainId.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await ChainId.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

@@ -1,11 +1,12 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
+import * as Util from "./util";
 export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "code";
@@ -19,6 +20,7 @@ export class ModuleMetadata
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ModuleMetadata";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -49,6 +51,11 @@ export class ModuleMetadata
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ModuleMetadata", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.name.loadFullState(app);
+    await this.source.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -56,6 +63,7 @@ export class PackageMetadata
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "PackageMetadata";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -63,19 +71,25 @@ export class PackageMetadata
   static fields: FieldDeclType[] = [
   { name: "name", typeTag: new StructTag(new HexString("0x1"), "string", "String", []) },
   { name: "upgrade_policy", typeTag: new StructTag(new HexString("0x1"), "code", "UpgradePolicy", []) },
+  { name: "build_info", typeTag: new StructTag(new HexString("0x1"), "string", "String", []) },
   { name: "manifest", typeTag: new StructTag(new HexString("0x1"), "string", "String", []) },
-  { name: "modules", typeTag: new VectorTag(new StructTag(new HexString("0x1"), "code", "ModuleMetadata", [])) }];
+  { name: "modules", typeTag: new VectorTag(new StructTag(new HexString("0x1"), "code", "ModuleMetadata", [])) },
+  { name: "error_map", typeTag: new VectorTag(AtomicTypeTag.U8) }];
 
   name: Std.String.String;
   upgrade_policy: UpgradePolicy;
+  build_info: Std.String.String;
   manifest: Std.String.String;
   modules: ModuleMetadata[];
+  error_map: U8[];
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.name = proto['name'] as Std.String.String;
     this.upgrade_policy = proto['upgrade_policy'] as UpgradePolicy;
+    this.build_info = proto['build_info'] as Std.String.String;
     this.manifest = proto['manifest'] as Std.String.String;
     this.modules = proto['modules'] as ModuleMetadata[];
+    this.error_map = proto['error_map'] as U8[];
   }
 
   static PackageMetadataParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : PackageMetadata {
@@ -86,6 +100,13 @@ export class PackageMetadata
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "PackageMetadata", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.name.loadFullState(app);
+    await this.upgrade_policy.loadFullState(app);
+    await this.build_info.loadFullState(app);
+    await this.manifest.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -93,6 +114,7 @@ export class PackageRegistry
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "PackageRegistry";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -115,8 +137,16 @@ export class PackageRegistry
     const result = await repo.loadResource(client, address, PackageRegistry, typeParams);
     return result as unknown as PackageRegistry;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, PackageRegistry, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as PackageRegistry;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "PackageRegistry", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -125,6 +155,7 @@ export class UpgradePolicy
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "UpgradePolicy";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -145,6 +176,9 @@ export class UpgradePolicy
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "UpgradePolicy", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -170,8 +204,8 @@ export function check_coexistence_ (
       while (($.copy(j)).lt(Std.Vector.length_(new_modules, $c, [new StructTag(new HexString("0x1"), "string", "String", [])]))) {
         {
           name = Std.Vector.borrow_(new_modules, $.copy(j), $c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
-          if (!$.deep_eq(old_mod.name, name)) {
-            throw $.abortCode(Std.Error.already_exists_(EMODULE_NAME_CLASH, $c));
+          if (!!$.deep_eq(old_mod.name, name)) {
+            throw $.abortCode(Std.Error.already_exists_($.copy(EMODULE_NAME_CLASH), $c));
           }
         }
 
@@ -188,22 +222,14 @@ export function check_upgradability_ (
   let temp$1;
   temp$1 = upgrade_policy_immutable_($c);
   if (!($.copy(old_pack.upgrade_policy.policy)).lt($.copy(temp$1.policy))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EUPGRADE_IMMUTABLE, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EUPGRADE_IMMUTABLE), $c));
   }
   if (!can_change_upgrade_policy_to_($.copy(old_pack.upgrade_policy), $.copy(new_pack.upgrade_policy), $c)) {
-    throw $.abortCode(Std.Error.invalid_argument_(EUPGRADE_WEAKER_POLICY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EUPGRADE_WEAKER_POLICY), $c));
   }
   return;
 }
 
-export function from_bytes_ (
-  bytes: U8[],
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <T>*/
-): PackageMetadata {
-  return $.aptos_framework_code_from_bytes(bytes, $c, [$p[0]]);
-
-}
 export function get_module_names_ (
   pack: PackageMetadata,
   $c: AptosDataCache,
@@ -267,7 +293,7 @@ export function publish_package_txn_ (
   code: U8[][],
   $c: AptosDataCache,
 ): void {
-  return publish_package_(owner, from_bytes_($.copy(pack_serialized), $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]), $.copy(code), $c);
+  return publish_package_(owner, Util.from_bytes_($.copy(pack_serialized), $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]), $.copy(code), $c);
 }
 
 
@@ -324,13 +350,25 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get ModuleMetadata() { return ModuleMetadata; }
+  get PackageMetadata() { return PackageMetadata; }
+  get PackageRegistry() { return PackageRegistry; }
   async loadPackageRegistry(
     owner: HexString,
+    loadFull=true,
   ) {
-    return PackageRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await PackageRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get UpgradePolicy() { return UpgradePolicy; }
   publish_package_txn(
     pack_serialized: U8[],
     code: U8[][],

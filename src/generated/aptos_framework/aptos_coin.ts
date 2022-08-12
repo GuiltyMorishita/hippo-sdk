@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -21,6 +21,7 @@ export class AptosCoin
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "AptosCoin";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -41,8 +42,16 @@ export class AptosCoin
     const result = await repo.loadResource(client, address, AptosCoin, typeParams);
     return result as unknown as AptosCoin;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, AptosCoin, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as AptosCoin;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "AptosCoin", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -51,6 +60,7 @@ export class Capabilities
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Capabilities";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -73,8 +83,17 @@ export class Capabilities
     const result = await repo.loadResource(client, address, Capabilities, typeParams);
     return result as unknown as Capabilities;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Capabilities, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Capabilities;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Capabilities", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.mint_cap.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -83,6 +102,7 @@ export class DelegatedMintCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "DelegatedMintCapability";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -104,6 +124,9 @@ export class DelegatedMintCapability
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "DelegatedMintCapability", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -111,6 +134,7 @@ export class Delegations
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Delegations";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -133,8 +157,16 @@ export class Delegations
     const result = await repo.loadResource(client, address, Delegations, typeParams);
     return result as unknown as Delegations;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Delegations, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Delegations;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Delegations", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -145,7 +177,7 @@ export function claim_mint_capability_ (
   let delegations, idx, maybe_index, mint_cap;
   maybe_index = find_delegation_(Std.Signer.address_of_(account, $c), $c);
   if (!Std.Option.is_some_(maybe_index, $c, [AtomicTypeTag.U64])) {
-    throw $.abortCode(EDELEGATION_NOT_FOUND);
+    throw $.abortCode($.copy(EDELEGATION_NOT_FOUND));
   }
   idx = $.copy(Std.Option.borrow_(maybe_index, $c, [AtomicTypeTag.U64]));
   delegations = $c.borrow_global_mut<Delegations>(new StructTag(new HexString("0x1"), "aptos_coin", "Delegations", []), new HexString("0xa550c18")).inner;
@@ -180,7 +212,7 @@ export function delegate_mint_capability_ (
       [temp$1, temp$2] = [delegations, $.copy(i)];
       element = Std.Vector.borrow_(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "DelegatedMintCapability", [])]);
       if (!(($.copy(element.to)).hex() !== ($.copy(to)).hex())) {
-        throw $.abortCode(Std.Error.invalid_argument_(EALREADY_DELEGATED, $c));
+        throw $.abortCode(Std.Error.invalid_argument_($.copy(EALREADY_DELEGATED), $c));
       }
       i = ($.copy(i)).add(u64("1"));
     }
@@ -234,7 +266,7 @@ export function initialize_ (
 ): [Coin.MintCapability, Coin.BurnCapability] {
   let burn_cap, coins, mint_cap;
   System_addresses.assert_aptos_framework_(aptos_framework, $c);
-  [mint_cap, burn_cap] = Coin.initialize_(aptos_framework, Std.String.utf8_([u8("65"), u8("112"), u8("116"), u8("111"), u8("115"), u8("32"), u8("67"), u8("111"), u8("105"), u8("110")], $c), Std.String.utf8_([u8("65"), u8("80"), u8("84"), u8("79"), u8("83")], $c), u64("8"), false, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  [mint_cap, burn_cap] = Coin.initialize_(aptos_framework, Std.String.utf8_([u8("65"), u8("112"), u8("116"), u8("111"), u8("115"), u8("32"), u8("67"), u8("111"), u8("105"), u8("110")], $c), Std.String.utf8_([u8("65"), u8("80"), u8("84")], $c), u64("8"), false, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   $c.move_to(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), aptos_framework, new Capabilities({ mint_cap: $.copy(mint_cap) }, new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", [])));
   Coin.register_(core_resource, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   coins = Coin.mint_(u64("18446744073709551615"), mint_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
@@ -253,7 +285,7 @@ export function mint_ (
   let account_addr, capabilities, coins_minted;
   account_addr = Std.Signer.address_of_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), $.copy(account_addr))) {
-    throw $.abortCode(Std.Error.not_found_(ENO_CAPABILITIES, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ENO_CAPABILITIES), $c));
   }
   capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "aptos_coin", "Capabilities", []), $.copy(account_addr));
   coins_minted = Coin.mint_($.copy(amount), capabilities.mint_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
@@ -287,22 +319,44 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get AptosCoin() { return AptosCoin; }
   async loadAptosCoin(
     owner: HexString,
+    loadFull=true,
   ) {
-    return AptosCoin.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await AptosCoin.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get Capabilities() { return Capabilities; }
   async loadCapabilities(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Capabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Capabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get DelegatedMintCapability() { return DelegatedMintCapability; }
+  get Delegations() { return Delegations; }
   async loadDelegations(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Delegations.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Delegations.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
   claim_mint_capability(
   ) {

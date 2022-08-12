@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -89,7 +89,7 @@ export function get_y_ (
 ): U128 {
   let amp__1, b, c, result, x__2, y;
   if (!($.copy(x)).neq(u64("0"))) {
-    throw $.abortCode(ERROR_SWAP_INVALID_AMOUNT);
+    throw $.abortCode($.copy(ERROR_SWAP_INVALID_AMOUNT));
   }
   if (($.copy(d)).eq((u128("0")))) {
     return u128("0");
@@ -117,7 +117,7 @@ export function recur_D_improved_ (
 ): [U128, U128] {
   let temp$1, temp$2, temp$3, temp$4, d_prev, new_d, result;
   if (!($.copy(iter)).lt($.copy(end))) {
-    throw $.abortCode(ERROR_SWAP_INVALID_DERIVIATION);
+    throw $.abortCode($.copy(ERROR_SWAP_INVALID_DERIVIATION));
   }
   d_prev = $.copy(d);
   result = u128("0");
@@ -165,7 +165,7 @@ export function recur_D_newton_method_ (
 ): [U128, U128] {
   let temp$1, temp$2, d1, minuend;
   if (!($.copy(iter)).lt($.copy(end))) {
-    throw $.abortCode(ERROR_SWAP_INVALID_DERIVIATION);
+    throw $.abortCode($.copy(ERROR_SWAP_INVALID_DERIVIATION));
   }
   d1 = ((((((u128("8")).mul($.copy(amp))).mul($.copy(x))).mul($.copy(y))).mul(($.copy(x)).add($.copy(y)))).add((((u128("2")).mul($.copy(d))).mul($.copy(d))).mul($.copy(d)))).div((((u128("3")).mul($.copy(d))).mul($.copy(d))).add((((u128("4")).mul($.copy(x))).mul($.copy(y))).mul(((u128("2")).mul($.copy(amp))).sub(u128("1")))));
   minuend = ($.copy(d)).sub($.copy(d1));
@@ -190,7 +190,7 @@ export function recur_D_origin_ (
 ): [U128, U128] {
   let temp$1, temp$2, temp$3, temp$4, d_p, d_prev, new_d, result;
   if (!($.copy(iter)).lt($.copy(end))) {
-    throw $.abortCode(ERROR_SWAP_INVALID_DERIVIATION);
+    throw $.abortCode($.copy(ERROR_SWAP_INVALID_DERIVIATION));
   }
   d_prev = $.copy(d);
   result = u128("0");
@@ -240,7 +240,7 @@ export function recur_y_ (
 ): [U128, U128] {
   let temp$1, difference, y_next;
   if (!($.copy(iter)).lt($.copy(end))) {
-    throw $.abortCode(ERROR_SWAP_INVALID_DERIVIATION);
+    throw $.abortCode($.copy(ERROR_SWAP_INVALID_DERIVIATION));
   }
   y_next = ((($.copy(y)).mul($.copy(y))).add($.copy(c))).div((((u128("2")).mul($.copy(y))).add($.copy(b))).sub($.copy(d)));
   if (($.copy(y_next)).gt($.copy(y))) {
@@ -264,7 +264,10 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
 }
 

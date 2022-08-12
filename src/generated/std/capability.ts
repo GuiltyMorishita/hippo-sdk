@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -20,6 +20,7 @@ export class Cap
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Cap";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Feature", isPhantom: true }
@@ -41,6 +42,9 @@ export class Cap
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Cap", $p);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -48,6 +52,7 @@ export class CapDelegateState
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CapDelegateState";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Feature", isPhantom: true }
@@ -70,8 +75,16 @@ export class CapDelegateState
     const result = await repo.loadResource(client, address, CapDelegateState, typeParams);
     return result as unknown as CapDelegateState;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CapDelegateState, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CapDelegateState;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "CapDelegateState", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -80,6 +93,7 @@ export class CapState
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CapState";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Feature", isPhantom: true }
@@ -102,8 +116,16 @@ export class CapState
     const result = await repo.loadResource(client, address, CapState, typeParams);
     return result as unknown as CapState;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CapState, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CapState;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "CapState", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -112,6 +134,7 @@ export class LinearCap
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "LinearCap";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Feature", isPhantom: true }
@@ -132,6 +155,9 @@ export class LinearCap
 
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "LinearCap", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -178,7 +204,7 @@ export function create_ (
   let addr;
   addr = Signer.address_of_(owner, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(addr))) {
-    throw $.abortCode(Error.already_exists_(ECAP, $c));
+    throw $.abortCode(Error.already_exists_($.copy(ECAP), $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), owner, new CapState({ delegates: Vector.empty_($c, [AtomicTypeTag.Address]) }, new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]])));
   return;
@@ -265,16 +291,16 @@ export function validate_acquire_ (
   if ($c.exists(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(addr))) {
     root_addr = $.copy($c.borrow_global<CapDelegateState>(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(addr)).root);
     if (!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(root_addr))) {
-      throw $.abortCode(Error.invalid_state_(EDELEGATE, $c));
+      throw $.abortCode(Error.invalid_state_($.copy(EDELEGATE), $c));
     }
     if (!Vector.contains_($c.borrow_global<CapState>(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(root_addr)).delegates, addr, $c, [AtomicTypeTag.Address])) {
-      throw $.abortCode(Error.invalid_state_(EDELEGATE, $c));
+      throw $.abortCode(Error.invalid_state_($.copy(EDELEGATE), $c));
     }
     temp$1 = $.copy(root_addr);
   }
   else{
     if (!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(addr))) {
-      throw $.abortCode(Error.not_found_(ECAP, $c));
+      throw $.abortCode(Error.not_found_($.copy(ECAP), $c));
     }
     temp$1 = $.copy(addr);
   }
@@ -291,19 +317,36 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Cap() { return Cap; }
+  get CapDelegateState() { return CapDelegateState; }
   async loadCapDelegateState(
     owner: HexString,
     $p: TypeTag[], /* <Feature> */
+    loadFull=true,
   ) {
-    return CapDelegateState.load(this.repo, this.client, owner, $p);
+    const val = await CapDelegateState.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get CapState() { return CapState; }
   async loadCapState(
     owner: HexString,
     $p: TypeTag[], /* <Feature> */
+    loadFull=true,
   ) {
-    return CapState.load(this.repo, this.client, owner, $p);
+    const val = await CapState.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get LinearCap() { return LinearCap; }
 }
 

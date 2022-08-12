@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,6 +19,7 @@ export class Container
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Container";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -41,8 +42,17 @@ export class Container
     const result = await repo.loadResource(client, address, Container, typeParams);
     return result as unknown as Container;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Container, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Container;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Container", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.store.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -97,7 +107,7 @@ export function retrieve_resource_account_cap_ (
 ): Account.SignerCapability {
   let _resource_addr, container, container__1, empty_container, resource__2, resource_addr, resource_signer_cap, signer_cap, zero_auth_key;
   if (!$c.exists(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(source_addr))) {
-    throw $.abortCode(Std.Error.not_found_(ECONTAINER_NOT_PUBLISHED, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ECONTAINER_NOT_PUBLISHED), $c));
   }
   resource_addr = Std.Signer.address_of_(resource, $c);
   container = $c.borrow_global_mut<Container>(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(source_addr));
@@ -123,12 +133,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Container() { return Container; }
   async loadContainer(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Container.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Container.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
   create_resource_account(
     seed: U8[],

@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -17,6 +17,7 @@ export class IterableTable
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "IterableTable";
   static typeParameters: TypeParamDeclType[] = [
     { name: "K", isPhantom: false },
@@ -45,7 +46,14 @@ export class IterableTable
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "IterableTable", $p);
   }
-  toTypedIterTable<K, V>(field: $.FieldDeclType) { return (TypedIterableTable<K, V>).buildFromField(this, field); }
+
+  toTypedIterTable<K = any, V = any>() { return TypedIterableTable.fromIterableTable<K, V>(this); }
+
+  async loadFullState(app: $.AppType) {
+    const typedIterTable = this.toTypedIterTable();
+    await typedIterTable.fetchAll(app.client, app.repo, app.cache);
+    this.__app = app;
+  }
 
 }
 
@@ -53,6 +61,7 @@ export class IterableValue
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "IterableValue";
   static typeParameters: TypeParamDeclType[] = [
     { name: "K", isPhantom: false },
@@ -80,6 +89,12 @@ export class IterableValue
 
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "IterableValue", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    if (this.val.typeTag instanceof StructTag) {await this.val.loadFullState(app);}
+    await this.prev.loadFullState(app);
+    await this.next.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -299,13 +314,18 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get IterableTable() { return IterableTable; }
+  get IterableValue() { return IterableValue; }
 }
 
-export class TypedIterableTable<K, V> {
-  static buildFromField<K, V>(table: IterableTable, field: FieldDeclType): TypedIterableTable<K, V> {
-    const tag = field.typeTag;
+export class TypedIterableTable<K=any, V=any> {
+  static fromIterableTable<K=any, V=any>(table: IterableTable): TypedIterableTable<K, V> {
+    const tag = table.typeTag;
     if (!(tag instanceof StructTag)) {
       throw new Error();
     }
@@ -338,19 +358,29 @@ export class TypedIterableTable<K, V> {
 
   async loadEntry(client: AptosClient, repo: AptosParserRepo, key: K): Promise<IterableValue> {
     const rawVal = await this.loadEntryRaw(client, key);
-    return repo.parse(rawVal.data, this.iterValueTag) as IterableValue;
+    return repo.parse(rawVal, this.iterValueTag) as IterableValue;
   }
 
-  async fetchAll(client: AptosClient, repo: AptosParserRepo): Promise<[K, V][]> {
+  async fetchAll(client: AptosClient, repo: AptosParserRepo, cache: AptosLocalCache | null = null): Promise<[K, V][]> {
     const result: [K, V][] = [];
-    const cache = new $.DummyCache();
+    const dummyCache = new $.DummyCache();
     let next = this.table.head;
-    while(next && await Std.Option.is_some_(next, cache, [this.keyTag])) {
-      const key = await Std.Option.borrow_(next, cache, [this.keyTag]) as K;
+    while(next && await Std.Option.is_some_(next, dummyCache, [this.keyTag])) {
+      const key = await Std.Option.borrow_(next, dummyCache, [this.keyTag]) as K;
       const iterVal = await this.loadEntry(client, repo, key);
       const value = iterVal.val as V;
       result.push([key, value]);
       next = iterVal.next;
+      if (cache) {
+        const $p = [this.keyTag, this.valueTag];
+        Table_with_length.add_(
+          this.table.inner,
+          $.copy(key),
+          iterVal,
+          cache,
+          [$p[0], iterVal.typeTag]
+        );
+      }
     }
     return result;
   }

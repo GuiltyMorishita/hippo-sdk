@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -26,6 +26,7 @@ export class Configuration
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Configuration";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -54,8 +55,17 @@ export class Configuration
     const result = await repo.loadResource(client, address, Configuration, typeParams);
     return result as unknown as Configuration;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Configuration, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Configuration;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Configuration", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.events.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -64,6 +74,7 @@ export class DisableReconfiguration
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "DisableReconfiguration";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -84,8 +95,16 @@ export class DisableReconfiguration
     const result = await repo.loadResource(client, address, DisableReconfiguration, typeParams);
     return result as unknown as DisableReconfiguration;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, DisableReconfiguration, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as DisableReconfiguration;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "DisableReconfiguration", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -94,6 +113,7 @@ export class NewEpochEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "NewEpochEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -115,6 +135,9 @@ export class NewEpochEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "NewEpochEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function disable_reconfiguration_ (
@@ -123,7 +146,7 @@ export function disable_reconfiguration_ (
 ): void {
   System_addresses.assert_aptos_framework_(account, $c);
   if (!reconfiguration_enabled_($c)) {
-    throw $.abortCode(Std.Error.invalid_state_(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(ECONFIGURATION), $c));
   }
   return $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), account, new DisableReconfiguration({  }, new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", [])));
 }
@@ -133,7 +156,7 @@ export function emit_genesis_reconfiguration_event_ (
 ): void {
   let temp$1, config_ref;
   if (!$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"))) {
-    throw $.abortCode(Std.Error.not_found_(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ECONFIGURATION), $c));
   }
   config_ref = $c.borrow_global_mut<Configuration>(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"));
   if (($.copy(config_ref.epoch)).eq((u64("0")))) {
@@ -143,7 +166,7 @@ export function emit_genesis_reconfiguration_event_ (
     temp$1 = false;
   }
   if (!temp$1) {
-    throw $.abortCode(Std.Error.invalid_state_(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(ECONFIGURATION), $c));
   }
   config_ref.epoch = u64("1");
   Aptos_std.Event.emit_event_(config_ref.events, new NewEpochEvent({ epoch: $.copy(config_ref.epoch) }, new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])), $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])]);
@@ -156,7 +179,7 @@ export function enable_reconfiguration_ (
 ): void {
   System_addresses.assert_aptos_framework_(account, $c);
   if (!!reconfiguration_enabled_($c)) {
-    throw $.abortCode(Std.Error.invalid_state_(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(ECONFIGURATION), $c));
   }
   $c.move_from<DisableReconfiguration>(new StructTag(new HexString("0x1"), "reconfiguration", "DisableReconfiguration", []), Std.Signer.address_of_(account, $c));
   return;
@@ -189,10 +212,10 @@ export function initialize_ (
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), new HexString("0x1"))) {
-    throw $.abortCode(Std.Error.already_exists_(ECONFIGURATION, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(ECONFIGURATION), $c));
   }
   if (!(Std.Guid.get_next_creation_num_(Std.Signer.address_of_(account, $c), $c)).eq((u64("1")))) {
-    throw $.abortCode(Std.Error.invalid_state_(EINVALID_GUID_FOR_EVENT, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(EINVALID_GUID_FOR_EVENT), $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", []), account, new Configuration({ epoch: u64("0"), last_reconfiguration_time: u64("0"), events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "reconfiguration", "NewEpochEvent", [])]) }, new StructTag(new HexString("0x1"), "reconfiguration", "Configuration", [])));
   return;
@@ -247,7 +270,7 @@ export function reconfigure__ (
   else{
   }
   if (!($.copy(current_time)).gt($.copy(config_ref.last_reconfiguration_time))) {
-    throw $.abortCode(Std.Error.invalid_state_(EINVALID_BLOCK_TIME, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(EINVALID_BLOCK_TIME), $c));
   }
   config_ref.last_reconfiguration_time = $.copy(current_time);
   config_ref.epoch = ($.copy(config_ref.epoch)).add(u64("1"));
@@ -264,18 +287,34 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Configuration() { return Configuration; }
   async loadConfiguration(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Configuration.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Configuration.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get DisableReconfiguration() { return DisableReconfiguration; }
   async loadDisableReconfiguration(
     owner: HexString,
+    loadFull=true,
   ) {
-    return DisableReconfiguration.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await DisableReconfiguration.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get NewEpochEvent() { return NewEpochEvent; }
   force_reconfigure(
   ) {
     return buildPayload_force_reconfigure();

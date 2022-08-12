@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -18,6 +18,7 @@ export class Option
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Option";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Element", isPhantom: false }
@@ -39,6 +40,9 @@ export class Option
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Option", $p);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function borrow_ (
@@ -47,7 +51,7 @@ export function borrow_ (
   $p: TypeTag[], /* <Element>*/
 ): any {
   if (!is_some_(t, $c, [$p[0]])) {
-    throw $.abortCode(EOPTION_NOT_SET);
+    throw $.abortCode($.copy(EOPTION_NOT_SET));
   }
   return Vector.borrow_(t.vec, u64("0"), $c, [$p[0]]);
 }
@@ -58,7 +62,7 @@ export function borrow_mut_ (
   $p: TypeTag[], /* <Element>*/
 ): any {
   if (!is_some_(t, $c, [$p[0]])) {
-    throw $.abortCode(EOPTION_NOT_SET);
+    throw $.abortCode($.copy(EOPTION_NOT_SET));
   }
   return Vector.borrow_mut_(t.vec, u64("0"), $c, [$p[0]]);
 }
@@ -95,7 +99,7 @@ export function destroy_none_ (
   $p: TypeTag[], /* <Element>*/
 ): void {
   if (!is_none_(t, $c, [$p[0]])) {
-    throw $.abortCode(EOPTION_IS_SET);
+    throw $.abortCode($.copy(EOPTION_IS_SET));
   }
   let { vec: vec } = t;
   return Vector.destroy_empty_(vec, $c, [$p[0]]);
@@ -108,7 +112,7 @@ export function destroy_some_ (
 ): any {
   let elem;
   if (!is_some_(t, $c, [$p[0]])) {
-    throw $.abortCode(EOPTION_NOT_SET);
+    throw $.abortCode($.copy(EOPTION_NOT_SET));
   }
   let { vec: vec } = t;
   elem = Vector.pop_back_(vec, $c, [$p[0]]);
@@ -139,7 +143,7 @@ export function extract_ (
   $p: TypeTag[], /* <Element>*/
 ): any {
   if (!is_some_(t, $c, [$p[0]])) {
-    throw $.abortCode(EOPTION_NOT_SET);
+    throw $.abortCode($.copy(EOPTION_NOT_SET));
   }
   return Vector.pop_back_(t.vec, $c, [$p[0]]);
 }
@@ -156,7 +160,7 @@ export function fill_ (
     Vector.push_back_(vec_ref, e, $c, [$p[0]]);
   }
   else{
-    throw $.abortCode(EOPTION_IS_SET);
+    throw $.abortCode($.copy(EOPTION_IS_SET));
   }
   return;
 }
@@ -217,7 +221,7 @@ export function swap_ (
 ): any {
   let old_value, vec_ref;
   if (!is_some_(t, $c, [$p[0]])) {
-    throw $.abortCode(EOPTION_NOT_SET);
+    throw $.abortCode($.copy(EOPTION_NOT_SET));
   }
   vec_ref = t.vec;
   old_value = Vector.pop_back_(vec_ref, $c, [$p[0]]);
@@ -260,7 +264,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Option() { return Option; }
 }
 

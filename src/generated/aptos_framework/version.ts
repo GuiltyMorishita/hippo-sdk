@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -21,6 +21,7 @@ export class Version
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Version";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -43,8 +44,16 @@ export class Version
     const result = await repo.loadResource(client, address, Version, typeParams);
     return result as unknown as Version;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Version, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Version;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Version", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -56,7 +65,7 @@ export function initialize_ (
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"))) {
-    throw $.abortCode(Std.Error.already_exists_(ECONFIG, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(ECONFIG), $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "version", "Version", []), account, new Version({ major: $.copy(initial_version) }, new StructTag(new HexString("0x1"), "version", "Version", [])));
   return;
@@ -70,11 +79,11 @@ export function set_version_ (
   let config, old_major;
   System_addresses.assert_core_resource_(account, $c);
   if (!$c.exists(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"))) {
-    throw $.abortCode(Std.Error.not_found_(ECONFIG, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ECONFIG), $c));
   }
   old_major = $.copy($c.borrow_global<Version>(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1")).major);
   if (!($.copy(old_major)).lt($.copy(major))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EINVALID_MAJOR_VERSION_NUMBER, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EINVALID_MAJOR_VERSION_NUMBER), $c));
   }
   config = $c.borrow_global_mut<Version>(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"));
   config.major = $.copy(major);
@@ -103,12 +112,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Version() { return Version; }
   async loadVersion(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Version.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Version.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
   set_version(
     major: U64,

@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -21,6 +21,7 @@ export class CurrentTimeMicroseconds
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CurrentTimeMicroseconds";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -43,8 +44,16 @@ export class CurrentTimeMicroseconds
     const result = await repo.loadResource(client, address, CurrentTimeMicroseconds, typeParams);
     return result as unknown as CurrentTimeMicroseconds;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CurrentTimeMicroseconds, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CurrentTimeMicroseconds;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "CurrentTimeMicroseconds", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -52,7 +61,7 @@ export function assert_genesis_ (
   $c: AptosDataCache,
 ): void {
   if (!is_genesis_($c)) {
-    throw $.abortCode(Std.Error.invalid_state_(ENOT_GENESIS, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(ENOT_GENESIS), $c));
   }
   return;
 }
@@ -61,7 +70,7 @@ export function assert_operating_ (
   $c: AptosDataCache,
 ): void {
   if (!is_operating_($c)) {
-    throw $.abortCode(Std.Error.invalid_state_(ENOT_OPERATING, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(ENOT_OPERATING), $c));
   }
   return;
 }
@@ -88,7 +97,7 @@ export function now_microseconds_ (
 export function now_seconds_ (
   $c: AptosDataCache,
 ): U64 {
-  return (now_microseconds_($c)).div(MICRO_CONVERSION_FACTOR);
+  return (now_microseconds_($c)).div($.copy(MICRO_CONVERSION_FACTOR));
 }
 
 export function set_time_has_started_ (
@@ -116,12 +125,12 @@ export function update_global_time_ (
   now = $.copy(global_timer.microseconds);
   if ((($.copy(proposer)).hex() === (new HexString("0x0")).hex())) {
     if (!($.copy(now)).eq(($.copy(timestamp)))) {
-      throw $.abortCode(Std.Error.invalid_argument_(ETIMESTAMP, $c));
+      throw $.abortCode(Std.Error.invalid_argument_($.copy(ETIMESTAMP), $c));
     }
   }
   else{
     if (!($.copy(now)).lt($.copy(timestamp))) {
-      throw $.abortCode(Std.Error.invalid_argument_(ETIMESTAMP, $c));
+      throw $.abortCode(Std.Error.invalid_argument_($.copy(ETIMESTAMP), $c));
     }
   }
   global_timer.microseconds = $.copy(timestamp);
@@ -135,12 +144,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get CurrentTimeMicroseconds() { return CurrentTimeMicroseconds; }
   async loadCurrentTimeMicroseconds(
     owner: HexString,
+    loadFull=true,
   ) {
-    return CurrentTimeMicroseconds.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await CurrentTimeMicroseconds.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

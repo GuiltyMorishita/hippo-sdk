@@ -90,7 +90,7 @@ export class PontemPoolProvider extends TradingPoolProvider {
     const ownerAddress = hippo_swap.Cp_swap.moduleAddress;
     const resources = await client.getAccountResources(ownerAddress);
     for(const resource of resources) {
-      if (resource.type.module === 'liquidity_pool' && resource.type.name === 'LiquidityPool') {
+      if (resource.type.indexOf("liquidity_pool::LiquidityPool") >= 0) {
         const tag = parseMoveStructTag(resource.type);
         const xTag = tag.typeParams[0] as StructTag;
         const yTag = tag.typeParams[1] as StructTag;

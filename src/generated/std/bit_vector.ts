@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -20,6 +20,7 @@ export class BitVector
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "BitVector";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -44,6 +45,9 @@ export class BitVector
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "BitVector", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function is_index_set_ (
@@ -52,7 +56,7 @@ export function is_index_set_ (
   $c: AptosDataCache,
 ): boolean {
   if (!($.copy(bit_index)).lt(Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]))) {
-    throw $.abortCode(EINDEX);
+    throw $.abortCode($.copy(EINDEX));
   }
   return $.copy(Vector.borrow_(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool]));
 }
@@ -71,7 +75,7 @@ export function longest_set_sequence_starting_at_ (
 ): U64 {
   let index;
   if (!($.copy(start_index)).lt($.copy(bitvector.length))) {
-    throw $.abortCode(EINDEX);
+    throw $.abortCode($.copy(EINDEX));
   }
   index = $.copy(start_index);
   while (($.copy(index)).lt($.copy(bitvector.length))) {
@@ -93,10 +97,10 @@ export function new___ (
 ): BitVector {
   let bit_field, counter;
   if (!($.copy(length)).gt(u64("0"))) {
-    throw $.abortCode(ELENGTH);
+    throw $.abortCode($.copy(ELENGTH));
   }
-  if (!($.copy(length)).lt(MAX_SIZE)) {
-    throw $.abortCode(ELENGTH);
+  if (!($.copy(length)).lt($.copy(MAX_SIZE))) {
+    throw $.abortCode($.copy(ELENGTH));
   }
   counter = u64("0");
   bit_field = Vector.empty_($c, [AtomicTypeTag.Bool]);
@@ -121,7 +125,7 @@ export function set_ (
 ): void {
   let x;
   if (!($.copy(bit_index)).lt(Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]))) {
-    throw $.abortCode(EINDEX);
+    throw $.abortCode($.copy(EINDEX));
   }
   x = Vector.borrow_mut_(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool]);
   $.set(x, true);
@@ -177,7 +181,7 @@ export function unset_ (
 ): void {
   let x;
   if (!($.copy(bit_index)).lt(Vector.length_(bitvector.bit_field, $c, [AtomicTypeTag.Bool]))) {
-    throw $.abortCode(EINDEX);
+    throw $.abortCode($.copy(EINDEX));
   }
   x = Vector.borrow_mut_(bitvector.bit_field, $.copy(bit_index), $c, [AtomicTypeTag.Bool]);
   $.set(x, false);
@@ -191,7 +195,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get BitVector() { return BitVector; }
 }
 

@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -16,6 +16,7 @@ export class TypeInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "TypeInfo";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -49,6 +50,9 @@ export class TypeInfo
   toTypeTag() { return $.parseTypeTagOrThrow(this.typeFullname()); }
   moduleName() { return (this.toTypeTag() as $.StructTag).module; }
   structName() { return (this.toTypeTag() as $.StructTag).name; }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function account_address_ (
@@ -93,7 +97,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get TypeInfo() { return TypeInfo; }
 }
 

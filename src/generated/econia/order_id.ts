@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -21,7 +21,7 @@ export function order_id_ (
   $c: AptosDataCache,
 ): U128 {
   let temp$1;
-  if ((side == ASK)) {
+  if ((side == $.copy(ASK))) {
     temp$1 = order_id_ask_($.copy(price), $.copy(serial_id), $c);
   }
   else{
@@ -35,7 +35,7 @@ export function order_id_ask_ (
   serial_id: U64,
   $c: AptosDataCache,
 ): U128 {
-  return ((u128($.copy(price))).shl(FIRST_64)).or(u128($.copy(serial_id)));
+  return ((u128($.copy(price))).shl($.copy(FIRST_64))).or(u128($.copy(serial_id)));
 }
 
 export function order_id_bid_ (
@@ -43,28 +43,28 @@ export function order_id_bid_ (
   serial_id: U64,
   $c: AptosDataCache,
 ): U128 {
-  return ((u128($.copy(price))).shl(FIRST_64)).or(u128(($.copy(serial_id)).xor(HI_64)));
+  return ((u128($.copy(price))).shl($.copy(FIRST_64))).or(u128(($.copy(serial_id)).xor($.copy(HI_64))));
 }
 
 export function price_ (
   order_id: U128,
   $c: AptosDataCache,
 ): U64 {
-  return u64(($.copy(order_id)).shr(FIRST_64));
+  return u64(($.copy(order_id)).shr($.copy(FIRST_64)));
 }
 
 export function serial_id_ask_ (
   order_id: U128,
   $c: AptosDataCache,
 ): U64 {
-  return u64(($.copy(order_id)).and(u128(HI_64)));
+  return u64(($.copy(order_id)).and(u128($.copy(HI_64))));
 }
 
 export function serial_id_bid_ (
   order_id: U128,
   $c: AptosDataCache,
 ): U64 {
-  return (u64(($.copy(order_id)).and(u128(HI_64)))).xor(HI_64);
+  return (u64(($.copy(order_id)).and(u128($.copy(HI_64))))).xor($.copy(HI_64));
 }
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -73,7 +73,10 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
 }
 

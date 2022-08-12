@@ -1,6 +1,6 @@
 
 import { AptosClient } from "aptos";
-import { AptosParserRepo } from "@manahippo/move-to-ts";
+import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
 import * as aptos_framework from './aptos_framework';
 import * as aptos_std from './aptos_std';
 import * as coin_registry from './coin_registry';
@@ -36,6 +36,7 @@ export function getProjectRepo(): AptosParserRepo {
 
 export class App {
   parserRepo: AptosParserRepo;
+  cache: AptosLocalCache;
   aptos_framework : aptos_framework.App
   aptos_std : aptos_std.App
   coin_registry : coin_registry.App
@@ -48,13 +49,14 @@ export class App {
     public client: AptosClient,
   ) {
     this.parserRepo = getProjectRepo();
-    this.aptos_framework = new aptos_framework.App(client, this.parserRepo);
-    this.aptos_std = new aptos_std.App(client, this.parserRepo);
-    this.coin_registry = new coin_registry.App(client, this.parserRepo);
-    this.econia = new econia.App(client, this.parserRepo);
-    this.hippo_aggregator = new hippo_aggregator.App(client, this.parserRepo);
-    this.hippo_swap = new hippo_swap.App(client, this.parserRepo);
-    this.pontem = new pontem.App(client, this.parserRepo);
-    this.std = new std.App(client, this.parserRepo);
+    this.cache = new AptosLocalCache();
+    this.aptos_framework = new aptos_framework.App(client, this.parserRepo, this.cache);
+    this.aptos_std = new aptos_std.App(client, this.parserRepo, this.cache);
+    this.coin_registry = new coin_registry.App(client, this.parserRepo, this.cache);
+    this.econia = new econia.App(client, this.parserRepo, this.cache);
+    this.hippo_aggregator = new hippo_aggregator.App(client, this.parserRepo, this.cache);
+    this.hippo_swap = new hippo_swap.App(client, this.parserRepo, this.cache);
+    this.pontem = new pontem.App(client, this.parserRepo, this.cache);
+    this.std = new std.App(client, this.parserRepo, this.cache);
   }
 }

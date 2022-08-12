@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -22,7 +22,7 @@ export function get_amount_out_ (
 ): U64 {
   let temp$1, amount_in_with_fee, denominator, numerator;
   if (!($.copy(amount_in)).gt(u64("0"))) {
-    throw $.abortCode(ERROR_INSUFFICIENT_INPUT_AMOUNT);
+    throw $.abortCode($.copy(ERROR_INSUFFICIENT_INPUT_AMOUNT));
   }
   if (($.copy(reserve_in)).gt(u64("0"))) {
     temp$1 = ($.copy(reserve_out)).gt(u64("0"));
@@ -31,7 +31,7 @@ export function get_amount_out_ (
     temp$1 = false;
   }
   if (!temp$1) {
-    throw $.abortCode(ERROR_INSUFFICIENT_LIQUIDITY);
+    throw $.abortCode($.copy(ERROR_INSUFFICIENT_LIQUIDITY));
   }
   amount_in_with_fee = Safe_math.mul_(u128($.copy(amount_in)), u128("997"), $c);
   numerator = Safe_math.mul_($.copy(amount_in_with_fee), u128($.copy(reserve_out)), $c);
@@ -47,7 +47,7 @@ export function quote_ (
 ): U64 {
   let temp$1;
   if (!($.copy(amount_x)).gt(u64("0"))) {
-    throw $.abortCode(ERROR_INSUFFICIENT_AMOUNT);
+    throw $.abortCode($.copy(ERROR_INSUFFICIENT_AMOUNT));
   }
   if (($.copy(reserve_x)).gt(u64("0"))) {
     temp$1 = ($.copy(reserve_y)).gt(u64("0"));
@@ -56,7 +56,7 @@ export function quote_ (
     temp$1 = false;
   }
   if (!temp$1) {
-    throw $.abortCode(ERROR_INSUFFICIENT_LIQUIDITY);
+    throw $.abortCode($.copy(ERROR_INSUFFICIENT_LIQUIDITY));
   }
   return u64(Safe_math.div_(Safe_math.mul_(u128($.copy(amount_x)), u128($.copy(reserve_y)), $c), u128($.copy(reserve_x)), $c));
 }
@@ -67,7 +67,10 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
 }
 

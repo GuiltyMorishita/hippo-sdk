@@ -1,6 +1,6 @@
 
 import { AptosClient } from "aptos";
-import { AptosParserRepo } from "@manahippo/move-to-ts";
+import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
 import * as Lp from './lp';
 import * as Router from './router';
 import * as Scripts from './scripts';
@@ -23,6 +23,12 @@ export function getPackageRepo(): AptosParserRepo {
   return repo;
 }
 
+export type AppType = {
+  client: AptosClient,
+  repo: AptosParserRepo,
+  cache: AptosLocalCache,
+};
+
 export class App {
   lp : Lp.App
   router : Router.App
@@ -30,9 +36,10 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
-    this.lp = new Lp.App(client, repo);
-    this.router = new Router.App(client, repo);
-    this.scripts = new Scripts.App(client, repo);
+    this.lp = new Lp.App(client, repo, cache);
+    this.router = new Router.App(client, repo, cache);
+    this.scripts = new Scripts.App(client, repo, cache);
   }
 }

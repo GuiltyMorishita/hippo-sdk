@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -146,7 +146,7 @@ export function remove_ (
   let temp$1, temp$2, len;
   len = length_(v, $c, [$p[0]]);
   if (($.copy(i)).ge($.copy(len))) {
-    throw $.abortCode(EINDEX_OUT_OF_BOUNDS);
+    throw $.abortCode($.copy(EINDEX_OUT_OF_BOUNDS));
   }
   else{
   }
@@ -215,7 +215,7 @@ export function swap_remove_ (
 ): any {
   let last_idx;
   if (!!is_empty_(v, $c, [$p[0]])) {
-    throw $.abortCode(EINDEX_OUT_OF_BOUNDS);
+    throw $.abortCode($.copy(EINDEX_OUT_OF_BOUNDS));
   }
   last_idx = (length_(v, $c, [$p[0]])).sub(u64("1"));
   swap_(v, $.copy(i), $.copy(last_idx), $c, [$p[0]]);
@@ -228,7 +228,10 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
 }
 

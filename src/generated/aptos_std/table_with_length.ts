@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -20,6 +20,7 @@ export class TableWithLength
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "TableWithLength";
   static typeParameters: TypeParamDeclType[] = [
     { name: "K", isPhantom: true },
@@ -44,6 +45,10 @@ export class TableWithLength
 
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "TableWithLength", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.inner.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -102,7 +107,7 @@ export function destroy_empty_ (
   $p: TypeTag[], /* <K, V>*/
 ): void {
   if (!($.copy(table.length)).eq((u64("0")))) {
-    throw $.abortCode(Std.Error.invalid_state_(ENOT_EMPTY, $c));
+    throw $.abortCode(Std.Error.invalid_state_($.copy(ENOT_EMPTY), $c));
   }
   let { inner: inner } = table;
   return Table.destroy_(inner, $c, [$p[0], $p[1]]);
@@ -150,7 +155,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get TableWithLength() { return TableWithLength; }
 }
 

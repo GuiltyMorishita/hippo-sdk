@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -41,6 +41,7 @@ export class EconiaCapabilityStore
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "EconiaCapabilityStore";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -63,8 +64,17 @@ export class EconiaCapabilityStore
     const result = await repo.loadResource(client, address, EconiaCapabilityStore, typeParams);
     return result as unknown as EconiaCapabilityStore;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, EconiaCapabilityStore, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as EconiaCapabilityStore;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "EconiaCapabilityStore", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.econia_capability.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -73,6 +83,7 @@ export class Order
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Order";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -100,6 +111,9 @@ export class Order
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Order", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -107,6 +121,7 @@ export class OrderBook
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "OrderBook";
   static typeParameters: TypeParamDeclType[] = [
     { name: "B", isPhantom: true },
@@ -146,21 +161,31 @@ export class OrderBook
     const result = await repo.loadResource(client, address, OrderBook, typeParams);
     return result as unknown as OrderBook;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, OrderBook, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as OrderBook;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "OrderBook", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.asks.loadFullState(app);
+    await this.bids.loadFullState(app);
+    this.__app = app;
   }
 
 
   book_orders_sdk(
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return book_orders_sdk_(this, cache, tags);
   }
 
   book_price_levels_sdk(
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return book_price_levels_sdk_(this, cache, tags);
   }
@@ -168,7 +193,7 @@ export class OrderBook
   get_orders_sdk(
     side: boolean,
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return get_orders_sdk_(this, side, cache, tags);
   }
@@ -177,7 +202,7 @@ export class OrderBook
     style: boolean,
     coins_in: U64,
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return simulate_swap_sdk_(this, style, coins_in, cache, tags);
   }
@@ -188,6 +213,7 @@ export class PriceLevel
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "PriceLevel";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -212,6 +238,9 @@ export class PriceLevel
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "PriceLevel", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -219,6 +248,7 @@ export class SimpleOrder
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "SimpleOrder";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -243,6 +273,9 @@ export class SimpleOrder
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "SimpleOrder", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function book_orders_sdk_ (
@@ -250,7 +283,7 @@ export function book_orders_sdk_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): [SimpleOrder[], SimpleOrder[]] {
-  return [get_orders_sdk_(order_book_ref_mut, ASK, $c, [$p[0], $p[1], $p[2]]), get_orders_sdk_(order_book_ref_mut, BID, $c, [$p[0], $p[1], $p[2]])];
+  return [get_orders_sdk_(order_book_ref_mut, $.copy(ASK), $c, [$p[0], $p[1], $p[2]]), get_orders_sdk_(order_book_ref_mut, $.copy(BID), $c, [$p[0], $p[1], $p[2]])];
 }
 
 export function book_price_levels_sdk_ (
@@ -258,7 +291,7 @@ export function book_price_levels_sdk_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): [PriceLevel[], PriceLevel[]] {
-  return [get_price_levels_sdk_(get_orders_sdk_(order_book_ref_mut, ASK, $c, [$p[0], $p[1], $p[2]]), $c), get_price_levels_sdk_(get_orders_sdk_(order_book_ref_mut, BID, $c, [$p[0], $p[1], $p[2]]), $c)];
+  return [get_price_levels_sdk_(get_orders_sdk_(order_book_ref_mut, $.copy(ASK), $c, [$p[0], $p[1], $p[2]]), $c), get_price_levels_sdk_(get_orders_sdk_(order_book_ref_mut, $.copy(BID), $c, [$p[0], $p[1], $p[2]]), $c)];
 }
 
 export function cancel_limit_order_ (
@@ -272,10 +305,10 @@ export function cancel_limit_order_ (
 ): void {
   let temp$1, temp$10, temp$11, temp$12, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, order_book_ref_mut, tree_ref_mut;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host))) {
-    throw $.abortCode(E_NO_ORDER_BOOK);
+    throw $.abortCode($.copy(E_NO_ORDER_BOOK));
   }
   order_book_ref_mut = $c.borrow_global_mut<OrderBook>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host));
-  if ((side == ASK)) {
+  if ((side == $.copy(ASK))) {
     temp$1 = order_book_ref_mut.asks;
   }
   else{
@@ -284,16 +317,16 @@ export function cancel_limit_order_ (
   tree_ref_mut = temp$1;
   [temp$2, temp$3] = [tree_ref_mut, $.copy(order_id)];
   if (!Critbit.has_key_(temp$2, temp$3, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])])) {
-    throw $.abortCode(E_NO_SUCH_ORDER);
+    throw $.abortCode($.copy(E_NO_SUCH_ORDER));
   }
   let { user: order_user, custodian_id: order_custodian_id } = Critbit.pop_(tree_ref_mut, $.copy(order_id), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]);
   if (!(($.copy(user)).hex() === ($.copy(order_user)).hex())) {
-    throw $.abortCode(E_INVALID_USER);
+    throw $.abortCode($.copy(E_INVALID_USER));
   }
   if (!($.copy(custodian_id)).eq(($.copy(order_custodian_id)))) {
-    throw $.abortCode(E_INVALID_CUSTODIAN);
+    throw $.abortCode($.copy(E_INVALID_CUSTODIAN));
   }
-  if ((side == ASK)) {
+  if ((side == $.copy(ASK))) {
     temp$4 = ($.copy(order_id)).eq(($.copy(order_book_ref_mut.min_ask)));
   }
   else{
@@ -301,7 +334,7 @@ export function cancel_limit_order_ (
   }
   if (temp$4) {
     if (Critbit.is_empty_(tree_ref_mut, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])])) {
-      temp$5 = MIN_ASK_DEFAULT;
+      temp$5 = $.copy(MIN_ASK_DEFAULT);
     }
     else{
       temp$5 = Critbit.min_key_(tree_ref_mut, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]);
@@ -309,7 +342,7 @@ export function cancel_limit_order_ (
     order_book_ref_mut.min_ask = temp$5;
   }
   else{
-    if ((side == BID)) {
+    if ((side == $.copy(BID))) {
       temp$6 = ($.copy(order_id)).eq(($.copy(order_book_ref_mut.max_bid)));
     }
     else{
@@ -317,7 +350,7 @@ export function cancel_limit_order_ (
     }
     if (temp$6) {
       if (Critbit.is_empty_(tree_ref_mut, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])])) {
-        temp$7 = MAX_BID_DEFAULT;
+        temp$7 = $.copy(MAX_BID_DEFAULT);
       }
       else{
         temp$7 = Critbit.max_key_(tree_ref_mut, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]);
@@ -359,7 +392,7 @@ export function cancel_limit_order_user_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
-  cancel_limit_order_(Std.Signer.address_of_(user, $c), $.copy(host), NO_CUSTODIAN, side, $.copy(order_id), $c, [$p[0], $p[1], $p[2]]);
+  cancel_limit_order_(Std.Signer.address_of_(user, $c), $.copy(host), $.copy(NO_CUSTODIAN), side, $.copy(order_id), $c, [$p[0], $p[1], $p[2]]);
   return;
 }
 
@@ -400,7 +433,7 @@ export function fill_market_order_ (
     temp$2 = true;
   }
   else{
-    if ((style == BUY)) {
+    if ((style == $.copy(BUY))) {
       temp$1 = ($.copy(max_quote_units)).eq((u64("0")));
     }
     else{
@@ -451,7 +484,7 @@ export function fill_market_order_check_base_parcels_to_fill_ (
   $p: TypeTag[], /* <Q>*/
 ): void {
   let base_parcels_can_afford;
-  if ((style == SELL)) {
+  if ((style == $.copy(SELL))) {
     return;
   }
   else{
@@ -497,13 +530,13 @@ export function fill_market_order_from_market_account_ (
 ): void {
   let temp$1, temp$2, base_coins, econia_capability, market_account_info, order_book_ref_mut, quote_coins, scale_factor;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host))) {
-    throw $.abortCode(E_NO_ORDER_BOOK);
+    throw $.abortCode($.copy(E_NO_ORDER_BOOK));
   }
   order_book_ref_mut = $c.borrow_global_mut<OrderBook>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host));
   scale_factor = $.copy(order_book_ref_mut.scale_factor);
   market_account_info = User.market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
   econia_capability = get_econia_capability_($c);
-  if ((style == BUY)) {
+  if ((style == $.copy(BUY))) {
     [temp$1, temp$2] = [Aptos_framework.Coin.zero_($c, [$p[0]]), User.withdraw_collateral_internal_($.copy(user), $.copy(market_account_info), $.copy(max_quote_units), econia_capability, $c, [$p[1]])];
   }
   else{
@@ -525,11 +558,11 @@ export function fill_market_order_init_ (
 ): [U64, boolean, Critbit.CritBitTree, U128, U64, boolean] {
   let temp$1, temp$2, temp$3, temp$4, base_parcels_to_fill, n_orders, side, spread_maker_ref_mut, traversal_direction, tree_ref_mut;
   base_parcels_to_fill = $.copy(max_base_parcels);
-  if ((style == BUY)) {
-    [temp$1, temp$2, temp$3, temp$4] = [ASK, order_book_ref_mut.asks, order_book_ref_mut.min_ask, RIGHT];
+  if ((style == $.copy(BUY))) {
+    [temp$1, temp$2, temp$3, temp$4] = [$.copy(ASK), order_book_ref_mut.asks, order_book_ref_mut.min_ask, $.copy(RIGHT)];
   }
   else{
-    [temp$1, temp$2, temp$3, temp$4] = [BID, order_book_ref_mut.bids, order_book_ref_mut.max_bid, LEFT];
+    [temp$1, temp$2, temp$3, temp$4] = [$.copy(BID), order_book_ref_mut.bids, order_book_ref_mut.max_bid, $.copy(LEFT)];
   }
   [side, tree_ref_mut, spread_maker_ref_mut, traversal_direction] = [temp$1, temp$2, temp$3, temp$4];
   n_orders = Critbit.length_(tree_ref_mut, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]);
@@ -554,11 +587,11 @@ export function fill_market_order_loop_order_follow_up_ (
   if (($.copy(n_orders)).eq((u64("1")))) {
     if (complete_fill) {
       should_pop = true;
-      if ((side == ASK)) {
-        temp$1 = MIN_ASK_DEFAULT;
+      if ((side == $.copy(ASK))) {
+        temp$1 = $.copy(MIN_ASK_DEFAULT);
       }
       else{
-        temp$1 = MAX_BID_DEFAULT;
+        temp$1 = $.copy(MAX_BID_DEFAULT);
       }
       new_spread_maker = temp$1;
     }
@@ -667,7 +700,7 @@ export function fill_market_order_user_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
-  fill_market_order_from_market_account_(Std.Signer.address_of_(user, $c), $.copy(host), NO_CUSTODIAN, style, $.copy(max_base_parcels), $.copy(max_quote_units), $c, [$p[0], $p[1], $p[2]]);
+  fill_market_order_from_market_account_(Std.Signer.address_of_(user, $c), $.copy(host), $.copy(NO_CUSTODIAN), style, $.copy(max_base_parcels), $.copy(max_quote_units), $c, [$p[0], $p[1], $p[2]]);
   return;
 }
 
@@ -697,7 +730,7 @@ export function get_econia_capability_ (
   $c: AptosDataCache,
 ): Capability.EconiaCapability {
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "EconiaCapabilityStore", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_NO_ECONIA_CAPABILITY_STORE);
+    throw $.abortCode($.copy(E_NO_ECONIA_CAPABILITY_STORE));
   }
   return $.copy($c.borrow_global<EconiaCapabilityStore>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "EconiaCapabilityStore", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).econia_capability);
 }
@@ -710,11 +743,11 @@ export function get_orders_sdk_ (
 ): SimpleOrder[] {
   let temp$1, temp$2, remaining_traversals, simple_orders, target_id, target_order_ref_mut, target_parent_index, traversal_direction, tree_ref_mut;
   simple_orders = Std.Vector.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "SimpleOrder", [])]);
-  if ((side == ASK)) {
-    [temp$1, temp$2] = [order_book_ref_mut.asks, RIGHT];
+  if ((side == $.copy(ASK))) {
+    [temp$1, temp$2] = [order_book_ref_mut.asks, $.copy(RIGHT)];
   }
   else{
-    [temp$1, temp$2] = [order_book_ref_mut.bids, LEFT];
+    [temp$1, temp$2] = [order_book_ref_mut.bids, $.copy(LEFT)];
   }
   [tree_ref_mut, traversal_direction] = [temp$1, temp$2];
   if (Critbit.is_empty_(tree_ref_mut, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])])) {
@@ -788,9 +821,9 @@ export function init_book_ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   if (!!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), Std.Signer.address_of_(host, $c))) {
-    throw $.abortCode(E_BOOK_EXISTS);
+    throw $.abortCode($.copy(E_BOOK_EXISTS));
   }
-  $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), host, new OrderBook({ scale_factor: $.copy(scale_factor), asks: Critbit.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]), bids: Critbit.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]), min_ask: MIN_ASK_DEFAULT, max_bid: MAX_BID_DEFAULT, counter: u64("0") }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]])));
+  $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), host, new OrderBook({ scale_factor: $.copy(scale_factor), asks: Critbit.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]), bids: Critbit.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "Order", [])]), min_ask: $.copy(MIN_ASK_DEFAULT), max_bid: $.copy(MAX_BID_DEFAULT), counter: u64("0") }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]])));
   return;
 }
 
@@ -800,10 +833,10 @@ export function init_econia_capability_store_ (
 ): void {
   let econia_capability;
   if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
-    throw $.abortCode(E_NOT_ECONIA);
+    throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   if (!!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "EconiaCapabilityStore", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_ECONIA_CAPABILITY_STORE_EXISTS);
+    throw $.abortCode($.copy(E_ECONIA_CAPABILITY_STORE_EXISTS));
   }
   econia_capability = Capability.get_econia_capability_(account, $c);
   $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "EconiaCapabilityStore", []), account, new EconiaCapabilityStore({ econia_capability: $.copy(econia_capability) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "EconiaCapabilityStore", [])));
@@ -822,7 +855,7 @@ export function place_limit_order_ (
 ): void {
   let temp$1, temp$10, temp$11, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, crossed_spread, new_spread_maker, order_book_ref_mut, order_id, spread_maker_ref_mut, tree_ref_mut;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host))) {
-    throw $.abortCode(E_NO_ORDER_BOOK);
+    throw $.abortCode($.copy(E_NO_ORDER_BOOK));
   }
   order_book_ref_mut = $c.borrow_global_mut<OrderBook>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host));
   order_id = Order_id.order_id_($.copy(price), get_serial_id_(order_book_ref_mut, $c, [$p[0], $p[1], $p[2]]), side, $c);
@@ -834,7 +867,7 @@ export function place_limit_order_ (
   temp$2 = $.copy(price);
   temp$1 = get_econia_capability_($c);
   User.add_order_internal_(temp$7, temp$6, temp$5, temp$4, temp$3, temp$2, temp$1, $c, [$p[0], $p[1], $p[2]]);
-  if ((side == ASK)) {
+  if ((side == $.copy(ASK))) {
     [temp$8, temp$9, temp$10, temp$11] = [order_book_ref_mut.asks, ($.copy(order_id)).lt($.copy(order_book_ref_mut.min_ask)), ($.copy(price)).le(Order_id.price_($.copy(order_book_ref_mut.max_bid), $c)), order_book_ref_mut.min_ask];
   }
   else{
@@ -842,7 +875,7 @@ export function place_limit_order_ (
   }
   [tree_ref_mut, new_spread_maker, crossed_spread, spread_maker_ref_mut] = [temp$8, temp$9, temp$10, temp$11];
   if (!!crossed_spread) {
-    throw $.abortCode(E_CROSSED_SPREAD);
+    throw $.abortCode($.copy(E_CROSSED_SPREAD));
   }
   if (new_spread_maker) {
     $.set(spread_maker_ref_mut, $.copy(order_id));
@@ -878,7 +911,7 @@ export function place_limit_order_user_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
-  place_limit_order_(Std.Signer.address_of_(user, $c), $.copy(host), NO_CUSTODIAN, side, $.copy(base_parcels), $.copy(price), $c, [$p[0], $p[1], $p[2]]);
+  place_limit_order_(Std.Signer.address_of_(user, $c), $.copy(host), $.copy(NO_CUSTODIAN), side, $.copy(base_parcels), $.copy(price), $c, [$p[0], $p[1], $p[2]]);
   return;
 }
 
@@ -938,11 +971,11 @@ export function simulate_swap_sdk_ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): [U64, U64] {
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, base_parcels_can_afford, base_parcels_filled, base_parcels_on_hand, coins_in_left, coins_in_multiplier, coins_out, coins_out_multiplier, n_orders, scale_factor, should_return, side, simple_order, simple_order_index, simple_orders;
-  if ((style == BUY)) {
-    temp$1 = ASK;
+  if ((style == $.copy(BUY))) {
+    temp$1 = $.copy(ASK);
   }
   else{
-    temp$1 = BID;
+    temp$1 = $.copy(BID);
   }
   side = temp$1;
   simple_orders = get_orders_sdk_(order_book_ref_mut, side, $c, [$p[0], $p[1], $p[2]]);
@@ -955,14 +988,14 @@ export function simulate_swap_sdk_ (
   [coins_in_left, coins_out, simple_order_index, n_orders] = [$.copy(coins_in), u64("0"), u64("0"), Std.Vector.length_(simple_orders, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "SimpleOrder", [])])];
   while (true) {
     simple_order = Std.Vector.borrow_(simple_orders, $.copy(simple_order_index), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "SimpleOrder", [])]);
-    if ((style == SELL)) {
+    if ((style == $.copy(SELL))) {
       [temp$2, temp$3] = [$.copy(scale_factor), $.copy(simple_order.price)];
     }
     else{
       [temp$2, temp$3] = [$.copy(simple_order.price), $.copy(scale_factor)];
     }
     [coins_in_multiplier, coins_out_multiplier] = [temp$2, temp$3];
-    if ((style == SELL)) {
+    if ((style == $.copy(SELL))) {
       base_parcels_on_hand = ($.copy(coins_in_left)).div($.copy(scale_factor));
       if (($.copy(base_parcels_on_hand)).gt($.copy(simple_order.base_parcels))) {
         [temp$4, temp$5] = [$.copy(simple_order.base_parcels), false];
@@ -1009,13 +1042,13 @@ export function swap_ (
 ): void {
   let temp$1, temp$2, econia_capability, max_base_parcels, max_quote_units, order_book_ref_mut, scale_factor;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host))) {
-    throw $.abortCode(E_NO_ORDER_BOOK);
+    throw $.abortCode($.copy(E_NO_ORDER_BOOK));
   }
   order_book_ref_mut = $c.borrow_global_mut<OrderBook>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "market", "OrderBook", [$p[0], $p[1], $p[2]]), $.copy(host));
   scale_factor = $.copy(order_book_ref_mut.scale_factor);
   econia_capability = get_econia_capability_($c);
-  if ((style == BUY)) {
-    [temp$1, temp$2] = [HI_64, Aptos_framework.Coin.value_(quote_coins_ref_mut, $c, [$p[1]])];
+  if ((style == $.copy(BUY))) {
+    [temp$1, temp$2] = [$.copy(HI_64), Aptos_framework.Coin.value_(quote_coins_ref_mut, $c, [$p[1]])];
   }
   else{
     [temp$1, temp$2] = [(Aptos_framework.Coin.value_(base_coins_ref_mut, $c, [$p[0]])).div($.copy(scale_factor)), u64("0")];
@@ -1036,19 +1069,37 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get EconiaCapabilityStore() { return EconiaCapabilityStore; }
   async loadEconiaCapabilityStore(
     owner: HexString,
+    loadFull=true,
   ) {
-    return EconiaCapabilityStore.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await EconiaCapabilityStore.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get Order() { return Order; }
+  get OrderBook() { return OrderBook; }
   async loadOrderBook(
     owner: HexString,
     $p: TypeTag[], /* <B, Q, E> */
+    loadFull=true,
   ) {
-    return OrderBook.load(this.repo, this.client, owner, $p);
+    const val = await OrderBook.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get PriceLevel() { return PriceLevel; }
+  get SimpleOrder() { return SimpleOrder; }
   cancel_limit_order_user(
     host: HexString,
     side: boolean,

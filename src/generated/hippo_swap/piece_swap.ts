@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -25,6 +25,7 @@ export class LPToken
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "LPToken";
   static typeParameters: TypeParamDeclType[] = [
     { name: "X", isPhantom: true },
@@ -45,6 +46,9 @@ export class LPToken
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "LPToken", $p);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -52,6 +56,7 @@ export class PieceSwapPoolInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "PieceSwapPoolInfo";
   static typeParameters: TypeParamDeclType[] = [
     { name: "X", isPhantom: true },
@@ -123,15 +128,29 @@ export class PieceSwapPoolInfo
     const result = await repo.loadResource(client, address, PieceSwapPoolInfo, typeParams);
     return result as unknown as PieceSwapPoolInfo;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, PieceSwapPoolInfo, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as PieceSwapPoolInfo;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "PieceSwapPoolInfo", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.reserve_x.loadFullState(app);
+    await this.reserve_y.loadFullState(app);
+    await this.lp_mint_cap.loadFullState(app);
+    await this.lp_burn_cap.loadFullState(app);
+    await this.protocol_fee_x.loadFullState(app);
+    await this.protocol_fee_y.loadFullState(app);
+    this.__app = app;
   }
 
 
   quote_x_to_y(
     amount_x_in: U64,
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return quote_x_to_y_(this, amount_x_in, cache, tags);
   }
@@ -139,7 +158,7 @@ export class PieceSwapPoolInfo
   quote_x_to_y_after_fees(
     amount_x_in: U64,
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return quote_x_to_y_after_fees_(this, amount_x_in, cache, tags);
   }
@@ -147,7 +166,7 @@ export class PieceSwapPoolInfo
   quote_y_to_x(
     amount_y_in: U64,
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return quote_y_to_x_(this, amount_y_in, cache, tags);
   }
@@ -155,7 +174,7 @@ export class PieceSwapPoolInfo
   quote_y_to_x_after_fees(
     amount_y_in: U64,
   ) {
-    const cache = new DummyCache();
+    const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return quote_y_to_x_after_fees_(this, amount_y_in, cache, tags);
   }
@@ -169,7 +188,7 @@ export function add_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64, U64] {
   let actual_add_x, actual_add_y, current_x, current_y, opt_amt_x, opt_amt_y, opt_lp, pool, x_coin, y_coin;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   [opt_amt_x, opt_amt_y, opt_lp] = Piece_swap_math.get_add_liquidity_actual_amount_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), (u128($.copy(add_amt_x))).mul(u128($.copy(pool.x_deci_mult))), (u128($.copy(add_amt_y))).mul(u128($.copy(pool.y_deci_mult))), $c);
@@ -197,7 +216,7 @@ export function add_liquidity_direct_ (
   let actual_add_x, actual_add_x_coin, actual_add_y, actual_add_y_coin, add_amt_x, add_amt_y, current_x, current_y, lp_coin, opt_amt_x, opt_amt_y, opt_lp, pool;
   add_amt_x = Aptos_framework.Coin.value_(coin_x, $c, [$p[0]]);
   add_amt_y = Aptos_framework.Coin.value_(coin_y, $c, [$p[1]]);
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   [opt_amt_x, opt_amt_y, opt_lp] = Piece_swap_math.get_add_liquidity_actual_amount_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), (u128($.copy(add_amt_x))).mul(u128($.copy(pool.x_deci_mult))), (u128($.copy(add_amt_y))).mul(u128($.copy(pool.y_deci_mult))), $c);
@@ -274,20 +293,20 @@ export function create_new_pool_ (
 ): void {
   let temp$1, temp$2, temp$3, temp$4, admin_addr, k2, lp_burn_cap, lp_mint_cap, m, n, x_deci_mult, x_decimals, xa, xb, y_deci_mult, y_decimals;
   admin_addr = Std.Signer.address_of_(admin, $c);
-  if (!(($.copy(admin_addr)).hex() === (MODULE_ADMIN).hex())) {
-    throw $.abortCode(ERROR_NOT_CREATOR);
+  if (!(($.copy(admin_addr)).hex() === ($.copy(MODULE_ADMIN)).hex())) {
+    throw $.abortCode($.copy(ERROR_NOT_CREATOR));
   }
   if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(admin_addr))) {
-    throw $.abortCode(ERROR_ALREADY_INITIALIZED);
+    throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
   if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[1], $p[0]]), $.copy(admin_addr))) {
-    throw $.abortCode(ERROR_ALREADY_INITIALIZED);
+    throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[0]])) {
-    throw $.abortCode(ERROR_COIN_NOT_INITIALIZED);
+    throw $.abortCode($.copy(ERROR_COIN_NOT_INITIALIZED));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
-    throw $.abortCode(ERROR_COIN_NOT_INITIALIZED);
+    throw $.abortCode($.copy(ERROR_COIN_NOT_INITIALIZED));
   }
   [lp_mint_cap, lp_burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(lp_decimals), true, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
   [xa, xb, m, n, k2] = Piece_swap_math.compute_initialization_constants_($.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $c);
@@ -401,7 +420,7 @@ export function remove_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64] {
   let actual_remove_x, actual_remove_y, current_x, current_y, opt_amt_x, opt_amt_y, pool, removed_x, removed_y;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   [opt_amt_x, opt_amt_y] = Piece_swap_math.get_remove_liquidity_amounts_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), u128($.copy(remove_lp_amt)), $c);
@@ -421,7 +440,7 @@ export function remove_liquidity_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let actual_remove_x, actual_remove_y, current_x, current_y, opt_amt_x, opt_amt_y, pool, remove_lp_amt, removed_x, removed_y;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   remove_lp_amt = Aptos_framework.Coin.value_(remove_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
@@ -454,7 +473,7 @@ export function swap_x_to_y_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let temp$1, temp$2, actual_out_y, coin_y, out_y_after_fees, pool, protocol_fee_y, protocol_fees, total_fees;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   [temp$1, temp$2] = [pool, Aptos_framework.Coin.value_(coin_x, $c, [$p[0]])];
   actual_out_y = quote_x_to_y_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   Aptos_framework.Coin.merge_(pool.reserve_x, coin_x, $c, [$p[0]]);
@@ -487,7 +506,7 @@ export function swap_y_to_x_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let temp$1, temp$2, actual_out_x, coin_x, out_x_after_fees, pool, protocol_fee_x, protocol_fees, total_fees;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), MODULE_ADMIN);
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   [temp$1, temp$2] = [pool, Aptos_framework.Coin.value_(coin_y, $c, [$p[1]])];
   actual_out_x = quote_y_to_x_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   Aptos_framework.Coin.merge_(pool.reserve_y, coin_y, $c, [$p[1]]);
@@ -508,13 +527,23 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get LPToken() { return LPToken; }
+  get PieceSwapPoolInfo() { return PieceSwapPoolInfo; }
   async loadPieceSwapPoolInfo(
     owner: HexString,
     $p: TypeTag[], /* <X, Y> */
+    loadFull=true,
   ) {
-    return PieceSwapPoolInfo.load(this.repo, this.client, owner, $p);
+    const val = await PieceSwapPoolInfo.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

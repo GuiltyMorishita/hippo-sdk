@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,6 +19,7 @@ export class Result
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Result";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -39,6 +40,9 @@ export class Result
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Result", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -77,11 +81,11 @@ export function compare_u8_vector_ (
       left_byte = $.copy(Std.Vector.borrow_(left, $.copy(idx), $c, [AtomicTypeTag.U8]));
       right_byte = $.copy(Std.Vector.borrow_(right, $.copy(idx), $c, [AtomicTypeTag.U8]));
       if (($.copy(left_byte)).lt($.copy(right_byte))) {
-        return new Result({ inner: SMALLER }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+        return new Result({ inner: $.copy(SMALLER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
       }
       else{
         if (($.copy(left_byte)).gt($.copy(right_byte))) {
-          return new Result({ inner: GREATER }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+          return new Result({ inner: $.copy(GREATER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
         }
         else{
         }
@@ -90,14 +94,14 @@ export function compare_u8_vector_ (
     }
 
   }if (($.copy(left_length)).lt($.copy(right_length))) {
-    temp$3 = new Result({ inner: SMALLER }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+    temp$3 = new Result({ inner: $.copy(SMALLER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
   }
   else{
     if (($.copy(left_length)).gt($.copy(right_length))) {
-      temp$2 = new Result({ inner: GREATER }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+      temp$2 = new Result({ inner: $.copy(GREATER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
     }
     else{
-      temp$2 = new Result({ inner: EQUAL }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+      temp$2 = new Result({ inner: $.copy(EQUAL) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
     }
     temp$3 = temp$2;
   }
@@ -108,21 +112,21 @@ export function is_equal_ (
   result: Result,
   $c: AptosDataCache,
 ): boolean {
-  return ($.copy(result.inner)).eq((EQUAL));
+  return ($.copy(result.inner)).eq(($.copy(EQUAL)));
 }
 
 export function is_greater_than_ (
   result: Result,
   $c: AptosDataCache,
 ): boolean {
-  return ($.copy(result.inner)).eq((GREATER));
+  return ($.copy(result.inner)).eq(($.copy(GREATER)));
 }
 
 export function is_smaller_than_ (
   result: Result,
   $c: AptosDataCache,
 ): boolean {
-  return ($.copy(result.inner)).eq((SMALLER));
+  return ($.copy(result.inner)).eq(($.copy(SMALLER)));
 }
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -132,7 +136,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Result() { return Result; }
 }
 

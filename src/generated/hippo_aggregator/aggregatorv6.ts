@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -32,6 +32,7 @@ export class SignerStore
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "SignerStore";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -54,8 +55,17 @@ export class SignerStore
     const result = await repo.loadResource(client, address, SignerStore, typeParams);
     return result as unknown as SignerStore;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, SignerStore, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as SignerStore;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "SignerStore", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.signer_cap.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -107,8 +117,8 @@ export function get_intermediate_output_ (
   $p: TypeTag[], /* <X, Y, E>*/
 ): [Std.Option.Option, Aptos_framework.Coin.Coin] {
   let temp$10, temp$13, temp$14, temp$15, temp$16, temp$17, temp$18, temp$19, temp$20, temp$22, temp$23, temp$24, temp$25, temp$26, temp$27, temp$28, temp$29, temp$3, temp$30, temp$31, temp$4, temp$9, x_out, x_out__2, y_out, y_out__1, y_out__11, y_out__12, y_out__21, y_out__5, y_out__7, zero, zero__6, zero2, zero2__8;
-  if (($.copy(dex_type)).eq((DEX_HIPPO))) {
-    if (($.copy(pool_type)).eq((HIPPO_CONSTANT_PRODUCT))) {
+  if (($.copy(dex_type)).eq(($.copy(DEX_HIPPO)))) {
+    if (($.copy(pool_type)).eq(($.copy(HIPPO_CONSTANT_PRODUCT)))) {
       if (is_x_to_y) {
         [x_out, y_out] = Hippo_swap.Cp_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
         Aptos_framework.Coin.destroy_zero_(x_out, $c, [$p[0]]);
@@ -122,7 +132,7 @@ export function get_intermediate_output_ (
       [temp$19, temp$20] = [temp$3, temp$4];
     }
     else{
-      if (($.copy(pool_type)).eq((HIPPO_STABLE_CURVE))) {
+      if (($.copy(pool_type)).eq(($.copy(HIPPO_STABLE_CURVE)))) {
         if (is_x_to_y) {
           [zero, zero2, y_out__5] = Hippo_swap.Stable_curve_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
           Aptos_framework.Coin.destroy_zero_(zero, $c, [$p[0]]);
@@ -138,7 +148,7 @@ export function get_intermediate_output_ (
         [temp$17, temp$18] = [temp$9, temp$10];
       }
       else{
-        if (($.copy(pool_type)).eq((HIPPO_PIECEWISE))) {
+        if (($.copy(pool_type)).eq(($.copy(HIPPO_PIECEWISE)))) {
           if (is_x_to_y) {
             y_out__11 = Hippo_swap.Piece_swap.swap_x_to_y_direct_(x_in, $c, [$p[0], $p[1]]);
             [temp$13, temp$14] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_out__11];
@@ -150,7 +160,7 @@ export function get_intermediate_output_ (
           [temp$15, temp$16] = [temp$13, temp$14];
         }
         else{
-          throw $.abortCode(E_UNKNOWN_POOL_TYPE);
+          throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
         }
         [temp$17, temp$18] = [temp$15, temp$16];
       }
@@ -159,8 +169,8 @@ export function get_intermediate_output_ (
     [temp$30, temp$31] = [temp$19, temp$20];
   }
   else{
-    if (($.copy(dex_type)).eq((DEX_ECONIA))) {
-      if (($.copy(pool_type)).eq((ECONIA_V1))) {
+    if (($.copy(dex_type)).eq(($.copy(DEX_ECONIA)))) {
+      if (($.copy(pool_type)).eq(($.copy(ECONIA_V1)))) {
         y_out__21 = Aptos_framework.Coin.zero_($c, [$p[1]]);
         if (is_x_to_y) {
           Econia.Market.swap_(false, new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), x_in, y_out__21, $c, [$p[0], $p[1], $p[2]]);
@@ -178,16 +188,16 @@ export function get_intermediate_output_ (
         [temp$24, temp$25] = [temp$22, temp$23];
       }
       else{
-        throw $.abortCode(E_UNKNOWN_POOL_TYPE);
+        throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
       }
       [temp$28, temp$29] = [temp$24, temp$25];
     }
     else{
-      if (($.copy(dex_type)).eq((DEX_PONTEM))) {
+      if (($.copy(dex_type)).eq(($.copy(DEX_PONTEM)))) {
         [temp$26, temp$27] = [Std.Option.none_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), Pontem.Router.swap_exact_coin_for_coin_(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), x_in, u64("0"), $c, [$p[0], $p[1], $p[2]])];
       }
       else{
-        throw $.abortCode(E_UNKNOWN_DEX);
+        throw $.abortCode($.copy(E_UNKNOWN_DEX));
       }
       [temp$28, temp$29] = [temp$26, temp$27];
     }
@@ -203,7 +213,7 @@ export function initialize_ (
   let admin_addr, signer_cap;
   admin_addr = Std.Signer.address_of_(admin, $c);
   if (!(($.copy(admin_addr)).hex() === (new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a")).hex())) {
-    throw $.abortCode(E_NOT_ADMIN);
+    throw $.abortCode($.copy(E_NOT_ADMIN));
   }
   [, signer_cap] = Aptos_framework.Account.create_resource_account_(admin, [u8("115"), u8("105"), u8("103"), u8("110"), u8("101"), u8("114"), u8("118"), u8("51")], $c);
   $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv6", "SignerStore", []), admin, new SignerStore({ signer_cap: signer_cap }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv6", "SignerStore", [])));
@@ -236,7 +246,7 @@ export function one_step_route_ (
   coin_in = Aptos_framework.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
   [coin_remain_opt, coin_out] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_in, $c, [$p[0], $p[1], $p[2]]);
   if (!(Aptos_framework.Coin.value_(coin_out, $c, [$p[1]])).ge($.copy(y_min_out))) {
-    throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
+    throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
   check_and_deposit_opt_(sender, coin_remain_opt, $c, [$p[0]]);
   check_and_deposit_(sender, coin_out, $c, [$p[1]]);
@@ -289,7 +299,7 @@ export function three_step_route_ (
   [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[5]]);
   [coin_z_remain, coin_m] = get_intermediate_output_($.copy(third_dex_type), $.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3], $p[6]]);
   if (!(Aptos_framework.Coin.value_(coin_m, $c, [$p[3]])).ge($.copy(m_min_out))) {
-    throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
+    throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
   check_and_deposit_opt_(sender, coin_x_remain, $c, [$p[0]]);
   check_and_deposit_opt_(sender, coin_y_remain, $c, [$p[1]]);
@@ -352,7 +362,7 @@ export function two_step_route_ (
   [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[3]]);
   [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[4]]);
   if (!(Aptos_framework.Coin.value_(coin_z, $c, [$p[2]])).ge($.copy(z_min_out))) {
-    throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
+    throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
   check_and_deposit_opt_(sender, coin_x_remain, $c, [$p[0]]);
   check_and_deposit_opt_(sender, coin_y_remain, $c, [$p[1]]);
@@ -397,12 +407,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get SignerStore() { return SignerStore; }
   async loadSignerStore(
     owner: HexString,
+    loadFull=true,
   ) {
-    return SignerStore.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await SignerStore.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
   initialize(
   ) {

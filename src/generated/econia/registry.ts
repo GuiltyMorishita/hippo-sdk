@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -50,6 +50,7 @@ export class CustodianCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CustodianCapability";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -71,6 +72,9 @@ export class CustodianCapability
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "CustodianCapability", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -78,6 +82,7 @@ export class E0
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E0";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -97,6 +102,9 @@ export class E0
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E0", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -104,6 +112,7 @@ export class E1
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E1";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -123,6 +132,9 @@ export class E1
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E1", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -130,6 +142,7 @@ export class E10
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E10";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -149,6 +162,9 @@ export class E10
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E10", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -156,6 +172,7 @@ export class E11
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E11";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -175,6 +192,9 @@ export class E11
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E11", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -182,6 +202,7 @@ export class E12
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E12";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -201,6 +222,9 @@ export class E12
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E12", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -208,6 +232,7 @@ export class E13
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E13";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -227,6 +252,9 @@ export class E13
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E13", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -234,6 +262,7 @@ export class E14
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E14";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -253,6 +282,9 @@ export class E14
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E14", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -260,6 +292,7 @@ export class E15
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E15";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -279,6 +312,9 @@ export class E15
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E15", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -286,6 +322,7 @@ export class E16
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E16";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -305,6 +342,9 @@ export class E16
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E16", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -312,6 +352,7 @@ export class E17
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E17";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -331,6 +372,9 @@ export class E17
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E17", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -338,6 +382,7 @@ export class E18
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E18";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -357,6 +402,9 @@ export class E18
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E18", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -364,6 +412,7 @@ export class E19
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E19";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -383,6 +432,9 @@ export class E19
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E19", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -390,6 +442,7 @@ export class E2
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E2";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -409,6 +462,9 @@ export class E2
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E2", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -416,6 +472,7 @@ export class E3
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E3";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -435,6 +492,9 @@ export class E3
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E3", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -442,6 +502,7 @@ export class E4
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E4";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -461,6 +522,9 @@ export class E4
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E4", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -468,6 +532,7 @@ export class E5
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E5";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -487,6 +552,9 @@ export class E5
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E5", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -494,6 +562,7 @@ export class E6
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E6";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -513,6 +582,9 @@ export class E6
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E6", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -520,6 +592,7 @@ export class E7
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E7";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -539,6 +612,9 @@ export class E7
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E7", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -546,6 +622,7 @@ export class E8
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E8";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -565,6 +642,9 @@ export class E8
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E8", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -572,6 +652,7 @@ export class E9
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "E9";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -591,6 +672,9 @@ export class E9
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "E9", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -598,6 +682,7 @@ export class MarketInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "MarketInfo";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -625,6 +710,12 @@ export class MarketInfo
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "MarketInfo", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.base_coin_type.loadFullState(app);
+    await this.quote_coin_type.loadFullState(app);
+    await this.scale_exponent_type.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -632,6 +723,7 @@ export class Registry
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Registry";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -660,8 +752,18 @@ export class Registry
     const result = await repo.loadResource(client, address, Registry, typeParams);
     return result as unknown as Registry;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Registry, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Registry;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Registry", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.scales.loadFullState(app);
+    await this.markets.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -682,7 +784,7 @@ export function coin_is_base_coin_ (
   }
   else{
   }
-  throw $.abortCode(E_NOT_IN_MARKET_PAIR);
+  throw $.abortCode($.copy(E_NOT_IN_MARKET_PAIR));
 }
 
 export function coin_is_in_market_pair_ (
@@ -714,33 +816,33 @@ export function init_registry_ (
 ): void {
   let scales;
   if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
-    throw $.abortCode(E_NOT_ECONIA);
+    throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   if (!!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_REGISTRY_EXISTS);
+    throw $.abortCode($.copy(E_REGISTRY_EXISTS));
   }
   $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), account, new Registry({ scales: Open_table.empty_($c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]), markets: Open_table.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address]), n_custodians: u64("0") }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", [])));
   scales = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E0", [])]), F0, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E1", [])]), F1, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E2", [])]), F2, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E3", [])]), F3, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E4", [])]), F4, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E5", [])]), F5, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E6", [])]), F6, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E7", [])]), F7, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E8", [])]), F8, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E9", [])]), F9, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E10", [])]), F10, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E11", [])]), F11, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E12", [])]), F12, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E13", [])]), F13, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E14", [])]), F14, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E15", [])]), F15, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E16", [])]), F16, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E17", [])]), F17, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E18", [])]), F18, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E19", [])]), F19, $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E0", [])]), $.copy(F0), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E1", [])]), $.copy(F1), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E2", [])]), $.copy(F2), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E3", [])]), $.copy(F3), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E4", [])]), $.copy(F4), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E5", [])]), $.copy(F5), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E6", [])]), $.copy(F6), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E7", [])]), $.copy(F7), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E8", [])]), $.copy(F8), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E9", [])]), $.copy(F9), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E10", [])]), $.copy(F10), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E11", [])]), $.copy(F11), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E12", [])]), $.copy(F12), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E13", [])]), $.copy(F13), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E14", [])]), $.copy(F14), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E15", [])]), $.copy(F15), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E16", [])]), $.copy(F16), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E17", [])]), $.copy(F17), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E18", [])]), $.copy(F18), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E19", [])]), $.copy(F19), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
   return;
 }
 
@@ -788,7 +890,7 @@ export function n_custodians_ (
   $c: AptosDataCache,
 ): U64 {
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_NO_REGISTRY);
+    throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   return $.copy($c.borrow_global<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).n_custodians);
 }
@@ -798,7 +900,7 @@ export function register_custodian_capability_ (
 ): CustodianCapability {
   let custodian_id, registry;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_NO_REGISTRY);
+    throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   registry = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
   custodian_id = ($.copy(registry.n_custodians)).add(u64("1"));
@@ -814,27 +916,27 @@ export function register_market_internal_ (
 ): void {
   let base_coin_type, market_info, quote_coin_type, registry, scale_exponent_type;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_NO_REGISTRY);
+    throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[0]])) {
-    throw $.abortCode(E_NOT_COIN_BASE);
+    throw $.abortCode($.copy(E_NOT_COIN_BASE));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
-    throw $.abortCode(E_NOT_COIN_QUOTE);
+    throw $.abortCode($.copy(E_NOT_COIN_QUOTE));
   }
   base_coin_type = Aptos_std.Type_info.type_of_($c, [$p[0]]);
   quote_coin_type = Aptos_std.Type_info.type_of_($c, [$p[1]]);
-  if (!$.deep_eq($.copy(base_coin_type), $.copy(quote_coin_type))) {
-    throw $.abortCode(E_SAME_COIN_TYPE);
+  if (!!$.deep_eq($.copy(base_coin_type), $.copy(quote_coin_type))) {
+    throw $.abortCode($.copy(E_SAME_COIN_TYPE));
   }
   scale_exponent_type = Aptos_std.Type_info.type_of_($c, [$p[2]]);
   registry = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
   if (!Open_table.contains_(registry.scales, $.copy(scale_exponent_type), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64])) {
-    throw $.abortCode(E_NOT_EXPONENT_TYPE);
+    throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
   }
   market_info = new MarketInfo({ base_coin_type: $.copy(base_coin_type), quote_coin_type: $.copy(quote_coin_type), scale_exponent_type: $.copy(scale_exponent_type) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []));
   if (!!Open_table.contains_(registry.markets, $.copy(market_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address])) {
-    throw $.abortCode(E_MARKET_EXISTS);
+    throw $.abortCode($.copy(E_MARKET_EXISTS));
   }
   Open_table.add_(registry.markets, $.copy(market_info), $.copy(host), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address]);
   return;
@@ -860,11 +962,11 @@ export function scale_factor_from_type_info_ (
 ): U64 {
   let scales;
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_NO_REGISTRY);
+    throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   scales = $c.borrow_global<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
   if (!Open_table.contains_(scales, $.copy(scale_exponent_type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64])) {
-    throw $.abortCode(E_NOT_EXPONENT_TYPE);
+    throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
   }
   return $.copy(Open_table.borrow_(scales, $.copy(scale_exponent_type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]));
 }
@@ -898,12 +1000,43 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get CustodianCapability() { return CustodianCapability; }
+  get E0() { return E0; }
+  get E1() { return E1; }
+  get E10() { return E10; }
+  get E11() { return E11; }
+  get E12() { return E12; }
+  get E13() { return E13; }
+  get E14() { return E14; }
+  get E15() { return E15; }
+  get E16() { return E16; }
+  get E17() { return E17; }
+  get E18() { return E18; }
+  get E19() { return E19; }
+  get E2() { return E2; }
+  get E3() { return E3; }
+  get E4() { return E4; }
+  get E5() { return E5; }
+  get E6() { return E6; }
+  get E7() { return E7; }
+  get E8() { return E8; }
+  get E9() { return E9; }
+  get MarketInfo() { return MarketInfo; }
+  get Registry() { return Registry; }
   async loadRegistry(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Registry.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Registry.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

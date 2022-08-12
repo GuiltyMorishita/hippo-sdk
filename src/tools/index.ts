@@ -557,7 +557,7 @@ const checkTestCoin = async () => {
   }
   const payload = Coin_registry.buildPayload_add_token_script(
     strToU8("Aptos"),
-    strToU8("APTOS"),
+    strToU8("APT"),
     strToU8("Aptos Coin"),
     u8(testCoinInfo.decimals.value),
     strToU8("https://miro.medium.com/max/3150/1*Gf747eyRywU8Img0tK5wvw.png"),
@@ -611,7 +611,7 @@ const pontemListPools = async () => {
   const {client, contractAddress} = readConfig(program);
   const resources = await client.getAccountResources(contractAddress);
   for(const resource of resources) {
-    if (resource.type.module === 'liquidity_pool' && resource.type.name === 'LiquidityPool') {
+    if (resource.type.indexOf("liquidity_pool::LiquidityPool") >= 0) {
       console.log("##########");
       const tag = parseMoveStructTag(resource.type);
       console.log(`LHS: ${(tag.typeParams[0] as StructTag).getFullname()}`);

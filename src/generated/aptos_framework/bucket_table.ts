@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -23,6 +23,7 @@ export class BucketTable
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "BucketTable";
   static typeParameters: TypeParamDeclType[] = [
     { name: "K", isPhantom: false },
@@ -54,6 +55,10 @@ export class BucketTable
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "BucketTable", $p);
   }
+  async loadFullState(app: $.AppType) {
+    await this.buckets.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -61,6 +66,7 @@ export class Entry
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Entry";
   static typeParameters: TypeParamDeclType[] = [
     { name: "K", isPhantom: false },
@@ -89,6 +95,11 @@ export class Entry
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Entry", $p);
   }
+  async loadFullState(app: $.AppType) {
+    if (this.key.typeTag instanceof StructTag) {await this.key.loadFullState(app);}
+    if (this.value.typeTag instanceof StructTag) {await this.value.loadFullState(app);}
+    this.__app = app;
+  }
 
 }
 export function add_ (
@@ -109,14 +120,14 @@ export function add_ (
       [temp$1, temp$2] = [bucket, $.copy(i)];
       entry = Std.Vector.borrow_(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "bucket_table", "Entry", [$p[0], $p[1]])]);
       if (!$.dyn_neq($p[0], entry.key, key)) {
-        throw $.abortCode(Std.Error.invalid_argument_(EALREADY_EXIST, $c));
+        throw $.abortCode(Std.Error.invalid_argument_($.copy(EALREADY_EXIST), $c));
       }
       i = ($.copy(i)).add(u64("1"));
     }
 
   }Std.Vector.push_back_(bucket, new Entry({ hash: $.copy(hash), key: key, value: value }, new StructTag(new HexString("0x1"), "bucket_table", "Entry", [$p[0], $p[1]])), $c, [new StructTag(new HexString("0x1"), "bucket_table", "Entry", [$p[0], $p[1]])]);
   map.len = ($.copy(map.len)).add(u64("1"));
-  if ((load_factor_(map, $c, [$p[0], $p[1]])).gt(SPLIT_THRESHOLD)) {
+  if ((load_factor_(map, $c, [$p[0], $p[1]])).gt($.copy(SPLIT_THRESHOLD))) {
     split_one_bucket_(map, $c, [$p[0], $p[1]]);
   }
   else{
@@ -147,7 +158,7 @@ export function borrow_ (
       i = ($.copy(i)).add(u64("1"));
     }
 
-  }throw $.abortCode(Std.Error.invalid_argument_(ENOT_FOUND, $c));
+  }throw $.abortCode(Std.Error.invalid_argument_($.copy(ENOT_FOUND), $c));
 }
 
 export function borrow_mut_ (
@@ -172,7 +183,7 @@ export function borrow_mut_ (
       i = ($.copy(i)).add(u64("1"));
     }
 
-  }throw $.abortCode(Std.Error.invalid_argument_(ENOT_FOUND, $c));
+  }throw $.abortCode(Std.Error.invalid_argument_($.copy(ENOT_FOUND), $c));
 }
 
 export function bucket_index_ (
@@ -224,7 +235,7 @@ export function destroy_empty_ (
 ): void {
   let i;
   if (!($.copy(map.len)).eq((u64("0")))) {
-    throw $.abortCode(Std.Error.invalid_argument_(ENOT_EMPTY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ENOT_EMPTY), $c));
   }
   i = u64("0");
   while (($.copy(i)).lt($.copy(map.num_buckets))) {
@@ -251,7 +262,7 @@ export function load_factor_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V>*/
 ): U64 {
-  return (($.copy(map.len)).mul(u64("100"))).div(($.copy(map.num_buckets)).mul(TARGET_LOAD_PER_BUCKET));
+  return (($.copy(map.len)).mul(u64("100"))).div(($.copy(map.num_buckets)).mul($.copy(TARGET_LOAD_PER_BUCKET)));
 }
 
 export function new___ (
@@ -261,7 +272,7 @@ export function new___ (
 ): BucketTable {
   let buckets, map;
   if (!($.copy(initial_buckets)).gt(u64("0"))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EZERO_CAPACITY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EZERO_CAPACITY), $c));
   }
   buckets = Aptos_std.Table_with_length.new___($c, [AtomicTypeTag.U64, new VectorTag(new StructTag(new HexString("0x1"), "bucket_table", "Entry", [$p[0], $p[1]]))]);
   Aptos_std.Table_with_length.add_(buckets, u64("0"), Std.Vector.empty_($c, [new StructTag(new HexString("0x1"), "bucket_table", "Entry", [$p[0], $p[1]])]), $c, [AtomicTypeTag.U64, new VectorTag(new StructTag(new HexString("0x1"), "bucket_table", "Entry", [$p[0], $p[1]]))]);
@@ -295,7 +306,7 @@ export function remove_ (
       i = ($.copy(i)).add(u64("1"));
     }
 
-  }throw $.abortCode(Std.Error.invalid_argument_(ENOT_FOUND, $c));
+  }throw $.abortCode(Std.Error.invalid_argument_($.copy(ENOT_FOUND), $c));
 }
 
 export function split_ (
@@ -373,7 +384,12 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get BucketTable() { return BucketTable; }
+  get Entry() { return Entry; }
 }
 

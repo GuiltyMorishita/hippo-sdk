@@ -1,6 +1,6 @@
 
 import { AptosClient } from "aptos";
-import { AptosParserRepo } from "@manahippo/move-to-ts";
+import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
 import * as Capability from './capability';
 import * as Coins from './coins';
 import * as Critbit from './critbit';
@@ -41,6 +41,12 @@ export function getPackageRepo(): AptosParserRepo {
   return repo;
 }
 
+export type AppType = {
+  client: AptosClient,
+  repo: AptosParserRepo,
+  cache: AptosLocalCache,
+};
+
 export class App {
   capability : Capability.App
   coins : Coins.App
@@ -54,15 +60,16 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
-    this.capability = new Capability.App(client, repo);
-    this.coins = new Coins.App(client, repo);
-    this.critbit = new Critbit.App(client, repo);
-    this.init = new Init.App(client, repo);
-    this.market = new Market.App(client, repo);
-    this.open_table = new Open_table.App(client, repo);
-    this.order_id = new Order_id.App(client, repo);
-    this.registry = new Registry.App(client, repo);
-    this.user = new User.App(client, repo);
+    this.capability = new Capability.App(client, repo, cache);
+    this.coins = new Coins.App(client, repo, cache);
+    this.critbit = new Critbit.App(client, repo, cache);
+    this.init = new Init.App(client, repo, cache);
+    this.market = new Market.App(client, repo, cache);
+    this.open_table = new Open_table.App(client, repo, cache);
+    this.order_id = new Order_id.App(client, repo, cache);
+    this.registry = new Registry.App(client, repo, cache);
+    this.user = new User.App(client, repo, cache);
   }
 }

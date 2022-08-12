@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -16,6 +16,7 @@ export class EventHandle
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "EventHandle";
   static typeParameters: TypeParamDeclType[] = [
     { name: "T", isPhantom: true }
@@ -40,6 +41,10 @@ export class EventHandle
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "EventHandle", $p);
   }
+  async loadFullState(app: $.AppType) {
+    await this.guid.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -47,6 +52,7 @@ export class EventHandleGenerator
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "EventHandleGenerator";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -72,8 +78,16 @@ export class EventHandleGenerator
     const result = await repo.loadResource(client, address, EventHandleGenerator, typeParams);
     return result as unknown as EventHandleGenerator;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, EventHandleGenerator, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as EventHandleGenerator;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "EventHandleGenerator", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -139,12 +153,22 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get EventHandle() { return EventHandle; }
+  get EventHandleGenerator() { return EventHandleGenerator; }
   async loadEventHandleGenerator(
     owner: HexString,
+    loadFull=true,
   ) {
-    return EventHandleGenerator.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await EventHandleGenerator.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

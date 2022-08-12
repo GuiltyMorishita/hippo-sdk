@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -26,6 +26,7 @@ export class CreateProposalEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CreateProposalEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -59,6 +60,10 @@ export class CreateProposalEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "CreateProposalEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.early_resolution_vote_threshold.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -66,6 +71,7 @@ export class Proposal
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Proposal";
   static typeParameters: TypeParamDeclType[] = [
     { name: "ProposalType", isPhantom: false }
@@ -114,6 +120,11 @@ export class Proposal
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Proposal", $p);
   }
+  async loadFullState(app: $.AppType) {
+    await this.execution_content.loadFullState(app);
+    await this.early_resolution_vote_threshold.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -121,6 +132,7 @@ export class RegisterForumEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "RegisterForumEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -145,6 +157,10 @@ export class RegisterForumEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "RegisterForumEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.proposal_type_info.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -152,6 +168,7 @@ export class ResolveProposal
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ResolveProposal";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -182,6 +199,9 @@ export class ResolveProposal
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ResolveProposal", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -189,6 +209,7 @@ export class VoteEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "VoteEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -213,6 +234,9 @@ export class VoteEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "VoteEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -220,6 +244,7 @@ export class VotingEvents
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "VotingEvents";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -250,6 +275,13 @@ export class VotingEvents
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "VotingEvents", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.create_proposal_events.loadFullState(app);
+    await this.register_forum_events.loadFullState(app);
+    await this.resolve_proposal_events.loadFullState(app);
+    await this.vote_events.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -257,6 +289,7 @@ export class VotingForum
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "VotingForum";
   static typeParameters: TypeParamDeclType[] = [
     { name: "ProposalType", isPhantom: false }
@@ -285,8 +318,18 @@ export class VotingForum
     const result = await repo.loadResource(client, address, VotingForum, typeParams);
     return result as unknown as VotingForum;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, VotingForum, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as VotingForum;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "VotingForum", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.proposals.loadFullState(app);
+    await this.events.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -328,7 +371,7 @@ export function create_proposal_ (
 ): U64 {
   let temp$1, temp$10, temp$11, temp$12, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9, proposal_id, voting_forum;
   if (!(Std.Vector.length_(execution_hash, $c, [AtomicTypeTag.U8])).gt(u64("0"))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EPROPOSAL_EMPTY_EXECUTION_HASH, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_EMPTY_EXECUTION_HASH), $c));
   }
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
   proposal_id = $.copy(voting_forum.next_proposal_id);
@@ -381,15 +424,15 @@ export function get_proposal_state_ (
       temp$1 = false;
     }
     if (temp$1) {
-      temp$2 = PROPOSAL_STATE_SUCCEEDED;
+      temp$2 = $.copy(PROPOSAL_STATE_SUCCEEDED);
     }
     else{
-      temp$2 = PROPOSAL_STATE_FAILED;
+      temp$2 = $.copy(PROPOSAL_STATE_FAILED);
     }
     temp$3 = temp$2;
   }
   else{
-    temp$3 = PROPOSAL_STATE_PENDING;
+    temp$3 = $.copy(PROPOSAL_STATE_PENDING);
   }
   return temp$3;
 }
@@ -435,18 +478,18 @@ export function resolve_ (
 ): any {
   let proposal, proposal_state, resolved_early, voting_forum;
   proposal_state = get_proposal_state_($.copy(voting_forum_address), $.copy(proposal_id), $c, [$p[0]]);
-  if (!($.copy(proposal_state)).eq((PROPOSAL_STATE_SUCCEEDED))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EPROPOSAL_CANNOT_BE_RESOLVED, $c));
+  if (!($.copy(proposal_state)).eq(($.copy(PROPOSAL_STATE_SUCCEEDED)))) {
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_CANNOT_BE_RESOLVED), $c));
   }
   voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
   proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
   if (!!$.copy(proposal.is_resolved)) {
-    throw $.abortCode(Std.Error.invalid_argument_(EPROPOSAL_ALREADY_RESOLVED, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_ALREADY_RESOLVED), $c));
   }
   resolved_early = can_be_resolved_early_(proposal, $c, [$p[0]]);
   proposal.is_resolved = true;
   if (!$.veq(Transaction_context.get_script_hash_($c), $.copy(proposal.execution_hash))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EPROPOSAL_EXECUTION_HASH_NOT_MATCHING, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_EXECUTION_HASH_NOT_MATCHING), $c));
   }
   Aptos_std.Event.emit_event_(voting_forum.events.resolve_proposal_events, new ResolveProposal({ proposal_id: $.copy(proposal_id), yes_votes: $.copy(proposal.yes_votes), no_votes: $.copy(proposal.no_votes), resolved_early: resolved_early }, new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])), $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])]);
   return Std.Option.extract_(proposal.execution_content, $c, [$p[0]]);
@@ -487,13 +530,28 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get CreateProposalEvent() { return CreateProposalEvent; }
+  get Proposal() { return Proposal; }
+  get RegisterForumEvent() { return RegisterForumEvent; }
+  get ResolveProposal() { return ResolveProposal; }
+  get VoteEvent() { return VoteEvent; }
+  get VotingEvents() { return VotingEvents; }
+  get VotingForum() { return VotingForum; }
   async loadVotingForum(
     owner: HexString,
     $p: TypeTag[], /* <ProposalType> */
+    loadFull=true,
   ) {
-    return VotingForum.load(this.repo, this.client, owner, $p);
+    const val = await VotingForum.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -17,6 +17,7 @@ export class GovernanceProposal
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "GovernanceProposal";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -41,6 +42,11 @@ export class GovernanceProposal
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "GovernanceProposal", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.metadata_location.loadFullState(app);
+    await this.metadata_hash.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 export function create_empty_proposal_ (
@@ -55,10 +61,10 @@ export function create_proposal_ (
   $c: AptosDataCache,
 ): GovernanceProposal {
   if (!(Std.String.length_(metadata_location, $c)).le(u64("256"))) {
-    throw $.abortCode(Std.Error.invalid_argument_(ETOO_LONG, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ETOO_LONG), $c));
   }
   if (!(Std.String.length_(metadata_hash, $c)).le(u64("256"))) {
-    throw $.abortCode(Std.Error.invalid_argument_(ETOO_LONG, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ETOO_LONG), $c));
   }
   return new GovernanceProposal({ metadata_location: $.copy(metadata_location), metadata_hash: $.copy(metadata_hash) }, new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", []));
 }
@@ -70,7 +76,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get GovernanceProposal() { return GovernanceProposal; }
 }
 

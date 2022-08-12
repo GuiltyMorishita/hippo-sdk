@@ -1,6 +1,6 @@
 
 import { AptosClient } from "aptos";
-import { AptosParserRepo } from "@manahippo/move-to-ts";
+import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
 import * as Big_vector from './big_vector';
 import * as Comparator from './comparator';
 import * as Event from './event';
@@ -41,6 +41,12 @@ export function getPackageRepo(): AptosParserRepo {
   return repo;
 }
 
+export type AppType = {
+  client: AptosClient,
+  repo: AptosParserRepo,
+  cache: AptosLocalCache,
+};
+
 export class App {
   big_vector : Big_vector.App
   comparator : Comparator.App
@@ -54,15 +60,16 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
-    this.big_vector = new Big_vector.App(client, repo);
-    this.comparator = new Comparator.App(client, repo);
-    this.event = new Event.App(client, repo);
-    this.iterable_table = new Iterable_table.App(client, repo);
-    this.signature = new Signature.App(client, repo);
-    this.simple_map = new Simple_map.App(client, repo);
-    this.table = new Table.App(client, repo);
-    this.table_with_length = new Table_with_length.App(client, repo);
-    this.type_info = new Type_info.App(client, repo);
+    this.big_vector = new Big_vector.App(client, repo, cache);
+    this.comparator = new Comparator.App(client, repo, cache);
+    this.event = new Event.App(client, repo, cache);
+    this.iterable_table = new Iterable_table.App(client, repo, cache);
+    this.signature = new Signature.App(client, repo, cache);
+    this.simple_map = new Simple_map.App(client, repo, cache);
+    this.table = new Table.App(client, repo, cache);
+    this.table_with_length = new Table_with_length.App(client, repo, cache);
+    this.type_info = new Type_info.App(client, repo, cache);
   }
 }

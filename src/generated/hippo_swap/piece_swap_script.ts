@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -74,19 +74,19 @@ export function create_new_pool_ (
   let admin_addr, decimals, decimals__1;
   admin_addr = Std.Signer.address_of_(admin, $c);
   if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
-    throw $.abortCode(E_TOKEN_REGISTRY_NOT_INITIALIZED);
+    throw $.abortCode($.copy(E_TOKEN_REGISTRY_NOT_INITIALIZED));
   }
   if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[0]])) {
-    throw $.abortCode(E_TOKEN_X_NOT_REGISTERED);
+    throw $.abortCode($.copy(E_TOKEN_X_NOT_REGISTERED));
   }
   if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[1]])) {
-    throw $.abortCode(E_TOKEN_Y_NOT_REGISTERED);
+    throw $.abortCode($.copy(E_TOKEN_Y_NOT_REGISTERED));
   }
   if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])])) {
-    throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
   if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[1], $p[0]])])) {
-    throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
@@ -226,7 +226,7 @@ export function swap_script_ (
     temp$1 = false;
   }
   if (!!temp$1) {
-    throw $.abortCode(E_SWAP_ONLY_ONE_IN_ALLOWED);
+    throw $.abortCode($.copy(E_SWAP_ONLY_ONE_IN_ALLOWED));
   }
   if (($.copy(x_min_out)).gt(u64("0"))) {
     temp$2 = ($.copy(y_min_out)).gt(u64("0"));
@@ -235,24 +235,24 @@ export function swap_script_ (
     temp$2 = false;
   }
   if (!!temp$2) {
-    throw $.abortCode(E_SWAP_ONLY_ONE_OUT_ALLOWED);
+    throw $.abortCode($.copy(E_SWAP_ONLY_ONE_OUT_ALLOWED));
   }
   if (($.copy(x_in)).gt(u64("0"))) {
     y_out = Piece_swap.swap_x_to_y_(sender, $.copy(x_in), $c, [$p[0], $p[1]]);
     if (!($.copy(y_out)).ge($.copy(y_min_out))) {
-      throw $.abortCode(E_OUTPUT_LESS_THAN_MIN);
+      throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MIN));
     }
   }
   else{
     if (($.copy(y_in)).gt(u64("0"))) {
       x_out = Piece_swap.swap_y_to_x_(sender, $.copy(y_in), $c, [$p[0], $p[1]]);
       if (!($.copy(x_out)).ge($.copy(x_min_out))) {
-        throw $.abortCode(E_OUTPUT_LESS_THAN_MIN);
+        throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MIN));
       }
     }
     else{
       if (!false) {
-        throw $.abortCode(E_SWAP_NONZERO_INPUT_REQUIRED);
+        throw $.abortCode($.copy(E_SWAP_NONZERO_INPUT_REQUIRED));
       }
     }
   }
@@ -287,8 +287,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
   add_liquidity_script(
     amount_x: U64,
     amount_y: U64,

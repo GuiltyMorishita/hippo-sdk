@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -20,6 +20,7 @@ export class BigVector
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "BigVector";
   static typeParameters: TypeParamDeclType[] = [
     { name: "T", isPhantom: false }
@@ -50,6 +51,11 @@ export class BigVector
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "BigVector", $p);
   }
+  async loadFullState(app: $.AppType) {
+    await this.buckets.loadFullState(app);
+    await this.end_index.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -57,6 +63,7 @@ export class BigVectorIndex
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "BigVectorIndex";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -80,6 +87,9 @@ export class BigVectorIndex
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "BigVectorIndex", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -108,7 +118,7 @@ export function bucket_index_ (
   $p: TypeTag[], /* <T>*/
 ): BigVectorIndex {
   if (!($.copy(i)).lt(length_(v, $c, [$p[0]]))) {
-    throw $.abortCode(EINDEX_OUT_OF_BOUNDS);
+    throw $.abortCode($.copy(EINDEX_OUT_OF_BOUNDS));
   }
   return new BigVectorIndex({ bucket_index: ($.copy(i)).div($.copy(v.bucket_size)), vec_index: ($.copy(i)).mod($.copy(v.bucket_size)) }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", []));
 }
@@ -143,6 +153,11 @@ export function contains_ (
   $p: TypeTag[], /* <T>*/
 ): boolean {
   let exist;
+  if (is_empty_(v, $c, [$p[0]])) {
+    return false;
+  }
+  else{
+  }
   [exist, ] = index_of_(v, val, $c, [$p[0]]);
   return exist;
 }
@@ -154,7 +169,7 @@ export function decrement_index_ (
 ): void {
   if (($.copy(index.vec_index)).eq((u64("0")))) {
     if (!($.copy(index.bucket_index)).gt(u64("0"))) {
-      throw $.abortCode(EINDEX_OUT_OF_BOUNDS);
+      throw $.abortCode($.copy(EINDEX_OUT_OF_BOUNDS));
     }
     index.bucket_index = ($.copy(index.bucket_index)).sub(u64("1"));
     index.vec_index = ($.copy(bucket_size)).sub(u64("1"));
@@ -171,7 +186,7 @@ export function destroy_empty_ (
   $p: TypeTag[], /* <T>*/
 ): void {
   if (!is_empty_(v, $c, [$p[0]])) {
-    throw $.abortCode(Std.Error.invalid_argument_(ENOT_EMPTY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ENOT_EMPTY), $c));
   }
   shrink_to_fit_(v, $c, [$p[0]]);
   let { buckets: buckets } = v;
@@ -264,7 +279,7 @@ export function pop_back_ (
 ): any {
   let val;
   if (!!is_empty_(v, $c, [$p[0]])) {
-    throw $.abortCode(Std.Error.invalid_argument_(EINDEX_OUT_OF_BOUNDS, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EINDEX_OUT_OF_BOUNDS), $c));
   }
   decrement_index_(v.end_index, $.copy(v.bucket_size), $c);
   val = Std.Vector.pop_back_(Table_with_length.borrow_mut_(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), $c, [$p[0]]);
@@ -295,7 +310,7 @@ export function push_back_no_grow_ (
   $p: TypeTag[], /* <T>*/
 ): void {
   if (!($.copy(v.end_index.bucket_index)).lt($.copy(v.num_buckets))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EOUT_OF_CAPACITY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EOUT_OF_CAPACITY), $c));
   }
   Std.Vector.push_back_(Table_with_length.borrow_mut_(v.buckets, $.copy(v.end_index.bucket_index), $c, [AtomicTypeTag.U64, new VectorTag($p[0])]), val, $c, [$p[0]]);
   increment_index_(v.end_index, $.copy(v.bucket_size), $c);
@@ -369,7 +384,12 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get BigVector() { return BigVector; }
+  get BigVectorIndex() { return BigVectorIndex; }
 }
 

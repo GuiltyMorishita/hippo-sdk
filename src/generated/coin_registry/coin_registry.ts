@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -22,6 +22,7 @@ export class TokenInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "TokenInfo";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -64,6 +65,15 @@ export class TokenInfo
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "TokenInfo", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.name.loadFullState(app);
+    await this.symbol.loadFullState(app);
+    await this.description.loadFullState(app);
+    await this.logo_url.loadFullState(app);
+    await this.project_url.loadFullState(app);
+    await this.token_type.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -71,6 +81,7 @@ export class TokenRegistry
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "TokenRegistry";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -105,8 +116,19 @@ export class TokenRegistry
     const result = await repo.loadResource(client, address, TokenRegistry, typeParams);
     return result as unknown as TokenRegistry;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, TokenRegistry, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as TokenRegistry;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "TokenRegistry", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.symbol_to_token_info.loadFullState(app);
+    await this.type_info_to_symbol.loadFullState(app);
+    await this.symbol_to_list_idx.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -127,10 +149,10 @@ export function add_token_ (
   type_info = Aptos_std.Type_info.type_of_($c, [$p[0]]);
   token_info = new TokenInfo({ name: Std.String.utf8_($.copy(name), $c), symbol: Std.String.utf8_($.copy(symbol), $c), description: Std.String.utf8_($.copy(description), $c), decimals: $.copy(decimals), logo_url: Std.String.utf8_($.copy(logo_url), $c), project_url: Std.String.utf8_($.copy(project_url), $c), delisted: false, token_type: $.copy(type_info) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", []));
   if (!!Aptos_std.Table.contains_(registry.symbol_to_token_info, $.copy(token_info.symbol), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])])) {
-    throw $.abortCode(E_SYMBOL_ALREADY_EXISTS);
+    throw $.abortCode($.copy(E_SYMBOL_ALREADY_EXISTS));
   }
   if (!!Aptos_std.Table.contains_(registry.type_info_to_symbol, $.copy(type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])])) {
-    throw $.abortCode(E_TYPE_ALREADY_EXISTS);
+    throw $.abortCode($.copy(E_TYPE_ALREADY_EXISTS));
   }
   Aptos_std.Table.add_(registry.symbol_to_token_info, $.copy(token_info.symbol), $.copy(token_info), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
   Aptos_std.Table.add_(registry.type_info_to_symbol, $.copy(type_info), $.copy(token_info.symbol), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), new StructTag(new HexString("0x1"), "string", "String", [])]);
@@ -190,7 +212,7 @@ export function delist_token_ (
   registry = $c.borrow_global_mut<TokenRegistry>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr));
   symbol_str = Std.String.utf8_($.copy(symbol), $c);
   if (!Aptos_std.Table.contains_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])])) {
-    throw $.abortCode(E_SYMBOL_DOES_NOT_EXIST);
+    throw $.abortCode($.copy(E_SYMBOL_DOES_NOT_EXIST));
   }
   index = $.copy(Aptos_std.Table.borrow_(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]));
   type_info = $.copy(Aptos_std.Table.borrow_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]).token_type);
@@ -243,7 +265,7 @@ export function initialize_ (
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, admin_addr;
   admin_addr = Std.Signer.address_of_(admin, $c);
   if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr))) {
-    throw $.abortCode(E_ALREADY_INITIALIZED);
+    throw $.abortCode($.copy(E_ALREADY_INITIALIZED));
   }
   temp$6 = admin;
   temp$1 = $.copy(admin_addr);
@@ -295,7 +317,7 @@ export function update_token_info_ (
   registry = $c.borrow_global_mut<TokenRegistry>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenRegistry", []), $.copy(admin_addr));
   symbol_str = Std.String.utf8_($.copy(symbol), $c);
   if (!Aptos_std.Table.contains_(registry.symbol_to_token_info, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])])) {
-    throw $.abortCode(E_SYMBOL_DOES_NOT_EXIST);
+    throw $.abortCode($.copy(E_SYMBOL_DOES_NOT_EXIST));
   }
   index = $.copy(Aptos_std.Table.borrow_(registry.symbol_to_list_idx, $.copy(symbol_str), $c, [new StructTag(new HexString("0x1"), "string", "String", []), AtomicTypeTag.U64]));
   list_token_info = Std.Vector.borrow_mut_(registry.token_info_list, $.copy(index), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "coin_registry", "TokenInfo", [])]);
@@ -350,12 +372,22 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get TokenInfo() { return TokenInfo; }
+  get TokenRegistry() { return TokenRegistry; }
   async loadTokenRegistry(
     owner: HexString,
+    loadFull=true,
   ) {
-    return TokenRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await TokenRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
   add_token_script(
     name: U8[],

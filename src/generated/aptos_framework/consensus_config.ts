@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -13,13 +13,14 @@ export const packageName = "AptosFramework";
 export const moduleAddress = new HexString("0x1");
 export const moduleName = "consensus_config";
 
-export const ECONFIG : U64 = u64("0");
+export const ECONFIG : U64 = u64("1");
 
 
 export class ConsensusConfig 
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ConsensusConfig";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -42,8 +43,16 @@ export class ConsensusConfig
     const result = await repo.loadResource(client, address, ConsensusConfig, typeParams);
     return result as unknown as ConsensusConfig;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, ConsensusConfig, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as ConsensusConfig;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ConsensusConfig", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -54,7 +63,7 @@ export function initialize_ (
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
   if (!!$c.exists(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), new HexString("0x1"))) {
-    throw $.abortCode(Std.Error.already_exists_(ECONFIG, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(ECONFIG), $c));
   }
   $c.move_to(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), account, new ConsensusConfig({ config: Std.Vector.empty_($c, [AtomicTypeTag.U8]) }, new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", [])));
   return;
@@ -80,12 +89,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get ConsensusConfig() { return ConsensusConfig; }
   async loadConsensusConfig(
     owner: HexString,
+    loadFull=true,
   ) {
-    return ConsensusConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await ConsensusConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

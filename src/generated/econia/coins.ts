@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -26,6 +26,7 @@ export class BC
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "BC";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -45,6 +46,9 @@ export class BC
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "BC", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -52,6 +56,7 @@ export class CoinCapabilities
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CoinCapabilities";
   static typeParameters: TypeParamDeclType[] = [
     { name: "CoinType", isPhantom: true }
@@ -77,8 +82,18 @@ export class CoinCapabilities
     const result = await repo.loadResource(client, address, CoinCapabilities, typeParams);
     return result as unknown as CoinCapabilities;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CoinCapabilities, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CoinCapabilities;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "CoinCapabilities", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.mint_capability.loadFullState(app);
+    await this.burn_capability.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -87,6 +102,7 @@ export class QC
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "QC";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -105,6 +121,9 @@ export class QC
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "QC", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -129,10 +148,10 @@ export function init_coin_type_ (
 ): void {
   let burn_capability, mint_capability;
   if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
-    throw $.abortCode(E_NOT_ECONIA);
+    throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   if (!!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "CoinCapabilities", [$p[0]]), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
-    throw $.abortCode(E_HAS_CAPABILITIES);
+    throw $.abortCode($.copy(E_HAS_CAPABILITIES));
   }
   [mint_capability, burn_capability] = Aptos_framework.Coin.initialize_(account, Std.String.utf8_($.copy(coin_name), $c), Std.String.utf8_($.copy(coin_symbol), $c), $.copy(decimals), false, $c, [$p[0]]);
   $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "CoinCapabilities", [$p[0]]), account, new CoinCapabilities({ mint_capability: $.copy(mint_capability), burn_capability: $.copy(burn_capability) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "CoinCapabilities", [$p[0]])));
@@ -143,8 +162,8 @@ export function init_coin_types_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  init_coin_type_(account, BASE_COIN_NAME, BASE_COIN_SYMBOL, BASE_COIN_DECIMALS, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "BC", [])]);
-  init_coin_type_(account, QUOTE_COIN_NAME, QUOTE_COIN_SYMBOL, QUOTE_COIN_DECIMALS, $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "QC", [])]);
+  init_coin_type_(account, $.copy(BASE_COIN_NAME), $.copy(BASE_COIN_SYMBOL), $.copy(BASE_COIN_DECIMALS), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "BC", [])]);
+  init_coin_type_(account, $.copy(QUOTE_COIN_NAME), $.copy(QUOTE_COIN_SYMBOL), $.copy(QUOTE_COIN_DECIMALS), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "QC", [])]);
   return;
 }
 
@@ -169,10 +188,10 @@ export function mint_ (
   let account_address, mint_capability;
   account_address = Std.Signer.address_of_(account, $c);
   if (!(($.copy(account_address)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
-    throw $.abortCode(E_NOT_ECONIA);
+    throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "CoinCapabilities", [$p[0]]), $.copy(account_address))) {
-    throw $.abortCode(E_NO_CAPABILITIES);
+    throw $.abortCode($.copy(E_NO_CAPABILITIES));
   }
   mint_capability = $c.borrow_global<CoinCapabilities>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "coins", "CoinCapabilities", [$p[0]]), $.copy(account_address)).mint_capability;
   return Aptos_framework.Coin.mint_($.copy(amount), mint_capability, $c, [$p[0]]);
@@ -203,14 +222,25 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get BC() { return BC; }
+  get CoinCapabilities() { return CoinCapabilities; }
   async loadCoinCapabilities(
     owner: HexString,
     $p: TypeTag[], /* <CoinType> */
+    loadFull=true,
   ) {
-    return CoinCapabilities.load(this.repo, this.client, owner, $p);
+    const val = await CoinCapabilities.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get QC() { return QC; }
   init_coin_types(
   ) {
     return buildPayload_init_coin_types();

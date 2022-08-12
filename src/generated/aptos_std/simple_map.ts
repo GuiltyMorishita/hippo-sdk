@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,6 +19,7 @@ export class Element
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Element";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Key", isPhantom: false },
@@ -44,6 +45,11 @@ export class Element
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Element", $p);
   }
+  async loadFullState(app: $.AppType) {
+    if (this.key.typeTag instanceof StructTag) {await this.key.loadFullState(app);}
+    if (this.value.typeTag instanceof StructTag) {await this.value.loadFullState(app);}
+    this.__app = app;
+  }
 
 }
 
@@ -51,6 +57,7 @@ export class SimpleMap
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "SimpleMap";
   static typeParameters: TypeParamDeclType[] = [
     { name: "Key", isPhantom: false },
@@ -73,6 +80,9 @@ export class SimpleMap
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "SimpleMap", $p);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function add_ (
@@ -86,7 +96,7 @@ export function add_ (
   [temp$1, temp$2] = [map, key];
   [maybe_idx, maybe_placement] = find_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   if (!Std.Option.is_none_(maybe_idx, $c, [AtomicTypeTag.U64])) {
-    throw $.abortCode(Std.Error.invalid_argument_(EKEY_ALREADY_EXISTS, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_ALREADY_EXISTS), $c));
   }
   Std.Vector.push_back_(map.data, new Element({ key: key, value: value }, new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
   placement = Std.Option.extract_(maybe_placement, $c, [AtomicTypeTag.U64]);
@@ -109,7 +119,7 @@ export function borrow_ (
   let idx, maybe_idx;
   [maybe_idx, ] = find_(map, key, $c, [$p[0], $p[1]]);
   if (!Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64])) {
-    throw $.abortCode(Std.Error.invalid_argument_(EKEY_NOT_FOUND, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_NOT_FOUND), $c));
   }
   idx = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
   return Std.Vector.borrow_(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).value;
@@ -125,7 +135,7 @@ export function borrow_mut_ (
   [temp$1, temp$2] = [map, key];
   [maybe_idx, ] = find_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   if (!Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64])) {
-    throw $.abortCode(Std.Error.invalid_argument_(EKEY_NOT_FOUND, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_NOT_FOUND), $c));
   }
   idx = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
   return Std.Vector.borrow_mut_(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).value;
@@ -220,7 +230,7 @@ export function remove_ (
   [temp$1, temp$2] = [map, key];
   [maybe_idx, ] = find_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   if (!Std.Option.is_some_(maybe_idx, $c, [AtomicTypeTag.U64])) {
-    throw $.abortCode(Std.Error.invalid_argument_(EKEY_NOT_FOUND, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_NOT_FOUND), $c));
   }
   placement = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
   end = (Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])])).sub(u64("1"));
@@ -242,7 +252,12 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Element() { return Element; }
+  get SimpleMap() { return SimpleMap; }
 }
 

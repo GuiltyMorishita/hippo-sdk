@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -70,22 +70,22 @@ export function create_new_pool_ (
   let admin_addr, block_timestamp, decimals, decimals__1, future_time;
   admin_addr = Std.Signer.address_of_(sender, $c);
   if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
-    throw $.abortCode(E_TOKEN_REGISTRY_NOT_INITIALIZED);
+    throw $.abortCode($.copy(E_TOKEN_REGISTRY_NOT_INITIALIZED));
   }
   if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[0]])) {
-    throw $.abortCode(E_TOKEN_X_NOT_REGISTERED);
+    throw $.abortCode($.copy(E_TOKEN_X_NOT_REGISTERED));
   }
   if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[1]])) {
-    throw $.abortCode(E_TOKEN_Y_NOT_REGISTERED);
+    throw $.abortCode($.copy(E_TOKEN_Y_NOT_REGISTERED));
   }
   if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])])) {
-    throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
   if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[1], $p[0]])])) {
-    throw $.abortCode(E_LP_TOKEN_ALREADY_REGISTERED);
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
   block_timestamp = Aptos_framework.Timestamp.now_microseconds_($c);
-  future_time = ($.copy(block_timestamp)).add(((u64("24")).mul(u64("3600"))).mul(MICRO_CONVERSION_FACTOR));
+  future_time = ($.copy(block_timestamp)).add(((u64("24")).mul(u64("3600"))).mul($.copy(MICRO_CONVERSION_FACTOR)));
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
   Stable_curve_swap.initialize_(sender, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals__1), u64("60"), u64("80"), $.copy(block_timestamp), $.copy(future_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
@@ -108,7 +108,7 @@ export function mock_create_pair_and_add_liquidity_ (
   name = Std.String.utf8_($.copy(symbol), $c);
   [initial_A, future_A] = [u64("60"), u64("100")];
   initial_A_time = Aptos_framework.Timestamp.now_microseconds_($c);
-  future_A_time = ($.copy(initial_A_time)).add(((u64("24")).mul(u64("3600"))).mul(MICRO_CONVERSION_FACTOR));
+  future_A_time = ($.copy(initial_A_time)).add(((u64("24")).mul(u64("3600"))).mul($.copy(MICRO_CONVERSION_FACTOR)));
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
   Stable_curve_swap.initialize_(admin, $.copy(name), $.copy(name), $.copy(decimals__1), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
@@ -230,22 +230,22 @@ export function swap_ (
   }
   cond_c = temp$3;
   if (!!(cond_a || cond_b)) {
-    throw $.abortCode(E_SWAP_ONLY_ONE_IN_ALLOWED);
+    throw $.abortCode($.copy(E_SWAP_ONLY_ONE_IN_ALLOWED));
   }
   if (!!cond_c) {
-    throw $.abortCode(E_SWAP_ONLY_ONE_OUT_ALLOWED);
+    throw $.abortCode($.copy(E_SWAP_ONLY_ONE_OUT_ALLOWED));
   }
   addr = Std.Signer.address_of_(sender, $c);
   if (($.copy(x_in)).gt(u64("0"))) {
     [, , out_amount] = Stable_curve_swap.swap_x_to_exact_y_(sender, $.copy(x_in), $.copy(addr), $c, [$p[0], $p[1]]);
     if (!($.copy(out_amount)).gt($.copy(y_min_out))) {
-      throw $.abortCode(E_OUTPUT_LESS_THAN_MIN);
+      throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MIN));
     }
   }
   else{
     [, out_amount__4, ] = Stable_curve_swap.swap_y_to_exact_x_(sender, $.copy(y_in), $.copy(addr), $c, [$p[0], $p[1]]);
     if (!($.copy(out_amount__4)).gt($.copy(x_min_out))) {
-      throw $.abortCode(E_OUTPUT_LESS_THAN_MIN);
+      throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MIN));
     }
   }
   return;
@@ -291,8 +291,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
   add_liquidity(
     amount_x: U64,
     amount_y: U64,

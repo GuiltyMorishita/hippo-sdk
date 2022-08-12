@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -29,19 +29,19 @@ export function add_liquidity_route_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64, U64] {
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, temp$8, temp$9;
-  if (($.copy(pool_type)).eq((POOL_TYPE_CONSTANT_PRODUCT))) {
+  if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_CONSTANT_PRODUCT)))) {
     [temp$7, temp$8, temp$9] = Cp_swap.add_liquidity_(signer, $.copy(amount_x), $.copy(amount_y), $c, [$p[0], $p[1]]);
   }
   else{
-    if (($.copy(pool_type)).eq((POOL_TYPE_STABLE_CURVE))) {
+    if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_STABLE_CURVE)))) {
       [temp$4, temp$5, temp$6] = Stable_curve_swap.add_liquidity_(signer, $.copy(amount_x), $.copy(amount_y), $c, [$p[0], $p[1]]);
     }
     else{
-      if (($.copy(pool_type)).eq((POOL_TYPE_PIECEWISE))) {
+      if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_PIECEWISE)))) {
         [temp$1, temp$2, temp$3] = Piece_swap.add_liquidity_(signer, $.copy(amount_x), $.copy(amount_y), $c, [$p[0], $p[1]]);
       }
       else{
-        throw $.abortCode(E_UNKNOWN_POOL_TYPE);
+        throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
       }
       [temp$4, temp$5, temp$6] = [temp$1, temp$2, temp$3];
     }
@@ -58,7 +58,7 @@ export function get_intermediate_output_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let temp$11, temp$12, temp$13, temp$14, temp$3, temp$8, x_out, x_out__2, y_out, y_out__1, y_out__10, y_out__4, y_out__6, y_out__9, zero, zero__5, zero2, zero2__7;
-  if (($.copy(pool_type)).eq((POOL_TYPE_CONSTANT_PRODUCT))) {
+  if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_CONSTANT_PRODUCT)))) {
     if (is_x_to_y) {
       [x_out, y_out] = Cp_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
       Aptos_framework.Coin.destroy_zero_(x_out, $c, [$p[0]]);
@@ -72,7 +72,7 @@ export function get_intermediate_output_ (
     temp$14 = temp$3;
   }
   else{
-    if (($.copy(pool_type)).eq((POOL_TYPE_STABLE_CURVE))) {
+    if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_STABLE_CURVE)))) {
       if (is_x_to_y) {
         [zero, zero2, y_out__4] = Stable_curve_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
         Aptos_framework.Coin.destroy_zero_(zero, $c, [$p[0]]);
@@ -88,7 +88,7 @@ export function get_intermediate_output_ (
       temp$13 = temp$8;
     }
     else{
-      if (($.copy(pool_type)).eq((POOL_TYPE_PIECEWISE))) {
+      if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_PIECEWISE)))) {
         if (is_x_to_y) {
           y_out__9 = Piece_swap.swap_x_to_y_direct_(x_in, $c, [$p[0], $p[1]]);
           temp$11 = y_out__9;
@@ -100,7 +100,7 @@ export function get_intermediate_output_ (
         temp$12 = temp$11;
       }
       else{
-        throw $.abortCode(E_UNKNOWN_POOL_TYPE);
+        throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
       }
       temp$13 = temp$12;
     }
@@ -119,19 +119,19 @@ export function remove_liquidity_route_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64] {
   let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6;
-  if (($.copy(pool_type)).eq((POOL_TYPE_CONSTANT_PRODUCT))) {
+  if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_CONSTANT_PRODUCT)))) {
     [temp$5, temp$6] = Cp_swap.remove_liquidity_(signer, $.copy(liquidity), $.copy(amount_x_min), $.copy(amount_y_min), $c, [$p[0], $p[1]]);
   }
   else{
-    if (($.copy(pool_type)).eq((POOL_TYPE_STABLE_CURVE))) {
+    if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_STABLE_CURVE)))) {
       [temp$3, temp$4] = Stable_curve_swap.remove_liquidity_(signer, $.copy(liquidity), $.copy(amount_x_min), $.copy(amount_y_min), $c, [$p[0], $p[1]]);
     }
     else{
-      if (($.copy(pool_type)).eq((POOL_TYPE_PIECEWISE))) {
+      if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_PIECEWISE)))) {
         [temp$1, temp$2] = Piece_swap.remove_liquidity_(signer, $.copy(liquidity), $c, [$p[0], $p[1]]);
       }
       else{
-        throw $.abortCode(E_UNKNOWN_POOL_TYPE);
+        throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
       }
       [temp$3, temp$4] = [temp$1, temp$2];
     }
@@ -159,7 +159,7 @@ export function three_step_route_ (
   coin_z = get_intermediate_output_($.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2]]);
   coin_a = get_intermediate_output_($.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3]]);
   if (!(Aptos_framework.Coin.value_(coin_a, $c, [$p[3]])).ge($.copy(a_min_out))) {
-    throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
+    throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
   sender_addr = Std.Signer.address_of_(sender, $c);
   if (!Aptos_framework.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[3]])) {
@@ -234,7 +234,7 @@ export function two_step_route_ (
   coin_z = get_intermediate_output_($.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2]]);
   coin_z_amt = Aptos_framework.Coin.value_(coin_z, $c, [$p[2]]);
   if (!($.copy(coin_z_amt)).ge($.copy(z_min_out))) {
-    throw $.abortCode(E_OUTPUT_LESS_THAN_MINIMUM);
+    throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
   sender_addr = Std.Signer.address_of_(sender, $c);
   if (!Aptos_framework.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[2]])) {
@@ -293,8 +293,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
   three_step_route_script(
     first_pool_type: U8,
     first_is_x_to_y: boolean,

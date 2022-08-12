@@ -1,6 +1,6 @@
 
 import { AptosClient } from "aptos";
-import { AptosParserRepo } from "@manahippo/move-to-ts";
+import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
 import * as Acl from './acl';
 import * as Bcs from './bcs';
 import * as Bit_vector from './bit_vector';
@@ -53,6 +53,12 @@ export function getPackageRepo(): AptosParserRepo {
   return repo;
 }
 
+export type AppType = {
+  client: AptosClient,
+  repo: AptosParserRepo,
+  cache: AptosLocalCache,
+};
+
 export class App {
   acl : Acl.App
   bcs : Bcs.App
@@ -70,19 +76,20 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
-    this.acl = new Acl.App(client, repo);
-    this.bcs = new Bcs.App(client, repo);
-    this.bit_vector = new Bit_vector.App(client, repo);
-    this.capability = new Capability.App(client, repo);
-    this.debug = new Debug.App(client, repo);
-    this.error = new Error.App(client, repo);
-    this.fixed_point32 = new Fixed_point32.App(client, repo);
-    this.guid = new Guid.App(client, repo);
-    this.hash = new Hash.App(client, repo);
-    this.option = new Option.App(client, repo);
-    this.signer = new Signer.App(client, repo);
-    this.string = new String.App(client, repo);
-    this.vector = new Vector.App(client, repo);
+    this.acl = new Acl.App(client, repo, cache);
+    this.bcs = new Bcs.App(client, repo, cache);
+    this.bit_vector = new Bit_vector.App(client, repo, cache);
+    this.capability = new Capability.App(client, repo, cache);
+    this.debug = new Debug.App(client, repo, cache);
+    this.error = new Error.App(client, repo, cache);
+    this.fixed_point32 = new Fixed_point32.App(client, repo, cache);
+    this.guid = new Guid.App(client, repo, cache);
+    this.hash = new Hash.App(client, repo, cache);
+    this.option = new Option.App(client, repo, cache);
+    this.signer = new Signer.App(client, repo, cache);
+    this.string = new String.App(client, repo, cache);
+    this.vector = new Vector.App(client, repo, cache);
   }
 }

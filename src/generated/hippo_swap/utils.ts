@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -16,6 +16,7 @@ export class PoolInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "PoolInfo";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -40,6 +41,9 @@ export class PoolInfo
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "PoolInfo", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -47,6 +51,7 @@ export class PoolList
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "PoolList";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -69,8 +74,16 @@ export class PoolList
     const result = await repo.loadResource(client, address, PoolList, typeParams);
     return result as unknown as PoolList;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, PoolList, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as PoolList;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "PoolList", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -126,12 +139,22 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get PoolInfo() { return PoolInfo; }
+  get PoolList() { return PoolList; }
   async loadPoolList(
     owner: HexString,
+    loadFull=true,
   ) {
-    return PoolList.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await PoolList.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
   get_pool_list(
   ) {

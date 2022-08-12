@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -27,6 +27,7 @@ export class BurnCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "BurnCapability";
   static typeParameters: TypeParamDeclType[] = [
     { name: "CoinType", isPhantom: true }
@@ -47,8 +48,16 @@ export class BurnCapability
     const result = await repo.loadResource(client, address, BurnCapability, typeParams);
     return result as unknown as BurnCapability;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, BurnCapability, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as BurnCapability;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "BurnCapability", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -57,6 +66,7 @@ export class Coin
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Coin";
   static typeParameters: TypeParamDeclType[] = [
     { name: "CoinType", isPhantom: true }
@@ -78,6 +88,9 @@ export class Coin
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "Coin", $p);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -85,6 +98,7 @@ export class CoinInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CoinInfo";
   static typeParameters: TypeParamDeclType[] = [
     { name: "CoinType", isPhantom: true }
@@ -116,8 +130,19 @@ export class CoinInfo
     const result = await repo.loadResource(client, address, CoinInfo, typeParams);
     return result as unknown as CoinInfo;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CoinInfo, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CoinInfo;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "CoinInfo", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.name.loadFullState(app);
+    await this.symbol.loadFullState(app);
+    await this.supply.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -126,6 +151,7 @@ export class CoinStore
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CoinStore";
   static typeParameters: TypeParamDeclType[] = [
     { name: "CoinType", isPhantom: true }
@@ -154,8 +180,19 @@ export class CoinStore
     const result = await repo.loadResource(client, address, CoinStore, typeParams);
     return result as unknown as CoinStore;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CoinStore, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CoinStore;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "CoinStore", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.coin.loadFullState(app);
+    await this.deposit_events.loadFullState(app);
+    await this.withdraw_events.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -164,6 +201,7 @@ export class DepositEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "DepositEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -185,6 +223,9 @@ export class DepositEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "DepositEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -192,6 +233,7 @@ export class MintCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "MintCapability";
   static typeParameters: TypeParamDeclType[] = [
     { name: "CoinType", isPhantom: true }
@@ -212,8 +254,16 @@ export class MintCapability
     const result = await repo.loadResource(client, address, MintCapability, typeParams);
     return result as unknown as MintCapability;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, MintCapability, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as MintCapability;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "MintCapability", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -222,6 +272,7 @@ export class WithdrawEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WithdrawEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -243,6 +294,9 @@ export class WithdrawEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WithdrawEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function balance_ (
@@ -251,7 +305,7 @@ export function balance_ (
   $p: TypeTag[], /* <CoinType>*/
 ): U64 {
   if (!is_account_registered_($.copy(owner), $c, [$p[0]])) {
-    throw $.abortCode(Std.Error.not_found_(ECOIN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ECOIN_STORE_NOT_PUBLISHED), $c));
   }
   return $.copy($c.borrow_global<CoinStore>(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), $.copy(owner)).coin.value);
 }
@@ -265,7 +319,7 @@ export function burn_ (
   let temp$1, coin_addr, supply, supply__2;
   let { value: amount } = coin;
   if (!($.copy(amount)).gt(u64("0"))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EINVALID_COIN_AMOUNT, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EINVALID_COIN_AMOUNT), $c));
   }
   temp$1 = Aptos_std.Type_info.type_of_($c, [$p[0]]);
   coin_addr = Aptos_std.Type_info.account_address_(temp$1, $c);
@@ -316,7 +370,7 @@ export function deposit_ (
 ): void {
   let coin_store;
   if (!is_account_registered_($.copy(account_addr), $c, [$p[0]])) {
-    throw $.abortCode(Std.Error.not_found_(ECOIN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ECOIN_STORE_NOT_PUBLISHED), $c));
   }
   coin_store = $c.borrow_global_mut<CoinStore>(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), $.copy(account_addr));
   Aptos_std.Event.emit_event_(coin_store.deposit_events, new DepositEvent({ amount: $.copy(coin.value) }, new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])]);
@@ -331,7 +385,7 @@ export function destroy_zero_ (
 ): void {
   let { value: value } = zero_coin;
   if (!($.copy(value)).eq((u64("0")))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EDESTRUCTION_OF_NONZERO_TOKEN, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EDESTRUCTION_OF_NONZERO_TOKEN), $c));
   }
   return;
 }
@@ -343,7 +397,7 @@ export function extract_ (
   $p: TypeTag[], /* <CoinType>*/
 ): Coin {
   if (!($.copy(coin.value)).ge($.copy(amount))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EINSUFFICIENT_BALANCE, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EINSUFFICIENT_BALANCE), $c));
   }
   coin.value = ($.copy(coin.value)).sub($.copy(amount));
   return new Coin({ value: $.copy(amount) }, new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]]));
@@ -373,10 +427,10 @@ export function initialize_ (
   account_addr = Std.Signer.address_of_(account, $c);
   type_info = Aptos_std.Type_info.type_of_($c, [$p[0]]);
   if (!((Aptos_std.Type_info.account_address_(type_info, $c)).hex() === ($.copy(account_addr)).hex())) {
-    throw $.abortCode(Std.Error.invalid_argument_(ECOIN_INFO_ADDRESS_MISMATCH, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ECOIN_INFO_ADDRESS_MISMATCH), $c));
   }
   if (!!$c.exists(new StructTag(new HexString("0x1"), "coin", "CoinInfo", [$p[0]]), $.copy(account_addr))) {
-    throw $.abortCode(Std.Error.already_exists_(ECOIN_INFO_ALREADY_PUBLISHED, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(ECOIN_INFO_ALREADY_PUBLISHED), $c));
   }
   temp$4 = $.copy(name);
   temp$3 = $.copy(symbol);
@@ -439,8 +493,8 @@ export function mint_ (
   if (Std.Option.is_some_(supply, $c, [AtomicTypeTag.U128])) {
     supply__2 = Std.Option.borrow_mut_(supply, $c, [AtomicTypeTag.U128]);
     amount_u128 = u128($.copy(amount));
-    if (!($.copy(supply__2)).le((MAX_U128).sub($.copy(amount_u128)))) {
-      throw $.abortCode(Std.Error.invalid_argument_(ETOTAL_SUPPLY_OVERFLOW, $c));
+    if (!($.copy(supply__2)).le(($.copy(MAX_U128)).sub($.copy(amount_u128)))) {
+      throw $.abortCode(Std.Error.invalid_argument_($.copy(ETOTAL_SUPPLY_OVERFLOW), $c));
     }
     $.set(supply__2, ($.copy(supply__2)).add($.copy(amount_u128)));
   }
@@ -467,7 +521,7 @@ export function register_ (
   let account_addr, coin_store;
   account_addr = Std.Signer.address_of_(account, $c);
   if (!!is_account_registered_($.copy(account_addr), $c, [$p[0]])) {
-    throw $.abortCode(Std.Error.already_exists_(ECOIN_STORE_ALREADY_PUBLISHED, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(ECOIN_STORE_ALREADY_PUBLISHED), $c));
   }
   coin_store = new CoinStore({ coin: new Coin({ value: u64("0") }, new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])), deposit_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "coin", "DepositEvent", [])]), withdraw_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])]) }, new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]));
   $c.move_to(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), account, coin_store);
@@ -541,7 +595,7 @@ export function withdraw_ (
   let account_addr, coin_store;
   account_addr = Std.Signer.address_of_(account, $c);
   if (!is_account_registered_($.copy(account_addr), $c, [$p[0]])) {
-    throw $.abortCode(Std.Error.not_found_(ECOIN_STORE_NOT_PUBLISHED, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(ECOIN_STORE_NOT_PUBLISHED), $c));
   }
   coin_store = $c.borrow_global_mut<CoinStore>(new StructTag(new HexString("0x1"), "coin", "CoinStore", [$p[0]]), $.copy(account_addr));
   Aptos_std.Event.emit_event_(coin_store.withdraw_events, new WithdrawEvent({ amount: $.copy(amount) }, new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])), $c, [new StructTag(new HexString("0x1"), "coin", "WithdrawEvent", [])]);
@@ -568,32 +622,62 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get BurnCapability() { return BurnCapability; }
   async loadBurnCapability(
     owner: HexString,
     $p: TypeTag[], /* <CoinType> */
+    loadFull=true,
   ) {
-    return BurnCapability.load(this.repo, this.client, owner, $p);
+    const val = await BurnCapability.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get Coin() { return Coin; }
+  get CoinInfo() { return CoinInfo; }
   async loadCoinInfo(
     owner: HexString,
     $p: TypeTag[], /* <CoinType> */
+    loadFull=true,
   ) {
-    return CoinInfo.load(this.repo, this.client, owner, $p);
+    const val = await CoinInfo.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get CoinStore() { return CoinStore; }
   async loadCoinStore(
     owner: HexString,
     $p: TypeTag[], /* <CoinType> */
+    loadFull=true,
   ) {
-    return CoinStore.load(this.repo, this.client, owner, $p);
+    const val = await CoinStore.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get DepositEvent() { return DepositEvent; }
+  get MintCapability() { return MintCapability; }
   async loadMintCapability(
     owner: HexString,
     $p: TypeTag[], /* <CoinType> */
+    loadFull=true,
   ) {
-    return MintCapability.load(this.repo, this.client, owner, $p);
+    const val = await MintCapability.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get WithdrawEvent() { return WithdrawEvent; }
   transfer(
     to: HexString,
     amount: U64,

@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -17,6 +17,7 @@ export class AptosCoinCapabilities
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "AptosCoinCapabilities";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -39,8 +40,17 @@ export class AptosCoinCapabilities
     const result = await repo.loadResource(client, address, AptosCoinCapabilities, typeParams);
     return result as unknown as AptosCoinCapabilities;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, AptosCoinCapabilities, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as AptosCoinCapabilities;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "AptosCoinCapabilities", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.burn_cap.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -69,12 +79,21 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get AptosCoinCapabilities() { return AptosCoinCapabilities; }
   async loadAptosCoinCapabilities(
     owner: HexString,
+    loadFull=true,
   ) {
-    return AptosCoinCapabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await AptosCoinCapabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
 }
 

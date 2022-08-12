@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,7 +19,7 @@ export function assert_aptos_framework_ (
   $c: AptosDataCache,
 ): void {
   if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0x1")).hex())) {
-    throw $.abortCode(Std.Error.permission_denied_(ENOT_CORE_FRAMEWORK_ADDRESS, $c));
+    throw $.abortCode(Std.Error.permission_denied_($.copy(ENOT_CORE_FRAMEWORK_ADDRESS), $c));
   }
   return;
 }
@@ -36,7 +36,7 @@ export function assert_core_resource_address_ (
   $c: AptosDataCache,
 ): void {
   if (!is_core_resource_address_($.copy(addr), $c)) {
-    throw $.abortCode(Std.Error.permission_denied_(ENOT_CORE_RESOURCE_ADDRESS, $c));
+    throw $.abortCode(Std.Error.permission_denied_($.copy(ENOT_CORE_RESOURCE_ADDRESS), $c));
   }
   return;
 }
@@ -46,7 +46,7 @@ export function assert_vm_ (
   $c: AptosDataCache,
 ): void {
   if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0x0")).hex())) {
-    throw $.abortCode(Std.Error.permission_denied_(EVM, $c));
+    throw $.abortCode(Std.Error.permission_denied_($.copy(EVM), $c));
   }
   return;
 }
@@ -64,7 +64,10 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
 }
 

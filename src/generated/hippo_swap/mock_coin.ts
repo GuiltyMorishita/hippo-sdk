@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -18,6 +18,7 @@ export class TokenSharedCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "TokenSharedCapability";
   static typeParameters: TypeParamDeclType[] = [
     { name: "TokenType", isPhantom: true }
@@ -43,8 +44,18 @@ export class TokenSharedCapability
     const result = await repo.loadResource(client, address, TokenSharedCapability, typeParams);
     return result as unknown as TokenSharedCapability;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, TokenSharedCapability, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as TokenSharedCapability;
+  }
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "TokenSharedCapability", $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.mint.loadFullState(app);
+    await this.burn.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -53,6 +64,7 @@ export class WBTC
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WBTC";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -72,6 +84,9 @@ export class WBTC
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WBTC", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -79,6 +94,7 @@ export class WDAI
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WDAI";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -98,6 +114,9 @@ export class WDAI
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WDAI", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -105,6 +124,7 @@ export class WDOT
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WDOT";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -124,6 +144,9 @@ export class WDOT
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WDOT", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -131,6 +154,7 @@ export class WETH
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WETH";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -150,6 +174,9 @@ export class WETH
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WETH", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -157,6 +184,7 @@ export class WSOL
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WSOL";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -176,6 +204,9 @@ export class WSOL
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WSOL", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -183,6 +214,7 @@ export class WUSDC
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WUSDC";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -202,6 +234,9 @@ export class WUSDC
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WUSDC", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 
@@ -209,6 +244,7 @@ export class WUSDT
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "WUSDT";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -227,6 +263,9 @@ export class WUSDT
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "WUSDT", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -334,14 +373,30 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get TokenSharedCapability() { return TokenSharedCapability; }
   async loadTokenSharedCapability(
     owner: HexString,
     $p: TypeTag[], /* <TokenType> */
+    loadFull=true,
   ) {
-    return TokenSharedCapability.load(this.repo, this.client, owner, $p);
+    const val = await TokenSharedCapability.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get WBTC() { return WBTC; }
+  get WDAI() { return WDAI; }
+  get WDOT() { return WDOT; }
+  get WETH() { return WETH; }
+  get WSOL() { return WSOL; }
+  get WUSDC() { return WUSDC; }
+  get WUSDT() { return WUSDT; }
   faucet_mint_to_script(
     amount: U64,
     $p: TypeTag[], /* <TokenType>*/

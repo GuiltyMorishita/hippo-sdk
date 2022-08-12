@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -17,6 +17,7 @@ export class CreateCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CreateCapability";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -39,8 +40,16 @@ export class CreateCapability
     const result = await repo.loadResource(client, address, CreateCapability, typeParams);
     return result as unknown as CreateCapability;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CreateCapability, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as CreateCapability;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "CreateCapability", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -49,6 +58,7 @@ export class GUID
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "GUID";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -70,6 +80,10 @@ export class GUID
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "GUID", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.id.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -77,6 +91,7 @@ export class Generator
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Generator";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -99,8 +114,16 @@ export class Generator
     const result = await repo.loadResource(client, address, Generator, typeParams);
     return result as unknown as Generator;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Generator, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Generator;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Generator", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -109,6 +132,7 @@ export class ID
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ID";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -132,6 +156,9 @@ export class ID
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ID", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -174,7 +201,7 @@ export function create_with_capability_ (
   $c: AptosDataCache,
 ): GUID {
   if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
-    throw $.abortCode(EGUID_GENERATOR_NOT_PUBLISHED);
+    throw $.abortCode($.copy(EGUID_GENERATOR_NOT_PUBLISHED));
   }
   return create_impl_($.copy(addr), $c);
 }
@@ -267,17 +294,34 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get CreateCapability() { return CreateCapability; }
   async loadCreateCapability(
     owner: HexString,
+    loadFull=true,
   ) {
-    return CreateCapability.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await CreateCapability.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get GUID() { return GUID; }
+  get Generator() { return Generator; }
   async loadGenerator(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Generator.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Generator.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get ID() { return ID; }
 }
 

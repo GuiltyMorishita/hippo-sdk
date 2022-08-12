@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -47,6 +47,7 @@ export class Account
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "Account";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -54,18 +55,15 @@ export class Account
   static fields: FieldDeclType[] = [
   { name: "authentication_key", typeTag: new VectorTag(AtomicTypeTag.U8) },
   { name: "sequence_number", typeTag: AtomicTypeTag.U64 },
-  { name: "self_address", typeTag: AtomicTypeTag.Address },
   { name: "coin_register_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]) }];
 
   authentication_key: U8[];
   sequence_number: U64;
-  self_address: HexString;
   coin_register_events: Aptos_std.Event.EventHandle;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.authentication_key = proto['authentication_key'] as U8[];
     this.sequence_number = proto['sequence_number'] as U64;
-    this.self_address = proto['self_address'] as HexString;
     this.coin_register_events = proto['coin_register_events'] as Aptos_std.Event.EventHandle;
   }
 
@@ -78,8 +76,17 @@ export class Account
     const result = await repo.loadResource(client, address, Account, typeParams);
     return result as unknown as Account;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, Account, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as Account;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "Account", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.coin_register_events.loadFullState(app);
+    this.__app = app;
   }
 
 }
@@ -88,6 +95,7 @@ export class ChainSpecificAccountInfo
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ChainSpecificAccountInfo";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -131,8 +139,16 @@ export class ChainSpecificAccountInfo
     const result = await repo.loadResource(client, address, ChainSpecificAccountInfo, typeParams);
     return result as unknown as ChainSpecificAccountInfo;
   }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, ChainSpecificAccountInfo, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as ChainSpecificAccountInfo;
+  }
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ChainSpecificAccountInfo", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -141,6 +157,7 @@ export class CoinRegisterEvent
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "CoinRegisterEvent";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -162,6 +179,10 @@ export class CoinRegisterEvent
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "CoinRegisterEvent", []);
   }
+  async loadFullState(app: $.AppType) {
+    await this.type_info.loadFullState(app);
+    this.__app = app;
+  }
 
 }
 
@@ -169,6 +190,7 @@ export class SignerCapability
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "SignerCapability";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -189,6 +211,9 @@ export class SignerCapability
 
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "SignerCapability", []);
+  }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
   }
 
 }
@@ -222,13 +247,13 @@ export function create_account_internal_ (
   $c: AptosDataCache,
 ): HexString {
   if (!!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(new_address))) {
-    throw $.abortCode(Std.Error.already_exists_(EACCOUNT, $c));
+    throw $.abortCode(Std.Error.already_exists_($.copy(EACCOUNT), $c));
   }
   if (!(($.copy(new_address)).hex() !== (new HexString("0x0")).hex())) {
-    throw $.abortCode(Std.Error.invalid_argument_(ECANNOT_CREATE_AT_VM_RESERVED, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ECANNOT_CREATE_AT_VM_RESERVED), $c));
   }
   if (!(($.copy(new_address)).hex() !== (new HexString("0x1")).hex())) {
-    throw $.abortCode(Std.Error.invalid_argument_(ECANNOT_CREATE_AT_CORE_CODE, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(ECANNOT_CREATE_AT_CORE_CODE), $c));
   }
   return create_account_unchecked_($.copy(new_address), $c);
 }
@@ -241,9 +266,9 @@ export function create_account_unchecked_ (
   new_account = create_signer_($.copy(new_address), $c);
   authentication_key = Std.Bcs.to_bytes_(new_address, $c, [AtomicTypeTag.Address]);
   if (!(Std.Vector.length_(authentication_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EMALFORMED_AUTHENTICATION_KEY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EMALFORMED_AUTHENTICATION_KEY), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "account", "Account", []), new_account, new Account({ authentication_key: $.copy(authentication_key), sequence_number: u64("0"), self_address: $.copy(new_address), coin_register_events: Aptos_std.Event.new_event_handle_(new_account, $c, [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]) }, new StructTag(new HexString("0x1"), "account", "Account", [])));
+  $c.move_to(new StructTag(new HexString("0x1"), "account", "Account", []), new_account, new Account({ authentication_key: $.copy(authentication_key), sequence_number: u64("0"), coin_register_events: Aptos_std.Event.new_event_handle_(new_account, $c, [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]) }, new StructTag(new HexString("0x1"), "account", "Account", [])));
   return new_account;
 }
 
@@ -263,7 +288,7 @@ export function create_authentication_key_ (
   authentication_key = $.copy(auth_key_prefix);
   Std.Vector.append_(authentication_key, Std.Bcs.to_bytes_(Std.Signer.borrow_address_(account, $c), $c, [AtomicTypeTag.Address]), $c, [AtomicTypeTag.U8]);
   if (!(Std.Vector.length_(authentication_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EMALFORMED_AUTHENTICATION_KEY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EMALFORMED_AUTHENTICATION_KEY), $c));
   }
   return $.copy(authentication_key);
 }
@@ -319,21 +344,21 @@ export function epilogue_ (
 ): void {
   let account_resource, addr, gas_used, old_sequence_number, transaction_fee_amount;
   if (!($.copy(txn_max_gas_units)).ge($.copy(gas_units_remaining))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EGAS, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EGAS), $c));
   }
   gas_used = ($.copy(txn_max_gas_units)).sub($.copy(gas_units_remaining));
-  if (!((u128($.copy(txn_gas_price))).mul(u128($.copy(gas_used)))).le(MAX_U64)) {
-    throw $.abortCode(Std.Error.out_of_range_(EGAS, $c));
+  if (!((u128($.copy(txn_gas_price))).mul(u128($.copy(gas_used)))).le($.copy(MAX_U64))) {
+    throw $.abortCode(Std.Error.out_of_range_($.copy(EGAS), $c));
   }
   transaction_fee_amount = ($.copy(txn_gas_price)).mul($.copy(gas_used));
   addr = Std.Signer.address_of_(account, $c);
   if (!(Coin.balance_($.copy(addr), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])])).ge($.copy(transaction_fee_amount))) {
-    throw $.abortCode(Std.Error.out_of_range_(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
+    throw $.abortCode(Std.Error.out_of_range_($.copy(PROLOGUE_ECANT_PAY_GAS_DEPOSIT), $c));
   }
   Transaction_fee.burn_fee_($.copy(addr), $.copy(transaction_fee_amount), $c);
   old_sequence_number = get_sequence_number_($.copy(addr), $c);
-  if (!(u128($.copy(old_sequence_number))).lt(MAX_U64)) {
-    throw $.abortCode(Std.Error.out_of_range_(ESEQUENCE_NUMBER_TOO_BIG, $c));
+  if (!(u128($.copy(old_sequence_number))).lt($.copy(MAX_U64))) {
+    throw $.abortCode(Std.Error.out_of_range_($.copy(ESEQUENCE_NUMBER_TOO_BIG), $c));
   }
   account_resource = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
   account_resource.sequence_number = ($.copy(old_sequence_number)).add(u64("1"));
@@ -407,19 +432,19 @@ export function multi_agent_script_prologue_ (
   prologue_common_(sender, $.copy(txn_sequence_number), $.copy(txn_sender_public_key), $.copy(txn_gas_price), $.copy(txn_max_gas_units), $.copy(txn_expiration_time), $.copy(chain_id), $c);
   num_secondary_signers = Std.Vector.length_(secondary_signer_addresses, $c, [AtomicTypeTag.Address]);
   if (!(Std.Vector.length_(secondary_signer_public_key_hashes, $c, [new VectorTag(AtomicTypeTag.U8)])).eq(($.copy(num_secondary_signers)))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ESECONDARY_KEYS_ADDRESSES_COUNT_MISMATCH, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_ESECONDARY_KEYS_ADDRESSES_COUNT_MISMATCH), $c));
   }
   i = u64("0");
   while (($.copy(i)).lt($.copy(num_secondary_signers))) {
     {
       secondary_address = $.copy(Std.Vector.borrow_(secondary_signer_addresses, $.copy(i), $c, [AtomicTypeTag.Address]));
       if (!exists_at_($.copy(secondary_address), $c)) {
-        throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EACCOUNT_DNE, $c));
+        throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EACCOUNT_DNE), $c));
       }
       signer_account = $c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(secondary_address));
       signer_public_key_hash = $.copy(Std.Vector.borrow_(secondary_signer_public_key_hashes, $.copy(i), $c, [new VectorTag(AtomicTypeTag.U8)]));
       if (!$.veq($.copy(signer_public_key_hash), $.copy(signer_account.authentication_key))) {
-        throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY, $c));
+        throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY), $c));
       }
       i = ($.copy(i)).add(u64("1"));
     }
@@ -439,35 +464,35 @@ export function prologue_common_ (
 ): void {
   let balance, max_transaction_fee, sender_account, transaction_sender;
   if (!(Timestamp.now_seconds_($c)).lt($.copy(txn_expiration_time))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ETRANSACTION_EXPIRED, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_ETRANSACTION_EXPIRED), $c));
   }
   transaction_sender = Std.Signer.address_of_(sender, $c);
   if (!(Chain_id.get_($c)).eq(($.copy(chain_id)))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EBAD_CHAIN_ID, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EBAD_CHAIN_ID), $c));
   }
   if (!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(transaction_sender))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EACCOUNT_DNE, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EACCOUNT_DNE), $c));
   }
   sender_account = $c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(transaction_sender));
   if (!$.veq(Std.Hash.sha3_256_($.copy(txn_public_key), $c), $.copy(sender_account.authentication_key))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY), $c));
   }
-  if (!(u128($.copy(txn_sequence_number))).lt(MAX_U64)) {
-    throw $.abortCode(Std.Error.out_of_range_(PROLOGUE_ESEQUENCE_NUMBER_TOO_BIG, $c));
+  if (!(u128($.copy(txn_sequence_number))).lt($.copy(MAX_U64))) {
+    throw $.abortCode(Std.Error.out_of_range_($.copy(PROLOGUE_ESEQUENCE_NUMBER_TOO_BIG), $c));
   }
   if (!($.copy(txn_sequence_number)).ge($.copy(sender_account.sequence_number))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ESEQUENCE_NUMBER_TOO_OLD, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_ESEQUENCE_NUMBER_TOO_OLD), $c));
   }
   if (!($.copy(txn_sequence_number)).eq(($.copy(sender_account.sequence_number)))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ESEQUENCE_NUMBER_TOO_NEW, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_ESEQUENCE_NUMBER_TOO_NEW), $c));
   }
   max_transaction_fee = ($.copy(txn_gas_price)).mul($.copy(txn_max_gas_units));
   if (!Coin.is_account_registered_($.copy(transaction_sender), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])])) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_ECANT_PAY_GAS_DEPOSIT), $c));
   }
   balance = Coin.balance_($.copy(transaction_sender), $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   if (!($.copy(balance)).ge($.copy(max_transaction_fee))) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_ECANT_PAY_GAS_DEPOSIT, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_ECANT_PAY_GAS_DEPOSIT), $c));
   }
   return;
 }
@@ -514,10 +539,10 @@ export function rotate_authentication_key_internal_ (
   let account_resource, addr;
   addr = Std.Signer.address_of_(account, $c);
   if (!exists_at_($.copy(addr), $c)) {
-    throw $.abortCode(Std.Error.not_found_(EACCOUNT, $c));
+    throw $.abortCode(Std.Error.not_found_($.copy(EACCOUNT), $c));
   }
   if (!(Std.Vector.length_(new_auth_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
-    throw $.abortCode(Std.Error.invalid_argument_(EMALFORMED_AUTHENTICATION_KEY, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EMALFORMED_AUTHENTICATION_KEY), $c));
   }
   account_resource = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
   account_resource.authentication_key = $.copy(new_auth_key);
@@ -575,7 +600,7 @@ export function writeset_epilogue_ (
   $c: AptosDataCache,
 ): void {
   if (!false) {
-    throw $.abortCode(Std.Error.invalid_argument_(EWRITESET_NOT_ALLOWED, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(EWRITESET_NOT_ALLOWED), $c));
   }
   return;
 }
@@ -589,7 +614,7 @@ export function writeset_prologue_ (
   $c: AptosDataCache,
 ): void {
   if (!false) {
-    throw $.abortCode(Std.Error.invalid_argument_(PROLOGUE_EINVALID_WRITESET_SENDER, $c));
+    throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EINVALID_WRITESET_SENDER), $c));
   }
   return;
 }
@@ -604,18 +629,35 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get Account() { return Account; }
   async loadAccount(
     owner: HexString,
+    loadFull=true,
   ) {
-    return Account.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Account.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get ChainSpecificAccountInfo() { return ChainSpecificAccountInfo; }
   async loadChainSpecificAccountInfo(
     owner: HexString,
+    loadFull=true,
   ) {
-    return ChainSpecificAccountInfo.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await ChainSpecificAccountInfo.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
   }
+  get CoinRegisterEvent() { return CoinRegisterEvent; }
+  get SignerCapability() { return SignerCapability; }
   create_account(
     auth_key: HexString,
   ) {

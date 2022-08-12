@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,6 +19,7 @@ export class ACL
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "ACL";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -40,6 +41,9 @@ export class ACL
   static getTag(): StructTag {
     return new StructTag(moduleAddress, moduleName, "ACL", []);
   }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function add_ (
@@ -50,7 +54,7 @@ export function add_ (
   let temp$1, temp$2;
   [temp$1, temp$2] = [acl.list, addr];
   if (!!Vector.contains_(temp$1, temp$2, $c, [AtomicTypeTag.Address])) {
-    throw $.abortCode(Error.invalid_argument_(ECONTAIN, $c));
+    throw $.abortCode(Error.invalid_argument_($.copy(ECONTAIN), $c));
   }
   Vector.push_back_(acl.list, $.copy(addr), $c, [AtomicTypeTag.Address]);
   return;
@@ -62,7 +66,7 @@ export function assert_contains_ (
   $c: AptosDataCache,
 ): void {
   if (!contains_(acl, $.copy(addr), $c)) {
-    throw $.abortCode(Error.invalid_argument_(ENOT_CONTAIN, $c));
+    throw $.abortCode(Error.invalid_argument_($.copy(ENOT_CONTAIN), $c));
   }
   return;
 }
@@ -90,7 +94,7 @@ export function remove_ (
   [temp$1, temp$2] = [acl.list, addr];
   [found, index] = Vector.index_of_(temp$1, temp$2, $c, [AtomicTypeTag.Address]);
   if (!found) {
-    throw $.abortCode(Error.invalid_argument_(ENOT_CONTAIN, $c));
+    throw $.abortCode(Error.invalid_argument_($.copy(ENOT_CONTAIN), $c));
   }
   Vector.remove_(acl.list, $.copy(index), $c, [AtomicTypeTag.Address]);
   return;
@@ -103,7 +107,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get ACL() { return ACL; }
 }
 

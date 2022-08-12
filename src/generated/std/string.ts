@@ -1,5 +1,5 @@
 import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache} from "@manahippo/move-to-ts";
+import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
@@ -19,6 +19,7 @@ export class String
 {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
+  __app: $.AppType | null = null;
   static structName: string = "String";
   static typeParameters: TypeParamDeclType[] = [
 
@@ -41,6 +42,9 @@ export class String
     return new StructTag(moduleAddress, moduleName, "String", []);
   }
   str(): string { return $.u8str(this.bytes); }
+  async loadFullState(app: $.AppType) {
+    this.__app = app;
+  }
 
 }
 export function append_ (
@@ -89,7 +93,7 @@ export function insert_ (
     temp$1 = false;
   }
   if (!temp$1) {
-    throw $.abortCode(EINVALID_INDEX);
+    throw $.abortCode($.copy(EINVALID_INDEX));
   }
   l = length_(s, $c);
   [temp$2, temp$3, temp$4] = [s, u64("0"), $.copy(at)];
@@ -176,7 +180,7 @@ export function sub_string_ (
     temp$3 = false;
   }
   if (!temp$3) {
-    throw $.abortCode(EINVALID_INDEX);
+    throw $.abortCode($.copy(EINVALID_INDEX));
   }
   return new String({ bytes: internal_sub_string_(bytes, $.copy(i), $.copy(j), $c) }, new StructTag(new HexString("0x1"), "string", "String", []));
 }
@@ -200,7 +204,7 @@ export function utf8_ (
   $c: AptosDataCache,
 ): String {
   if (!internal_check_utf8_(bytes, $c)) {
-    throw $.abortCode(EINVALID_UTF8);
+    throw $.abortCode($.copy(EINVALID_UTF8));
   }
   return new String({ bytes: $.copy(bytes) }, new StructTag(new HexString("0x1"), "string", "String", []));
 }
@@ -212,7 +216,11 @@ export class App {
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
   ) {
   }
+  get moduleAddress() {{ return moduleAddress; }}
+  get moduleName() {{ return moduleName; }}
+  get String() { return String; }
 }
 

@@ -5,17 +5,19 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-export const packageName = "hippo-swap";
-export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
-export const moduleName = "hippo_config";
+export const packageName = "AptosFramework";
+export const moduleAddress = new HexString("0x1");
+export const moduleName = "util";
 
 
-export function admin_address_ (
+export function from_bytes_ (
+  bytes: U8[],
   $c: AptosDataCache,
-): HexString {
-  return new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
-}
+  $p: TypeTag[], /* <T>*/
+): any {
+  return $.aptos_framework_util_from_bytes(bytes, $c, [$p[0]]);
 
+}
 export function loadParsers(repo: AptosParserRepo) {
 }
 export class App {
