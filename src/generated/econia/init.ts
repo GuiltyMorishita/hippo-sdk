@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Market from "./market";
@@ -49,9 +49,16 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  init_econia(
+  payload_init_econia(
   ) {
     return buildPayload_init_econia();
+  }
+  async init_econia(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_init_econia();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Comparator from "./comparator";
@@ -98,12 +98,12 @@ export function add_ (
   if (!Std.Option.is_none_(maybe_idx, $c, [AtomicTypeTag.U64])) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_ALREADY_EXISTS), $c));
   }
-  Std.Vector.push_back_(map.data, new Element({ key: key, value: value }, new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  Std.Vector.push_back_(map.data, new Element({ key: key, value: value }, new SimpleStructTag(Element, [$p[0], $p[1]])), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
   placement = Std.Option.extract_(maybe_placement, $c, [AtomicTypeTag.U64]);
-  end = (Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])])).sub(u64("1"));
+  end = (Std.Vector.length_(map.data, $c, [new SimpleStructTag(Element, [$p[0], $p[1]])])).sub(u64("1"));
   while (($.copy(placement)).lt($.copy(end))) {
     {
-      Std.Vector.swap_(map.data, $.copy(placement), $.copy(end), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+      Std.Vector.swap_(map.data, $.copy(placement), $.copy(end), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
       placement = ($.copy(placement)).add(u64("1"));
     }
 
@@ -122,7 +122,7 @@ export function borrow_ (
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_NOT_FOUND), $c));
   }
   idx = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
-  return Std.Vector.borrow_(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).value;
+  return Std.Vector.borrow_(map.data, $.copy(idx), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]).value;
 }
 
 export function borrow_mut_ (
@@ -138,7 +138,7 @@ export function borrow_mut_ (
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_NOT_FOUND), $c));
   }
   idx = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
-  return Std.Vector.borrow_mut_(map.data, $.copy(idx), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).value;
+  return Std.Vector.borrow_mut_(map.data, $.copy(idx), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]).value;
 }
 
 export function contains_key_ (
@@ -156,7 +156,7 @@ export function create_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): SimpleMap {
-  return new SimpleMap({ data: Std.Vector.empty_($c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]) }, new StructTag(new HexString("0x1"), "simple_map", "SimpleMap", [$p[0], $p[1]]));
+  return new SimpleMap({ data: Std.Vector.empty_($c, [new SimpleStructTag(Element, [$p[0], $p[1]])]) }, new SimpleStructTag(SimpleMap, [$p[0], $p[1]]));
 }
 
 export function destroy_empty_ (
@@ -165,7 +165,7 @@ export function destroy_empty_ (
   $p: TypeTag[], /* <Key, Value>*/
 ): void {
   let { data: data } = map;
-  Std.Vector.destroy_empty_(data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  Std.Vector.destroy_empty_(data, $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
   return;
 }
 
@@ -176,7 +176,7 @@ export function find_ (
   $p: TypeTag[], /* <Key, Value>*/
 ): [Std.Option.Option, Std.Option.Option] {
   let temp$1, temp$2, temp$3, temp$4, left, length, mid, potential_key, right;
-  length = Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  length = Std.Vector.length_(map.data, $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
   if (($.copy(length)).eq((u64("0")))) {
     return [Std.Option.none_($c, [AtomicTypeTag.U64]), Std.Option.some_(u64("0"), $c, [AtomicTypeTag.U64])];
   }
@@ -187,7 +187,7 @@ export function find_ (
   while (($.copy(left)).neq($.copy(right))) {
     {
       mid = (($.copy(left)).add($.copy(right))).div(u64("2"));
-      potential_key = Std.Vector.borrow_(map.data, $.copy(mid), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).key;
+      potential_key = Std.Vector.borrow_(map.data, $.copy(mid), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]).key;
       temp$1 = Comparator.compare_(potential_key, key, $c, [$p[0]]);
       if (Comparator.is_smaller_than_(temp$1, $c)) {
         left = ($.copy(mid)).add(u64("1"));
@@ -198,7 +198,7 @@ export function find_ (
     }
 
   }if (($.copy(left)).neq($.copy(length))) {
-    temp$2 = $.dyn_eq($p[0], key, Std.Vector.borrow_(map.data, $.copy(left), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]).key);
+    temp$2 = $.dyn_eq($p[0], key, Std.Vector.borrow_(map.data, $.copy(left), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]).key);
   }
   else{
     temp$2 = false;
@@ -217,7 +217,7 @@ export function length_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Key, Value>*/
 ): U64 {
-  return Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  return Std.Vector.length_(map.data, $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
 }
 
 export function remove_ (
@@ -233,14 +233,14 @@ export function remove_ (
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EKEY_NOT_FOUND), $c));
   }
   placement = Std.Option.extract_(maybe_idx, $c, [AtomicTypeTag.U64]);
-  end = (Std.Vector.length_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])])).sub(u64("1"));
+  end = (Std.Vector.length_(map.data, $c, [new SimpleStructTag(Element, [$p[0], $p[1]])])).sub(u64("1"));
   while (($.copy(placement)).lt($.copy(end))) {
     {
-      Std.Vector.swap_(map.data, $.copy(placement), ($.copy(placement)).add(u64("1")), $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+      Std.Vector.swap_(map.data, $.copy(placement), ($.copy(placement)).add(u64("1")), $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
       placement = ($.copy(placement)).add(u64("1"));
     }
 
-  }let { key: key__3, value: value } = Std.Vector.pop_back_(map.data, $c, [new StructTag(new HexString("0x1"), "simple_map", "Element", [$p[0], $p[1]])]);
+  }let { key: key__3, value: value } = Std.Vector.pop_back_(map.data, $c, [new SimpleStructTag(Element, [$p[0], $p[1]])]);
   return [key__3, value];
 }
 

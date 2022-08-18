@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Vector from "./vector";
 export const packageName = "MoveStdlib";
@@ -202,7 +202,7 @@ export function none_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Element>*/
 ): Option {
-  return new Option({ vec: Vector.empty_($c, [$p[0]]) }, new StructTag(new HexString("0x1"), "option", "Option", [$p[0]]));
+  return new Option({ vec: Vector.empty_($c, [$p[0]]) }, new SimpleStructTag(Option, [$p[0]]));
 }
 
 export function some_ (
@@ -210,7 +210,7 @@ export function some_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Element>*/
 ): Option {
-  return new Option({ vec: Vector.singleton_(e, $c, [$p[0]]) }, new StructTag(new HexString("0x1"), "option", "Option", [$p[0]]));
+  return new Option({ vec: Vector.singleton_(e, $c, [$p[0]]) }, new SimpleStructTag(Option, [$p[0]]));
 }
 
 export function swap_ (

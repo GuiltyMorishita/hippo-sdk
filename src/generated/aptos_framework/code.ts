@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Util from "./util";
@@ -197,9 +197,9 @@ export function check_coexistence_ (
 ): void {
   let i, j, name, old_mod;
   i = u64("0");
-  while (($.copy(i)).lt(Std.Vector.length_(old_pack.modules, $c, [new StructTag(new HexString("0x1"), "code", "ModuleMetadata", [])]))) {
+  while (($.copy(i)).lt(Std.Vector.length_(old_pack.modules, $c, [new SimpleStructTag(ModuleMetadata)]))) {
     {
-      old_mod = Std.Vector.borrow_(old_pack.modules, $.copy(i), $c, [new StructTag(new HexString("0x1"), "code", "ModuleMetadata", [])]);
+      old_mod = Std.Vector.borrow_(old_pack.modules, $.copy(i), $c, [new SimpleStructTag(ModuleMetadata)]);
       j = u64("0");
       while (($.copy(j)).lt(Std.Vector.length_(new_modules, $c, [new StructTag(new HexString("0x1"), "string", "String", [])]))) {
         {
@@ -237,9 +237,9 @@ export function get_module_names_ (
   let i, module_names;
   module_names = Std.Vector.empty_($c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
   i = u64("0");
-  while (($.copy(i)).lt(Std.Vector.length_(pack.modules, $c, [new StructTag(new HexString("0x1"), "code", "ModuleMetadata", [])]))) {
+  while (($.copy(i)).lt(Std.Vector.length_(pack.modules, $c, [new SimpleStructTag(ModuleMetadata)]))) {
     {
-      Std.Vector.push_back_(module_names, $.copy(Std.Vector.borrow_(pack.modules, $.copy(i), $c, [new StructTag(new HexString("0x1"), "code", "ModuleMetadata", [])]).name), $c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
+      Std.Vector.push_back_(module_names, $.copy(Std.Vector.borrow_(pack.modules, $.copy(i), $c, [new SimpleStructTag(ModuleMetadata)]).name), $c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
       i = ($.copy(i)).add(u64("1"));
     }
 
@@ -254,20 +254,20 @@ export function publish_package_ (
 ): void {
   let temp$1, temp$2, addr, i, index, len, module_names, old, packages;
   addr = Std.Signer.address_of_(owner, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "code", "PackageRegistry", []), $.copy(addr))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "code", "PackageRegistry", []), owner, new PackageRegistry({ packages: Std.Vector.empty_($c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]) }, new StructTag(new HexString("0x1"), "code", "PackageRegistry", [])));
+  if (!$c.exists(new SimpleStructTag(PackageRegistry), $.copy(addr))) {
+    $c.move_to(new SimpleStructTag(PackageRegistry), owner, new PackageRegistry({ packages: Std.Vector.empty_($c, [new SimpleStructTag(PackageMetadata)]) }, new SimpleStructTag(PackageRegistry)));
   }
   else{
   }
   module_names = get_module_names_(pack, $c);
-  packages = $c.borrow_global_mut<PackageRegistry>(new StructTag(new HexString("0x1"), "code", "PackageRegistry", []), $.copy(addr)).packages;
-  len = Std.Vector.length_(packages, $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]);
+  packages = $c.borrow_global_mut<PackageRegistry>(new SimpleStructTag(PackageRegistry), $.copy(addr)).packages;
+  len = Std.Vector.length_(packages, $c, [new SimpleStructTag(PackageMetadata)]);
   index = $.copy(len);
   i = u64("0");
   while (($.copy(i)).lt($.copy(len))) {
     {
       [temp$1, temp$2] = [packages, $.copy(i)];
-      old = Std.Vector.borrow_(temp$1, temp$2, $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]);
+      old = Std.Vector.borrow_(temp$1, temp$2, $c, [new SimpleStructTag(PackageMetadata)]);
       if ($.deep_eq($.copy(old.name), $.copy(pack.name))) {
         check_upgradability_(old, pack, $c);
         index = $.copy(i);
@@ -279,10 +279,10 @@ export function publish_package_ (
     }
 
   }if (($.copy(index)).lt($.copy(len))) {
-    $.set(Std.Vector.borrow_mut_(packages, $.copy(index), $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]), $.copy(pack));
+    $.set(Std.Vector.borrow_mut_(packages, $.copy(index), $c, [new SimpleStructTag(PackageMetadata)]), $.copy(pack));
   }
   else{
-    Std.Vector.push_back_(packages, $.copy(pack), $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]);
+    Std.Vector.push_back_(packages, $.copy(pack), $c, [new SimpleStructTag(PackageMetadata)]);
   }
   return request_publish_($.copy(addr), $.copy(module_names), $.copy(code), $.copy(pack.upgrade_policy.policy), $c);
 }
@@ -293,7 +293,7 @@ export function publish_package_txn_ (
   code: U8[][],
   $c: AptosDataCache,
 ): void {
-  return publish_package_(owner, Util.from_bytes_($.copy(pack_serialized), $c, [new StructTag(new HexString("0x1"), "code", "PackageMetadata", [])]), $.copy(code), $c);
+  return publish_package_(owner, Util.from_bytes_($.copy(pack_serialized), $c, [new SimpleStructTag(PackageMetadata)]), $.copy(code), $c);
 }
 
 
@@ -325,19 +325,19 @@ export function request_publish_ (
 export function upgrade_policy_compat_ (
   $c: AptosDataCache,
 ): UpgradePolicy {
-  return new UpgradePolicy({ policy: u8("1") }, new StructTag(new HexString("0x1"), "code", "UpgradePolicy", []));
+  return new UpgradePolicy({ policy: u8("1") }, new SimpleStructTag(UpgradePolicy));
 }
 
 export function upgrade_policy_immutable_ (
   $c: AptosDataCache,
 ): UpgradePolicy {
-  return new UpgradePolicy({ policy: u8("2") }, new StructTag(new HexString("0x1"), "code", "UpgradePolicy", []));
+  return new UpgradePolicy({ policy: u8("2") }, new SimpleStructTag(UpgradePolicy));
 }
 
 export function upgrade_policy_no_compat_ (
   $c: AptosDataCache,
 ): UpgradePolicy {
-  return new UpgradePolicy({ policy: u8("0") }, new StructTag(new HexString("0x1"), "code", "UpgradePolicy", []));
+  return new UpgradePolicy({ policy: u8("0") }, new SimpleStructTag(UpgradePolicy));
 }
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -369,11 +369,20 @@ export class App {
     return val;
   }
   get UpgradePolicy() { return UpgradePolicy; }
-  publish_package_txn(
+  payload_publish_package_txn(
     pack_serialized: U8[],
     code: U8[][],
   ) {
     return buildPayload_publish_package_txn(pack_serialized, code);
+  }
+  async publish_package_txn(
+    _account: AptosAccount,
+    pack_serialized: U8[],
+    code: U8[][],
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_publish_package_txn(pack_serialized, code);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

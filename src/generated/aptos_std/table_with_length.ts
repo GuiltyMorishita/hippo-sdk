@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Table from "./table";
@@ -133,7 +133,7 @@ export function new___ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V>*/
 ): TableWithLength {
-  return new TableWithLength({ inner: Table.new___($c, [$p[0], $p[1]]), length: u64("0") }, new StructTag(new HexString("0x1"), "table_with_length", "TableWithLength", [$p[0], $p[1]]));
+  return new TableWithLength({ inner: Table.new___($c, [$p[0], $p[1]]), length: u64("0") }, new SimpleStructTag(TableWithLength, [$p[0], $p[1]]));
 }
 
 export function remove_ (

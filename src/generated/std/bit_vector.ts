@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Vector from "./vector";
 export const packageName = "MoveStdlib";
@@ -115,7 +115,7 @@ export function new___ (
     }
 
   };
-  return new BitVector({ length: $.copy(length), bit_field: $.copy(bit_field) }, new StructTag(new HexString("0x1"), "bit_vector", "BitVector", []));
+  return new BitVector({ length: $.copy(length), bit_field: $.copy(bit_field) }, new SimpleStructTag(BitVector));
 }
 
 export function set_ (

@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Error from "./error";
 import * as Signer from "./signer";
@@ -167,7 +167,7 @@ export function acquire_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Feature>*/
 ): Cap {
-  return new Cap({ root: validate_acquire_(requester, $c, [$p[0]]) }, new StructTag(new HexString("0x1"), "capability", "Cap", [$p[0]]));
+  return new Cap({ root: validate_acquire_(requester, $c, [$p[0]]) }, new SimpleStructTag(Cap, [$p[0]]));
 }
 
 export function acquire_linear_ (
@@ -176,7 +176,7 @@ export function acquire_linear_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Feature>*/
 ): LinearCap {
-  return new LinearCap({ root: validate_acquire_(requester, $c, [$p[0]]) }, new StructTag(new HexString("0x1"), "capability", "LinearCap", [$p[0]]));
+  return new LinearCap({ root: validate_acquire_(requester, $c, [$p[0]]) }, new SimpleStructTag(LinearCap, [$p[0]]));
 }
 
 export function add_element_ (
@@ -203,10 +203,10 @@ export function create_ (
 ): void {
   let addr;
   addr = Signer.address_of_(owner, $c);
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(addr))) {
+  if (!!$c.exists(new SimpleStructTag(CapState, [$p[0]]), $.copy(addr))) {
     throw $.abortCode(Error.already_exists_($.copy(ECAP), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), owner, new CapState({ delegates: Vector.empty_($c, [AtomicTypeTag.Address]) }, new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]])));
+  $c.move_to(new SimpleStructTag(CapState, [$p[0]]), owner, new CapState({ delegates: Vector.empty_($c, [AtomicTypeTag.Address]) }, new SimpleStructTag(CapState, [$p[0]])));
   return;
 }
 
@@ -219,13 +219,13 @@ export function delegate_ (
 ): void {
   let addr;
   addr = Signer.address_of_(to, $c);
-  if ($c.exists(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(addr))) {
+  if ($c.exists(new SimpleStructTag(CapDelegateState, [$p[0]]), $.copy(addr))) {
     return;
   }
   else{
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), to, new CapDelegateState({ root: $.copy(cap.root) }, new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]])));
-  add_element_($c.borrow_global_mut<CapState>(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(cap.root)).delegates, $.copy(addr), $c, [AtomicTypeTag.Address]);
+  $c.move_to(new SimpleStructTag(CapDelegateState, [$p[0]]), to, new CapDelegateState({ root: $.copy(cap.root) }, new SimpleStructTag(CapDelegateState, [$p[0]])));
+  add_element_($c.borrow_global_mut<CapState>(new SimpleStructTag(CapState, [$p[0]]), $.copy(cap.root)).delegates, $.copy(addr), $c, [AtomicTypeTag.Address]);
   return;
 }
 
@@ -262,13 +262,13 @@ export function revoke_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <Feature>*/
 ): void {
-  if (!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(from))) {
+  if (!$c.exists(new SimpleStructTag(CapDelegateState, [$p[0]]), $.copy(from))) {
     return;
   }
   else{
   }
-  let { root: _root } = $c.move_from<CapDelegateState>(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(from));
-  remove_element_($c.borrow_global_mut<CapState>(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(cap.root)).delegates, from, $c, [AtomicTypeTag.Address]);
+  let { root: _root } = $c.move_from<CapDelegateState>(new SimpleStructTag(CapDelegateState, [$p[0]]), $.copy(from));
+  remove_element_($c.borrow_global_mut<CapState>(new SimpleStructTag(CapState, [$p[0]]), $.copy(cap.root)).delegates, from, $c, [AtomicTypeTag.Address]);
   return;
 }
 
@@ -288,18 +288,18 @@ export function validate_acquire_ (
 ): HexString {
   let temp$1, addr, root_addr;
   addr = Signer.address_of_(requester, $c);
-  if ($c.exists(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(addr))) {
-    root_addr = $.copy($c.borrow_global<CapDelegateState>(new StructTag(new HexString("0x1"), "capability", "CapDelegateState", [$p[0]]), $.copy(addr)).root);
-    if (!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(root_addr))) {
+  if ($c.exists(new SimpleStructTag(CapDelegateState, [$p[0]]), $.copy(addr))) {
+    root_addr = $.copy($c.borrow_global<CapDelegateState>(new SimpleStructTag(CapDelegateState, [$p[0]]), $.copy(addr)).root);
+    if (!$c.exists(new SimpleStructTag(CapState, [$p[0]]), $.copy(root_addr))) {
       throw $.abortCode(Error.invalid_state_($.copy(EDELEGATE), $c));
     }
-    if (!Vector.contains_($c.borrow_global<CapState>(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(root_addr)).delegates, addr, $c, [AtomicTypeTag.Address])) {
+    if (!Vector.contains_($c.borrow_global<CapState>(new SimpleStructTag(CapState, [$p[0]]), $.copy(root_addr)).delegates, addr, $c, [AtomicTypeTag.Address])) {
       throw $.abortCode(Error.invalid_state_($.copy(EDELEGATE), $c));
     }
     temp$1 = $.copy(root_addr);
   }
   else{
-    if (!$c.exists(new StructTag(new HexString("0x1"), "capability", "CapState", [$p[0]]), $.copy(addr))) {
+    if (!$c.exists(new SimpleStructTag(CapState, [$p[0]]), $.copy(addr))) {
       throw $.abortCode(Error.not_found_($.copy(ECAP), $c));
     }
     temp$1 = $.copy(addr);

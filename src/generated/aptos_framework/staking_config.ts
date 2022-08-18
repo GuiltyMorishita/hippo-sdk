@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as System_addresses from "./system_addresses";
@@ -74,7 +74,7 @@ export class StakingConfig
 export function get_ (
   $c: AptosDataCache,
 ): StakingConfig {
-  return $.copy($c.borrow_global<StakingConfig>(new StructTag(new HexString("0x1"), "staking_config", "StakingConfig", []), new HexString("0x1")));
+  return $.copy($c.borrow_global<StakingConfig>(new SimpleStructTag(StakingConfig), new HexString("0x1")));
 }
 
 export function get_allow_validator_set_change_ (
@@ -120,7 +120,7 @@ export function initialize_ (
   if (!($.copy(rewards_rate_denominator)).gt(u64("0"))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EINVALID_REWARDS_RATE), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "staking_config", "StakingConfig", []), aptos_framework, new StakingConfig({ minimum_stake: $.copy(minimum_stake), maximum_stake: $.copy(maximum_stake), recurring_lockup_duration_secs: $.copy(recurring_lockup_duration_secs), allow_validator_set_change: allow_validator_set_change, rewards_rate: $.copy(rewards_rate), rewards_rate_denominator: $.copy(rewards_rate_denominator) }, new StructTag(new HexString("0x1"), "staking_config", "StakingConfig", [])));
+  $c.move_to(new SimpleStructTag(StakingConfig), aptos_framework, new StakingConfig({ minimum_stake: $.copy(minimum_stake), maximum_stake: $.copy(maximum_stake), recurring_lockup_duration_secs: $.copy(recurring_lockup_duration_secs), allow_validator_set_change: allow_validator_set_change, rewards_rate: $.copy(rewards_rate), rewards_rate_denominator: $.copy(rewards_rate_denominator) }, new SimpleStructTag(StakingConfig)));
   return;
 }
 
@@ -134,7 +134,7 @@ export function update_recurring_lockup_duration_secs_ (
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EINVALID_LOCKUP_VALUE), $c));
   }
   System_addresses.assert_aptos_framework_(aptos_framework, $c);
-  staking_config = $c.borrow_global_mut<StakingConfig>(new StructTag(new HexString("0x1"), "staking_config", "StakingConfig", []), new HexString("0x1"));
+  staking_config = $c.borrow_global_mut<StakingConfig>(new SimpleStructTag(StakingConfig), new HexString("0x1"));
   staking_config.recurring_lockup_duration_secs = $.copy(new_recurring_lockup_duration_secs);
   return;
 }
@@ -148,7 +148,7 @@ export function update_required_stake_ (
   let staking_config;
   System_addresses.assert_aptos_framework_(aptos_framework, $c);
   validate_required_stake_($.copy(minimum_stake), $.copy(maximum_stake), $c);
-  staking_config = $c.borrow_global_mut<StakingConfig>(new StructTag(new HexString("0x1"), "staking_config", "StakingConfig", []), new HexString("0x1"));
+  staking_config = $c.borrow_global_mut<StakingConfig>(new SimpleStructTag(StakingConfig), new HexString("0x1"));
   staking_config.minimum_stake = $.copy(minimum_stake);
   staking_config.maximum_stake = $.copy(maximum_stake);
   return;
@@ -165,7 +165,7 @@ export function update_rewards_rate_ (
   if (!($.copy(new_rewards_rate_denominator)).gt(u64("0"))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EINVALID_REWARDS_RATE), $c));
   }
-  staking_config = $c.borrow_global_mut<StakingConfig>(new StructTag(new HexString("0x1"), "staking_config", "StakingConfig", []), new HexString("0x1"));
+  staking_config = $c.borrow_global_mut<StakingConfig>(new SimpleStructTag(StakingConfig), new HexString("0x1"));
   staking_config.rewards_rate = $.copy(new_rewards_rate);
   staking_config.rewards_rate_denominator = $.copy(new_rewards_rate_denominator);
   return;

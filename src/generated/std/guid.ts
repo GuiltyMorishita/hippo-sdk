@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Signer from "./signer";
 export const packageName = "AptosStdlib";
@@ -168,8 +168,8 @@ export function create_ (
 ): GUID {
   let addr;
   addr = Signer.address_of_(account, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "guid", "Generator", []), account, new Generator({ counter: u64("0") }, new StructTag(new HexString("0x1"), "guid", "Generator", [])));
+  if (!$c.exists(new SimpleStructTag(Generator), $.copy(addr))) {
+    $c.move_to(new SimpleStructTag(Generator), account, new Generator({ counter: u64("0") }, new SimpleStructTag(Generator)));
   }
   else{
   }
@@ -181,7 +181,7 @@ export function create_id_ (
   creation_num: U64,
   $c: AptosDataCache,
 ): ID {
-  return new ID({ creation_num: $.copy(creation_num), addr: $.copy(addr) }, new StructTag(new HexString("0x1"), "guid", "ID", []));
+  return new ID({ creation_num: $.copy(creation_num), addr: $.copy(addr) }, new SimpleStructTag(ID));
 }
 
 export function create_impl_ (
@@ -189,10 +189,10 @@ export function create_impl_ (
   $c: AptosDataCache,
 ): GUID {
   let creation_num, generator;
-  generator = $c.borrow_global_mut<Generator>(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr));
+  generator = $c.borrow_global_mut<Generator>(new SimpleStructTag(Generator), $.copy(addr));
   creation_num = $.copy(generator.counter);
   generator.counter = ($.copy(creation_num)).add(u64("1"));
-  return new GUID({ id: new ID({ creation_num: $.copy(creation_num), addr: $.copy(addr) }, new StructTag(new HexString("0x1"), "guid", "ID", [])) }, new StructTag(new HexString("0x1"), "guid", "GUID", []));
+  return new GUID({ id: new ID({ creation_num: $.copy(creation_num), addr: $.copy(addr) }, new SimpleStructTag(ID)) }, new SimpleStructTag(GUID));
 }
 
 export function create_with_capability_ (
@@ -200,7 +200,7 @@ export function create_with_capability_ (
   _cap: CreateCapability,
   $c: AptosDataCache,
 ): GUID {
-  if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
+  if (!$c.exists(new SimpleStructTag(Generator), $.copy(addr))) {
     throw $.abortCode($.copy(EGUID_GENERATOR_NOT_PUBLISHED));
   }
   return create_impl_($.copy(addr), $c);
@@ -234,12 +234,12 @@ export function gen_create_capability_ (
 ): CreateCapability {
   let addr;
   addr = Signer.address_of_(account, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "guid", "Generator", []), account, new Generator({ counter: u64("0") }, new StructTag(new HexString("0x1"), "guid", "Generator", [])));
+  if (!$c.exists(new SimpleStructTag(Generator), $.copy(addr))) {
+    $c.move_to(new SimpleStructTag(Generator), account, new Generator({ counter: u64("0") }, new SimpleStructTag(Generator)));
   }
   else{
   }
-  return new CreateCapability({ addr: $.copy(addr) }, new StructTag(new HexString("0x1"), "guid", "CreateCapability", []));
+  return new CreateCapability({ addr: $.copy(addr) }, new SimpleStructTag(CreateCapability));
 }
 
 export function get_next_creation_num_ (
@@ -247,11 +247,11 @@ export function get_next_creation_num_ (
   $c: AptosDataCache,
 ): U64 {
   let temp$1;
-  if (!$c.exists(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr))) {
+  if (!$c.exists(new SimpleStructTag(Generator), $.copy(addr))) {
     temp$1 = u64("0");
   }
   else{
-    temp$1 = $.copy($c.borrow_global<Generator>(new StructTag(new HexString("0x1"), "guid", "Generator", []), $.copy(addr)).counter);
+    temp$1 = $.copy($c.borrow_global<Generator>(new SimpleStructTag(Generator), $.copy(addr)).counter);
   }
   return temp$1;
 }
@@ -281,7 +281,7 @@ export function publish_generator_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  return $c.move_to(new StructTag(new HexString("0x1"), "guid", "Generator", []), account, new Generator({ counter: u64("0") }, new StructTag(new HexString("0x1"), "guid", "Generator", [])));
+  return $c.move_to(new SimpleStructTag(Generator), account, new Generator({ counter: u64("0") }, new SimpleStructTag(Generator)));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

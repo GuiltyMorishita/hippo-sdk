@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Table_with_length from "./table_with_length";
@@ -120,7 +120,7 @@ export function bucket_index_ (
   if (!($.copy(i)).lt(length_(v, $c, [$p[0]]))) {
     throw $.abortCode($.copy(EINDEX_OUT_OF_BOUNDS));
   }
-  return new BigVectorIndex({ bucket_index: ($.copy(i)).div($.copy(v.bucket_size)), vec_index: ($.copy(i)).mod($.copy(v.bucket_size)) }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", []));
+  return new BigVectorIndex({ bucket_index: ($.copy(i)).div($.copy(v.bucket_size)), vec_index: ($.copy(i)).mod($.copy(v.bucket_size)) }, new SimpleStructTag(BigVectorIndex));
 }
 
 export function bucket_size_ (
@@ -257,7 +257,7 @@ export function new___ (
   if (!($.copy(bucket_size)).gt(u64("0"))) {
     throw $.abortCode(u64("0"));
   }
-  return new BigVector({ buckets: Table_with_length.new___($c, [AtomicTypeTag.U64, new VectorTag($p[0])]), end_index: new BigVectorIndex({ bucket_index: u64("0"), vec_index: u64("0") }, new StructTag(new HexString("0x1"), "big_vector", "BigVectorIndex", [])), num_buckets: u64("0"), bucket_size: $.copy(bucket_size) }, new StructTag(new HexString("0x1"), "big_vector", "BigVector", [$p[0]]));
+  return new BigVector({ buckets: Table_with_length.new___($c, [AtomicTypeTag.U64, new VectorTag($p[0])]), end_index: new BigVectorIndex({ bucket_index: u64("0"), vec_index: u64("0") }, new SimpleStructTag(BigVectorIndex)), num_buckets: u64("0"), bucket_size: $.copy(bucket_size) }, new SimpleStructTag(BigVector, [$p[0]]));
 }
 
 export function new_with_capacity_ (

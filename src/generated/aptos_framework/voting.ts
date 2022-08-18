@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_std from "../aptos_std";
 import * as Std from "../std";
@@ -373,7 +373,7 @@ export function create_proposal_ (
   if (!(Std.Vector.length_(execution_hash, $c, [AtomicTypeTag.U8])).gt(u64("0"))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_EMPTY_EXECUTION_HASH), $c));
   }
-  voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
+  voting_forum = $c.borrow_global_mut<VotingForum>(new SimpleStructTag(VotingForum, [$p[0]]), $.copy(voting_forum_address));
   proposal_id = $.copy(voting_forum.next_proposal_id);
   voting_forum.next_proposal_id = ($.copy(voting_forum.next_proposal_id)).add(u64("1"));
   temp$12 = voting_forum.proposals;
@@ -388,8 +388,8 @@ export function create_proposal_ (
   temp$8 = u128("0");
   temp$9 = u128("0");
   temp$10 = false;
-  Aptos_std.Table.add_(temp$12, temp$11, new Proposal({ proposer: temp$1, execution_content: temp$3, creation_time_secs: temp$2, execution_hash: temp$4, min_vote_threshold: temp$5, expiration_secs: temp$6, early_resolution_vote_threshold: temp$7, yes_votes: temp$8, no_votes: temp$9, is_resolved: temp$10 }, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
-  Aptos_std.Event.emit_event_(voting_forum.events.create_proposal_events, new CreateProposalEvent({ proposal_id: $.copy(proposal_id), early_resolution_vote_threshold: $.copy(early_resolution_vote_threshold), execution_hash: $.copy(execution_hash), expiration_secs: $.copy(expiration_secs), min_vote_threshold: $.copy(min_vote_threshold) }, new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])]);
+  Aptos_std.Table.add_(temp$12, temp$11, new Proposal({ proposer: temp$1, execution_content: temp$3, creation_time_secs: temp$2, execution_hash: temp$4, min_vote_threshold: temp$5, expiration_secs: temp$6, early_resolution_vote_threshold: temp$7, yes_votes: temp$8, no_votes: temp$9, is_resolved: temp$10 }, new SimpleStructTag(Proposal, [$p[0]])), $c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
+  Aptos_std.Event.emit_event_(voting_forum.events.create_proposal_events, new CreateProposalEvent({ proposal_id: $.copy(proposal_id), early_resolution_vote_threshold: $.copy(early_resolution_vote_threshold), execution_hash: $.copy(execution_hash), expiration_secs: $.copy(expiration_secs), min_vote_threshold: $.copy(min_vote_threshold) }, new SimpleStructTag(CreateProposalEvent)), $c, [new SimpleStructTag(CreateProposalEvent)]);
   return $.copy(proposal_id);
 }
 
@@ -400,8 +400,8 @@ export function get_proposal_expiration_secs_ (
   $p: TypeTag[], /* <ProposalType>*/
 ): U64 {
   let proposal, voting_forum;
-  voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
+  voting_forum = $c.borrow_global_mut<VotingForum>(new SimpleStructTag(VotingForum, [$p[0]]), $.copy(voting_forum_address));
+  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
   return $.copy(proposal.expiration_secs);
 }
 
@@ -413,8 +413,8 @@ export function get_proposal_state_ (
 ): U64 {
   let temp$1, temp$2, temp$3, no_votes, proposal, voting_forum, yes_votes;
   if (is_voting_closed_($.copy(voting_forum_address), $.copy(proposal_id), $c, [$p[0]])) {
-    voting_forum = $c.borrow_global<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-    proposal = Aptos_std.Table.borrow_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
+    voting_forum = $c.borrow_global<VotingForum>(new SimpleStructTag(VotingForum, [$p[0]]), $.copy(voting_forum_address));
+    proposal = Aptos_std.Table.borrow_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
     yes_votes = $.copy(proposal.yes_votes);
     no_votes = $.copy(proposal.no_votes);
     if (($.copy(yes_votes)).gt($.copy(no_votes))) {
@@ -444,8 +444,8 @@ export function is_voting_closed_ (
   $p: TypeTag[], /* <ProposalType>*/
 ): boolean {
   let temp$1, proposal, voting_forum;
-  voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
+  voting_forum = $c.borrow_global_mut<VotingForum>(new SimpleStructTag(VotingForum, [$p[0]]), $.copy(voting_forum_address));
+  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
   if (can_be_resolved_early_(proposal, $c, [$p[0]])) {
     temp$1 = true;
   }
@@ -462,11 +462,11 @@ export function register_ (
 ): void {
   let temp$1, temp$2, temp$3, voting_forum;
   temp$1 = u64("0");
-  temp$2 = Aptos_std.Table.new___($c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
-  temp$3 = new VotingEvents({ create_proposal_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "voting", "CreateProposalEvent", [])]), register_forum_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])]), resolve_proposal_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])]), vote_events: Aptos_std.Event.new_event_handle_(account, $c, [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])]) }, new StructTag(new HexString("0x1"), "voting", "VotingEvents", []));
-  voting_forum = new VotingForum({ proposals: temp$2, events: temp$3, next_proposal_id: temp$1 }, new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]));
-  Aptos_std.Event.emit_event_(voting_forum.events.register_forum_events, new RegisterForumEvent({ hosting_account: Std.Signer.address_of_(account, $c), proposal_type_info: Aptos_std.Type_info.type_of_($c, [$p[0]]) }, new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "RegisterForumEvent", [])]);
-  $c.move_to(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), account, voting_forum);
+  temp$2 = Aptos_std.Table.new___($c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
+  temp$3 = new VotingEvents({ create_proposal_events: Aptos_std.Event.new_event_handle_(account, $c, [new SimpleStructTag(CreateProposalEvent)]), register_forum_events: Aptos_std.Event.new_event_handle_(account, $c, [new SimpleStructTag(RegisterForumEvent)]), resolve_proposal_events: Aptos_std.Event.new_event_handle_(account, $c, [new SimpleStructTag(ResolveProposal)]), vote_events: Aptos_std.Event.new_event_handle_(account, $c, [new SimpleStructTag(VoteEvent)]) }, new SimpleStructTag(VotingEvents));
+  voting_forum = new VotingForum({ proposals: temp$2, events: temp$3, next_proposal_id: temp$1 }, new SimpleStructTag(VotingForum, [$p[0]]));
+  Aptos_std.Event.emit_event_(voting_forum.events.register_forum_events, new RegisterForumEvent({ hosting_account: Std.Signer.address_of_(account, $c), proposal_type_info: Aptos_std.Type_info.type_of_($c, [$p[0]]) }, new SimpleStructTag(RegisterForumEvent)), $c, [new SimpleStructTag(RegisterForumEvent)]);
+  $c.move_to(new SimpleStructTag(VotingForum, [$p[0]]), account, voting_forum);
   return;
 }
 
@@ -481,8 +481,8 @@ export function resolve_ (
   if (!($.copy(proposal_state)).eq(($.copy(PROPOSAL_STATE_SUCCEEDED)))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_CANNOT_BE_RESOLVED), $c));
   }
-  voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
+  voting_forum = $c.borrow_global_mut<VotingForum>(new SimpleStructTag(VotingForum, [$p[0]]), $.copy(voting_forum_address));
+  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
   if (!!$.copy(proposal.is_resolved)) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_ALREADY_RESOLVED), $c));
   }
@@ -491,7 +491,7 @@ export function resolve_ (
   if (!$.veq(Transaction_context.get_script_hash_($c), $.copy(proposal.execution_hash))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EPROPOSAL_EXECUTION_HASH_NOT_MATCHING), $c));
   }
-  Aptos_std.Event.emit_event_(voting_forum.events.resolve_proposal_events, new ResolveProposal({ proposal_id: $.copy(proposal_id), yes_votes: $.copy(proposal.yes_votes), no_votes: $.copy(proposal.no_votes), resolved_early: resolved_early }, new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])), $c, [new StructTag(new HexString("0x1"), "voting", "ResolveProposal", [])]);
+  Aptos_std.Event.emit_event_(voting_forum.events.resolve_proposal_events, new ResolveProposal({ proposal_id: $.copy(proposal_id), yes_votes: $.copy(proposal.yes_votes), no_votes: $.copy(proposal.no_votes), resolved_early: resolved_early }, new SimpleStructTag(ResolveProposal)), $c, [new SimpleStructTag(ResolveProposal)]);
   return Std.Option.extract_(proposal.execution_content, $c, [$p[0]]);
 }
 
@@ -505,15 +505,15 @@ export function vote_ (
   $p: TypeTag[], /* <ProposalType>*/
 ): void {
   let proposal, voting_forum;
-  voting_forum = $c.borrow_global_mut<VotingForum>(new StructTag(new HexString("0x1"), "voting", "VotingForum", [$p[0]]), $.copy(voting_forum_address));
-  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new StructTag(new HexString("0x1"), "voting", "Proposal", [$p[0]])]);
+  voting_forum = $c.borrow_global_mut<VotingForum>(new SimpleStructTag(VotingForum, [$p[0]]), $.copy(voting_forum_address));
+  proposal = Aptos_std.Table.borrow_mut_(voting_forum.proposals, $.copy(proposal_id), $c, [AtomicTypeTag.U64, new SimpleStructTag(Proposal, [$p[0]])]);
   if (should_pass) {
     proposal.yes_votes = ($.copy(proposal.yes_votes)).add(u128($.copy(num_votes)));
   }
   else{
     proposal.no_votes = ($.copy(proposal.no_votes)).add(u128($.copy(num_votes)));
   }
-  Aptos_std.Event.emit_event_(voting_forum.events.vote_events, new VoteEvent({ proposal_id: $.copy(proposal_id), num_votes: $.copy(num_votes) }, new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])), $c, [new StructTag(new HexString("0x1"), "voting", "VoteEvent", [])]);
+  Aptos_std.Event.emit_event_(voting_forum.events.vote_events, new VoteEvent({ proposal_id: $.copy(proposal_id), num_votes: $.copy(num_votes) }, new SimpleStructTag(VoteEvent)), $c, [new SimpleStructTag(VoteEvent)]);
   return;
 }
 

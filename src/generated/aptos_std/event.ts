@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 export const packageName = "AptosStdlib";
@@ -132,7 +132,7 @@ export function new_event_handle_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <T>*/
 ): EventHandle {
-  return new EventHandle({ counter: u64("0"), guid: Std.Guid.create_(account, $c) }, new StructTag(new HexString("0x1"), "event", "EventHandle", [$p[0]]));
+  return new EventHandle({ counter: u64("0"), guid: Std.Guid.create_(account, $c) }, new SimpleStructTag(EventHandle, [$p[0]]));
 }
 
 export function write_to_event_store_ (

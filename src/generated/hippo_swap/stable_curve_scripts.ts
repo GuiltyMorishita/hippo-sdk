@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Coin_registry from "../coin_registry";
@@ -296,18 +296,35 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  add_liquidity(
+  payload_add_liquidity(
     amount_x: U64,
     amount_y: U64,
     $p: TypeTag[], /* <X, Y>*/
   ) {
     return buildPayload_add_liquidity(amount_x, amount_y, $p);
   }
-  mock_deploy_script(
+  async add_liquidity(
+    _account: AptosAccount,
+    amount_x: U64,
+    amount_y: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_add_liquidity(amount_x, amount_y, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_mock_deploy_script(
   ) {
     return buildPayload_mock_deploy_script();
   }
-  remove_liquidity(
+  async mock_deploy_script(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_mock_deploy_script();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_remove_liquidity(
     liquidity: U64,
     min_amount_x: U64,
     min_amount_y: U64,
@@ -315,7 +332,18 @@ export class App {
   ) {
     return buildPayload_remove_liquidity(liquidity, min_amount_x, min_amount_y, $p);
   }
-  swap_script(
+  async remove_liquidity(
+    _account: AptosAccount,
+    liquidity: U64,
+    min_amount_x: U64,
+    min_amount_y: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_remove_liquidity(liquidity, min_amount_x, min_amount_y, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_swap_script(
     x_in: U64,
     y_in: U64,
     x_min_out: U64,
@@ -323,6 +351,18 @@ export class App {
     $p: TypeTag[], /* <X, Y>*/
   ) {
     return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+  }
+  async swap_script(
+    _account: AptosAccount,
+    x_in: U64,
+    y_in: U64,
+    x_min_out: U64,
+    y_min_out: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

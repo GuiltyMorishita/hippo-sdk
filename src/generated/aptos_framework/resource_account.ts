@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_std from "../aptos_std";
 import * as Std from "../std";
@@ -65,12 +65,12 @@ export function create_resource_account_ (
   let temp$1, auth_key, container, origin_addr, resource, resource_addr, resource_signer_cap;
   [resource, resource_signer_cap] = Account.create_resource_account_(origin, $.copy(seed), $c);
   origin_addr = Std.Signer.address_of_(origin, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(origin_addr))) {
-    $c.move_to(new StructTag(new HexString("0x1"), "resource_account", "Container", []), origin, new Container({ store: Aptos_std.Simple_map.create_($c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])]) }, new StructTag(new HexString("0x1"), "resource_account", "Container", [])));
+  if (!$c.exists(new SimpleStructTag(Container), $.copy(origin_addr))) {
+    $c.move_to(new SimpleStructTag(Container), origin, new Container({ store: Aptos_std.Simple_map.create_($c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])]) }, new SimpleStructTag(Container)));
   }
   else{
   }
-  container = $c.borrow_global_mut<Container>(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(origin_addr));
+  container = $c.borrow_global_mut<Container>(new SimpleStructTag(Container), $.copy(origin_addr));
   resource_addr = Std.Signer.address_of_(resource, $c);
   Aptos_std.Simple_map.add_(container.store, $.copy(resource_addr), resource_signer_cap, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])]);
   if (Std.Vector.is_empty_(optional_auth_key, $c, [AtomicTypeTag.U8])) {
@@ -106,15 +106,15 @@ export function retrieve_resource_account_cap_ (
   $c: AptosDataCache,
 ): Account.SignerCapability {
   let _resource_addr, container, container__1, empty_container, resource__2, resource_addr, resource_signer_cap, signer_cap, zero_auth_key;
-  if (!$c.exists(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(source_addr))) {
+  if (!$c.exists(new SimpleStructTag(Container), $.copy(source_addr))) {
     throw $.abortCode(Std.Error.not_found_($.copy(ECONTAINER_NOT_PUBLISHED), $c));
   }
   resource_addr = Std.Signer.address_of_(resource, $c);
-  container = $c.borrow_global_mut<Container>(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(source_addr));
+  container = $c.borrow_global_mut<Container>(new SimpleStructTag(Container), $.copy(source_addr));
   [_resource_addr, signer_cap] = Aptos_std.Simple_map.remove_(container.store, resource_addr, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])]);
   [resource_signer_cap, empty_container] = [signer_cap, (Aptos_std.Simple_map.length_(container.store, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])])).eq((u64("0")))];
   if (empty_container) {
-    container__1 = $c.move_from<Container>(new StructTag(new HexString("0x1"), "resource_account", "Container", []), $.copy(source_addr));
+    container__1 = $c.move_from<Container>(new SimpleStructTag(Container), $.copy(source_addr));
     let { store: store } = container__1;
     Aptos_std.Simple_map.destroy_empty_(store, $c, [AtomicTypeTag.Address, new StructTag(new HexString("0x1"), "account", "SignerCapability", [])]);
   }
@@ -149,11 +149,20 @@ export class App {
     }
     return val;
   }
-  create_resource_account(
+  payload_create_resource_account(
     seed: U8[],
     optional_auth_key: U8[],
   ) {
     return buildPayload_create_resource_account(seed, optional_auth_key);
+  }
+  async create_resource_account(
+    _account: AptosAccount,
+    seed: U8[],
+    optional_auth_key: U8[],
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_create_resource_account(seed, optional_auth_key);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

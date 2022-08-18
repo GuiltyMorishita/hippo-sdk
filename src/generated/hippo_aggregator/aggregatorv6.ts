@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Econia from "../econia";
@@ -216,7 +216,7 @@ export function initialize_ (
     throw $.abortCode($.copy(E_NOT_ADMIN));
   }
   [, signer_cap] = Aptos_framework.Account.create_resource_account_(admin, [u8("115"), u8("105"), u8("103"), u8("110"), u8("101"), u8("114"), u8("118"), u8("51")], $c);
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv6", "SignerStore", []), admin, new SignerStore({ signer_cap: signer_cap }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregatorv6", "SignerStore", [])));
+  $c.move_to(new SimpleStructTag(SignerStore), admin, new SignerStore({ signer_cap: signer_cap }, new SimpleStructTag(SignerStore)));
   return;
 }
 
@@ -423,11 +423,18 @@ export class App {
     }
     return val;
   }
-  initialize(
+  payload_initialize(
   ) {
     return buildPayload_initialize();
   }
-  one_step_route(
+  async initialize(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_initialize();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_one_step_route(
     first_dex_type: U8,
     first_pool_type: U8,
     first_is_x_to_y: boolean,
@@ -437,7 +444,20 @@ export class App {
   ) {
     return buildPayload_one_step_route(first_dex_type, first_pool_type, first_is_x_to_y, x_in, y_min_out, $p);
   }
-  three_step_route(
+  async one_step_route(
+    _account: AptosAccount,
+    first_dex_type: U8,
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    x_in: U64,
+    y_min_out: U64,
+    $p: TypeTag[], /* <X, Y, E>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_one_step_route(first_dex_type, first_pool_type, first_is_x_to_y, x_in, y_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_three_step_route(
     first_dex_type: U8,
     first_pool_type: U8,
     first_is_x_to_y: boolean,
@@ -453,7 +473,26 @@ export class App {
   ) {
     return buildPayload_three_step_route(first_dex_type, first_pool_type, first_is_x_to_y, second_dex_type, second_pool_type, second_is_x_to_y, third_dex_type, third_pool_type, third_is_x_to_y, x_in, m_min_out, $p);
   }
-  two_step_route(
+  async three_step_route(
+    _account: AptosAccount,
+    first_dex_type: U8,
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    second_dex_type: U8,
+    second_pool_type: U8,
+    second_is_x_to_y: boolean,
+    third_dex_type: U8,
+    third_pool_type: U8,
+    third_is_x_to_y: boolean,
+    x_in: U64,
+    m_min_out: U64,
+    $p: TypeTag[], /* <X, Y, Z, M, E1, E2, E3>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_three_step_route(first_dex_type, first_pool_type, first_is_x_to_y, second_dex_type, second_pool_type, second_is_x_to_y, third_dex_type, third_pool_type, third_is_x_to_y, x_in, m_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_two_step_route(
     first_dex_type: U8,
     first_pool_type: U8,
     first_is_x_to_y: boolean,
@@ -465,6 +504,22 @@ export class App {
     $p: TypeTag[], /* <X, Y, Z, E1, E2>*/
   ) {
     return buildPayload_two_step_route(first_dex_type, first_pool_type, first_is_x_to_y, second_dex_type, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+  }
+  async two_step_route(
+    _account: AptosAccount,
+    first_dex_type: U8,
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    second_dex_type: U8,
+    second_pool_type: U8,
+    second_is_x_to_y: boolean,
+    x_in: U64,
+    z_min_out: U64,
+    $p: TypeTag[], /* <X, Y, Z, E1, E2>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_two_step_route(first_dex_type, first_pool_type, first_is_x_to_y, second_dex_type, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

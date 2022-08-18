@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_std from "../aptos_std";
 import * as Std from "../std";
@@ -246,7 +246,7 @@ export function create_account_internal_ (
   new_address: HexString,
   $c: AptosDataCache,
 ): HexString {
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(new_address))) {
+  if (!!$c.exists(new SimpleStructTag(Account), $.copy(new_address))) {
     throw $.abortCode(Std.Error.already_exists_($.copy(EACCOUNT), $c));
   }
   if (!(($.copy(new_address)).hex() !== (new HexString("0x0")).hex())) {
@@ -268,7 +268,7 @@ export function create_account_unchecked_ (
   if (!(Std.Vector.length_(authentication_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EMALFORMED_AUTHENTICATION_KEY), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "account", "Account", []), new_account, new Account({ authentication_key: $.copy(authentication_key), sequence_number: u64("0"), coin_register_events: Aptos_std.Event.new_event_handle_(new_account, $c, [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]) }, new StructTag(new HexString("0x1"), "account", "Account", [])));
+  $c.move_to(new SimpleStructTag(Account), new_account, new Account({ authentication_key: $.copy(authentication_key), sequence_number: u64("0"), coin_register_events: Aptos_std.Event.new_event_handle_(new_account, $c, [new SimpleStructTag(CoinRegisterEvent)]) }, new SimpleStructTag(Account)));
   return new_account;
 }
 
@@ -299,7 +299,7 @@ export function create_core_framework_account_ (
   let signer, signer_cap;
   Timestamp.assert_genesis_($c);
   signer = create_account_unchecked_(new HexString("0x1"), $c);
-  signer_cap = new SignerCapability({ account: new HexString("0x1") }, new StructTag(new HexString("0x1"), "account", "SignerCapability", []));
+  signer_cap = new SignerCapability({ account: new HexString("0x1") }, new SimpleStructTag(SignerCapability));
   return [signer, signer_cap];
 }
 
@@ -314,7 +314,7 @@ export function create_resource_account_ (
   Std.Vector.append_(bytes, $.copy(seed), $c, [AtomicTypeTag.U8]);
   addr = create_address_(Std.Hash.sha3_256_($.copy(bytes), $c), $c);
   signer = create_account_internal_($.copy(addr), $c);
-  signer_cap = new SignerCapability({ account: $.copy(addr) }, new StructTag(new HexString("0x1"), "account", "SignerCapability", []));
+  signer_cap = new SignerCapability({ account: $.copy(addr) }, new SimpleStructTag(SignerCapability));
   return [signer, signer_cap];
 }
 
@@ -360,7 +360,7 @@ export function epilogue_ (
   if (!(u128($.copy(old_sequence_number))).lt($.copy(MAX_U64))) {
     throw $.abortCode(Std.Error.out_of_range_($.copy(ESEQUENCE_NUMBER_TOO_BIG), $c));
   }
-  account_resource = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
+  account_resource = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(addr));
   account_resource.sequence_number = ($.copy(old_sequence_number)).add(u64("1"));
   return;
 }
@@ -369,21 +369,21 @@ export function exists_at_ (
   addr: HexString,
   $c: AptosDataCache,
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
+  return $c.exists(new SimpleStructTag(Account), $.copy(addr));
 }
 
 export function get_authentication_key_ (
   addr: HexString,
   $c: AptosDataCache,
 ): U8[] {
-  return $.copy($c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr)).authentication_key);
+  return $.copy($c.borrow_global<Account>(new SimpleStructTag(Account), $.copy(addr)).authentication_key);
 }
 
 export function get_sequence_number_ (
   addr: HexString,
   $c: AptosDataCache,
 ): U64 {
-  return $.copy($c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr)).sequence_number);
+  return $.copy($c.borrow_global<Account>(new SimpleStructTag(Account), $.copy(addr)).sequence_number);
 }
 
 export function initialize_ (
@@ -399,7 +399,7 @@ export function initialize_ (
   $c: AptosDataCache,
 ): void {
   System_addresses.assert_aptos_framework_(account, $c);
-  $c.move_to(new StructTag(new HexString("0x1"), "account", "ChainSpecificAccountInfo", []), account, new ChainSpecificAccountInfo({ module_addr: $.copy(module_addr), module_name: $.copy(module_name), script_prologue_name: $.copy(script_prologue_name), module_prologue_name: $.copy(module_prologue_name), writeset_prologue_name: $.copy(writeset_prologue_name), multi_agent_prologue_name: $.copy(multi_agent_prologue_name), user_epilogue_name: $.copy(user_epilogue_name), writeset_epilogue_name: $.copy(writeset_epilogue_name) }, new StructTag(new HexString("0x1"), "account", "ChainSpecificAccountInfo", [])));
+  $c.move_to(new SimpleStructTag(ChainSpecificAccountInfo), account, new ChainSpecificAccountInfo({ module_addr: $.copy(module_addr), module_name: $.copy(module_name), script_prologue_name: $.copy(script_prologue_name), module_prologue_name: $.copy(module_prologue_name), writeset_prologue_name: $.copy(writeset_prologue_name), multi_agent_prologue_name: $.copy(multi_agent_prologue_name), user_epilogue_name: $.copy(user_epilogue_name), writeset_epilogue_name: $.copy(writeset_epilogue_name) }, new SimpleStructTag(ChainSpecificAccountInfo)));
   return;
 }
 
@@ -441,7 +441,7 @@ export function multi_agent_script_prologue_ (
       if (!exists_at_($.copy(secondary_address), $c)) {
         throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EACCOUNT_DNE), $c));
       }
-      signer_account = $c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(secondary_address));
+      signer_account = $c.borrow_global<Account>(new SimpleStructTag(Account), $.copy(secondary_address));
       signer_public_key_hash = $.copy(Std.Vector.borrow_(secondary_signer_public_key_hashes, $.copy(i), $c, [new VectorTag(AtomicTypeTag.U8)]));
       if (!$.veq($.copy(signer_public_key_hash), $.copy(signer_account.authentication_key))) {
         throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY), $c));
@@ -470,10 +470,10 @@ export function prologue_common_ (
   if (!(Chain_id.get_($c)).eq(($.copy(chain_id)))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EBAD_CHAIN_ID), $c));
   }
-  if (!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(transaction_sender))) {
+  if (!$c.exists(new SimpleStructTag(Account), $.copy(transaction_sender))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EACCOUNT_DNE), $c));
   }
-  sender_account = $c.borrow_global<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(transaction_sender));
+  sender_account = $c.borrow_global<Account>(new SimpleStructTag(Account), $.copy(transaction_sender));
   if (!$.veq(Std.Hash.sha3_256_($.copy(txn_public_key), $c), $.copy(sender_account.authentication_key))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(PROLOGUE_EINVALID_ACCOUNT_AUTH_KEY), $c));
   }
@@ -503,8 +503,8 @@ export function register_coin_ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let account;
-  account = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(account_addr));
-  Aptos_std.Event.emit_event_(account.coin_register_events, new CoinRegisterEvent({ type_info: Aptos_std.Type_info.type_of_($c, [$p[0]]) }, new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])), $c, [new StructTag(new HexString("0x1"), "account", "CoinRegisterEvent", [])]);
+  account = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(account_addr));
+  Aptos_std.Event.emit_event_(account.coin_register_events, new CoinRegisterEvent({ type_info: Aptos_std.Type_info.type_of_($c, [$p[0]]) }, new SimpleStructTag(CoinRegisterEvent)), $c, [new SimpleStructTag(CoinRegisterEvent)]);
   return;
 }
 
@@ -544,7 +544,7 @@ export function rotate_authentication_key_internal_ (
   if (!(Std.Vector.length_(new_auth_key, $c, [AtomicTypeTag.U8])).eq((u64("32")))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EMALFORMED_AUTHENTICATION_KEY), $c));
   }
-  account_resource = $c.borrow_global_mut<Account>(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(addr));
+  account_resource = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(addr));
   account_resource.authentication_key = $.copy(new_auth_key);
   return;
 }
@@ -569,7 +569,7 @@ export function transfer_ (
   amount: U64,
   $c: AptosDataCache,
 ): void {
-  if (!$c.exists(new StructTag(new HexString("0x1"), "account", "Account", []), $.copy(to))) {
+  if (!$c.exists(new SimpleStructTag(Account), $.copy(to))) {
     create_account_($.copy(to), $c);
   }
   else{
@@ -658,21 +658,46 @@ export class App {
   }
   get CoinRegisterEvent() { return CoinRegisterEvent; }
   get SignerCapability() { return SignerCapability; }
-  create_account(
+  payload_create_account(
     auth_key: HexString,
   ) {
     return buildPayload_create_account(auth_key);
   }
-  rotate_authentication_key(
+  async create_account(
+    _account: AptosAccount,
+    auth_key: HexString,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_create_account(auth_key);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_rotate_authentication_key(
     new_auth_key: U8[],
   ) {
     return buildPayload_rotate_authentication_key(new_auth_key);
   }
-  transfer(
+  async rotate_authentication_key(
+    _account: AptosAccount,
+    new_auth_key: U8[],
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_rotate_authentication_key(new_auth_key);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_transfer(
     to: HexString,
     amount: U64,
   ) {
     return buildPayload_transfer(to, amount);
+  }
+  async transfer(
+    _account: AptosAccount,
+    to: HexString,
+    amount: U64,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_transfer(to, amount);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

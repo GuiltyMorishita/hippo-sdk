@@ -12,7 +12,6 @@ import { CoinInfo } from "../generated/aptos_framework/coin";
 import { PoolType } from "../swap/baseTypes";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
-import { TokenRegistryClient } from "../tokenRegistry";
 
 
 const actionShowTokenRegistry = async () => {

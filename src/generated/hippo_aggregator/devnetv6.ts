@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Econia from "../econia";
 import * as Hippo_swap from "../hippo_swap";
@@ -80,7 +80,7 @@ export function mock_deploy_pontem_ (
 ): void {
   Hippo_swap.Mock_coin.faucet_mint_to_(admin, $.copy(BTC_AMOUNT), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", [])]);
   Hippo_swap.Mock_coin.faucet_mint_to_(admin, $.copy(USDC_AMOUNT), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  return Pontem.Scripts.register_pool_and_add_liquidity_(admin, u8("2"), $.copy(BTC_AMOUNT), u64("0"), $.copy(USDC_AMOUNT), u64("0"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "devnetv6", "PontemLP", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])])]);
+  return Pontem.Scripts.register_pool_and_add_liquidity_(admin, u8("2"), $.copy(BTC_AMOUNT), u64("0"), $.copy(USDC_AMOUNT), u64("0"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", []), new SimpleStructTag(PontemLP, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])])]);
 }
 
 
@@ -108,13 +108,27 @@ export class App {
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
   get PontemLP() { return PontemLP; }
-  mock_deploy_econia(
+  payload_mock_deploy_econia(
   ) {
     return buildPayload_mock_deploy_econia();
   }
-  mock_deploy_pontem(
+  async mock_deploy_econia(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_mock_deploy_econia();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_mock_deploy_pontem(
   ) {
     return buildPayload_mock_deploy_pontem();
+  }
+  async mock_deploy_pontem(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_mock_deploy_pontem();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

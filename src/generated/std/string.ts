@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Option from "./option";
 import * as Vector from "./vector";
@@ -182,7 +182,7 @@ export function sub_string_ (
   if (!temp$3) {
     throw $.abortCode($.copy(EINVALID_INDEX));
   }
-  return new String({ bytes: internal_sub_string_(bytes, $.copy(i), $.copy(j), $c) }, new StructTag(new HexString("0x1"), "string", "String", []));
+  return new String({ bytes: internal_sub_string_(bytes, $.copy(i), $.copy(j), $c) }, new SimpleStructTag(String));
 }
 
 export function try_utf8_ (
@@ -191,10 +191,10 @@ export function try_utf8_ (
 ): Option.Option {
   let temp$1;
   if (internal_check_utf8_(bytes, $c)) {
-    temp$1 = Option.some_(new String({ bytes: $.copy(bytes) }, new StructTag(new HexString("0x1"), "string", "String", [])), $c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
+    temp$1 = Option.some_(new String({ bytes: $.copy(bytes) }, new SimpleStructTag(String)), $c, [new SimpleStructTag(String)]);
   }
   else{
-    temp$1 = Option.none_($c, [new StructTag(new HexString("0x1"), "string", "String", [])]);
+    temp$1 = Option.none_($c, [new SimpleStructTag(String)]);
   }
   return temp$1;
 }
@@ -206,7 +206,7 @@ export function utf8_ (
   if (!internal_check_utf8_(bytes, $c)) {
     throw $.abortCode($.copy(EINVALID_UTF8));
   }
-  return new String({ bytes: $.copy(bytes) }, new StructTag(new HexString("0x1"), "string", "String", []));
+  return new String({ bytes: $.copy(bytes) }, new SimpleStructTag(String));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

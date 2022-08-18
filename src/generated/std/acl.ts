@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Error from "./error";
 import * as Vector from "./vector";
@@ -82,7 +82,7 @@ export function contains_ (
 export function empty_ (
   $c: AptosDataCache,
 ): ACL {
-  return new ACL({ list: Vector.empty_($c, [AtomicTypeTag.Address]) }, new StructTag(new HexString("0x1"), "acl", "ACL", []));
+  return new ACL({ list: Vector.empty_($c, [AtomicTypeTag.Address]) }, new SimpleStructTag(ACL));
 }
 
 export function remove_ (

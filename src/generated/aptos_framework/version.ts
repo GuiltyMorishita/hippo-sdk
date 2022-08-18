@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Reconfiguration from "./reconfiguration";
@@ -64,10 +64,10 @@ export function initialize_ (
 ): void {
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"))) {
+  if (!!$c.exists(new SimpleStructTag(Version), new HexString("0x1"))) {
     throw $.abortCode(Std.Error.already_exists_($.copy(ECONFIG), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "version", "Version", []), account, new Version({ major: $.copy(initial_version) }, new StructTag(new HexString("0x1"), "version", "Version", [])));
+  $c.move_to(new SimpleStructTag(Version), account, new Version({ major: $.copy(initial_version) }, new SimpleStructTag(Version)));
   return;
 }
 
@@ -78,14 +78,14 @@ export function set_version_ (
 ): void {
   let config, old_major;
   System_addresses.assert_core_resource_(account, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"))) {
+  if (!$c.exists(new SimpleStructTag(Version), new HexString("0x1"))) {
     throw $.abortCode(Std.Error.not_found_($.copy(ECONFIG), $c));
   }
-  old_major = $.copy($c.borrow_global<Version>(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1")).major);
+  old_major = $.copy($c.borrow_global<Version>(new SimpleStructTag(Version), new HexString("0x1")).major);
   if (!($.copy(old_major)).lt($.copy(major))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(EINVALID_MAJOR_VERSION_NUMBER), $c));
   }
-  config = $c.borrow_global_mut<Version>(new StructTag(new HexString("0x1"), "version", "Version", []), new HexString("0x1"));
+  config = $c.borrow_global_mut<Version>(new SimpleStructTag(Version), new HexString("0x1"));
   config.major = $.copy(major);
   Reconfiguration.reconfigure_($c);
   return;
@@ -128,10 +128,18 @@ export class App {
     }
     return val;
   }
-  set_version(
+  payload_set_version(
     major: U64,
   ) {
     return buildPayload_set_version(major);
+  }
+  async set_version(
+    _account: AptosAccount,
+    major: U64,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_set_version(major);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

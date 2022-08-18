@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Reconfiguration from "./reconfiguration";
@@ -101,10 +101,10 @@ export function initialize_ (
 ): void {
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "gas_schedule", "GasSchedule", []), new HexString("0x1"))) {
+  if (!!$c.exists(new SimpleStructTag(GasSchedule), new HexString("0x1"))) {
     throw $.abortCode(Std.Error.already_exists_($.copy(ECONFIG), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "gas_schedule", "GasSchedule", []), account, Util.from_bytes_($.copy(gas_schedule_blob), $c, [new StructTag(new HexString("0x1"), "gas_schedule", "GasSchedule", [])]));
+  $c.move_to(new SimpleStructTag(GasSchedule), account, Util.from_bytes_($.copy(gas_schedule_blob), $c, [new SimpleStructTag(GasSchedule)]));
   return;
 }
 
@@ -116,11 +116,11 @@ export function set_gas_schedule_ (
   let gas_schedule;
   Timestamp.assert_operating_($c);
   System_addresses.assert_core_resource_(account, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "gas_schedule", "GasSchedule", []), new HexString("0x1"))) {
+  if (!$c.exists(new SimpleStructTag(GasSchedule), new HexString("0x1"))) {
     throw $.abortCode(Std.Error.not_found_($.copy(ECONFIG), $c));
   }
-  gas_schedule = $c.borrow_global_mut<GasSchedule>(new StructTag(new HexString("0x1"), "gas_schedule", "GasSchedule", []), new HexString("0x1"));
-  $.set(gas_schedule, Util.from_bytes_($.copy(gas_schedule_blob), $c, [new StructTag(new HexString("0x1"), "gas_schedule", "GasSchedule", [])]));
+  gas_schedule = $c.borrow_global_mut<GasSchedule>(new SimpleStructTag(GasSchedule), new HexString("0x1"));
+  $.set(gas_schedule, Util.from_bytes_($.copy(gas_schedule_blob), $c, [new SimpleStructTag(GasSchedule)]));
   Reconfiguration.reconfigure_($c);
   return;
 }
@@ -164,10 +164,18 @@ export class App {
     }
     return val;
   }
-  set_gas_schedule(
+  payload_set_gas_schedule(
     gas_schedule_blob: U8[],
   ) {
     return buildPayload_set_gas_schedule(gas_schedule_blob);
+  }
+  async set_gas_schedule(
+    _account: AptosAccount,
+    gas_schedule_blob: U8[],
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_set_gas_schedule(gas_schedule_blob);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

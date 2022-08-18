@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 export const packageName = "AptosFramework";
@@ -66,7 +66,7 @@ export function create_proposal_ (
   if (!(Std.String.length_(metadata_hash, $c)).le(u64("256"))) {
     throw $.abortCode(Std.Error.invalid_argument_($.copy(ETOO_LONG), $c));
   }
-  return new GovernanceProposal({ metadata_location: $.copy(metadata_location), metadata_hash: $.copy(metadata_hash) }, new StructTag(new HexString("0x1"), "governance_proposal", "GovernanceProposal", []));
+  return new GovernanceProposal({ metadata_location: $.copy(metadata_location), metadata_hash: $.copy(metadata_hash) }, new SimpleStructTag(GovernanceProposal));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

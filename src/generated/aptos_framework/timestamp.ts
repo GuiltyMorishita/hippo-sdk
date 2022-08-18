@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as System_addresses from "./system_addresses";
@@ -78,20 +78,20 @@ export function assert_operating_ (
 export function is_genesis_ (
   $c: AptosDataCache,
 ): boolean {
-  return !$c.exists(new StructTag(new HexString("0x1"), "timestamp", "CurrentTimeMicroseconds", []), new HexString("0x1"));
+  return !$c.exists(new SimpleStructTag(CurrentTimeMicroseconds), new HexString("0x1"));
 }
 
 export function is_operating_ (
   $c: AptosDataCache,
 ): boolean {
-  return $c.exists(new StructTag(new HexString("0x1"), "timestamp", "CurrentTimeMicroseconds", []), new HexString("0x1"));
+  return $c.exists(new SimpleStructTag(CurrentTimeMicroseconds), new HexString("0x1"));
 }
 
 export function now_microseconds_ (
   $c: AptosDataCache,
 ): U64 {
   assert_operating_($c);
-  return $.copy($c.borrow_global<CurrentTimeMicroseconds>(new StructTag(new HexString("0x1"), "timestamp", "CurrentTimeMicroseconds", []), new HexString("0x1")).microseconds);
+  return $.copy($c.borrow_global<CurrentTimeMicroseconds>(new SimpleStructTag(CurrentTimeMicroseconds), new HexString("0x1")).microseconds);
 }
 
 export function now_seconds_ (
@@ -107,8 +107,8 @@ export function set_time_has_started_ (
   let timer;
   assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
-  timer = new CurrentTimeMicroseconds({ microseconds: u64("0") }, new StructTag(new HexString("0x1"), "timestamp", "CurrentTimeMicroseconds", []));
-  $c.move_to(new StructTag(new HexString("0x1"), "timestamp", "CurrentTimeMicroseconds", []), account, timer);
+  timer = new CurrentTimeMicroseconds({ microseconds: u64("0") }, new SimpleStructTag(CurrentTimeMicroseconds));
+  $c.move_to(new SimpleStructTag(CurrentTimeMicroseconds), account, timer);
   return;
 }
 
@@ -121,7 +121,7 @@ export function update_global_time_ (
   let global_timer, now;
   assert_operating_($c);
   System_addresses.assert_vm_(account, $c);
-  global_timer = $c.borrow_global_mut<CurrentTimeMicroseconds>(new StructTag(new HexString("0x1"), "timestamp", "CurrentTimeMicroseconds", []), new HexString("0x1"));
+  global_timer = $c.borrow_global_mut<CurrentTimeMicroseconds>(new SimpleStructTag(CurrentTimeMicroseconds), new HexString("0x1"));
   now = $.copy(global_timer.microseconds);
   if ((($.copy(proposer)).hex() === (new HexString("0x0")).hex())) {
     if (!($.copy(now)).eq(($.copy(timestamp)))) {

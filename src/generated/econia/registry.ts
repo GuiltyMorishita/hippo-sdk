@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Aptos_std from "../aptos_std";
@@ -818,31 +818,31 @@ export function init_registry_ (
   if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
   }
-  if (!!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_REGISTRY_EXISTS));
   }
-  $c.move_to(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), account, new Registry({ scales: Open_table.empty_($c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]), markets: Open_table.empty_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address]), n_custodians: u64("0") }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", [])));
-  scales = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E0", [])]), $.copy(F0), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E1", [])]), $.copy(F1), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E2", [])]), $.copy(F2), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E3", [])]), $.copy(F3), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E4", [])]), $.copy(F4), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E5", [])]), $.copy(F5), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E6", [])]), $.copy(F6), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E7", [])]), $.copy(F7), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E8", [])]), $.copy(F8), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E9", [])]), $.copy(F9), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E10", [])]), $.copy(F10), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E11", [])]), $.copy(F11), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E12", [])]), $.copy(F12), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E13", [])]), $.copy(F13), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E14", [])]), $.copy(F14), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E15", [])]), $.copy(F15), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E16", [])]), $.copy(F16), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E17", [])]), $.copy(F17), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E18", [])]), $.copy(F18), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "E19", [])]), $.copy(F19), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  $c.move_to(new SimpleStructTag(Registry), account, new Registry({ scales: Open_table.empty_($c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]), markets: Open_table.empty_($c, [new SimpleStructTag(MarketInfo), AtomicTypeTag.Address]), n_custodians: u64("0") }, new SimpleStructTag(Registry)));
+  scales = $c.borrow_global_mut<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E0)]), $.copy(F0), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E1)]), $.copy(F1), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E2)]), $.copy(F2), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E3)]), $.copy(F3), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E4)]), $.copy(F4), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E5)]), $.copy(F5), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E6)]), $.copy(F6), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E7)]), $.copy(F7), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E8)]), $.copy(F8), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E9)]), $.copy(F9), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E10)]), $.copy(F10), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E11)]), $.copy(F11), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E12)]), $.copy(F12), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E13)]), $.copy(F13), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E14)]), $.copy(F14), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E15)]), $.copy(F15), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E16)]), $.copy(F16), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E17)]), $.copy(F17), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E18)]), $.copy(F18), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E19)]), $.copy(F19), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
   return;
 }
 
@@ -851,13 +851,13 @@ export function is_registered_ (
   $c: AptosDataCache,
 ): boolean {
   let registry;
-  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     return false;
   }
   else{
   }
-  registry = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
-  return Open_table.contains_(registry.markets, $.copy(market_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address]);
+  registry = $c.borrow_global_mut<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
+  return Open_table.contains_(registry.markets, $.copy(market_info), $c, [new SimpleStructTag(MarketInfo), AtomicTypeTag.Address]);
 }
 
 export function is_registered_types_ (
@@ -871,7 +871,7 @@ export function is_valid_custodian_id_ (
   custodian_id: U64,
   $c: AptosDataCache,
 ): boolean {
-  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     return false;
   }
   else{
@@ -883,29 +883,29 @@ export function market_info_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): MarketInfo {
-  return new MarketInfo({ base_coin_type: Aptos_std.Type_info.type_of_($c, [$p[0]]), quote_coin_type: Aptos_std.Type_info.type_of_($c, [$p[1]]), scale_exponent_type: Aptos_std.Type_info.type_of_($c, [$p[2]]) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []));
+  return new MarketInfo({ base_coin_type: Aptos_std.Type_info.type_of_($c, [$p[0]]), quote_coin_type: Aptos_std.Type_info.type_of_($c, [$p[1]]), scale_exponent_type: Aptos_std.Type_info.type_of_($c, [$p[2]]) }, new SimpleStructTag(MarketInfo));
 }
 
 export function n_custodians_ (
   $c: AptosDataCache,
 ): U64 {
-  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
-  return $.copy($c.borrow_global<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).n_custodians);
+  return $.copy($c.borrow_global<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).n_custodians);
 }
 
 export function register_custodian_capability_ (
   $c: AptosDataCache,
 ): CustodianCapability {
   let custodian_id, registry;
-  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
-  registry = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
+  registry = $c.borrow_global_mut<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
   custodian_id = ($.copy(registry.n_custodians)).add(u64("1"));
   registry.n_custodians = $.copy(custodian_id);
-  return new CustodianCapability({ custodian_id: $.copy(custodian_id) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "CustodianCapability", []));
+  return new CustodianCapability({ custodian_id: $.copy(custodian_id) }, new SimpleStructTag(CustodianCapability));
 }
 
 export function register_market_internal_ (
@@ -915,7 +915,7 @@ export function register_market_internal_ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let base_coin_type, market_info, quote_coin_type, registry, scale_exponent_type;
-  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[0]])) {
@@ -930,15 +930,15 @@ export function register_market_internal_ (
     throw $.abortCode($.copy(E_SAME_COIN_TYPE));
   }
   scale_exponent_type = Aptos_std.Type_info.type_of_($c, [$p[2]]);
-  registry = $c.borrow_global_mut<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
+  registry = $c.borrow_global_mut<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
   if (!Open_table.contains_(registry.scales, $.copy(scale_exponent_type), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64])) {
     throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
   }
-  market_info = new MarketInfo({ base_coin_type: $.copy(base_coin_type), quote_coin_type: $.copy(quote_coin_type), scale_exponent_type: $.copy(scale_exponent_type) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []));
-  if (!!Open_table.contains_(registry.markets, $.copy(market_info), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address])) {
+  market_info = new MarketInfo({ base_coin_type: $.copy(base_coin_type), quote_coin_type: $.copy(quote_coin_type), scale_exponent_type: $.copy(scale_exponent_type) }, new SimpleStructTag(MarketInfo));
+  if (!!Open_table.contains_(registry.markets, $.copy(market_info), $c, [new SimpleStructTag(MarketInfo), AtomicTypeTag.Address])) {
     throw $.abortCode($.copy(E_MARKET_EXISTS));
   }
-  Open_table.add_(registry.markets, $.copy(market_info), $.copy(host), $c, [new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "MarketInfo", []), AtomicTypeTag.Address]);
+  Open_table.add_(registry.markets, $.copy(market_info), $.copy(host), $c, [new SimpleStructTag(MarketInfo), AtomicTypeTag.Address]);
   return;
 }
 
@@ -961,10 +961,10 @@ export function scale_factor_from_type_info_ (
   $c: AptosDataCache,
 ): U64 {
   let scales;
-  if (!$c.exists(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
+  if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
-  scales = $c.borrow_global<Registry>(new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "registry", "Registry", []), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
+  scales = $c.borrow_global<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
   if (!Open_table.contains_(scales, $.copy(scale_exponent_type_info), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64])) {
     throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
   }

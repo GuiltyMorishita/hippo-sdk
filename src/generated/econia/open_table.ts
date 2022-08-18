@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_std from "../aptos_std";
 import * as Std from "../std";
@@ -92,7 +92,7 @@ export function empty_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <K, V>*/
 ): OpenTable {
-  return new OpenTable({ base_table: Aptos_std.Table.new___($c, [$p[0], $p[1]]), keys: Std.Vector.empty_($c, [$p[0]]) }, new StructTag(new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"), "open_table", "OpenTable", [$p[0], $p[1]]));
+  return new OpenTable({ base_table: Aptos_std.Table.new___($c, [$p[0], $p[1]]), keys: Std.Vector.empty_($c, [$p[0]]) }, new SimpleStructTag(OpenTable, [$p[0], $p[1]]));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

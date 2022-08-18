@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Std from "../std";
@@ -225,10 +225,10 @@ export function add_liquidity_ (
   y_coin = Aptos_framework.Coin.withdraw_(sender, $.copy(amount_y), $c, [$p[1]]);
   [x, y, minted_lp_token] = add_liquidity_direct_(x_coin, y_coin, $c, [$p[0], $p[1]]);
   addr = Std.Signer.address_of_(sender, $c);
-  lp_amt = Aptos_framework.Coin.value_(minted_lp_token, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  lp_amt = Aptos_framework.Coin.value_(minted_lp_token, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   Aptos_framework.Coin.deposit_($.copy(addr), x, $c, [$p[0]]);
   Aptos_framework.Coin.deposit_($.copy(addr), y, $c, [$p[1]]);
-  check_and_deposit_(sender, minted_lp_token, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  check_and_deposit_(sender, minted_lp_token, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return [$.copy(amount_x), $.copy(amount_y), $.copy(lp_amt)];
 }
 
@@ -239,13 +239,13 @@ export function add_liquidity_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let temp$1, _r_b_x, _r_b_y, amp, d0, d1, d2, fee, fee_coin_x, fee_coin_y, fee_x, fee_y, mint_amount, mint_token, n_b_x, n_b_y, new_reserve_x, new_reserve_y, p, reserve_amt_x, reserve_amt_y, token_pair, token_pair__2, token_supply, x_value_prev, y_value_prev;
-  p = $c.borrow_global<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   [reserve_amt_x, reserve_amt_y] = [Aptos_framework.Coin.value_(p.reserve_x, $c, [$p[0]]), Aptos_framework.Coin.value_(p.reserve_y, $c, [$p[1]])];
   x_value_prev = Aptos_framework.Coin.value_(x, $c, [$p[0]]);
   y_value_prev = Aptos_framework.Coin.value_(y, $c, [$p[1]]);
   amp = get_current_A_($.copy(p.initial_A), $.copy(p.future_A), $.copy(p.initial_A_time), $.copy(p.future_A_time), $c);
   d0 = get_D_flat_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(amp), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
-  temp$1 = Aptos_framework.Coin.supply_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  temp$1 = Aptos_framework.Coin.supply_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   token_supply = u128($.copy(Std.Option.borrow_(temp$1, $c, [AtomicTypeTag.U128])));
   if (($.copy(token_supply)).eq((u128("0")))) {
     if (!($.copy(x_value_prev)).gt(u64("0"))) {
@@ -269,7 +269,7 @@ export function add_liquidity_direct_ (
     d2 = get_D_flat_(u64($.copy(n_b_x)), u64($.copy(n_b_y)), $.copy(amp), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
     fee_coin_x = Aptos_framework.Coin.extract_(x, u64($.copy(fee_x)), $c, [$p[0]]);
     fee_coin_y = Aptos_framework.Coin.extract_(y, u64($.copy(fee_y)), $c, [$p[1]]);
-    token_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+    token_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
     Aptos_framework.Coin.merge_(token_pair.reserve_x, x, $c, [$p[0]]);
     Aptos_framework.Coin.merge_(token_pair.reserve_y, y, $c, [$p[1]]);
     Aptos_framework.Coin.merge_(token_pair.fee_x, fee_coin_x, $c, [$p[0]]);
@@ -278,7 +278,7 @@ export function add_liquidity_direct_ (
   }
   else{
     mint_amount = $.copy(d1);
-    token_pair__2 = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+    token_pair__2 = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
     Aptos_framework.Coin.merge_(token_pair__2.reserve_x, x, $c, [$p[0]]);
     Aptos_framework.Coin.merge_(token_pair__2.reserve_y, y, $c, [$p[1]]);
   }
@@ -301,7 +301,7 @@ export function balance_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): U64 {
-  return Aptos_framework.Coin.balance_($.copy(addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  return Aptos_framework.Coin.balance_($.copy(addr), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
 }
 
 export function burn_ (
@@ -310,8 +310,8 @@ export function burn_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let liquidity_cap;
-  liquidity_cap = $c.borrow_global<LPCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPCapability", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  Aptos_framework.Coin.burn_(to_burn, liquidity_cap.burn_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  liquidity_cap = $c.borrow_global<LPCapability>(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  Aptos_framework.Coin.burn_(to_burn, liquidity_cap.burn_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -367,7 +367,7 @@ export function create_pool_info_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): StableCurvePoolInfo {
-  return new StableCurvePoolInfo({ disabled: false, reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_precision: $.copy(lp_precision), multiplier_x: $.copy(multiplier_x), multiplier_y: $.copy(multiplier_y), fee: $.copy(fee), admin_fee: $.copy(admin_fee), initial_A: $.copy(initial_A), future_A: $.copy(future_A), initial_A_time: $.copy(initial_A_time), future_A_time: $.copy(future_A_time) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]));
+  return new StableCurvePoolInfo({ disabled: false, reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_precision: $.copy(lp_precision), multiplier_x: $.copy(multiplier_x), multiplier_y: $.copy(multiplier_y), fee: $.copy(fee), admin_fee: $.copy(admin_fee), initial_A: $.copy(initial_A), future_A: $.copy(future_A), initial_A_time: $.copy(initial_A_time), future_A_time: $.copy(future_A_time) }, new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]));
 }
 
 export function get_D_flat_ (
@@ -449,7 +449,7 @@ export function initialize_ (
   y_rate = u64(Math.pow_(u128("10"), u8(($.copy(lp_decimal)).sub($.copy(y_decimal))), $c));
   initialize_coin_(signer, $.copy(lp_name), $.copy(lp_symbol), u64($.copy(lp_precision)), $c, [$p[0], $p[1]]);
   token_pair = create_pool_info_($.copy(lp_precision), $.copy(x_rate), $.copy(y_rate), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), signer, token_pair);
+  $c.move_to(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), signer, token_pair);
   return;
 }
 
@@ -463,10 +463,10 @@ export function initialize_coin_ (
 ): void {
   let addr, burn_capability, mint_capability;
   addr = Std.Signer.address_of_(signer, $c);
-  if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), $.copy(addr))) {
+  if (!!$c.exists(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), $.copy(addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
-  if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[1], $p[0]]), $.copy(addr))) {
+  if (!!$c.exists(new SimpleStructTag(StableCurvePoolInfo, [$p[1], $p[0]]), $.copy(addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[0]])) {
@@ -475,9 +475,9 @@ export function initialize_coin_ (
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
     throw $.abortCode($.copy(ERROR_SWAP_INVALID_TOKEN_PAIR));
   }
-  [mint_capability, burn_capability] = Aptos_framework.Coin.initialize_(signer, $.copy(name), $.copy(symbol), $.copy(decimals), true, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
-  Aptos_framework.Coins.register_internal_(signer, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPCapability", [$p[0], $p[1]]), signer, new LPCapability({ mint_cap: $.copy(mint_capability), burn_cap: $.copy(burn_capability) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPCapability", [$p[0], $p[1]])));
+  [mint_capability, burn_capability] = Aptos_framework.Coin.initialize_(signer, $.copy(name), $.copy(symbol), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  Aptos_framework.Coins.register_internal_(signer, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  $c.move_to(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), signer, new LPCapability({ mint_cap: $.copy(mint_capability), burn_cap: $.copy(burn_capability) }, new SimpleStructTag(LPCapability, [$p[0], $p[1]])));
   return;
 }
 
@@ -487,8 +487,8 @@ export function mint_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let liquidity_cap, mint_token;
-  liquidity_cap = $c.borrow_global<LPCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPCapability", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  mint_token = Aptos_framework.Coin.mint_($.copy(amount), liquidity_cap.mint_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  liquidity_cap = $c.borrow_global<LPCapability>(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  mint_token = Aptos_framework.Coin.mint_($.copy(amount), liquidity_cap.mint_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return mint_token;
 }
 
@@ -535,7 +535,7 @@ export function ramp_A_ (
 ): void {
   let block_timestamp, cond_a, cond_b, future_A_p, initial_A, p, pair;
   assert_admin_(account, $c);
-  p = $c.borrow_global<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   block_timestamp = Aptos_framework.Timestamp.now_microseconds_($c);
   if (!($.copy(block_timestamp)).ge(($.copy(p.initial_A_time)).add($.copy(MIN_RAMP_TIME)))) {
     throw $.abortCode($.copy(ERROR_SWAP_RAMP_TIME));
@@ -560,7 +560,7 @@ export function ramp_A_ (
       throw $.abortCode($.copy(ERROR_SWAP_A_VALUE));
     }
   }
-  pair = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   pair.initial_A = $.copy(initial_A);
   pair.future_A = $.copy(future_A_p);
   pair.initial_A_time = $.copy(block_timestamp);
@@ -577,7 +577,7 @@ export function remove_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64] {
   let amount_x, amount_y, coin, coin_x, coin_y;
-  coin = Aptos_framework.Coin.withdraw_(sender, $.copy(liquidity), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  coin = Aptos_framework.Coin.withdraw_(sender, $.copy(liquidity), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   [coin_x, coin_y] = withdraw_liquidity_(coin, $c, [$p[0], $p[1]]);
   [amount_x, amount_y] = [Aptos_framework.Coin.value_(coin_x, $c, [$p[0]]), Aptos_framework.Coin.value_(coin_y, $c, [$p[1]])];
   if (!($.copy(amount_x)).gt($.copy(min_amount_x))) {
@@ -598,10 +598,10 @@ export function stop_ramp_A_ (
 ): void {
   let block_timestamp, current_A, p, pair;
   assert_admin_(account, $c);
-  p = $c.borrow_global<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   current_A = get_current_A_($.copy(p.initial_A), $.copy(p.future_A), $.copy(p.initial_A_time), $.copy(p.future_A_time), $c);
   block_timestamp = Aptos_framework.Timestamp.now_microseconds_($c);
-  pair = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   pair.initial_A = $.copy(current_A);
   pair.future_A = $.copy(current_A);
   pair.initial_A_time = $.copy(block_timestamp);
@@ -632,7 +632,7 @@ export function swap_x_to_exact_y_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let amount_dy, amount_dy_fee, charged_amt_dy, coin_dy, coin_fee, dx, dx_rated, dy_admin_fee, i, p, reserve_amt_x, reserve_amt_y, swap_pair, xp, y, yp;
-  p = $c.borrow_global<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   [reserve_amt_x, reserve_amt_y] = [Aptos_framework.Coin.value_(p.reserve_x, $c, [$p[0]]), Aptos_framework.Coin.value_(p.reserve_y, $c, [$p[1]])];
   [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
   i = u64("0");
@@ -643,7 +643,7 @@ export function swap_x_to_exact_y_direct_ (
   amount_dy_fee = (($.copy(amount_dy)).mul($.copy(p.fee))).div(u64($.copy(FEE_DENOMINATOR)));
   charged_amt_dy = ($.copy(amount_dy)).sub($.copy(amount_dy_fee));
   dy_admin_fee = (($.copy(amount_dy_fee)).mul($.copy(p.admin_fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   Aptos_framework.Coin.merge_(swap_pair.reserve_x, coins_in, $c, [$p[0]]);
   coin_dy = Aptos_framework.Coin.extract_(swap_pair.reserve_y, $.copy(charged_amt_dy), $c, [$p[1]]);
   coin_fee = Aptos_framework.Coin.extract_(swap_pair.reserve_y, $.copy(dy_admin_fee), $c, [$p[1]]);
@@ -674,7 +674,7 @@ export function swap_y_to_exact_x_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let amount_dx, amount_dx_fee, charged_amt_dx, coin_dx, coin_fee, dx_admin_fee, dy, dy_rated, i, p, reserve_amt_x, reserve_amt_y, swap_pair, x, xp, yp;
-  p = $c.borrow_global<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   [reserve_amt_x, reserve_amt_y] = [Aptos_framework.Coin.value_(p.reserve_x, $c, [$p[0]]), Aptos_framework.Coin.value_(p.reserve_y, $c, [$p[1]])];
   [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
   i = u64("1");
@@ -685,7 +685,7 @@ export function swap_y_to_exact_x_direct_ (
   amount_dx_fee = (($.copy(amount_dx)).mul($.copy(p.fee))).div(u64($.copy(FEE_DENOMINATOR)));
   charged_amt_dx = ($.copy(amount_dx)).sub($.copy(amount_dx_fee));
   dx_admin_fee = (($.copy(amount_dx_fee)).mul($.copy(p.admin_fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   Aptos_framework.Coin.merge_(swap_pair.reserve_y, coins_in, $c, [$p[1]]);
   coin_dx = Aptos_framework.Coin.extract_(swap_pair.reserve_x, $.copy(charged_amt_dx), $c, [$p[0]]);
   coin_fee = Aptos_framework.Coin.extract_(swap_pair.reserve_x, $.copy(dx_admin_fee), $c, [$p[0]]);
@@ -699,11 +699,11 @@ export function withdraw_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let temp$1, coin_x, coin_y, reserve_x, reserve_y, swap_pair, to_burn_value, total_supply, x, y;
-  to_burn_value = u128(Aptos_framework.Coin.value_(to_burn, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]));
-  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "StableCurvePoolInfo", [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  to_burn_value = u128(Aptos_framework.Coin.value_(to_burn, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]));
+  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
   reserve_x = u128(Aptos_framework.Coin.value_(swap_pair.reserve_x, $c, [$p[0]]));
   reserve_y = u128(Aptos_framework.Coin.value_(swap_pair.reserve_y, $c, [$p[1]]));
-  temp$1 = Aptos_framework.Coin.supply_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  temp$1 = Aptos_framework.Coin.supply_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   total_supply = u128($.copy(Std.Option.borrow_(temp$1, $c, [AtomicTypeTag.U128])));
   x = u64((($.copy(to_burn_value)).mul($.copy(reserve_x))).div($.copy(total_supply)));
   y = u64((($.copy(to_burn_value)).mul($.copy(reserve_y))).div($.copy(total_supply)));

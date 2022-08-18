@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as System_addresses from "./system_addresses";
@@ -59,7 +59,7 @@ export function get_ (
   $c: AptosDataCache,
 ): U8 {
   Timestamp.assert_operating_($c);
-  return $.copy($c.borrow_global<ChainId>(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), new HexString("0x1")).id);
+  return $.copy($c.borrow_global<ChainId>(new SimpleStructTag(ChainId), new HexString("0x1")).id);
 }
 
 export function initialize_ (
@@ -69,10 +69,10 @@ export function initialize_ (
 ): void {
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), Std.Signer.address_of_(account, $c))) {
+  if (!!$c.exists(new SimpleStructTag(ChainId), Std.Signer.address_of_(account, $c))) {
     throw $.abortCode(Std.Error.already_exists_($.copy(ECHAIN_ID), $c));
   }
-  return $c.move_to(new StructTag(new HexString("0x1"), "chain_id", "ChainId", []), account, new ChainId({ id: $.copy(id) }, new StructTag(new HexString("0x1"), "chain_id", "ChainId", [])));
+  return $c.move_to(new SimpleStructTag(ChainId), account, new ChainId({ id: $.copy(id) }, new SimpleStructTag(ChainId)));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

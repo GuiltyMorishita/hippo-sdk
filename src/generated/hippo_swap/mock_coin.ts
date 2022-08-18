@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Aptos_std from "../aptos_std";
@@ -277,7 +277,7 @@ export function burn_ (
   let temp$1, addr, amt, cap;
   temp$1 = Aptos_std.Type_info.type_of_($c, [$p[0]]);
   addr = Aptos_std.Type_info.account_address_(temp$1, $c);
-  cap = $c.borrow_global<TokenSharedCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]]), $.copy(addr));
+  cap = $c.borrow_global<TokenSharedCapability>(new SimpleStructTag(TokenSharedCapability, [$p[0]]), $.copy(addr));
   amt = Aptos_framework.Coin.value_(tokens, $c, [$p[0]]);
   if (($.copy(amt)).eq((u64("0")))) {
     Aptos_framework.Coin.destroy_zero_(tokens, $c, [$p[0]]);
@@ -343,7 +343,7 @@ export function initialize_ (
   name = Std.String.utf8_(Aptos_std.Type_info.struct_name_(temp$1, $c), $c);
   [mint_capability, burn_capability] = Aptos_framework.Coin.initialize_(account, $.copy(name), $.copy(name), $.copy(decimals), true, $c, [$p[0]]);
   Aptos_framework.Coins.register_internal_(account, $c, [$p[0]]);
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]]), account, new TokenSharedCapability({ mint: $.copy(mint_capability), burn: $.copy(burn_capability) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]])));
+  $c.move_to(new SimpleStructTag(TokenSharedCapability, [$p[0]]), account, new TokenSharedCapability({ mint: $.copy(mint_capability), burn: $.copy(burn_capability) }, new SimpleStructTag(TokenSharedCapability, [$p[0]])));
   return;
 }
 
@@ -355,7 +355,7 @@ export function mint_ (
   let temp$1, addr, cap;
   temp$1 = Aptos_std.Type_info.type_of_($c, [$p[0]]);
   addr = Aptos_std.Type_info.account_address_(temp$1, $c);
-  cap = $c.borrow_global<TokenSharedCapability>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "TokenSharedCapability", [$p[0]]), $.copy(addr));
+  cap = $c.borrow_global<TokenSharedCapability>(new SimpleStructTag(TokenSharedCapability, [$p[0]]), $.copy(addr));
   return Aptos_framework.Coin.mint_($.copy(amount), cap.mint, $c, [$p[0]]);
 }
 
@@ -397,11 +397,20 @@ export class App {
   get WSOL() { return WSOL; }
   get WUSDC() { return WUSDC; }
   get WUSDT() { return WUSDT; }
-  faucet_mint_to_script(
+  payload_faucet_mint_to_script(
     amount: U64,
     $p: TypeTag[], /* <TokenType>*/
   ) {
     return buildPayload_faucet_mint_to_script(amount, $p);
+  }
+  async faucet_mint_to_script(
+    _account: AptosAccount,
+    amount: U64,
+    $p: TypeTag[], /* <TokenType>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_faucet_mint_to_script(amount, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

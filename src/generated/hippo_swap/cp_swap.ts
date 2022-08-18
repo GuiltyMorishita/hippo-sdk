@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Std from "../std";
@@ -252,9 +252,9 @@ export function add_liquidity_ (
   deposit_y_(Aptos_framework.Coin.withdraw_(sender, $.copy(a_y), $c, [$p[1]]), $c, [$p[0], $p[1]]);
   sender_addr = Std.Signer.address_of_(sender, $c);
   lp = mint_($c, [$p[0], $p[1]]);
-  lp_amount = Aptos_framework.Coin.value_(lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
-  check_coin_store_(sender, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
-  Aptos_framework.Coin.deposit_($.copy(sender_addr), lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  lp_amount = Aptos_framework.Coin.value_(lp, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  check_coin_store_(sender, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  Aptos_framework.Coin.deposit_($.copy(sender_addr), lp, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return [$.copy(a_x), $.copy(a_y), $.copy(lp_amount)];
 }
 
@@ -310,14 +310,14 @@ export function burn_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let temp$1, amount_x, amount_y, balance_x, balance_x__2, balance_y, balance_y__3, liquidity, metadata, reserves, total_lp_supply, w_x, w_y;
-  metadata = $c.borrow_global_mut<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  metadata = $c.borrow_global_mut<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   if (!!$.copy(metadata.locked)) {
     throw $.abortCode($.copy(ERROR_ALREADY_LOCKED));
   }
   metadata.locked = true;
-  reserves = $c.borrow_global_mut<TokenPairReserve>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  reserves = $c.borrow_global_mut<TokenPairReserve>(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   [balance_x, balance_y] = token_balances_metadata_(metadata, $c, [$p[0], $p[1]]);
-  liquidity = Aptos_framework.Coin.value_(metadata.lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  liquidity = Aptos_framework.Coin.value_(metadata.lp, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   mint_fee_($.copy(reserves.reserve_x), $.copy(reserves.reserve_y), metadata, $c, [$p[0], $p[1]]);
   total_lp_supply = total_lp_supply_($c, [$p[0], $p[1]]);
   amount_x = u64(Safe_math.div_(Safe_math.mul_(u128($.copy(balance_x)), u128($.copy(liquidity)), $c), u128($.copy(total_lp_supply)), $c));
@@ -352,11 +352,11 @@ export function burn_lp_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let coins;
-  if (!(Aptos_framework.Coin.value_(metadata.lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])])).ge($.copy(amount))) {
+  if (!(Aptos_framework.Coin.value_(metadata.lp, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])])).ge($.copy(amount))) {
     throw $.abortCode($.copy(ERROR_INSUFFICIENT_LIQUIDITY));
   }
-  coins = Aptos_framework.Coin.extract_(metadata.lp, $.copy(amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
-  Aptos_framework.Coin.burn_(coins, metadata.burn_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  coins = Aptos_framework.Coin.extract_(metadata.lp, $.copy(amount), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  Aptos_framework.Coin.burn_(coins, metadata.burn_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -388,16 +388,16 @@ export function create_token_pair_ (
   if (!(($.copy(sender_addr)).hex() === ($.copy(MODULE_ADMIN)).hex())) {
     throw $.abortCode($.copy(ERROR_NOT_CREATOR));
   }
-  if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]]), $.copy(sender_addr))) {
+  if (!!$c.exists(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), $.copy(sender_addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
-  if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[1], $p[0]]), $.copy(sender_addr))) {
+  if (!!$c.exists(new SimpleStructTag(TokenPairReserve, [$p[1], $p[0]]), $.copy(sender_addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
-  [mint_cap, burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals), true, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]]), admin, new TokenPairReserve({ reserve_x: u64("0"), reserve_y: u64("0"), block_timestamp_last: u64("0") }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]])));
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), admin, new TokenPairMetadata({ locked: false, creator: $.copy(sender_addr), fee_to: $.copy(fee_to), fee_on: fee_on, k_last: u128("0"), lp: Aptos_framework.Coin.zero_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]), balance_x: Aptos_framework.Coin.zero_($c, [$p[0]]), balance_y: Aptos_framework.Coin.zero_($c, [$p[1]]), mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]])));
-  Aptos_framework.Coins.register_internal_(admin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  [mint_cap, burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  $c.move_to(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), admin, new TokenPairReserve({ reserve_x: u64("0"), reserve_y: u64("0"), block_timestamp_last: u64("0") }, new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]])));
+  $c.move_to(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), admin, new TokenPairMetadata({ locked: false, creator: $.copy(sender_addr), fee_to: $.copy(fee_to), fee_on: fee_on, k_last: u128("0"), lp: Aptos_framework.Coin.zero_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]), balance_x: Aptos_framework.Coin.zero_($c, [$p[0]]), balance_y: Aptos_framework.Coin.zero_($c, [$p[1]]), mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap) }, new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]])));
+  Aptos_framework.Coins.register_internal_(admin, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -407,7 +407,7 @@ export function deposit_x_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let metadata;
-  metadata = $c.borrow_global_mut<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  metadata = $c.borrow_global_mut<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   Aptos_framework.Coin.merge_(metadata.balance_x, amount, $c, [$p[0]]);
   return;
 }
@@ -418,7 +418,7 @@ export function deposit_y_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let metadata;
-  metadata = $c.borrow_global_mut<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  metadata = $c.borrow_global_mut<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   Aptos_framework.Coin.merge_(metadata.balance_y, amount, $c, [$p[1]]);
   return;
 }
@@ -452,7 +452,7 @@ export function get_reserves_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64, U64] {
   let reserve;
-  reserve = $c.borrow_global<TokenPairReserve>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  reserve = $c.borrow_global<TokenPairReserve>(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   return [$.copy(reserve.reserve_x), $.copy(reserve.reserve_y), $.copy(reserve.block_timestamp_last)];
 }
 
@@ -461,7 +461,7 @@ export function lp_balance_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): U64 {
-  return Aptos_framework.Coin.balance_($.copy(addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  return Aptos_framework.Coin.balance_($.copy(addr), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
 }
 
 export function mint_ (
@@ -469,12 +469,12 @@ export function mint_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let temp$1, amount_x, amount_y, balance_x, balance_y, l, liquidity, lp, metadata, reserves, total_supply;
-  metadata = $c.borrow_global_mut<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  metadata = $c.borrow_global_mut<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   if (!!$.copy(metadata.locked)) {
     throw $.abortCode($.copy(ERROR_ALREADY_LOCKED));
   }
   metadata.locked = true;
-  reserves = $c.borrow_global_mut<TokenPairReserve>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  reserves = $c.borrow_global_mut<TokenPairReserve>(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   [balance_x, balance_y] = token_balances_metadata_(metadata, $c, [$p[0], $p[1]]);
   amount_x = Safe_math.sub_(u128($.copy(balance_x)), u128($.copy(reserves.reserve_x)), $c);
   amount_y = Safe_math.sub_(u128($.copy(balance_y)), u128($.copy(reserves.reserve_y)), $c);
@@ -544,7 +544,7 @@ export function mint_lp_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
-  return Aptos_framework.Coin.mint_($.copy(amount), mint_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  return Aptos_framework.Coin.mint_($.copy(amount), mint_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
 }
 
 export function mint_lp_to_ (
@@ -555,8 +555,8 @@ export function mint_lp_to_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let coins;
-  coins = Aptos_framework.Coin.mint_($.copy(amount), mint_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
-  Aptos_framework.Coin.deposit_($.copy(to), coins, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  coins = Aptos_framework.Coin.mint_($.copy(amount), mint_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  Aptos_framework.Coin.deposit_($.copy(to), coins, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -587,7 +587,7 @@ export function register_account_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  Aptos_framework.Coins.register_internal_(sender, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  Aptos_framework.Coins.register_internal_(sender, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -600,7 +600,7 @@ export function remove_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64] {
   let amount_x, amount_y, coins, coins_x, coins_y;
-  coins = Aptos_framework.Coin.withdraw_(sender, $.copy(liquidity), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  coins = Aptos_framework.Coin.withdraw_(sender, $.copy(liquidity), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   [coins_x, coins_y] = remove_liquidity_direct_(coins, $.copy(amount_x_min), $.copy(amount_y_min), $c, [$p[0], $p[1]]);
   amount_x = Aptos_framework.Coin.value_(coins_x, $c, [$p[0]]);
   amount_y = Aptos_framework.Coin.value_(coins_y, $c, [$p[1]]);
@@ -646,7 +646,7 @@ export function swap_ (
   if (!temp$1) {
     throw $.abortCode($.copy(ERROR_INSUFFICIENT_OUTPUT_AMOUNT));
   }
-  reserves = $c.borrow_global_mut<TokenPairReserve>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairReserve", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  reserves = $c.borrow_global_mut<TokenPairReserve>(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   if (($.copy(amount_x_out)).lt($.copy(reserves.reserve_x))) {
     temp$2 = ($.copy(amount_y_out)).lt($.copy(reserves.reserve_y));
   }
@@ -656,7 +656,7 @@ export function swap_ (
   if (!temp$2) {
     throw $.abortCode($.copy(ERROR_INSUFFICIENT_LIQUIDITY));
   }
-  metadata = $c.borrow_global_mut<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  metadata = $c.borrow_global_mut<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   if (!!$.copy(metadata.locked)) {
     throw $.abortCode($.copy(ERROR_ALREADY_LOCKED));
   }
@@ -781,7 +781,7 @@ export function token_balances_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64] {
   let meta;
-  meta = $c.borrow_global<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  meta = $c.borrow_global<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   return token_balances_metadata_(meta, $c, [$p[0], $p[1]]);
 }
 
@@ -798,7 +798,7 @@ export function total_lp_supply_ (
   $p: TypeTag[], /* <X, Y>*/
 ): U128 {
   let temp$1;
-  temp$1 = Aptos_framework.Coin.supply_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  temp$1 = Aptos_framework.Coin.supply_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return Std.Option.get_with_default_(temp$1, u128("0"), $c, [AtomicTypeTag.U128]);
 }
 
@@ -808,8 +808,8 @@ export function tranfer_lp_coin_in_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let metadata;
-  metadata = $c.borrow_global_mut<TokenPairMetadata>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "TokenPairMetadata", [$p[0], $p[1]]), new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"));
-  Aptos_framework.Coin.merge_(metadata.lp, coins, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  metadata = $c.borrow_global_mut<TokenPairMetadata>(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"));
+  Aptos_framework.Coin.merge_(metadata.lp, coins, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 

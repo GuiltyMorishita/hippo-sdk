@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Coin_registry from "../coin_registry";
@@ -292,14 +292,24 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  add_liquidity_script(
+  payload_add_liquidity_script(
     amount_x: U64,
     amount_y: U64,
     $p: TypeTag[], /* <X, Y>*/
   ) {
     return buildPayload_add_liquidity_script(amount_x, amount_y, $p);
   }
-  create_new_pool_script(
+  async add_liquidity_script(
+    _account: AptosAccount,
+    amount_x: U64,
+    amount_y: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_add_liquidity_script(amount_x, amount_y, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_create_new_pool_script(
     lp_name: U8[],
     lp_symbol: U8[],
     k: U128,
@@ -313,17 +323,50 @@ export class App {
   ) {
     return buildPayload_create_new_pool_script(lp_name, lp_symbol, k, w1_numerator, w1_denominator, w2_numerator, w2_denominator, swap_fee_per_million, protocol_fee_share_per_thousand, $p);
   }
-  mock_deploy_script(
+  async create_new_pool_script(
+    _account: AptosAccount,
+    lp_name: U8[],
+    lp_symbol: U8[],
+    k: U128,
+    w1_numerator: U128,
+    w1_denominator: U128,
+    w2_numerator: U128,
+    w2_denominator: U128,
+    swap_fee_per_million: U64,
+    protocol_fee_share_per_thousand: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_create_new_pool_script(lp_name, lp_symbol, k, w1_numerator, w1_denominator, w2_numerator, w2_denominator, swap_fee_per_million, protocol_fee_share_per_thousand, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_mock_deploy_script(
   ) {
     return buildPayload_mock_deploy_script();
   }
-  remove_liquidity_script(
+  async mock_deploy_script(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_mock_deploy_script();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_remove_liquidity_script(
     liquidity: U64,
     $p: TypeTag[], /* <X, Y>*/
   ) {
     return buildPayload_remove_liquidity_script(liquidity, $p);
   }
-  swap_script(
+  async remove_liquidity_script(
+    _account: AptosAccount,
+    liquidity: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_remove_liquidity_script(liquidity, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_swap_script(
     x_in: U64,
     y_in: U64,
     x_min_out: U64,
@@ -331,6 +374,18 @@ export class App {
     $p: TypeTag[], /* <X, Y>*/
   ) {
     return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+  }
+  async swap_script(
+    _account: AptosAccount,
+    x_in: U64,
+    y_in: U64,
+    x_min_out: U64,
+    y_min_out: U64,
+    $p: TypeTag[], /* <X, Y>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

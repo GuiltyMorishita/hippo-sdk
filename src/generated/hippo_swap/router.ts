@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Std from "../std";
@@ -298,7 +298,7 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  three_step_route_script(
+  payload_three_step_route_script(
     first_pool_type: U8,
     first_is_x_to_y: boolean,
     second_pool_type: U8,
@@ -311,7 +311,23 @@ export class App {
   ) {
     return buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p);
   }
-  two_step_route_script(
+  async three_step_route_script(
+    _account: AptosAccount,
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    second_pool_type: U8,
+    second_is_x_to_y: boolean,
+    third_pool_type: U8,
+    third_is_x_to_y: boolean,
+    x_in: U64,
+    a_min_out: U64,
+    $p: TypeTag[], /* <X, Y, Z, A>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_two_step_route_script(
     first_pool_type: U8,
     first_is_x_to_y: boolean,
     second_pool_type: U8,
@@ -321,6 +337,20 @@ export class App {
     $p: TypeTag[], /* <X, Y, Z>*/
   ) {
     return buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+  }
+  async two_step_route_script(
+    _account: AptosAccount,
+    first_pool_type: U8,
+    first_is_x_to_y: boolean,
+    second_pool_type: U8,
+    second_is_x_to_y: boolean,
+    x_in: U64,
+    z_min_out: U64,
+    $p: TypeTag[], /* <X, Y, Z>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

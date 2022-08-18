@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Account from "./account";
@@ -55,10 +55,18 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  register(
+  payload_register(
     $p: TypeTag[], /* <CoinType>*/
   ) {
     return buildPayload_register($p);
+  }
+  async register(
+    _account: AptosAccount,
+    $p: TypeTag[], /* <CoinType>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_register($p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

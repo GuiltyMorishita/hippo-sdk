@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 export const packageName = "LiquidSwapInterface";
 export const moduleAddress = new HexString("0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9");
@@ -57,7 +57,7 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
-  register_pool_and_add_liquidity(
+  payload_register_pool_and_add_liquidity(
     _pool_type: U8,
     _x_amount: U64,
     _x_min_amount: U64,
@@ -66,6 +66,19 @@ export class App {
     $p: TypeTag[], /* <X, Y, LP>*/
   ) {
     return buildPayload_register_pool_and_add_liquidity(_pool_type, _x_amount, _x_min_amount, _y_amount, _y_min_amount, $p);
+  }
+  async register_pool_and_add_liquidity(
+    _account: AptosAccount,
+    _pool_type: U8,
+    _x_amount: U64,
+    _x_min_amount: U64,
+    _y_amount: U64,
+    _y_min_amount: U64,
+    $p: TypeTag[], /* <X, Y, LP>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_register_pool_and_add_liquidity(_pool_type, _x_amount, _x_min_amount, _y_amount, _y_min_amount, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

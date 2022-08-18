@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
 import * as Std from "../std";
@@ -188,7 +188,7 @@ export function add_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64, U64] {
   let actual_add_x, actual_add_y, current_x, current_y, opt_amt_x, opt_amt_y, opt_lp, pool, x_coin, y_coin;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   [opt_amt_x, opt_amt_y, opt_lp] = Piece_swap_math.get_add_liquidity_actual_amount_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), (u128($.copy(add_amt_x))).mul(u128($.copy(pool.x_deci_mult))), (u128($.copy(add_amt_y))).mul(u128($.copy(pool.y_deci_mult))), $c);
@@ -216,12 +216,12 @@ export function add_liquidity_direct_ (
   let actual_add_x, actual_add_x_coin, actual_add_y, actual_add_y_coin, add_amt_x, add_amt_y, current_x, current_y, lp_coin, opt_amt_x, opt_amt_y, opt_lp, pool;
   add_amt_x = Aptos_framework.Coin.value_(coin_x, $c, [$p[0]]);
   add_amt_y = Aptos_framework.Coin.value_(coin_y, $c, [$p[1]]);
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   [opt_amt_x, opt_amt_y, opt_lp] = Piece_swap_math.get_add_liquidity_actual_amount_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), (u128($.copy(add_amt_x))).mul(u128($.copy(pool.x_deci_mult))), (u128($.copy(add_amt_y))).mul(u128($.copy(pool.y_deci_mult))), $c);
   if (($.copy(opt_lp)).eq((u128("0")))) {
-    return [coin_x, coin_y, Aptos_framework.Coin.zero_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])])];
+    return [coin_x, coin_y, Aptos_framework.Coin.zero_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])])];
   }
   else{
   }
@@ -242,8 +242,8 @@ export function burn_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let amount;
-  amount = Aptos_framework.Coin.value_(lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
-  Aptos_framework.Coin.burn_(lp, pool.lp_burn_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  amount = Aptos_framework.Coin.value_(lp, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  Aptos_framework.Coin.burn_(lp, pool.lp_burn_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   pool.lp_amt = ($.copy(pool.lp_amt)).sub($.copy(amount));
   return;
 }
@@ -256,7 +256,7 @@ export function burn_from_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let coin_to_burn;
-  coin_to_burn = Aptos_framework.Coin.withdraw_(from, $.copy(amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  coin_to_burn = Aptos_framework.Coin.withdraw_(from, $.copy(amount), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   burn_direct_(coin_to_burn, pool, $c, [$p[0], $p[1]]);
   return;
 }
@@ -296,10 +296,10 @@ export function create_new_pool_ (
   if (!(($.copy(admin_addr)).hex() === ($.copy(MODULE_ADMIN)).hex())) {
     throw $.abortCode($.copy(ERROR_NOT_CREATOR));
   }
-  if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(admin_addr))) {
+  if (!!$c.exists(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(admin_addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
-  if (!!$c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[1], $p[0]]), $.copy(admin_addr))) {
+  if (!!$c.exists(new SimpleStructTag(PieceSwapPoolInfo, [$p[1], $p[0]]), $.copy(admin_addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[0]])) {
@@ -308,7 +308,7 @@ export function create_new_pool_ (
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
     throw $.abortCode($.copy(ERROR_COIN_NOT_INITIALIZED));
   }
-  [lp_mint_cap, lp_burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(lp_decimals), true, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  [lp_mint_cap, lp_burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(lp_decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   [xa, xb, m, n, k2] = Piece_swap_math.compute_initialization_constants_($.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $c);
   x_decimals = Aptos_framework.Coin.decimals_($c, [$p[0]]);
   y_decimals = Aptos_framework.Coin.decimals_($c, [$p[1]]);
@@ -325,8 +325,8 @@ export function create_new_pool_ (
     [temp$3, temp$4] = [temp$1, temp$2];
   }
   [x_deci_mult, y_deci_mult] = [temp$3, temp$4];
-  $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), admin, new PieceSwapPoolInfo({ reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_amt: u64("0"), lp_mint_cap: $.copy(lp_mint_cap), lp_burn_cap: $.copy(lp_burn_cap), K: $.copy(k), K2: $.copy(k2), Xa: $.copy(xa), Xb: $.copy(xb), m: $.copy(m), n: $.copy(n), x_deci_mult: u64($.copy(x_deci_mult)), y_deci_mult: u64($.copy(y_deci_mult)), swap_fee_per_million: $.copy(swap_fee_per_million), protocol_fee_share_per_thousand: $.copy(protocol_fee_share_per_thousand), protocol_fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), protocol_fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]])));
-  Aptos_framework.Coins.register_internal_(admin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  $c.move_to(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), admin, new PieceSwapPoolInfo({ reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_amt: u64("0"), lp_mint_cap: $.copy(lp_mint_cap), lp_burn_cap: $.copy(lp_burn_cap), K: $.copy(k), K2: $.copy(k2), Xa: $.copy(xa), Xb: $.copy(xb), m: $.copy(m), n: $.copy(n), x_deci_mult: u64($.copy(x_deci_mult)), y_deci_mult: u64($.copy(y_deci_mult)), swap_fee_per_million: $.copy(swap_fee_per_million), protocol_fee_share_per_thousand: $.copy(protocol_fee_share_per_thousand), protocol_fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), protocol_fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]) }, new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]])));
+  Aptos_framework.Coins.register_internal_(admin, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -337,7 +337,7 @@ export function mint_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let lp_coin;
-  lp_coin = Aptos_framework.Coin.mint_($.copy(amount), pool.lp_mint_cap, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  lp_coin = Aptos_framework.Coin.mint_($.copy(amount), pool.lp_mint_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   pool.lp_amt = ($.copy(pool.lp_amt)).add($.copy(amount));
   return lp_coin;
 }
@@ -351,7 +351,7 @@ export function mint_to_ (
 ): void {
   let lp_coin;
   lp_coin = mint_direct_($.copy(amount), pool, $c, [$p[0], $p[1]]);
-  check_and_deposit_(to, lp_coin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  check_and_deposit_(to, lp_coin, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
@@ -420,7 +420,7 @@ export function remove_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [U64, U64] {
   let actual_remove_x, actual_remove_y, current_x, current_y, opt_amt_x, opt_amt_y, pool, removed_x, removed_y;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
   [opt_amt_x, opt_amt_y] = Piece_swap_math.get_remove_liquidity_amounts_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), u128($.copy(remove_lp_amt)), $c);
@@ -440,10 +440,10 @@ export function remove_liquidity_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): [Aptos_framework.Coin.Coin, Aptos_framework.Coin.Coin] {
   let actual_remove_x, actual_remove_y, current_x, current_y, opt_amt_x, opt_amt_y, pool, remove_lp_amt, removed_x, removed_y;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   current_x = (u128(Aptos_framework.Coin.value_(pool.reserve_x, $c, [$p[0]]))).mul(u128($.copy(pool.x_deci_mult)));
   current_y = (u128(Aptos_framework.Coin.value_(pool.reserve_y, $c, [$p[1]]))).mul(u128($.copy(pool.y_deci_mult)));
-  remove_lp_amt = Aptos_framework.Coin.value_(remove_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  remove_lp_amt = Aptos_framework.Coin.value_(remove_lp, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   [opt_amt_x, opt_amt_y] = Piece_swap_math.get_remove_liquidity_amounts_($.copy(current_x), $.copy(current_y), u128($.copy(pool.lp_amt)), u128($.copy(remove_lp_amt)), $c);
   actual_remove_x = u64(($.copy(opt_amt_x)).div(u128($.copy(pool.x_deci_mult))));
   actual_remove_y = u64(($.copy(opt_amt_y)).div(u128($.copy(pool.y_deci_mult))));
@@ -473,7 +473,7 @@ export function swap_x_to_y_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let temp$1, temp$2, actual_out_y, coin_y, out_y_after_fees, pool, protocol_fee_y, protocol_fees, total_fees;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   [temp$1, temp$2] = [pool, Aptos_framework.Coin.value_(coin_x, $c, [$p[0]])];
   actual_out_y = quote_x_to_y_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   Aptos_framework.Coin.merge_(pool.reserve_x, coin_x, $c, [$p[0]]);
@@ -506,7 +506,7 @@ export function swap_y_to_x_direct_ (
   $p: TypeTag[], /* <X, Y>*/
 ): Aptos_framework.Coin.Coin {
   let temp$1, temp$2, actual_out_x, coin_x, out_x_after_fees, pool, protocol_fee_x, protocol_fees, total_fees;
-  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "PieceSwapPoolInfo", [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
+  pool = $c.borrow_global_mut<PieceSwapPoolInfo>(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), $.copy(MODULE_ADMIN));
   [temp$1, temp$2] = [pool, Aptos_framework.Coin.value_(coin_y, $c, [$p[1]])];
   actual_out_x = quote_y_to_x_(temp$1, temp$2, $c, [$p[0], $p[1]]);
   Aptos_framework.Coin.merge_(pool.reserve_y, coin_y, $c, [$p[1]]);

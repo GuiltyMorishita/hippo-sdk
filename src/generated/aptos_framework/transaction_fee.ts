@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Coin from "./coin";
 import * as System_addresses from "./system_addresses";
@@ -59,7 +59,7 @@ export function burn_fee_ (
   fee: U64,
   $c: AptosDataCache,
 ): void {
-  Coin.burn_from_($.copy(account), $.copy(fee), $c.borrow_global<AptosCoinCapabilities>(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), new HexString("0x1")).burn_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
+  Coin.burn_from_($.copy(account), $.copy(fee), $c.borrow_global<AptosCoinCapabilities>(new SimpleStructTag(AptosCoinCapabilities), new HexString("0x1")).burn_cap, $c, [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]);
   return;
 }
 
@@ -69,7 +69,7 @@ export function store_aptos_coin_burn_cap_ (
   $c: AptosDataCache,
 ): void {
   System_addresses.assert_aptos_framework_(account, $c);
-  return $c.move_to(new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", []), account, new AptosCoinCapabilities({ burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0x1"), "transaction_fee", "AptosCoinCapabilities", [])));
+  return $c.move_to(new SimpleStructTag(AptosCoinCapabilities), account, new AptosCoinCapabilities({ burn_cap: $.copy(burn_cap) }, new SimpleStructTag(AptosCoinCapabilities)));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

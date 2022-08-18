@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Reconfiguration from "./reconfiguration";
@@ -62,10 +62,10 @@ export function initialize_ (
 ): void {
   Timestamp.assert_genesis_($c);
   System_addresses.assert_aptos_framework_(account, $c);
-  if (!!$c.exists(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), new HexString("0x1"))) {
+  if (!!$c.exists(new SimpleStructTag(ConsensusConfig), new HexString("0x1"))) {
     throw $.abortCode(Std.Error.already_exists_($.copy(ECONFIG), $c));
   }
-  $c.move_to(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), account, new ConsensusConfig({ config: Std.Vector.empty_($c, [AtomicTypeTag.U8]) }, new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", [])));
+  $c.move_to(new SimpleStructTag(ConsensusConfig), account, new ConsensusConfig({ config: Std.Vector.empty_($c, [AtomicTypeTag.U8]) }, new SimpleStructTag(ConsensusConfig)));
   return;
 }
 
@@ -76,7 +76,7 @@ export function set_ (
 ): void {
   let config_ref;
   System_addresses.assert_aptos_framework_(account, $c);
-  config_ref = $c.borrow_global_mut<ConsensusConfig>(new StructTag(new HexString("0x1"), "consensus_config", "ConsensusConfig", []), new HexString("0x1")).config;
+  config_ref = $c.borrow_global_mut<ConsensusConfig>(new SimpleStructTag(ConsensusConfig), new HexString("0x1")).config;
   $.set(config_ref, $.copy(config));
   Reconfiguration.reconfigure_($c);
   return;

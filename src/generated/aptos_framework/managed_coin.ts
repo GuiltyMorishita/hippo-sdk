@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 import * as Coin from "./coin";
@@ -68,10 +68,10 @@ export function burn_ (
 ): void {
   let account_addr, capabilities, to_burn;
   account_addr = Std.Signer.address_of_(account, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr))) {
+  if (!$c.exists(new SimpleStructTag(Capabilities, [$p[0]]), $.copy(account_addr))) {
     throw $.abortCode(Std.Error.not_found_($.copy(ENO_CAPABILITIES), $c));
   }
-  capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr));
+  capabilities = $c.borrow_global<Capabilities>(new SimpleStructTag(Capabilities, [$p[0]]), $.copy(account_addr));
   to_burn = Coin.withdraw_(account, $.copy(amount), $c, [$p[0]]);
   Coin.burn_(to_burn, capabilities.burn_cap, $c, [$p[0]]);
   return;
@@ -103,7 +103,7 @@ export function initialize_ (
 ): void {
   let burn_cap, mint_cap;
   [mint_cap, burn_cap] = Coin.initialize_(account, Std.String.utf8_($.copy(name), $c), Std.String.utf8_($.copy(symbol), $c), $.copy(decimals), monitor_supply, $c, [$p[0]]);
-  $c.move_to(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), account, new Capabilities({ mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap) }, new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]])));
+  $c.move_to(new SimpleStructTag(Capabilities, [$p[0]]), account, new Capabilities({ mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap) }, new SimpleStructTag(Capabilities, [$p[0]])));
   return;
 }
 
@@ -137,10 +137,10 @@ export function mint_ (
 ): void {
   let account_addr, capabilities, coins_minted;
   account_addr = Std.Signer.address_of_(account, $c);
-  if (!$c.exists(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr))) {
+  if (!$c.exists(new SimpleStructTag(Capabilities, [$p[0]]), $.copy(account_addr))) {
     throw $.abortCode(Std.Error.not_found_($.copy(ENO_CAPABILITIES), $c));
   }
-  capabilities = $c.borrow_global<Capabilities>(new StructTag(new HexString("0x1"), "managed_coin", "Capabilities", [$p[0]]), $.copy(account_addr));
+  capabilities = $c.borrow_global<Capabilities>(new SimpleStructTag(Capabilities, [$p[0]]), $.copy(account_addr));
   coins_minted = Coin.mint_($.copy(amount), capabilities.mint_cap, $c, [$p[0]]);
   Coin.deposit_($.copy(dst_addr), coins_minted, $c, [$p[0]]);
   return;
@@ -208,13 +208,22 @@ export class App {
     }
     return val;
   }
-  burn(
+  payload_burn(
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
   ) {
     return buildPayload_burn(amount, $p);
   }
-  initialize(
+  async burn(
+    _account: AptosAccount,
+    amount: U64,
+    $p: TypeTag[], /* <CoinType>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_burn(amount, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_initialize(
     name: U8[],
     symbol: U8[],
     decimals: U64,
@@ -223,17 +232,47 @@ export class App {
   ) {
     return buildPayload_initialize(name, symbol, decimals, monitor_supply, $p);
   }
-  mint(
+  async initialize(
+    _account: AptosAccount,
+    name: U8[],
+    symbol: U8[],
+    decimals: U64,
+    monitor_supply: boolean,
+    $p: TypeTag[], /* <CoinType>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_initialize(name, symbol, decimals, monitor_supply, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_mint(
     dst_addr: HexString,
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
   ) {
     return buildPayload_mint(dst_addr, amount, $p);
   }
-  register(
+  async mint(
+    _account: AptosAccount,
+    dst_addr: HexString,
+    amount: U64,
+    $p: TypeTag[], /* <CoinType>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_mint(dst_addr, amount, $p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_register(
     $p: TypeTag[], /* <CoinType>*/
   ) {
     return buildPayload_register($p);
+  }
+  async register(
+    _account: AptosAccount,
+    $p: TypeTag[], /* <CoinType>*/
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_register($p);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }
 

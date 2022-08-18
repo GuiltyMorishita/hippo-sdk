@@ -8,13 +8,11 @@ export function typeInfoToTypeTag(typeInfo: AptosStdlib.Type_info.TypeInfo) {
   return parseTypeTagOrThrow(fullname);
 }
 
-export function typeTagToTypeInfo(tag: TypeTag): AptosStdlib.Type_info.TypeInfo {
-  const fullname = getTypeTagFullname(tag);
-  const [addr, modName, structName] = fullname.split("::");
+export function typeTagToTypeInfo(tag: StructTag): AptosStdlib.Type_info.TypeInfo {
   return new AptosStdlib.Type_info.TypeInfo({
-    account_address: new HexString(addr),
-    module_name: strToU8(modName),
-    struct_name: strToU8(structName),
+    account_address: tag.address,
+    module_name: strToU8(tag.module),
+    struct_name: strToU8(tag.name),
   }, new StructTag(AptosStdlib.Type_info.moduleAddress, AptosStdlib.Type_info.moduleName, AptosStdlib.Type_info.TypeInfo.structName, []))
 }
 

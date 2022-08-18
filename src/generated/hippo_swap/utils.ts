@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 export const packageName = "hippo-swap";
@@ -91,21 +91,21 @@ export function compute_pool_list_ (
   $c: AptosDataCache,
 ): PoolList {
   let list;
-  list = Std.Vector.empty_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolInfo", [])]);
-  Std.Vector.push_back_(list, new PoolInfo({ pool_type: u8("0"), pool_idx: u8("0") }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolInfo", [])), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolInfo", [])]);
-  return new PoolList({ list: $.copy(list) }, new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolList", []));
+  list = Std.Vector.empty_($c, [new SimpleStructTag(PoolInfo)]);
+  Std.Vector.push_back_(list, new PoolInfo({ pool_type: u8("0"), pool_idx: u8("0") }, new SimpleStructTag(PoolInfo)), $c, [new SimpleStructTag(PoolInfo)]);
+  return new PoolList({ list: $.copy(list) }, new SimpleStructTag(PoolList));
 }
 
 export function get_pool_list_ (
   user: HexString,
   $c: AptosDataCache,
 ): void {
-  if ($c.exists(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolList", []), Std.Signer.address_of_(user, $c))) {
-    $c.move_from<PoolList>(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolList", []), Std.Signer.address_of_(user, $c));
+  if ($c.exists(new SimpleStructTag(PoolList), Std.Signer.address_of_(user, $c))) {
+    $c.move_from<PoolList>(new SimpleStructTag(PoolList), Std.Signer.address_of_(user, $c));
   }
   else{
   }
-  return $c.move_to(new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolList", []), user, compute_pool_list_($c));
+  return $c.move_to(new SimpleStructTag(PoolList), user, compute_pool_list_($c));
 }
 
 
@@ -127,9 +127,18 @@ export async function query_get_pool_list(
   $p: TypeTag[],
 ) {
   const payload = buildPayload_get_pool_list();
-  const outputTypeTag = new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "utils", "PoolList", []);
+  const outputTypeTag = new SimpleStructTag(PoolList);
   const output = await $.simulatePayloadTx(client, account, payload);
   return $.takeSimulationValue<PoolList>(output, outputTypeTag, repo)
+}
+function make_query_get_pool_list(app: App) {
+  function maker(
+    account: AptosAccount,
+    $p: TypeTag[],
+  ) {
+    return query_get_pool_list(app.client, account, app.repo, $p)
+  }
+  return maker;
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolInfo", PoolInfo.PoolInfoParser);
@@ -156,9 +165,17 @@ export class App {
     }
     return val;
   }
-  get_pool_list(
+  payload_get_pool_list(
   ) {
     return buildPayload_get_pool_list();
   }
+  async get_pool_list(
+    _account: AptosAccount,
+    _maxGas = 1000,
+  ) {
+    const payload = buildPayload_get_pool_list();
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  get query_get_pool_list() { return make_query_get_pool_list(this); }
 }
 

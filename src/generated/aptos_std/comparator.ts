@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Std from "../std";
 export const packageName = "AptosStdlib";
@@ -81,11 +81,11 @@ export function compare_u8_vector_ (
       left_byte = $.copy(Std.Vector.borrow_(left, $.copy(idx), $c, [AtomicTypeTag.U8]));
       right_byte = $.copy(Std.Vector.borrow_(right, $.copy(idx), $c, [AtomicTypeTag.U8]));
       if (($.copy(left_byte)).lt($.copy(right_byte))) {
-        return new Result({ inner: $.copy(SMALLER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+        return new Result({ inner: $.copy(SMALLER) }, new SimpleStructTag(Result));
       }
       else{
         if (($.copy(left_byte)).gt($.copy(right_byte))) {
-          return new Result({ inner: $.copy(GREATER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+          return new Result({ inner: $.copy(GREATER) }, new SimpleStructTag(Result));
         }
         else{
         }
@@ -94,14 +94,14 @@ export function compare_u8_vector_ (
     }
 
   }if (($.copy(left_length)).lt($.copy(right_length))) {
-    temp$3 = new Result({ inner: $.copy(SMALLER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+    temp$3 = new Result({ inner: $.copy(SMALLER) }, new SimpleStructTag(Result));
   }
   else{
     if (($.copy(left_length)).gt($.copy(right_length))) {
-      temp$2 = new Result({ inner: $.copy(GREATER) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+      temp$2 = new Result({ inner: $.copy(GREATER) }, new SimpleStructTag(Result));
     }
     else{
-      temp$2 = new Result({ inner: $.copy(EQUAL) }, new StructTag(new HexString("0x1"), "comparator", "Result", []));
+      temp$2 = new Result({ inner: $.copy(EQUAL) }, new SimpleStructTag(Result));
     }
     temp$3 = temp$2;
   }

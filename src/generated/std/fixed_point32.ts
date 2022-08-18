@@ -3,7 +3,7 @@ import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@man
 import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag} from "@manahippo/move-to-ts";
+import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 export const packageName = "MoveStdlib";
 export const moduleAddress = new HexString("0x1");
@@ -72,14 +72,14 @@ export function create_from_rational_ (
   if (!($.copy(quotient)).le($.copy(MAX_U64))) {
     throw $.abortCode($.copy(ERATIO_OUT_OF_RANGE));
   }
-  return new FixedPoint32({ value: u64($.copy(quotient)) }, new StructTag(new HexString("0x1"), "fixed_point32", "FixedPoint32", []));
+  return new FixedPoint32({ value: u64($.copy(quotient)) }, new SimpleStructTag(FixedPoint32));
 }
 
 export function create_from_raw_value_ (
   value: U64,
   $c: AptosDataCache,
 ): FixedPoint32 {
-  return new FixedPoint32({ value: $.copy(value) }, new StructTag(new HexString("0x1"), "fixed_point32", "FixedPoint32", []));
+  return new FixedPoint32({ value: $.copy(value) }, new SimpleStructTag(FixedPoint32));
 }
 
 export function divide_u64_ (
