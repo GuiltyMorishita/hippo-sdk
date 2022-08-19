@@ -6,16 +6,15 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
-import * as Coin_registry from "../coin_registry";
+import * as Coin_list from "../coin_list";
 import * as Std from "../std";
 import * as Math from "./math";
-import * as Mock_coin from "./mock_coin";
-import * as Mock_deploy from "./mock_deploy";
 import * as Piece_swap from "./piece_swap";
 export const packageName = "hippo-swap";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
 export const moduleName = "piece_swap_script";
 
+export const E_LP_TOKEN_ALREADY_IN_COIN_LIST : U64 = u64("8");
 export const E_LP_TOKEN_ALREADY_REGISTERED : U64 = u64("7");
 export const E_OUTPUT_LESS_THAN_MIN : U64 = u64("3");
 export const E_SWAP_NONZERO_INPUT_REQUIRED : U64 = u64("2");
@@ -58,7 +57,6 @@ export function create_new_pool_ (
   admin: HexString,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_description: U8[],
   lp_logo_url: U8[],
   lp_project_url: U8[],
   k: U128,
@@ -73,25 +71,42 @@ export function create_new_pool_ (
 ): void {
   let admin_addr, decimals, decimals__1;
   admin_addr = Std.Signer.address_of_(admin, $c);
-  if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
+  if (!Coin_list.Coin_list.is_registry_initialized_($c)) {
     throw $.abortCode($.copy(E_TOKEN_REGISTRY_NOT_INITIALIZED));
   }
-  if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[0]])) {
+  if (!Coin_list.Coin_list.is_coin_registered_($c, [$p[0]])) {
     throw $.abortCode($.copy(E_TOKEN_X_NOT_REGISTERED));
   }
-  if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[1]])) {
+  if (!Coin_list.Coin_list.is_coin_registered_($c, [$p[1]])) {
     throw $.abortCode($.copy(E_TOKEN_Y_NOT_REGISTERED));
   }
-  if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])])) {
+  if (!!Coin_list.Coin_list.is_coin_registered_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
-  if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[1], $p[0]])])) {
+  if (!!Coin_list.Coin_list.is_coin_registered_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[1], $p[0]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
+  }
+  if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])])) {
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
+  }
+  if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[1], $p[0]])])) {
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
   }
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
   Piece_swap.create_new_pool_(admin, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $.copy(swap_fee_per_million), $.copy(protocol_fee_share_per_thousand), $c, [$p[0], $p[1]]);
-  Coin_registry.Coin_registry.add_token_(admin, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8($.copy(decimals__1)), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_($.copy(lp_logo_url), $c), Std.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[0]]);
+  }
+  else{
+  }
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[1]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[1]]);
+  }
+  else{
+  }
+  Coin_list.Coin_list.add_to_list_(admin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
   return;
 }
 
@@ -109,7 +124,7 @@ export function create_new_pool_script_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  return create_new_pool_(admin, $.copy(lp_name), $.copy(lp_symbol), [], [], [], $.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $.copy(swap_fee_per_million), $.copy(protocol_fee_share_per_thousand), $c, [$p[0], $p[1]]);
+  return create_new_pool_(admin, $.copy(lp_name), $.copy(lp_symbol), [], [], $.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $.copy(swap_fee_per_million), $.copy(protocol_fee_share_per_thousand), $c, [$p[0], $p[1]]);
 }
 
 
@@ -148,26 +163,17 @@ export function mock_deploy_script_ (
   admin: HexString,
   $c: AptosDataCache,
 ): void {
-  let admin_addr, billion, initial_amount;
-  admin_addr = Std.Signer.address_of_(admin, $c);
-  if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
-    Coin_registry.Coin_registry.initialize_(admin, $c);
-  }
-  else{
-  }
-  Mock_deploy.init_coin_and_create_store_(admin, [u8("85"), u8("83"), u8("68"), u8("67")], [u8("85"), u8("83"), u8("68"), u8("67")], u64("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  Mock_deploy.init_coin_and_create_store_(admin, [u8("85"), u8("83"), u8("68"), u8("84")], [u8("85"), u8("83"), u8("68"), u8("84")], u64("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", [])]);
-  Mock_deploy.init_coin_and_create_store_(admin, [u8("68"), u8("65"), u8("73")], [u8("68"), u8("65"), u8("73")], u64("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WDAI", [])]);
+  let billion, initial_amount;
   billion = u128("1000000000");
-  create_new_pool_script_(admin, [u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("32"), u8("80"), u8("105"), u8("101"), u8("99"), u8("101"), u8("83"), u8("119"), u8("97"), u8("112"), u8("32"), u8("76"), u8("80"), u8("32"), u8("84"), u8("111"), u8("107"), u8("101"), u8("110")], [u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("80"), u8("83"), u8("95"), u8("76"), u8("80")], ($.copy(billion)).mul($.copy(billion)), u128("110"), u128("100"), u128("105"), u128("100"), u64("100"), u64("100"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  create_new_pool_script_(admin, [u8("68"), u8("65"), u8("73"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("32"), u8("80"), u8("105"), u8("101"), u8("99"), u8("101"), u8("83"), u8("119"), u8("97"), u8("112"), u8("32"), u8("76"), u8("80"), u8("32"), u8("84"), u8("111"), u8("107"), u8("101"), u8("110")], [u8("68"), u8("65"), u8("73"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("80"), u8("83"), u8("95"), u8("76"), u8("80")], ($.copy(billion)).mul($.copy(billion)), u128("110"), u128("100"), u128("105"), u128("100"), u64("100"), u64("100"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WDAI", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
+  create_new_pool_script_(admin, [u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("32"), u8("80"), u8("105"), u8("101"), u8("99"), u8("101"), u8("83"), u8("119"), u8("97"), u8("112"), u8("32"), u8("76"), u8("80"), u8("32"), u8("84"), u8("111"), u8("107"), u8("101"), u8("110")], [u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("80"), u8("83"), u8("95"), u8("76"), u8("80")], ($.copy(billion)).mul($.copy(billion)), u128("110"), u128("100"), u128("105"), u128("100"), u64("100"), u64("100"), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDT", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
+  create_new_pool_script_(admin, [u8("68"), u8("65"), u8("73"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("32"), u8("80"), u8("105"), u8("101"), u8("99"), u8("101"), u8("83"), u8("119"), u8("97"), u8("112"), u8("32"), u8("76"), u8("80"), u8("32"), u8("84"), u8("111"), u8("107"), u8("101"), u8("110")], [u8("68"), u8("65"), u8("73"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("80"), u8("83"), u8("95"), u8("76"), u8("80")], ($.copy(billion)).mul($.copy(billion)), u128("110"), u128("100"), u128("105"), u128("100"), u64("100"), u64("100"), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetDAI", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
   initial_amount = (u64("1000000")).mul(u64("100000000"));
-  Mock_coin.faucet_mint_to_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", [])]);
-  Mock_coin.faucet_mint_to_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  add_liquidity_script_(admin, $.copy(initial_amount), $.copy(initial_amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  Mock_coin.faucet_mint_to_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WDAI", [])]);
-  Mock_coin.faucet_mint_to_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  add_liquidity_script_(admin, $.copy(initial_amount), $.copy(initial_amount), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WDAI", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
+  Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDT", [])]);
+  Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
+  add_liquidity_script_(admin, $.copy(initial_amount), $.copy(initial_amount), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDT", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
+  Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetDAI", [])]);
+  Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
+  add_liquidity_script_(admin, $.copy(initial_amount), $.copy(initial_amount), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetDAI", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
   return;
 }
 

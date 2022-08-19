@@ -4,10 +4,9 @@ import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
 import * as Cp_scripts from './cp_scripts';
 import * as Cp_swap from './cp_swap';
 import * as Cp_swap_utils from './cp_swap_utils';
+import * as Devcoin_util from './devcoin_util';
 import * as Hippo_config from './hippo_config';
 import * as Math from './math';
-import * as Mock_coin from './mock_coin';
-import * as Mock_deploy from './mock_deploy';
 import * as Piece_swap from './piece_swap';
 import * as Piece_swap_math from './piece_swap_math';
 import * as Piece_swap_script from './piece_swap_script';
@@ -21,10 +20,9 @@ import * as Utils from './utils';
 export * as Cp_scripts from './cp_scripts';
 export * as Cp_swap from './cp_swap';
 export * as Cp_swap_utils from './cp_swap_utils';
+export * as Devcoin_util from './devcoin_util';
 export * as Hippo_config from './hippo_config';
 export * as Math from './math';
-export * as Mock_coin from './mock_coin';
-export * as Mock_deploy from './mock_deploy';
 export * as Piece_swap from './piece_swap';
 export * as Piece_swap_math from './piece_swap_math';
 export * as Piece_swap_script from './piece_swap_script';
@@ -40,10 +38,9 @@ export function loadParsers(repo: AptosParserRepo) {
   Cp_scripts.loadParsers(repo);
   Cp_swap.loadParsers(repo);
   Cp_swap_utils.loadParsers(repo);
+  Devcoin_util.loadParsers(repo);
   Hippo_config.loadParsers(repo);
   Math.loadParsers(repo);
-  Mock_coin.loadParsers(repo);
-  Mock_deploy.loadParsers(repo);
   Piece_swap.loadParsers(repo);
   Piece_swap_math.loadParsers(repo);
   Piece_swap_script.loadParsers(repo);
@@ -72,10 +69,9 @@ export class App {
   cp_scripts : Cp_scripts.App
   cp_swap : Cp_swap.App
   cp_swap_utils : Cp_swap_utils.App
+  devcoin_util : Devcoin_util.App
   hippo_config : Hippo_config.App
   math : Math.App
-  mock_coin : Mock_coin.App
-  mock_deploy : Mock_deploy.App
   piece_swap : Piece_swap.App
   piece_swap_math : Piece_swap_math.App
   piece_swap_script : Piece_swap_script.App
@@ -93,10 +89,9 @@ export class App {
     this.cp_scripts = new Cp_scripts.App(client, repo, cache);
     this.cp_swap = new Cp_swap.App(client, repo, cache);
     this.cp_swap_utils = new Cp_swap_utils.App(client, repo, cache);
+    this.devcoin_util = new Devcoin_util.App(client, repo, cache);
     this.hippo_config = new Hippo_config.App(client, repo, cache);
     this.math = new Math.App(client, repo, cache);
-    this.mock_coin = new Mock_coin.App(client, repo, cache);
-    this.mock_deploy = new Mock_deploy.App(client, repo, cache);
     this.piece_swap = new Piece_swap.App(client, repo, cache);
     this.piece_swap_math = new Piece_swap_math.App(client, repo, cache);
     this.piece_swap_script = new Piece_swap_script.App(client, repo, cache);

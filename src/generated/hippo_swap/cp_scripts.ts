@@ -6,15 +6,15 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
-import * as Coin_registry from "../coin_registry";
+import * as Coin_list from "../coin_list";
 import * as Std from "../std";
 import * as Cp_swap from "./cp_swap";
 import * as Math from "./math";
-import * as Mock_coin from "./mock_coin";
 export const packageName = "hippo-swap";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
 export const moduleName = "cp_scripts";
 
+export const E_LP_TOKEN_ALREADY_IN_COIN_LIST : U64 = u64("8");
 export const E_LP_TOKEN_ALREADY_REGISTERED : U64 = u64("7");
 export const E_OUTPUT_LESS_THAN_MIN : U64 = u64("3");
 export const E_SWAP_NONZERO_INPUT_REQUIRED : U64 = u64("2");
@@ -54,38 +54,54 @@ export function buildPayload_add_liquidity_script (
 }
 
 export function create_new_pool_ (
-  sender: HexString,
+  admin: HexString,
   fee_to: HexString,
   fee_on: boolean,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_description: U8[],
   lp_logo_url: U8[],
   lp_project_url: U8[],
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let admin_addr, decimals, decimals__1;
-  admin_addr = Std.Signer.address_of_(sender, $c);
-  if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
+  admin_addr = Std.Signer.address_of_(admin, $c);
+  if (!Coin_list.Coin_list.is_registry_initialized_($c)) {
     throw $.abortCode($.copy(E_TOKEN_REGISTRY_NOT_INITIALIZED));
   }
-  if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[0]])) {
+  if (!Coin_list.Coin_list.is_coin_registered_($c, [$p[0]])) {
     throw $.abortCode($.copy(E_TOKEN_X_NOT_REGISTERED));
   }
-  if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[1]])) {
+  if (!Coin_list.Coin_list.is_coin_registered_($c, [$p[1]])) {
     throw $.abortCode($.copy(E_TOKEN_Y_NOT_REGISTERED));
   }
-  if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])])) {
+  if (!!Coin_list.Coin_list.is_coin_registered_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
-  if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[1], $p[0]])])) {
+  if (!!Coin_list.Coin_list.is_coin_registered_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[1], $p[0]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
+  }
+  if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])])) {
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
+  }
+  if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[1], $p[0]])])) {
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
   }
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
-  Cp_swap.create_token_pair_(sender, $.copy(fee_to), fee_on, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $c, [$p[0], $p[1]]);
-  Coin_registry.Coin_registry.add_token_(sender, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8($.copy(decimals__1)), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  Cp_swap.create_token_pair_(admin, $.copy(fee_to), fee_on, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $c, [$p[0], $p[1]]);
+  Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_($.copy(lp_logo_url), $c), Std.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[0]]);
+  }
+  else{
+  }
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[1]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[1]]);
+  }
+  else{
+  }
+  Coin_list.Coin_list.add_to_list_(admin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
   return;
 }
 
@@ -95,13 +111,12 @@ export function create_new_pool_script_ (
   fee_on: boolean,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_description: U8[],
   lp_logo_url: U8[],
   lp_project_url: U8[],
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  create_new_pool_(sender, $.copy(fee_to), fee_on, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [$p[0], $p[1]]);
+  create_new_pool_(sender, $.copy(fee_to), fee_on, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [$p[0], $p[1]]);
   return;
 }
 
@@ -111,7 +126,6 @@ export function buildPayload_create_new_pool_script (
   fee_on: boolean,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_description: U8[],
   lp_logo_url: U8[],
   lp_project_url: U8[],
   $p: TypeTag[], /* <X, Y>*/
@@ -125,25 +139,11 @@ export function buildPayload_create_new_pool_script (
       $.payloadArg(fee_on),
       $.u8ArrayArg(lp_name),
       $.u8ArrayArg(lp_symbol),
-      $.u8ArrayArg(lp_description),
       $.u8ArrayArg(lp_logo_url),
       $.u8ArrayArg(lp_project_url),
     ]
   );
 
-}
-
-export function init_coin_and_create_store_ (
-  admin: HexString,
-  name: U8[],
-  symbol: U8[],
-  decimals: U8,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <CoinType>*/
-): void {
-  Mock_coin.initialize_(admin, u64("8"), $c, [$p[0]]);
-  Coin_registry.Coin_registry.add_token_(admin, $.copy(name), $.copy(symbol), $.copy(name), $.copy(decimals), [], [], $c, [$p[0]]);
-  return;
 }
 
 export function mock_create_pair_and_add_liquidity_ (
@@ -156,9 +156,9 @@ export function mock_create_pair_and_add_liquidity_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let some_lp, some_x, some_y, unused_x, unused_y;
-  create_new_pool_(admin, Std.Signer.address_of_(admin, $c), false, $.copy(symbol), $.copy(symbol), $.copy(symbol), [], [], $c, [$p[0], $p[1]]);
-  some_x = Mock_coin.mint_($.copy(left_amt), $c, [$p[0]]);
-  some_y = Mock_coin.mint_($.copy(right_amt), $c, [$p[1]]);
+  create_new_pool_(admin, Std.Signer.address_of_(admin, $c), false, $.copy(symbol), $.copy(symbol), [], [], $c, [$p[0], $p[1]]);
+  some_x = Coin_list.Devnet_coins.mint_($.copy(left_amt), $c, [$p[0]]);
+  some_y = Coin_list.Devnet_coins.mint_($.copy(right_amt), $c, [$p[1]]);
   [unused_x, unused_y, some_lp] = Cp_swap.add_liquidity_direct_(some_x, some_y, $c, [$p[0], $p[1]]);
   if (!(Aptos_framework.Coin.value_(unused_x, $c, [$p[0]])).eq((u64("0")))) {
     throw $.abortCode(u64("5"));
@@ -169,8 +169,8 @@ export function mock_create_pair_and_add_liquidity_ (
   if (!(Aptos_framework.Coin.value_(some_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])])).eq(($.copy(lp_amt)))) {
     throw $.abortCode(u64("5"));
   }
-  Mock_coin.burn_(unused_x, $c, [$p[0]]);
-  Mock_coin.burn_(unused_y, $c, [$p[1]]);
+  Coin_list.Devnet_coins.burn_(unused_x, $c, [$p[0]]);
+  Coin_list.Devnet_coins.burn_(unused_y, $c, [$p[1]]);
   Aptos_framework.Coin.deposit_(Std.Signer.address_of_(admin, $c), some_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
   return;
 }
@@ -179,19 +179,10 @@ export function mock_deploy_script_ (
   admin: HexString,
   $c: AptosDataCache,
 ): void {
-  let admin_addr, btc_amt;
-  admin_addr = Std.Signer.address_of_(admin, $c);
-  if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
-    Coin_registry.Coin_registry.initialize_(admin, $c);
-  }
-  else{
-  }
-  init_coin_and_create_store_(admin, [u8("66"), u8("105"), u8("116"), u8("99"), u8("111"), u8("105"), u8("110")], [u8("66"), u8("84"), u8("67")], u8("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", [])]);
-  init_coin_and_create_store_(admin, [u8("85"), u8("83"), u8("68"), u8("67")], [u8("85"), u8("83"), u8("68"), u8("67")], u8("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  init_coin_and_create_store_(admin, [u8("85"), u8("83"), u8("68"), u8("84")], [u8("85"), u8("83"), u8("68"), u8("84")], u8("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", [])]);
+  let btc_amt;
   btc_amt = u64("1000000000");
-  mock_create_pair_and_add_liquidity_(admin, [u8("66"), u8("84"), u8("67"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("76"), u8("80")], $.copy(btc_amt), ($.copy(btc_amt)).mul(u64("10000")), (($.copy(btc_amt)).mul(u64("100"))).sub(u64("1000")), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  mock_create_pair_and_add_liquidity_(admin, [u8("66"), u8("84"), u8("67"), u8("45"), u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("76"), u8("80")], $.copy(btc_amt), ($.copy(btc_amt)).mul(u64("10000")), (($.copy(btc_amt)).mul(u64("100"))).sub(u64("1000")), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WBTC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", [])]);
+  mock_create_pair_and_add_liquidity_(admin, [u8("66"), u8("84"), u8("67"), u8("45"), u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("76"), u8("80")], $.copy(btc_amt), ($.copy(btc_amt)).mul(u64("10000")), (($.copy(btc_amt)).mul(u64("100"))).sub(u64("1000")), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetBTC", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", [])]);
+  mock_create_pair_and_add_liquidity_(admin, [u8("66"), u8("84"), u8("67"), u8("45"), u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("76"), u8("80")], $.copy(btc_amt), ($.copy(btc_amt)).mul(u64("10000")), (($.copy(btc_amt)).mul(u64("100"))).sub(u64("1000")), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetBTC", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDT", [])]);
   return;
 }
 
@@ -206,6 +197,7 @@ export function buildPayload_mock_deploy_script (
   );
 
 }
+
 export function remove_liquidity_script_ (
   sender: HexString,
   liquidity: U64,
@@ -343,12 +335,11 @@ export class App {
     fee_on: boolean,
     lp_name: U8[],
     lp_symbol: U8[],
-    lp_description: U8[],
     lp_logo_url: U8[],
     lp_project_url: U8[],
     $p: TypeTag[], /* <X, Y>*/
   ) {
-    return buildPayload_create_new_pool_script(fee_to, fee_on, lp_name, lp_symbol, lp_description, lp_logo_url, lp_project_url, $p);
+    return buildPayload_create_new_pool_script(fee_to, fee_on, lp_name, lp_symbol, lp_logo_url, lp_project_url, $p);
   }
   async create_new_pool_script(
     _account: AptosAccount,
@@ -356,13 +347,12 @@ export class App {
     fee_on: boolean,
     lp_name: U8[],
     lp_symbol: U8[],
-    lp_description: U8[],
     lp_logo_url: U8[],
     lp_project_url: U8[],
     $p: TypeTag[], /* <X, Y>*/
     _maxGas = 1000,
   ) {
-    const payload = buildPayload_create_new_pool_script(fee_to, fee_on, lp_name, lp_symbol, lp_description, lp_logo_url, lp_project_url, $p);
+    const payload = buildPayload_create_new_pool_script(fee_to, fee_on, lp_name, lp_symbol, lp_logo_url, lp_project_url, $p);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mock_deploy_script(

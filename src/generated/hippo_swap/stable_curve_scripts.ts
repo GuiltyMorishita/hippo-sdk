@@ -6,16 +6,15 @@ import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
 import * as Aptos_framework from "../aptos_framework";
-import * as Coin_registry from "../coin_registry";
+import * as Coin_list from "../coin_list";
 import * as Std from "../std";
 import * as Math from "./math";
-import * as Mock_coin from "./mock_coin";
-import * as Mock_deploy from "./mock_deploy";
 import * as Stable_curve_swap from "./stable_curve_swap";
 export const packageName = "hippo-swap";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
 export const moduleName = "stable_curve_scripts";
 
+export const E_LP_TOKEN_ALREADY_IN_COIN_LIST : U64 = u64("8");
 export const E_LP_TOKEN_ALREADY_REGISTERED : U64 = u64("7");
 export const E_OUTPUT_LESS_THAN_MIN : U64 = u64("3");
 export const E_SWAP_NONZERO_INPUT_REQUIRED : U64 = u64("2");
@@ -56,10 +55,9 @@ export function buildPayload_add_liquidity (
 }
 
 export function create_new_pool_ (
-  sender: HexString,
+  admin: HexString,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_description: U8[],
   lp_logo_url: U8[],
   lp_project_url: U8[],
   fee: U64,
@@ -68,28 +66,45 @@ export function create_new_pool_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let admin_addr, block_timestamp, decimals, decimals__1, future_time;
-  admin_addr = Std.Signer.address_of_(sender, $c);
-  if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
+  admin_addr = Std.Signer.address_of_(admin, $c);
+  if (!Coin_list.Coin_list.is_registry_initialized_($c)) {
     throw $.abortCode($.copy(E_TOKEN_REGISTRY_NOT_INITIALIZED));
   }
-  if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[0]])) {
+  if (!Coin_list.Coin_list.is_coin_registered_($c, [$p[0]])) {
     throw $.abortCode($.copy(E_TOKEN_X_NOT_REGISTERED));
   }
-  if (!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [$p[1]])) {
+  if (!Coin_list.Coin_list.is_coin_registered_($c, [$p[1]])) {
     throw $.abortCode($.copy(E_TOKEN_Y_NOT_REGISTERED));
   }
-  if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])])) {
+  if (!!Coin_list.Coin_list.is_coin_registered_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
   }
-  if (!!Coin_registry.Coin_registry.has_token_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[1], $p[0]])])) {
+  if (!!Coin_list.Coin_list.is_coin_registered_($c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[1], $p[0]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_REGISTERED));
+  }
+  if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])])) {
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
+  }
+  if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[1], $p[0]])])) {
+    throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
   }
   block_timestamp = Aptos_framework.Timestamp.now_microseconds_($c);
   future_time = ($.copy(block_timestamp)).add(((u64("24")).mul(u64("3600"))).mul($.copy(MICRO_CONVERSION_FACTOR)));
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
-  Stable_curve_swap.initialize_(sender, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals__1), u64("60"), u64("80"), $.copy(block_timestamp), $.copy(future_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
-  Coin_registry.Coin_registry.add_token_(sender, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_description), u8("8"), $.copy(lp_logo_url), $.copy(lp_project_url), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  Stable_curve_swap.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals__1), u64("60"), u64("80"), $.copy(block_timestamp), $.copy(future_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
+  Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_($.copy(lp_logo_url), $c), Std.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[0]]);
+  }
+  else{
+  }
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[1]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[1]]);
+  }
+  else{
+  }
+  Coin_list.Coin_list.add_to_list_(admin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
   return;
 }
 
@@ -104,7 +119,8 @@ export function mock_create_pair_and_add_liquidity_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  let decimals, decimals__1, future_A, future_A_time, initial_A, initial_A_time, name, some_lp, some_x, some_y, unused_x, unused_y;
+  let admin_addr, decimals, decimals__1, future_A, future_A_time, initial_A, initial_A_time, name, some_lp, some_x, some_y, unused_x, unused_y;
+  admin_addr = Std.Signer.address_of_(admin, $c);
   name = Std.String.utf8_($.copy(symbol), $c);
   [initial_A, future_A] = [u64("60"), u64("100")];
   initial_A_time = Aptos_framework.Timestamp.now_microseconds_($c);
@@ -112,37 +128,27 @@ export function mock_create_pair_and_add_liquidity_ (
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u64($.copy(decimals));
   Stable_curve_swap.initialize_(admin, $.copy(name), $.copy(name), $.copy(decimals__1), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
-  Coin_registry.Coin_registry.add_token_(admin, $.copy(symbol), $.copy(symbol), $.copy(symbol), u8($.copy(decimals__1)), [], [], $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
-  some_x = Mock_coin.mint_($.copy(left_amt), $c, [$p[0]]);
-  some_y = Mock_coin.mint_($.copy(right_amt), $c, [$p[1]]);
+  Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(symbol), $c), Std.String.utf8_($.copy(symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[0]]);
+  }
+  else{
+  }
+  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[1]])) {
+    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[1]]);
+  }
+  else{
+  }
+  Coin_list.Coin_list.add_to_list_(admin, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
+  some_x = Coin_list.Devnet_coins.mint_($.copy(left_amt), $c, [$p[0]]);
+  some_y = Coin_list.Devnet_coins.mint_($.copy(right_amt), $c, [$p[1]]);
   [unused_x, unused_y, some_lp] = Stable_curve_swap.add_liquidity_direct_(some_x, some_y, $c, [$p[0], $p[1]]);
   if (!(Aptos_framework.Coin.value_(some_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])])).eq(($.copy(lp_amt)))) {
     throw $.abortCode(u64("5"));
   }
-  Mock_coin.burn_(unused_x, $c, [$p[0]]);
-  Mock_coin.burn_(unused_y, $c, [$p[1]]);
-  Aptos_framework.Coin.deposit_(Std.Signer.address_of_(admin, $c), some_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
-  return;
-}
-
-export function mock_deploy_ (
-  admin: HexString,
-  $c: AptosDataCache,
-): void {
-  let admin_addr, admin_fee, coin_amt, fee;
-  admin_addr = Std.Signer.address_of_(admin, $c);
-  if (!Coin_registry.Coin_registry.is_registry_initialized_($.copy(admin_addr), $c)) {
-    Coin_registry.Coin_registry.initialize_(admin, $c);
-  }
-  else{
-  }
-  Mock_deploy.init_coin_and_create_store_(admin, [u8("85"), u8("83"), u8("68"), u8("67")], [u8("85"), u8("83"), u8("68"), u8("67")], u64("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", [])]);
-  Mock_deploy.init_coin_and_create_store_(admin, [u8("85"), u8("83"), u8("68"), u8("84")], [u8("85"), u8("83"), u8("68"), u8("84")], u64("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", [])]);
-  Mock_deploy.init_coin_and_create_store_(admin, [u8("68"), u8("65"), u8("73")], [u8("68"), u8("65"), u8("73")], u64("8"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WDAI", [])]);
-  [fee, admin_fee] = [u64("3000"), u64("200000")];
-  coin_amt = u64("1000000000");
-  mock_create_pair_and_add_liquidity_(admin, [u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("67"), u8("85"), u8("82"), u8("86"), u8("69"), u8("45"), u8("76"), u8("80")], $.copy(fee), $.copy(admin_fee), ($.copy(coin_amt)).mul(u64("100")), ($.copy(coin_amt)).mul(u64("100")), u64("200000000000"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDT", [])]);
-  mock_create_pair_and_add_liquidity_(admin, [u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("68"), u8("65"), u8("73"), u8("45"), u8("67"), u8("85"), u8("82"), u8("86"), u8("69"), u8("45"), u8("76"), u8("80")], $.copy(fee), $.copy(admin_fee), ($.copy(coin_amt)).mul(u64("100")), ($.copy(coin_amt)).mul(u64("100")), u64("200000000000"), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WUSDC", []), new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "mock_coin", "WDAI", [])]);
+  Coin_list.Devnet_coins.deposit_(admin, unused_x, $c, [$p[0]]);
+  Coin_list.Devnet_coins.deposit_(admin, unused_y, $c, [$p[1]]);
+  Coin_list.Devnet_coins.deposit_(admin, some_lp, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [$p[0], $p[1]])]);
   return;
 }
 
@@ -150,7 +156,11 @@ export function mock_deploy_script_ (
   admin: HexString,
   $c: AptosDataCache,
 ): void {
-  mock_deploy_(admin, $c);
+  let admin_fee, coin_amt, fee;
+  [fee, admin_fee] = [u64("3000"), u64("200000")];
+  coin_amt = u64("1000000000");
+  mock_create_pair_and_add_liquidity_(admin, [u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("85"), u8("83"), u8("68"), u8("84"), u8("45"), u8("67"), u8("85"), u8("82"), u8("86"), u8("69"), u8("45"), u8("76"), u8("80")], $.copy(fee), $.copy(admin_fee), ($.copy(coin_amt)).mul(u64("100")), ($.copy(coin_amt)).mul(u64("100")), u64("200000000000"), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDT", [])]);
+  mock_create_pair_and_add_liquidity_(admin, [u8("85"), u8("83"), u8("68"), u8("67"), u8("45"), u8("68"), u8("65"), u8("73"), u8("45"), u8("67"), u8("85"), u8("82"), u8("86"), u8("69"), u8("45"), u8("76"), u8("80")], $.copy(fee), $.copy(admin_fee), ($.copy(coin_amt)).mul(u64("100")), ($.copy(coin_amt)).mul(u64("100")), u64("200000000000"), $c, [new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetUSDC", []), new StructTag(new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"), "devnet_coins", "DevnetSOL", [])]);
   return;
 }
 
