@@ -15,7 +15,7 @@ export const moduleName = "devcoin_util";
 
 export function init_coin_ (
   coin_list_admin: HexString,
-  decimals: U64,
+  decimals: U8,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
 ): void {
@@ -31,7 +31,7 @@ export function init_coin_and_register_ (
   admin: HexString,
   name: U8[],
   symbol: U8[],
-  decimals: U64,
+  decimals: U8,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
 ): void {

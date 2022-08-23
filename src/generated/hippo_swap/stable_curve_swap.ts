@@ -46,14 +46,17 @@ export class LPCapability
   ];
   static fields: FieldDeclType[] = [
   { name: "mint_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
-  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) }];
+  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
+  { name: "freeze_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "FreezeCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) }];
 
   mint_cap: Aptos_framework.Coin.MintCapability;
   burn_cap: Aptos_framework.Coin.BurnCapability;
+  freeze_cap: Aptos_framework.Coin.FreezeCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.mint_cap = proto['mint_cap'] as Aptos_framework.Coin.MintCapability;
     this.burn_cap = proto['burn_cap'] as Aptos_framework.Coin.BurnCapability;
+    this.freeze_cap = proto['freeze_cap'] as Aptos_framework.Coin.FreezeCapability;
   }
 
   static LPCapabilityParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : LPCapability {
@@ -76,6 +79,7 @@ export class LPCapability
   async loadFullState(app: $.AppType) {
     await this.mint_cap.loadFullState(app);
     await this.burn_cap.loadFullState(app);
+    await this.freeze_cap.loadFullState(app);
     this.__app = app;
   }
 
@@ -128,7 +132,7 @@ export class StableCurvePoolInfo
   { name: "reserve_y", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(1)]) },
   { name: "fee_x", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(0)]) },
   { name: "fee_y", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(1)]) },
-  { name: "lp_precision", typeTag: AtomicTypeTag.U64 },
+  { name: "lp_precision", typeTag: AtomicTypeTag.U8 },
   { name: "multiplier_x", typeTag: AtomicTypeTag.U64 },
   { name: "multiplier_y", typeTag: AtomicTypeTag.U64 },
   { name: "fee", typeTag: AtomicTypeTag.U64 },
@@ -143,7 +147,7 @@ export class StableCurvePoolInfo
   reserve_y: Aptos_framework.Coin.Coin;
   fee_x: Aptos_framework.Coin.Coin;
   fee_y: Aptos_framework.Coin.Coin;
-  lp_precision: U64;
+  lp_precision: U8;
   multiplier_x: U64;
   multiplier_y: U64;
   fee: U64;
@@ -159,7 +163,7 @@ export class StableCurvePoolInfo
     this.reserve_y = proto['reserve_y'] as Aptos_framework.Coin.Coin;
     this.fee_x = proto['fee_x'] as Aptos_framework.Coin.Coin;
     this.fee_y = proto['fee_y'] as Aptos_framework.Coin.Coin;
-    this.lp_precision = proto['lp_precision'] as U64;
+    this.lp_precision = proto['lp_precision'] as U8;
     this.multiplier_x = proto['multiplier_x'] as U64;
     this.multiplier_y = proto['multiplier_y'] as U64;
     this.fee = proto['fee'] as U64;
@@ -355,7 +359,7 @@ export function check_and_deposit_ (
 }
 
 export function create_pool_info_ (
-  lp_precision: U64,
+  lp_decimals: U8,
   multiplier_x: U64,
   multiplier_y: U64,
   initial_A: U64,
@@ -367,7 +371,7 @@ export function create_pool_info_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): StableCurvePoolInfo {
-  return new StableCurvePoolInfo({ disabled: false, reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_precision: $.copy(lp_precision), multiplier_x: $.copy(multiplier_x), multiplier_y: $.copy(multiplier_y), fee: $.copy(fee), admin_fee: $.copy(admin_fee), initial_A: $.copy(initial_A), future_A: $.copy(future_A), initial_A_time: $.copy(initial_A_time), future_A_time: $.copy(future_A_time) }, new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]));
+  return new StableCurvePoolInfo({ disabled: false, reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_precision: $.copy(lp_decimals), multiplier_x: $.copy(multiplier_x), multiplier_y: $.copy(multiplier_y), fee: $.copy(fee), admin_fee: $.copy(admin_fee), initial_A: $.copy(initial_A), future_A: $.copy(future_A), initial_A_time: $.copy(initial_A_time), future_A_time: $.copy(future_A_time) }, new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]));
 }
 
 export function get_D_flat_ (
@@ -431,7 +435,7 @@ export function initialize_ (
   signer: HexString,
   lp_name: Std.String.String,
   lp_symbol: Std.String.String,
-  lp_decimal: U64,
+  lp_decimal: U8,
   initial_A: U64,
   future_A: U64,
   initial_A_time: U64,
@@ -441,14 +445,13 @@ export function initialize_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  let lp_precision, token_pair, x_decimal, x_rate, y_decimal, y_rate;
+  let token_pair, x_decimal, x_rate, y_decimal, y_rate;
   assert_admin_(signer, $c);
   [x_decimal, y_decimal] = [Aptos_framework.Coin.decimals_($c, [$p[0]]), Aptos_framework.Coin.decimals_($c, [$p[1]])];
-  lp_precision = u64(Math.pow_(u128("10"), u8($.copy(lp_decimal)), $c));
   x_rate = u64(Math.pow_(u128("10"), u8(($.copy(lp_decimal)).sub($.copy(x_decimal))), $c));
   y_rate = u64(Math.pow_(u128("10"), u8(($.copy(lp_decimal)).sub($.copy(y_decimal))), $c));
-  initialize_coin_(signer, $.copy(lp_name), $.copy(lp_symbol), u64($.copy(lp_precision)), $c, [$p[0], $p[1]]);
-  token_pair = create_pool_info_($.copy(lp_precision), $.copy(x_rate), $.copy(y_rate), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
+  initialize_coin_(signer, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_decimal), $c, [$p[0], $p[1]]);
+  token_pair = create_pool_info_($.copy(lp_decimal), $.copy(x_rate), $.copy(y_rate), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
   $c.move_to(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), signer, token_pair);
   return;
 }
@@ -457,11 +460,11 @@ export function initialize_coin_ (
   signer: HexString,
   name: Std.String.String,
   symbol: Std.String.String,
-  decimals: U64,
+  decimals: U8,
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  let addr, burn_capability, mint_capability;
+  let addr, burn_capability, freeze_capability, mint_capability;
   addr = Std.Signer.address_of_(signer, $c);
   if (!!$c.exists(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), $.copy(addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
@@ -475,9 +478,9 @@ export function initialize_coin_ (
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
     throw $.abortCode($.copy(ERROR_SWAP_INVALID_TOKEN_PAIR));
   }
-  [mint_capability, burn_capability] = Aptos_framework.Coin.initialize_(signer, $.copy(name), $.copy(symbol), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  [burn_capability, freeze_capability, mint_capability] = Aptos_framework.Coin.initialize_(signer, $.copy(name), $.copy(symbol), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   Aptos_framework.Coins.register_internal_(signer, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
-  $c.move_to(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), signer, new LPCapability({ mint_cap: $.copy(mint_capability), burn_cap: $.copy(burn_capability) }, new SimpleStructTag(LPCapability, [$p[0], $p[1]])));
+  $c.move_to(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), signer, new LPCapability({ mint_cap: $.copy(mint_capability), burn_cap: $.copy(burn_capability), freeze_cap: $.copy(freeze_capability) }, new SimpleStructTag(LPCapability, [$p[0], $p[1]])));
   return;
 }
 

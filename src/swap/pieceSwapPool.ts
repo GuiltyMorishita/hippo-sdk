@@ -1,18 +1,18 @@
 import { u64 } from '@manahippo/move-to-ts';
 import { Piece_swap_script } from '../generated/hippo_swap';
 import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
-import { TokenInfo } from '../generated/coin_registry/coin_registry';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 import { TransactionPayload } from 'aptos/dist/generated';
+import {CoinInfo} from "../generated/coin_list/coin_list";
 
 export class HippoPieceSwapPool extends HippoPool {
   constructor(
-    xTokenInfo: TokenInfo,
-    yTokenInfo: TokenInfo,
-    lpTokenInfo: TokenInfo,
+    xCoinInfo: CoinInfo,
+    yCoinInfo: CoinInfo,
+    lpCoinInfo: CoinInfo,
     public poolInfo: PieceSwapPoolInfo,
   ) {
-    super(xTokenInfo, yTokenInfo, lpTokenInfo);
+    super(xCoinInfo, yCoinInfo, lpCoinInfo);
   }
 
   xUiBalance() {

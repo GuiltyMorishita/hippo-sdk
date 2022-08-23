@@ -67,7 +67,9 @@ export function buildPayload_mock_deploy_econia (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnetv6::mock_deploy_econia",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "devnetv6",
+    "mock_deploy_econia",
     typeParamStrings,
     []
   );
@@ -88,7 +90,9 @@ export function buildPayload_mock_deploy_pontem (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnetv6::mock_deploy_pontem",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "devnetv6",
+    "mock_deploy_pontem",
     typeParamStrings,
     []
   );

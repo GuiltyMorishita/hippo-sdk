@@ -1,14 +1,15 @@
 import { u64 } from '@manahippo/move-to-ts';
 import { Cp_scripts, Cp_swap } from '../generated/hippo_swap';
-import { TokenInfo } from '../generated/coin_registry/coin_registry';
+import { App } from "../generated";
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 import { TransactionPayload } from 'aptos/dist/generated';
+import {CoinInfo} from "../generated/coin_list/coin_list";
 
 export class HippoConstantProductPool extends HippoPool {
   constructor(
-    xTokenInfo: TokenInfo,
-    yTokenInfo: TokenInfo,
-    lpTokenInfo: TokenInfo,
+    xTokenInfo: CoinInfo,
+    yTokenInfo: CoinInfo,
+    lpTokenInfo: CoinInfo,
     public cpPoolMeta: Cp_swap.TokenPairMetadata,
   ) {
     super(xTokenInfo, yTokenInfo, lpTokenInfo);
@@ -125,11 +126,11 @@ export class HippoConstantProductPool extends HippoPool {
   }
 
   async makeRemoveLiquidityPayload(
-    liqiudityAmt: UITokenAmount, 
+    liquidityAmt: UITokenAmount,
     lhsMinAmt: UITokenAmount, 
     rhsMinAmt: UITokenAmount,
   ): Promise<TransactionPayload> {
-    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
+    const liquidityRawAmt = u64(liquidityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
     const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
     const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
     return Cp_scripts.buildPayload_remove_liquidity_script(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams);

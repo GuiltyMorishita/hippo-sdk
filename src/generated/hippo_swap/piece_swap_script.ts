@@ -43,11 +43,13 @@ export function buildPayload_add_liquidity_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap_script::add_liquidity_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "piece_swap_script",
+    "add_liquidity_script",
     typeParamStrings,
     [
-      $.payloadArg(amount_x),
-      $.payloadArg(amount_y),
+      amount_x,
+      amount_y,
     ]
   );
 
@@ -93,7 +95,7 @@ export function create_new_pool_ (
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
   }
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
-  decimals__1 = u64($.copy(decimals));
+  decimals__1 = u8($.copy(decimals));
   Piece_swap.create_new_pool_(admin, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $.copy(swap_fee_per_million), $.copy(protocol_fee_share_per_thousand), $c, [$p[0], $p[1]]);
   Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_($.copy(lp_logo_url), $c), Std.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
   if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
@@ -142,18 +144,20 @@ export function buildPayload_create_new_pool_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap_script::create_new_pool_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "piece_swap_script",
+    "create_new_pool_script",
     typeParamStrings,
     [
-      $.u8ArrayArg(lp_name),
-      $.u8ArrayArg(lp_symbol),
-      $.payloadArg(k),
-      $.payloadArg(w1_numerator),
-      $.payloadArg(w1_denominator),
-      $.payloadArg(w2_numerator),
-      $.payloadArg(w2_denominator),
-      $.payloadArg(swap_fee_per_million),
-      $.payloadArg(protocol_fee_share_per_thousand),
+      lp_name,
+      lp_symbol,
+      k,
+      w1_numerator,
+      w1_denominator,
+      w2_numerator,
+      w2_denominator,
+      swap_fee_per_million,
+      protocol_fee_share_per_thousand,
     ]
   );
 
@@ -182,7 +186,9 @@ export function buildPayload_mock_deploy_script (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap_script::mock_deploy_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "piece_swap_script",
+    "mock_deploy_script",
     typeParamStrings,
     []
   );
@@ -206,10 +212,12 @@ export function buildPayload_remove_liquidity_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap_script::remove_liquidity_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "piece_swap_script",
+    "remove_liquidity_script",
     typeParamStrings,
     [
-      $.payloadArg(liquidity),
+      liquidity,
     ]
   );
 
@@ -275,13 +283,15 @@ export function buildPayload_swap_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap_script::swap_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "piece_swap_script",
+    "swap_script",
     typeParamStrings,
     [
-      $.payloadArg(x_in),
-      $.payloadArg(y_in),
-      $.payloadArg(x_min_out),
-      $.payloadArg(y_min_out),
+      x_in,
+      y_in,
+      x_min_out,
+      y_min_out,
     ]
   );
 

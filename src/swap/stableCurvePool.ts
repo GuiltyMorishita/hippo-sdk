@@ -1,18 +1,18 @@
 import { u64 } from '@manahippo/move-to-ts';
 import { Stable_curve_scripts, Stable_curve_swap } from '../generated/hippo_swap';
-import { TokenInfo } from '../generated/coin_registry/coin_registry';
 import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
 import { TransactionPayload } from 'aptos/dist/generated';
+import {CoinInfo} from "../generated/coin_list/coin_list";
 
 export class HippoStableCurvePool extends HippoPool {
   static FEE_DENOMINATOR = 10 ** 6;
   constructor(
-    xTokenInfo: TokenInfo,
-    yTokenInfo: TokenInfo,
-    lpTokenInfo: TokenInfo,
+    xCoinInfo: CoinInfo,
+    yCoinInfo: CoinInfo,
+    lpCoinInfo: CoinInfo,
     public stablePoolInfo: Stable_curve_swap.StableCurvePoolInfo,
   ) {
-    super(xTokenInfo, yTokenInfo, lpTokenInfo);
+    super(xCoinInfo, yCoinInfo, lpCoinInfo);
   }
   xUiBalance() {
     return this.stablePoolInfo.reserve_x .value.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());

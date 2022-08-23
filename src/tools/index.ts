@@ -1,65 +1,62 @@
-import { AptosParserRepo, getTypeTagFullname, StructTag, u8, u64, strToU8, u8str, DummyCache, parseTypeTagOrThrow, buildPayload, parseMoveStructTag } from "@manahippo/move-to-ts";
-import { AptosClient, HexString } from "aptos";
+import { getTypeTagFullname, StructTag, u64, strToU8, parseMoveStructTag } from "@manahippo/move-to-ts";
+import { AptosAccount, HexString } from "aptos";
 import { Command } from "commander";
-import { getProjectRepo } from "../generated";
+import { App, getProjectRepo } from "../generated";
 import { aptos_framework, hippo_swap } from "../generated/";
-import { Coin_registry } from "../generated/coin_registry";
+import { Devnet_coins } from "../generated/coin_list";
 import { printResource, printResources, typeInfoToTypeTag } from "../utils";
-import { readConfig, sendPayloadTx, simulatePayloadTx } from "./utils";
+import { readConfig, sendPayloadTx, simulatePayloadTx, strToString } from "./utils";
 import { HippoSwapClient } from "../swap/hippoSwapClient";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/aptos_framework/coin";
 import { PoolType } from "../swap/baseTypes";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
+import { Coin_list } from "../generated/coin_list"
 
 
 const actionShowTokenRegistry = async () => {
-  const {client, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokens = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
-  for(const tokInfo of tokens.token_info_list) {
+  const {app, hippoDexAddress, account} = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(account, hippoDexAddress, [])
+  for(const tokInfo of fullList.coin_info_list) {
     console.log(`########${tokInfo.symbol.str()}#######`);
     console.log(`name: ${tokInfo.name.str()}`);
-    console.log(`description: ${tokInfo.description.str()}`);
     console.log(`decimals: ${tokInfo.decimals.toJsNumber()}`);
     console.log(`logo_url: ${tokInfo.logo_url.str()}`);
     console.log(`project_url: ${tokInfo.project_url.str()}`);
     const tagName = getTypeTagFullname(typeInfoToTypeTag(tokInfo.token_type));
     console.log(`type: ${tagName}`);
-    console.log(`delisted: ${tokInfo.delisted}`);
     console.log("");
   }
 }
 
 const actionShowPools = async () => {
-  const {client, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const tokens = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
-  const tokenList = tokens.token_info_list;
-  for(const pi of tokenList) {
-    const structTag = typeInfoToTypeTag(pi.token_type);
+  const {app, hippoDexAddress, account} = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(account, hippoDexAddress, [])
+  for(const coinInfo of fullList.coin_info_list) {
+    const structTag = typeInfoToTypeTag(coinInfo.token_type);
     if (
       structTag instanceof StructTag &&
-      structTag.address.hex() === contractAddress.hex() &&
+      structTag.address.hex() === hippoDexAddress.hex() &&
       structTag.module === hippo_swap.Cp_swap.moduleName &&
       structTag.name === hippo_swap.Cp_swap.LPToken.structName
     ) {
       // found our LPToken!
       console.log(structTag.typeParams);
-      const poolMeta = await hippo_swap.Cp_swap.TokenPairMetadata.load(repo, client, contractAddress, structTag.typeParams);
+      const poolMeta = await app.hippo_swap.cp_swap.TokenPairMetadata.load(app.parserRepo, app.client, hippoDexAddress, structTag.typeParams);
       printResource(poolMeta);
-      const poolReserve = await hippo_swap.Cp_swap.TokenPairReserve.load(repo, client, contractAddress, structTag.typeParams);
+      const poolReserve = await app.hippo_swap.cp_swap.TokenPairReserve.load(app.parserRepo, app.client, hippoDexAddress, structTag.typeParams);
       printResource(poolReserve);
     }
     else if (
       structTag instanceof StructTag &&
-      structTag.address.hex() == contractAddress.hex() &&
+      structTag.address.hex() == hippoDexAddress.hex() &&
       structTag.module === hippo_swap.Stable_curve_swap.moduleName &&
       structTag.name === hippo_swap.Stable_curve_swap.LPToken.structName
     ){
       console.log(structTag.typeParams)
-      const poolMeta = await hippo_swap.Stable_curve_swap.StableCurvePoolInfo.load(repo, client, contractAddress, structTag.typeParams);
+
+      const poolMeta = await app.hippo_swap.stable_curve_swap.StableCurvePoolInfo.load(app.parserRepo, app.client, hippoDexAddress, structTag.typeParams);
       printResource(poolMeta);
     }
   }
@@ -67,17 +64,13 @@ const actionShowPools = async () => {
 
 const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: any) => {
   const amount = u64(rawAmount);
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
-  for(const ti of registry.token_info_list) {
-    if (ti.delisted) {
-      continue;
-    }
-    if (ti.symbol.str() === coinSymbol) {
-      const coinTypeTag = typeInfoToTypeTag(ti.token_type);
-      const payload = hippo_swap.Mock_coin.buildPayload_faucet_mint_to_script(amount, [coinTypeTag]);
-      const result = sendPayloadTx(client, account, payload);
+  const {app, hippoDexAddress, account} = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(account, hippoDexAddress, [])
+  for(const coinInfo of fullList.coin_info_list) {
+    if (coinInfo.symbol.str() === coinSymbol) {
+      const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
+      const payload = Devnet_coins.buildPayload_mint_to_wallet(amount, [coinTypeTag])
+      const result = sendPayloadTx(app.client, account, payload);
       console.log(result);
       return;
     }
@@ -86,17 +79,13 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: a
 }
 
 const actionShowWallet = async() => {
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
-  for(const ti of registry.token_info_list) {
-    if(ti.delisted) {
-      continue;
-    }
-    const coinTypeTag = typeInfoToTypeTag(ti.token_type);
+  const {app, hippoDexAddress, account} = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(account, hippoDexAddress, [])
+  for(const coinInfo of fullList.coin_info_list) {
+    const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
     try{
-      const coin = await aptos_framework.Coin.CoinStore.load(repo, client, account.address(), [coinTypeTag])
-      console.log(`${ti.symbol}: ${coin.coin.value}`);
+      const coin = await aptos_framework.Coin.CoinStore.load(app.parserRepo, app.client, account.address(), [coinTypeTag])
+      console.log(`${coinInfo.symbol}: ${coin.coin.value}`);
     }
     catch(e) {
       continue;
@@ -105,33 +94,31 @@ const actionShowWallet = async() => {
 }
 
 const getFromToAndLps = async(
-  repo: AptosParserRepo,
-  client: AptosClient,
-  contractAddress: HexString,
+  app: App,
+  hippoDexAddress: HexString,
   fromSymbol: string,
-  toSymbol: string
+  toSymbol: string,
+  fetcher: AptosAccount
 ) => {
-  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
+
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, hippoDexAddress, [])
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
-  for(const ti of registry.token_info_list) {
-    if(ti.delisted) {
-      continue;
-    }
-    const coinTypeTag = typeInfoToTypeTag(ti.token_type);
-    symbolToCoinTagFullname[ti.symbol.str()] = getTypeTagFullname(coinTypeTag);
-    if(ti.symbol.str() === fromSymbol) {
+  for(const coinInfo of fullList.coin_info_list) {
+    const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
+    symbolToCoinTagFullname[coinInfo.symbol.str()] = getTypeTagFullname(coinTypeTag);
+    if(coinInfo.symbol.str() === fromSymbol) {
       fromTag = coinTypeTag;
     }
-    else if(ti.symbol.str() === toSymbol) {
+    else if(coinInfo.symbol.str() === toSymbol) {
       toTag = coinTypeTag;
     }
 
     // look for our LP token
     if (
       coinTypeTag instanceof StructTag &&
-      coinTypeTag.address.hex() === contractAddress.hex() &&
+      coinTypeTag.address.hex() === hippoDexAddress.hex() &&
       coinTypeTag.module === hippo_swap.Cp_swap.moduleName &&
       coinTypeTag.name === hippo_swap.Cp_swap.LPToken.structName
     ) {
@@ -149,9 +136,8 @@ const getFromToAndLps = async(
 
 const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string) => {
   const amount = u64(amountIn);
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, fromSymbol, toSymbol);
+  const {app, client, account, hippoDexAddress} = readConfig(program);
+  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(app, hippoDexAddress, fromSymbol, toSymbol, account);
   const fromFullname = getTypeTagFullname(fromTag);
   const toFullname = getTypeTagFullname(toTag);
 
@@ -178,9 +164,8 @@ const actionSwap = async(fromSymbol: string, toSymbol: string, amountIn: string)
 const actionAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsAmtIn: string, rhsAmtIn: string) => {
   const lhsAmt = u64(lhsAmtIn);
   const rhsAmt = u64(rhsAmtIn);
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, lhsSymbol, rhsSymbol);
+  const {app, client, account, hippoDexAddress} = readConfig(program);
+  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(app, hippoDexAddress, lhsSymbol, rhsSymbol, account);
   const fromFullname = getTypeTagFullname(fromTag);
   const toFullname = getTypeTagFullname(toTag);
   for(const lpTag of lpTokenTags) {
@@ -198,9 +183,8 @@ const actionAddLiquidity = async(lhsSymbol: string, rhsSymbol: string, lhsAmtIn:
 
 const actionRemoveLiquidity = async(lhsSymbol: string, rhsSymbol: string, removeAmtStr: string) => {
   const removeAmt = u64(removeAmtStr);
-  const {client, account, contractAddress} = readConfig(program);
-  const repo = getProjectRepo();
-  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(repo, client, contractAddress, lhsSymbol, rhsSymbol);
+  const {app, client, account, hippoDexAddress} = readConfig(program);
+  const {fromTag, toTag, lpTokenTags} = await getFromToAndLps(app, hippoDexAddress, lhsSymbol, rhsSymbol, account);
   const fromFullname = getTypeTagFullname(fromTag);
   const toFullname = getTypeTagFullname(toTag);
   for(const lpTag of lpTokenTags) {
@@ -228,9 +212,9 @@ const actionMockDeploy = async () => {
 
 
 const actionListModules = async () => {
-  const {client, contractAddress} = readConfig(program);
+  const {client, hippoDexAddress} = readConfig(program);
   try{
-    const result = await client.getAccountModules(contractAddress);
+    const result = await client.getAccountModules(hippoDexAddress);
     printResources(result);
   }
   catch(e) {
@@ -298,16 +282,14 @@ program
 const testCommand = new Command("test");
 
 const testHippoClient = async () => {
-  const {client, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   swapClient.printSelf();
 }
 
 const testWalletClient = async () => {
-  const {client, account, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const walletClient = await HippoWalletClient.createInTwoCalls(netConf, client, repo, account.address());
+  const {app, account, netConf} = readConfig(program);
+  const walletClient = await HippoWalletClient.createInTwoCalls(netConf, app, account.address(), account);
   walletClient.debugPrint();
 }
 
@@ -316,19 +298,17 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
   if(uiAmountNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const {client, account, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const walletClient = await HippoWalletClient.createInTwoCalls(netConf, client, repo, account.address());
+  const {app, account, netConf} = readConfig(program);
+  const walletClient = await HippoWalletClient.createInTwoCalls(netConf, app, account.address(), account);
   const payload = await walletClient.makeFaucetMintToPayload(uiAmountNum, symbol);
-  await sendPayloadTx(client, account, payload);
+  await sendPayloadTx(app.client, account, payload);
   await walletClient.refreshStores();
   walletClient.debugPrint();
 }
 
 const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, account, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -340,14 +320,13 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
   }
   const {bestRoute} = result;
   const payload = await bestRoute.makeSwapPayload(uiAmtInNum, 0);
-  await sendPayloadTx(client, account, payload);
+  await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
 
 const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, account, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -359,15 +338,14 @@ const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmt
   }
   const {bestRoute} = result;
   const payload = await bestRoute.makeSwapPayload(uiAmtInNum, 0);
-  const simResult = await simulatePayloadTx(client, account, payload);
+  const simResult = await simulatePayloadTx(app.client, account, payload);
   printResource(simResult);
   await testWalletClient();
 }
 
 const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {client, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -395,16 +373,15 @@ function cliPoolTypeToPoolType(poolType: string): PoolType {
 }
 
 const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, account, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const lhsUiAmt = Number.parseFloat(lhsUiAmtStr);
   const rhsUiAmt = Number.parseFloat(rhsUiAmtStr);
   if(lhsUiAmt <= 0 || rhsUiAmt <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
   const poolType = cliPoolTypeToPoolType(poolTypeStr);
-  const pools = await swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
+  const pools = swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
   if (pools.length === 0) {
     return;
   }
@@ -417,20 +394,19 @@ const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhs
     return;
   }
   const payload = await pools[0].makeAddLiquidityPayload(lhsUiAmt, rhsUiAmt);
-  await sendPayloadTx(client, account, payload);
+  await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
 
 const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, liquidityUiAmtStr: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, account, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const liquidityUiAmt = Number.parseFloat(liquidityUiAmtStr);
   if(liquidityUiAmt <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
   const poolType = cliPoolTypeToPoolType(poolTypeStr);
-  const pools = await swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
+  const pools = swapClient.getDirectPoolsBySymbolsAndPoolType(lhsSymbol, rhsSymbol, poolType);
   if (pools.length === 0) {
     console.log("Corresponding pool does not exist");
     return;
@@ -444,22 +420,20 @@ const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, 
     return;
   }
   const payload = await pools[0].makeRemoveLiquidityPayload(liquidityUiAmt, 0, 0);
-  await sendPayloadTx(client, account, payload);
+  await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
 
 const testShowSupply = async(symbol: string) => {
-  const {client, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const supply = await swapClient.getTokenTotalSupplyBySymbol(symbol);
   console.log(supply);
 }
 
 const testShowRoutes = async(lhsSymbol: string, rhsSymbol: string) => {
-  const {client, netConf} = readConfig(program);
-  const repo = getProjectRepo();
-  const swapClient = await HippoSwapClient.createInOneCall(netConf, client, repo);
+  const {app, netConf} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
   const routes = swapClient.getSteppedRoutesBySymbol(lhsSymbol, rhsSymbol, 3);
   printResources(routes.map(r=>r.summarize()));
 }
@@ -533,7 +507,7 @@ program.addCommand(testCommand);
 // other random things
 
 const checkTestCoin = async () => {
-  const {client, account, contractAddress} = readConfig(program);
+  const {app, client, account, hippoDexAddress} = readConfig(program);
   const repo = getProjectRepo();
   const testCoinTag = new StructTag(
     aptos_framework.Aptos_coin.moduleAddress,
@@ -543,47 +517,77 @@ const checkTestCoin = async () => {
   );
   const testCoinInfo = await CoinInfo.load(repo, client, aptos_framework.Aptos_coin.moduleAddress, [testCoinTag])
   printResource(testCoinInfo);
-  const registry = await Coin_registry.TokenRegistry.load(repo, client, contractAddress, []);
-  for(const tokenInfo of registry.token_info_list) {
-    if(tokenInfo.delisted) {
-      continue;
-    }
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(account, hippoDexAddress, [])
+  for(const tokenInfo of fullList.coin_info_list) {
     const tag = typeInfoToTypeTag(tokenInfo.token_type);
     if(getTypeTagFullname(tag) === getTypeTagFullname(testCoinTag)) {
       console.log("Aptos already registered.");
       return;
     }
   }
-  const payload = Coin_registry.buildPayload_add_token_script(
-    strToU8("Aptos"),
-    strToU8("APT"),
-    strToU8("Aptos Coin"),
-    u8(testCoinInfo.decimals.value),
-    strToU8("https://miro.medium.com/max/3150/1*Gf747eyRywU8Img0tK5wvw.png"),
-    strToU8("https://aptoslabs.com/"),
+  const payload = app.coin_list.coin_list.payload_add_to_registry_by_signer(
+    strToString("Aptos", app.cache),
+    strToString("APT", app.cache),
+    strToString("Aptos Coin", app.cache),
+    strToString("https://miro.medium.com/max/3150/1*Gf747eyRywU8Img0tK5wvw.png", app.cache),
+    strToString("https://aptoslabs.com/", app.cache),
+    false,
     [testCoinTag]
   );
   const result = await sendPayloadTx(client, account, payload);
   console.log(result);
 }
 
-const updateTokenRegistry = async (symbol: string, description: string, logo_url: string, project_url: string) => {
-  const {client, account} = readConfig(program);
-  const payload = Coin_registry.buildPayload_update_token_info_script(
-    strToU8(symbol),
-    strToU8(description),
-    strToU8(logo_url),
-    strToU8(project_url),
+const updateTokenRegistry = async (name: string, symbol: string, coin_gecko_id: string, logo_url: string, project_url: string) => {
+  const {app, client, account} = readConfig(program);
+  const testCoinTag = new StructTag(
+      aptos_framework.Aptos_coin.moduleAddress,
+      aptos_framework.Aptos_coin.moduleName,
+      aptos_framework.Aptos_coin.AptosCoin.structName,
+      []
   );
+  const testCoinInfo = await CoinInfo.load(app.parserRepo, client, aptos_framework.Aptos_coin.moduleAddress, [testCoinTag])
+  printResource(testCoinInfo);
+  const payload = app.coin_list.coin_list.payload_add_to_registry_by_signer(
+      strToString(name, app.cache),
+      strToString(symbol, app.cache),
+      strToString(coin_gecko_id, app.cache),
+      strToString(logo_url, app.cache),
+      strToString(project_url, app.cache),
+      true,
+      [testCoinTag]
+  )
   await sendPayloadTx(client, account, payload, 3000);
 }
 
 const furnishMockTokenDetails = async () => {
   // yes we steal from solana-token-list
-  await updateTokenRegistry('USDT', 'Tether', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg', 'https://tether.to/');
-  await updateTokenRegistry('USDC', 'USDC', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png', 'https://www.centre.io/');
-  await updateTokenRegistry('DAI', 'DAI', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FYpdBuyAHSbdaAyD1sKkxyLWbAP8uUW9h6uvdhK74ij1/logo.png', 'https://makerdao.com/');
-  await updateTokenRegistry('BTC', 'Bitcoin', 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png', 'https://bitcoin.org');
+  await updateTokenRegistry(
+      'USDT',
+      'Tether',
+      'tether',
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg',
+      'https://tether.to/'
+  );
+  await updateTokenRegistry(
+      'USDC',
+      'USDC',
+      'usd-coin',
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png',
+      'https://www.centre.io/');
+  await updateTokenRegistry(
+      'DAI',
+      'DAI',
+      'dai',
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FYpdBuyAHSbdaAyD1sKkxyLWbAP8uUW9h6uvdhK74ij1/logo.png',
+      'https://makerdao.com/'
+  );
+  await updateTokenRegistry(
+      'BTC',
+      'Bitcoin',
+      'bitcoin',
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E/logo.png',
+      'https://bitcoin.org');
 }
 
 const others = new Command('others');
@@ -607,8 +611,8 @@ others
 program.addCommand(others);
 
 const pontemListPools = async () => {
-  const {client, contractAddress} = readConfig(program);
-  const resources = await client.getAccountResources(contractAddress);
+  const {client, hippoDexAddress} = readConfig(program);
+  const resources = await client.getAccountResources(hippoDexAddress);
   for(const resource of resources) {
     if (resource.type.indexOf("liquidity_pool::LiquidityPool") >= 0) {
       console.log("##########");
@@ -630,11 +634,11 @@ program.addCommand(pontem);
 
 
 const aggListTradingPools = async () => {
-  const {client, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
   for (const pool of agg.allPools) {
     console.log("###########");
-    console.log(`Pair: ${pool.xTokenInfo.symbol.str()} - ${pool.yTokenInfo.symbol.str()}`);
+    console.log(`Pair: ${pool.xCoinInfo.symbol.str()} - ${pool.yCoinInfo.symbol.str()}`);
     console.log(`Dex: ${DEX_TYPE_NAME[pool.dexType]}`);
     console.log(`PoolType: ${pool.poolType.toJsNumber()}`);
     console.log();
@@ -642,17 +646,11 @@ const aggListTradingPools = async () => {
 }
 
 const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
-  const {client, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
-  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
-  if (xTokInfos.length !== 1) {
-    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
-  }
-  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
-  if (yTokInfos.length !== 1) {
-    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
-  }
-  const routes = agg.getAllRoutes(xTokInfos[0], yTokInfos[0]);
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
+  const routes = agg.getAllRoutes(xCoinInfo, yCoinInfo);
   for (const route of routes) {
     console.log("###########");
     route.debugPrint();
@@ -660,18 +658,12 @@ const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
 }
 
 const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const {client, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
-  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
-  if (xTokInfos.length !== 1) {
-    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
-  }
-  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
-  if (yTokInfos.length !== 1) {
-    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
-  }
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
-  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
   for (const quote of quotes) {
     console.log("###########");
     quote.route.debugPrint();
@@ -681,93 +673,69 @@ const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: s
 }
 
 const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
-  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
-  if (xTokInfos.length !== 1) {
-    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
-  }
-  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
-  if (yTokInfos.length !== 1) {
-    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
-  }
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
-  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
   if (quotes.length === 0) {
     console.log("No route available");
     return;
   }
   const payload = quotes[0].route.makePaylod(inputAmt, 0);
-  await sendPayloadTx(client, account, payload);
+  await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
 
 const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, routeIdx: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
-  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
-  if (xTokInfos.length !== 1) {
-    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
-  }
-  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
-  if (yTokInfos.length !== 1) {
-    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
-  }
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
-  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
   if (quotes.length === 0) {
     console.log("No route available");
     return;
   }
   const payload = quotes[parseInt(routeIdx)].route.makePaylod(inputAmt, 0);
-  await sendPayloadTx(client, account, payload);
+  await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
 
 const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
-  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
-  if (xTokInfos.length !== 1) {
-    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
-  }
-  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
-  if (yTokInfos.length !== 1) {
-    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
-  }
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
   const minOutUiAmt = parseFloat(minOutAmt);
-  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
   if (quotes.length === 0) {
     console.log("No route available");
     return;
   }
   const payload = quotes[0].route.makePaylod(inputAmt, minOutUiAmt);
-  const simResult = await simulatePayloadTx(client, account, payload);
+  const simResult = await simulatePayloadTx(app.client, account, payload);
   printResource(simResult);
   await testWalletClient();
 }
 
 const aggSimulateSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string, routeIdx: string) => {
-  const {client, account, netConf} = readConfig(program);
-  const agg = await TradeAggregator.create(client, netConf);
-  const xTokInfos = agg.registryClient.getTokenInfoBySymbol(fromSymbol);
-  if (xTokInfos.length !== 1) {
-    throw new Error(`${fromSymbol} has ${xTokInfos.length} corresponding TokenInfo`);
-  }
-  const yTokInfos = agg.registryClient.getTokenInfoBySymbol(toSymbol);
-  if (yTokInfos.length !== 1) {
-    throw new Error(`${toSymbol} has ${yTokInfos.length} corresponding TokenInfo`);
-  }
+  const {app, account} = readConfig(program);
+  const agg = await TradeAggregator.create(app, account);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
   const minOutUiAmt = parseFloat(minOutAmt);
-  const quotes = await agg.getQuotes(inputAmt, xTokInfos[0], yTokInfos[0]);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
   if (quotes.length === 0) {
     console.log("No route available");
     return;
   }
   const payload = quotes[parseInt(routeIdx)].route.makePaylod(inputAmt, minOutUiAmt);
-  const simResult = await simulatePayloadTx(client, account, payload);
+  const simResult = await simulatePayloadTx(app.client, account, payload);
   printResource(simResult);
   await testWalletClient();
 }

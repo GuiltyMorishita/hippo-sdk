@@ -31,7 +31,9 @@ export function buildPayload_init_econia (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::init::init_econia",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "init",
+    "init_econia",
     typeParamStrings,
     []
   );

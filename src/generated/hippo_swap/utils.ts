@@ -113,7 +113,9 @@ export function buildPayload_get_pool_list (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::get_pool_list",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "utils",
+    "get_pool_list",
     typeParamStrings,
     []
   );

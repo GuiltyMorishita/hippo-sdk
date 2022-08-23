@@ -1,13 +1,13 @@
 import { AptosLocalCache, AptosParserRepo, TypeTag, u64, U64, u8 } from "@manahippo/move-to-ts";
 import { AptosClient, HexString, Types } from "aptos";
-import { getProjectRepo } from "../../generated";
+import {App, getProjectRepo} from "../../generated";
 import { EconiaClient } from "./EconiaClient";
-import { TokenInfo } from "../../generated/coin_registry/coin_registry";
 import { get_orders_sdk_, OrderBook } from "../../generated/econia/market";
 import { MarketInfo } from "../../generated/econia/registry";
-import { TokenRegistryClient } from "../../tokenRegistry";
+import { CoinListClient } from "../../coinList";
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from "../types";
 import { Registry } from "../../generated/econia";
+import {CoinInfo} from "../../generated/coin_list/coin_list";
 
 export * from "./EconiaClient";
 
@@ -17,8 +17,8 @@ export enum EconiaPoolType {
 
 export class EconiaTradingPoolV1 extends TradingPool {
   constructor(
-    public xInfo: TokenInfo,
-    public yInfo: TokenInfo,
+    public xInfo: CoinInfo,
+    public yInfo: CoinInfo,
     public orderBook: OrderBook | null,
     public mi: MarketInfo,
     public owner: HexString,
@@ -30,14 +30,14 @@ export class EconiaTradingPoolV1 extends TradingPool {
   get poolType() { return u8(EconiaPoolType.V1); }
   get isRoutable() { return true; }
   // X-Y
-  get xTokenInfo() {return this.xInfo; }
-  get yTokenInfo() {return this.yInfo; }
-  get xTag() { return this.xTokenInfo.token_type.toTypeTag(); }
-  get yTag() { return this.yTokenInfo.token_type.toTypeTag(); }
+  get xCoinInfo() {return this.xInfo; }
+  get yCoinInfo() {return this.yInfo; }
+  get xTag() { return this.xCoinInfo.token_type.toTypeTag(); }
+  get yTag() { return this.yCoinInfo.token_type.toTypeTag(); }
   // functions that depend on pool's onchain state
   isStateLoaded() { return !!this.orderBook; }
-  async reloadState(client: AptosClient): Promise<void> {
-    this.orderBook = await OrderBook.load(this.repo, client, this.owner, this.getMiTags())
+  async reloadState(app: App): Promise<void> {
+    this.orderBook = await OrderBook.load(this.repo, app.client, this.owner, this.getMiTags())
   }
   getMiTags(): TypeTag[] {
     return [
@@ -50,8 +50,8 @@ export class EconiaTradingPoolV1 extends TradingPool {
     if (!this.orderBook) {
       throw new Error("Econia Orderbook not loaded. cannot compute price");
     }
-    const xFactor = Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
-    const yFactor = Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+    const xFactor = Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+    const yFactor = Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
     const scaleFactor = this.orderBook.scale_factor.toJsNumber(); 
     // yToX price
     return rawPrice.toJsNumber() / yFactor / (scaleFactor / xFactor);
@@ -89,7 +89,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
     if (isXtoY) {
       // selling
       let soldBaseSize = u64(0);
-      let remainingBaseSize = u64(Math.floor(inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())));
+      let remainingBaseSize = u64(Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())));
       let gotQuoteSize = u64(0);
       for(const bid of bids) {
         if (remainingBaseSize.eq(u64(0))) {
@@ -104,11 +104,11 @@ export class EconiaTradingPoolV1 extends TradingPool {
         }
       }
       // has partial unfilled
-      const actualInputUiAmt = soldBaseSize.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
-      const outputUiAmt = gotQuoteSize.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+      const actualInputUiAmt = soldBaseSize.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+      const outputUiAmt = gotQuoteSize.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
       return {
-        inputSymbol: this.xTokenInfo.symbol.str(),
-        outputSymbol: this.yTokenInfo.symbol.str(),
+        inputSymbol: this.xCoinInfo.symbol.str(),
+        outputSymbol: this.yCoinInfo.symbol.str(),
         inputUiAmt: actualInputUiAmt,
         outputUiAmt,
         avgPrice: outputUiAmt / actualInputUiAmt,
@@ -118,7 +118,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
         // buying
         let gotBaseSize = u64(0);
         let soldQuoteSize = u64(0);
-        let remainingQuoteSize = u64(Math.floor(inputUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())));
+        let remainingQuoteSize = u64(Math.floor(inputUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())));
         for (const ask of asks) {
           if (remainingQuoteSize.eq(u64(0))) {
             break;
@@ -131,11 +131,11 @@ export class EconiaTradingPoolV1 extends TradingPool {
             gotBaseSize = gotBaseSize.add(fillQuoteSize.div(ask.price).mul(this.orderBook.scale_factor));
           }
         }
-        const actualInputUiAmt = soldQuoteSize.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
-        const outputUiAmt = gotBaseSize.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
+        const actualInputUiAmt = soldQuoteSize.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+        const outputUiAmt = gotBaseSize.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
         return {
-          inputSymbol: this.xTokenInfo.symbol.str(),
-          outputSymbol: this.yTokenInfo.symbol.str(),
+          inputSymbol: this.xCoinInfo.symbol.str(),
+          outputSymbol: this.yCoinInfo.symbol.str(),
           inputUiAmt: actualInputUiAmt,
           outputUiAmt,
           avgPrice: outputUiAmt / actualInputUiAmt,
@@ -156,12 +156,12 @@ export class EconiaTradingPoolV1 extends TradingPool {
 
 export class EconiaPoolProvider extends TradingPoolProvider {
   constructor(
-    public registry: TokenRegistryClient,
+    public registry: CoinListClient,
   ) {
     super();
   }
-  async loadPoolList(client: AptosClient): Promise<TradingPool[]> {
-    const econiaClient = new EconiaClient(client, Registry.moduleAddress);
+  async loadPoolList(app: App): Promise<TradingPool[]> {
+    const econiaClient = new EconiaClient(app.client, Registry.moduleAddress);
     const repo = getProjectRepo();
     const markets = await econiaClient.getMarkets();
     const pools : TradingPool[] = [];
@@ -169,8 +169,8 @@ export class EconiaPoolProvider extends TradingPoolProvider {
     markets.forEach(([mi, owner]) => {
       if(this.registry.hasTokenType(mi.base_coin_type) && this.registry.hasTokenType(mi.quote_coin_type)) {
         pools.push(new EconiaTradingPoolV1(
-          this.registry.getTokenInfoByType(mi.base_coin_type),
-          this.registry.getTokenInfoByType(mi.quote_coin_type),
+          this.registry.getCoinInfoByType(mi.base_coin_type),
+          this.registry.getCoinInfoByType(mi.quote_coin_type),
           null,
           mi,
           owner,

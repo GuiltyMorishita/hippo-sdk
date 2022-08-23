@@ -225,7 +225,9 @@ export function buildPayload_initialize (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::initialize",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "aggregatorv6",
+    "initialize",
     typeParamStrings,
     []
   );
@@ -264,14 +266,16 @@ export function buildPayload_one_step_route (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::one_step_route",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "aggregatorv6",
+    "one_step_route",
     typeParamStrings,
     [
-      $.payloadArg(first_dex_type),
-      $.payloadArg(first_pool_type),
-      $.payloadArg(first_is_x_to_y),
-      $.payloadArg(x_in),
-      $.payloadArg(y_min_out),
+      first_dex_type,
+      first_pool_type,
+      first_is_x_to_y,
+      x_in,
+      y_min_out,
     ]
   );
 
@@ -325,20 +329,22 @@ export function buildPayload_three_step_route (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::three_step_route",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "aggregatorv6",
+    "three_step_route",
     typeParamStrings,
     [
-      $.payloadArg(first_dex_type),
-      $.payloadArg(first_pool_type),
-      $.payloadArg(first_is_x_to_y),
-      $.payloadArg(second_dex_type),
-      $.payloadArg(second_pool_type),
-      $.payloadArg(second_is_x_to_y),
-      $.payloadArg(third_dex_type),
-      $.payloadArg(third_pool_type),
-      $.payloadArg(third_is_x_to_y),
-      $.payloadArg(x_in),
-      $.payloadArg(m_min_out),
+      first_dex_type,
+      first_pool_type,
+      first_is_x_to_y,
+      second_dex_type,
+      second_pool_type,
+      second_is_x_to_y,
+      third_dex_type,
+      third_pool_type,
+      third_is_x_to_y,
+      x_in,
+      m_min_out,
     ]
   );
 
@@ -384,17 +390,19 @@ export function buildPayload_two_step_route (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::two_step_route",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "aggregatorv6",
+    "two_step_route",
     typeParamStrings,
     [
-      $.payloadArg(first_dex_type),
-      $.payloadArg(first_pool_type),
-      $.payloadArg(first_is_x_to_y),
-      $.payloadArg(second_dex_type),
-      $.payloadArg(second_pool_type),
-      $.payloadArg(second_is_x_to_y),
-      $.payloadArg(x_in),
-      $.payloadArg(z_min_out),
+      first_dex_type,
+      first_pool_type,
+      first_is_x_to_y,
+      second_dex_type,
+      second_pool_type,
+      second_is_x_to_y,
+      x_in,
+      z_min_out,
     ]
   );
 

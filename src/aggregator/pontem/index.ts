@@ -1,11 +1,11 @@
 import { parseMoveStructTag, StructTag, TypeTag, u8 } from "@manahippo/move-to-ts";
 import { AptosClient, HexString, Types } from "aptos";
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from "../types";
-import { TokenInfo } from "../../generated/coin_registry/coin_registry";
-import { TokenRegistryClient } from "../../tokenRegistry";
+import { CoinListClient } from "../../coinList";
 import { typeTagToTypeInfo } from "../../utils";
-import { hippo_swap } from "../../generated";
+import {App, hippo_swap} from "../../generated";
 import bigInt from "big-integer";
+import {CoinInfo} from "../../generated/coin_list/coin_list";
 
 export enum PontemPoolTypes {
   Stable = 1,
@@ -16,8 +16,8 @@ export class PontemTradingPool extends TradingPool {
   pontemPool: object | null;
   constructor(
     public ownerAddress: HexString,
-    public _xTokenInfo: TokenInfo,
-    public _yTokenInfo: TokenInfo,
+    public _xCoinInfo: CoinInfo,
+    public _yCoinInfo: CoinInfo,
     public lpTag: StructTag,
     public poolResourceTag: StructTag,
   ) {
@@ -28,12 +28,12 @@ export class PontemTradingPool extends TradingPool {
   get poolType() { return u8(0); } // ignored
   get isRoutable() { return true; }
   // X-Y
-  get xTokenInfo() { return this._xTokenInfo;}
-  get yTokenInfo() { return this._yTokenInfo;}
+  get xCoinInfo() { return this._xCoinInfo;}
+  get yCoinInfo() { return this._yCoinInfo;}
   // state-dependent
   isStateLoaded(): boolean { return true; }
-  async reloadState(client: AptosClient): Promise<void> {
-    this.pontemPool = await client.getAccountResource(
+  async reloadState(app: App): Promise<void> {
+    this.pontemPool = await app.client.getAccountResource(
       this.ownerAddress,
       this.poolResourceTag.getAptosMoveTypeTag(),
     );
@@ -48,8 +48,8 @@ export class PontemTradingPool extends TradingPool {
     if (!this.pontemPool) {
       throw new Error("Pontem pool not loaded. cannot compute quote");
     }
-    const inputTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
-    const outputTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
+    const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
+    const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
     const coinXReserve = (this.pontemPool as any).data.coin_x_reserve.value as string;
     const coinYReserve = (this.pontemPool as any).data.coin_y_reserve.value as string;
     const coinInAmt = bigInt(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
@@ -81,22 +81,22 @@ export class PontemTradingPool extends TradingPool {
 
 export class PontemPoolProvider extends TradingPoolProvider {
   constructor(
-    public registry: TokenRegistryClient,
+    public registry: CoinListClient,
   ) {
     super();
   }
-  async loadPoolList(client: AptosClient): Promise<TradingPool[]> {
+  async loadPoolList(app: App): Promise<TradingPool[]> {
     const poolList: TradingPool[] = [];
     const ownerAddress = hippo_swap.Cp_swap.moduleAddress;
-    const resources = await client.getAccountResources(ownerAddress);
+    const resources = await app.client.getAccountResources(ownerAddress);
     for(const resource of resources) {
       if (resource.type.indexOf("liquidity_pool::LiquidityPool") >= 0) {
         const tag = parseMoveStructTag(resource.type);
         const xTag = tag.typeParams[0] as StructTag;
         const yTag = tag.typeParams[1] as StructTag;
         const lpTag = tag.typeParams[2] as StructTag;
-        const xTokInfo = this.registry.getTokenInfoByType(typeTagToTypeInfo(xTag));
-        const yTokInfo = this.registry.getTokenInfoByType(typeTagToTypeInfo(yTag));
+        const xTokInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
+        const yTokInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
         if (!xTokInfo || !yTokInfo) {
           continue;
         }

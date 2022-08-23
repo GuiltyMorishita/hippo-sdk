@@ -1,31 +1,30 @@
 import { AptosAccount, AptosClient, FaucetClient } from 'aptos';
-import { CONFIGS, getParserRepo, HippoSwapClient, HippoWalletClient } from '../src';
+import { CONFIGS, HippoSwapClient, HippoWalletClient } from '../src';
 import { printResource } from '../src/utils';
-import { AptosParserRepo } from '@manahippo/aptos-tsgen';
 import { sendPayloadTx } from '../src/tools/utils';
-
+import { App } from "../src/generated"
 const { localhost: HIPPO_CONF } = CONFIGS;
 
 
 describe('Integration Tests', () => {
   let client: AptosClient, account: AptosAccount, swapClient: HippoSwapClient, walletClient: HippoWalletClient;
-  let repo: AptosParserRepo;
+  let app: App
+  it('create app', async () => {
 
-  it('create dependency', async () => {
     client = new AptosClient(HIPPO_CONF.fullNodeUrl);
+    app = new App(client)
     account = new AptosAccount();
     const faucetClient = new FaucetClient(HIPPO_CONF.fullNodeUrl, HIPPO_CONF.faucetUrl);
     await faucetClient.fundAccount(account.address(), 100000);
-    repo = getParserRepo();
-    swapClient = await HippoSwapClient.createInOneCall(HIPPO_CONF, client, getParserRepo());
-    walletClient = await HippoWalletClient.createInTwoCalls(HIPPO_CONF, client, repo, account.address());
+    swapClient = await HippoSwapClient.createInOneCall(app, HIPPO_CONF);
+    walletClient = await HippoWalletClient.createInTwoCalls(HIPPO_CONF, app, account.address(), account);
 
   });
 
   it('get quotes of USDC -> DAI', async () => {
-    const result = await swapClient.getBestQuoteBySymbols('USDC', 'DAI', 10, 3);
-    const { bestQuote } = result!;
-    printResource(bestQuote);
+    // const result =app.hippo_swap.client.getBestQuoteBySymbols('USDC', 'DAI', 10, 3);
+    // const { bestQuote } = result!;
+    // printResource(bestQuote);
   });
 
   it('get quotes of BTC -> USDT', async () => {

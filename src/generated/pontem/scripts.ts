@@ -34,14 +34,16 @@ export function buildPayload_register_pool_and_add_liquidity (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9::scripts::register_pool_and_add_liquidity",
+    new HexString("0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9"),
+    "scripts",
+    "register_pool_and_add_liquidity",
     typeParamStrings,
     [
-      $.payloadArg(_pool_type),
-      $.payloadArg(_x_amount),
-      $.payloadArg(_x_min_amount),
-      $.payloadArg(_y_amount),
-      $.payloadArg(_y_min_amount),
+      _pool_type,
+      _x_amount,
+      _x_min_amount,
+      _y_amount,
+      _y_min_amount,
     ]
   );
 

@@ -97,7 +97,8 @@ export class TokenPairMetadata
   { name: "balance_x", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(0)]) },
   { name: "balance_y", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(1)]) },
   { name: "mint_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
-  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) }];
+  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
+  { name: "freeze_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "FreezeCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) }];
 
   locked: boolean;
   creator: HexString;
@@ -109,6 +110,7 @@ export class TokenPairMetadata
   balance_y: Aptos_framework.Coin.Coin;
   mint_cap: Aptos_framework.Coin.MintCapability;
   burn_cap: Aptos_framework.Coin.BurnCapability;
+  freeze_cap: Aptos_framework.Coin.FreezeCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.locked = proto['locked'] as boolean;
@@ -121,6 +123,7 @@ export class TokenPairMetadata
     this.balance_y = proto['balance_y'] as Aptos_framework.Coin.Coin;
     this.mint_cap = proto['mint_cap'] as Aptos_framework.Coin.MintCapability;
     this.burn_cap = proto['burn_cap'] as Aptos_framework.Coin.BurnCapability;
+    this.freeze_cap = proto['freeze_cap'] as Aptos_framework.Coin.FreezeCapability;
   }
 
   static TokenPairMetadataParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : TokenPairMetadata {
@@ -146,6 +149,7 @@ export class TokenPairMetadata
     await this.balance_y.loadFullState(app);
     await this.mint_cap.loadFullState(app);
     await this.burn_cap.loadFullState(app);
+    await this.freeze_cap.loadFullState(app);
     this.__app = app;
   }
 
@@ -379,11 +383,11 @@ export function create_token_pair_ (
   fee_on: boolean,
   lp_name: U8[],
   lp_symbol: U8[],
-  decimals: U64,
+  decimals: U8,
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  let burn_cap, mint_cap, sender_addr;
+  let burn_cap, freeze_cap, mint_cap, sender_addr;
   sender_addr = Std.Signer.address_of_(admin, $c);
   if (!(($.copy(sender_addr)).hex() === ($.copy(MODULE_ADMIN)).hex())) {
     throw $.abortCode($.copy(ERROR_NOT_CREATOR));
@@ -394,9 +398,9 @@ export function create_token_pair_ (
   if (!!$c.exists(new SimpleStructTag(TokenPairReserve, [$p[1], $p[0]]), $.copy(sender_addr))) {
     throw $.abortCode($.copy(ERROR_ALREADY_INITIALIZED));
   }
-  [mint_cap, burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  [burn_cap, freeze_cap, mint_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   $c.move_to(new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]]), admin, new TokenPairReserve({ reserve_x: u64("0"), reserve_y: u64("0"), block_timestamp_last: u64("0") }, new SimpleStructTag(TokenPairReserve, [$p[0], $p[1]])));
-  $c.move_to(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), admin, new TokenPairMetadata({ locked: false, creator: $.copy(sender_addr), fee_to: $.copy(fee_to), fee_on: fee_on, k_last: u128("0"), lp: Aptos_framework.Coin.zero_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]), balance_x: Aptos_framework.Coin.zero_($c, [$p[0]]), balance_y: Aptos_framework.Coin.zero_($c, [$p[1]]), mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap) }, new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]])));
+  $c.move_to(new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]), admin, new TokenPairMetadata({ locked: false, creator: $.copy(sender_addr), fee_to: $.copy(fee_to), fee_on: fee_on, k_last: u128("0"), lp: Aptos_framework.Coin.zero_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]), balance_x: Aptos_framework.Coin.zero_($c, [$p[0]]), balance_y: Aptos_framework.Coin.zero_($c, [$p[1]]), mint_cap: $.copy(mint_cap), burn_cap: $.copy(burn_cap), freeze_cap: $.copy(freeze_cap) }, new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]])));
   Aptos_framework.Coins.register_internal_(admin, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }

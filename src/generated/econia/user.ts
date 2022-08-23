@@ -312,12 +312,14 @@ export function buildPayload_deposit_collateral_coinstore (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::deposit_collateral_coinstore",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "user",
+    "deposit_collateral_coinstore",
     typeParamStrings,
     [
-      $.payloadArg(custodian_id),
-      $.payloadArg(base),
-      $.payloadArg(amount),
+      custodian_id,
+      base,
+      amount,
     ]
   );
 
@@ -521,10 +523,12 @@ export function buildPayload_register_market_account (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::register_market_account",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "user",
+    "register_market_account",
     typeParamStrings,
     [
-      $.payloadArg(custodian_id),
+      custodian_id,
     ]
   );
 
@@ -610,6 +614,9 @@ export function withdraw_collateral_coinstore_ (
   $p: TypeTag[], /* <B, Q, E>*/
 ): void {
   let market_account_info;
+  if (!($.copy(custodian_id)).eq(($.copy(NO_CUSTODIAN)))) {
+    throw $.abortCode($.copy(E_CUSTODIAN_OVERRIDE));
+  }
   market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
   if (base) {
     Aptos_framework.Coin.deposit_(Std.Signer.address_of_(user, $c), withdraw_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
@@ -629,12 +636,14 @@ export function buildPayload_withdraw_collateral_coinstore (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::user::withdraw_collateral_coinstore",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "user",
+    "withdraw_collateral_coinstore",
     typeParamStrings,
     [
-      $.payloadArg(custodian_id),
-      $.payloadArg(base),
-      $.payloadArg(amount),
+      custodian_id,
+      base,
+      amount,
     ]
   );
 

@@ -2,8 +2,8 @@ import { getTypeTagFullname, StructTag, u64, u8 } from "@manahippo/move-to-ts";
 import { Types } from "aptos";
 import bigInt from "big-integer";
 import { Router } from "../generated/hippo_swap";
-import { TokenInfo } from "../generated/coin_registry/coin_registry";
 import { typeInfoToTypeTag } from "../utils";
+import {CoinInfo} from "../generated/coin_list/coin_list";
 
 export type UITokenAmount = number;
 
@@ -42,9 +42,9 @@ export function poolTypeToName(poolType: PoolType) {
 }
 
 export abstract class TradeRoute {
-  constructor(
-    public xTokenInfo: TokenInfo,
-    public yTokenInfo: TokenInfo,
+  protected constructor(
+    public xTokenInfo: CoinInfo,
+    public yTokenInfo: CoinInfo,
   ) {
 
   }
@@ -71,10 +71,10 @@ export abstract class TradeRoute {
 }
 
 export abstract class HippoPool extends TradeRoute {
-  constructor(
-    xTokenInfo: TokenInfo,
-    yTokenInfo: TokenInfo,
-    public lpTokenInfo: TokenInfo,
+  protected constructor(
+    xTokenInfo: CoinInfo,
+    yTokenInfo: CoinInfo,
+    public lpTokenInfo: CoinInfo,
   ) {
     super(xTokenInfo, yTokenInfo);
   }

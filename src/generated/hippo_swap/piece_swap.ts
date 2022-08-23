@@ -68,6 +68,7 @@ export class PieceSwapPoolInfo
   { name: "lp_amt", typeTag: AtomicTypeTag.U64 },
   { name: "lp_mint_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
   { name: "lp_burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
+  { name: "lp_freeze_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "FreezeCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
   { name: "K", typeTag: AtomicTypeTag.U128 },
   { name: "K2", typeTag: AtomicTypeTag.U128 },
   { name: "Xa", typeTag: AtomicTypeTag.U128 },
@@ -86,6 +87,7 @@ export class PieceSwapPoolInfo
   lp_amt: U64;
   lp_mint_cap: Aptos_framework.Coin.MintCapability;
   lp_burn_cap: Aptos_framework.Coin.BurnCapability;
+  lp_freeze_cap: Aptos_framework.Coin.FreezeCapability;
   K: U128;
   K2: U128;
   Xa: U128;
@@ -105,6 +107,7 @@ export class PieceSwapPoolInfo
     this.lp_amt = proto['lp_amt'] as U64;
     this.lp_mint_cap = proto['lp_mint_cap'] as Aptos_framework.Coin.MintCapability;
     this.lp_burn_cap = proto['lp_burn_cap'] as Aptos_framework.Coin.BurnCapability;
+    this.lp_freeze_cap = proto['lp_freeze_cap'] as Aptos_framework.Coin.FreezeCapability;
     this.K = proto['K'] as U128;
     this.K2 = proto['K2'] as U128;
     this.Xa = proto['Xa'] as U128;
@@ -141,6 +144,7 @@ export class PieceSwapPoolInfo
     await this.reserve_y.loadFullState(app);
     await this.lp_mint_cap.loadFullState(app);
     await this.lp_burn_cap.loadFullState(app);
+    await this.lp_freeze_cap.loadFullState(app);
     await this.protocol_fee_x.loadFullState(app);
     await this.protocol_fee_y.loadFullState(app);
     this.__app = app;
@@ -280,7 +284,7 @@ export function create_new_pool_ (
   admin: HexString,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_decimals: U64,
+  lp_decimals: U8,
   k: U128,
   w1_numerator: U128,
   w1_denominator: U128,
@@ -291,7 +295,7 @@ export function create_new_pool_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
 ): void {
-  let temp$1, temp$2, temp$3, temp$4, admin_addr, k2, lp_burn_cap, lp_mint_cap, m, n, x_deci_mult, x_decimals, xa, xb, y_deci_mult, y_decimals;
+  let temp$1, temp$2, temp$3, temp$4, admin_addr, k2, lp_burn_cap, lp_freeze_cap, lp_mint_cap, m, n, x_deci_mult, x_decimals, xa, xb, y_deci_mult, y_decimals;
   admin_addr = Std.Signer.address_of_(admin, $c);
   if (!(($.copy(admin_addr)).hex() === ($.copy(MODULE_ADMIN)).hex())) {
     throw $.abortCode($.copy(ERROR_NOT_CREATOR));
@@ -308,7 +312,7 @@ export function create_new_pool_ (
   if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
     throw $.abortCode($.copy(ERROR_COIN_NOT_INITIALIZED));
   }
-  [lp_mint_cap, lp_burn_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(lp_decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  [lp_burn_cap, lp_freeze_cap, lp_mint_cap] = Aptos_framework.Coin.initialize_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), $.copy(lp_decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   [xa, xb, m, n, k2] = Piece_swap_math.compute_initialization_constants_($.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $c);
   x_decimals = Aptos_framework.Coin.decimals_($c, [$p[0]]);
   y_decimals = Aptos_framework.Coin.decimals_($c, [$p[1]]);
@@ -325,7 +329,7 @@ export function create_new_pool_ (
     [temp$3, temp$4] = [temp$1, temp$2];
   }
   [x_deci_mult, y_deci_mult] = [temp$3, temp$4];
-  $c.move_to(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), admin, new PieceSwapPoolInfo({ reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_amt: u64("0"), lp_mint_cap: $.copy(lp_mint_cap), lp_burn_cap: $.copy(lp_burn_cap), K: $.copy(k), K2: $.copy(k2), Xa: $.copy(xa), Xb: $.copy(xb), m: $.copy(m), n: $.copy(n), x_deci_mult: u64($.copy(x_deci_mult)), y_deci_mult: u64($.copy(y_deci_mult)), swap_fee_per_million: $.copy(swap_fee_per_million), protocol_fee_share_per_thousand: $.copy(protocol_fee_share_per_thousand), protocol_fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), protocol_fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]) }, new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]])));
+  $c.move_to(new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]]), admin, new PieceSwapPoolInfo({ reserve_x: Aptos_framework.Coin.zero_($c, [$p[0]]), reserve_y: Aptos_framework.Coin.zero_($c, [$p[1]]), lp_amt: u64("0"), lp_mint_cap: $.copy(lp_mint_cap), lp_burn_cap: $.copy(lp_burn_cap), lp_freeze_cap: $.copy(lp_freeze_cap), K: $.copy(k), K2: $.copy(k2), Xa: $.copy(xa), Xb: $.copy(xb), m: $.copy(m), n: $.copy(n), x_deci_mult: u64($.copy(x_deci_mult)), y_deci_mult: u64($.copy(y_deci_mult)), swap_fee_per_million: $.copy(swap_fee_per_million), protocol_fee_share_per_thousand: $.copy(protocol_fee_share_per_thousand), protocol_fee_x: Aptos_framework.Coin.zero_($c, [$p[0]]), protocol_fee_y: Aptos_framework.Coin.zero_($c, [$p[1]]) }, new SimpleStructTag(PieceSwapPoolInfo, [$p[0], $p[1]])));
   Aptos_framework.Coins.register_internal_(admin, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }

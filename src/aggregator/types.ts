@@ -1,7 +1,8 @@
 import { AtomicTypeTag, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
 import { AptosClient, Types } from "aptos";
-import { TokenInfo } from "../generated/coin_registry/coin_registry";
+import {CoinInfo} from "../generated/coin_list/coin_list";
 import { Aggregatorv6 } from "../generated/hippo_aggregator";
+import {App} from "../generated";
 
 export type UITokenAmount = number;
 export type UITokenAmountRatio = number;
@@ -41,13 +42,13 @@ export abstract class TradingPool {
   abstract get poolType(): PoolType;
   abstract get isRoutable(): boolean;
   // X-Y
-  abstract get xTokenInfo(): TokenInfo;
-  abstract get yTokenInfo(): TokenInfo;
-  get xTag() { return this.xTokenInfo.token_type.toTypeTag(); }
-  get yTag() { return this.yTokenInfo.token_type.toTypeTag(); }
+  abstract get xCoinInfo(): CoinInfo;
+  abstract get yCoinInfo(): CoinInfo;
+  get xTag() { return this.xCoinInfo.token_type.toTypeTag(); }
+  get yTag() { return this.yCoinInfo.token_type.toTypeTag(); }
   // functions that depend on pool's onchain state
   abstract isStateLoaded(): boolean;
-  abstract reloadState(client: AptosClient): Promise<void>;
+  abstract reloadState(app: App): Promise<void>;
   abstract getPrice(): PriceType;
   abstract getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType;
   // build payload directly if not routable
@@ -66,10 +67,10 @@ export class TradeStep {
 
   }
   get xTokenInfo() {
-    return this.isXtoY ? this.pool.xTokenInfo : this.pool.yTokenInfo;
+    return this.isXtoY ? this.pool.xCoinInfo : this.pool.yCoinInfo;
   }
   get yTokenInfo() {
-    return this.isXtoY ? this.pool.yTokenInfo : this.pool.xTokenInfo;
+    return this.isXtoY ? this.pool.yCoinInfo : this.pool.xCoinInfo;
   }
   get xTag() { return this.xTokenInfo.token_type.toTypeTag(); }
   get yTag() { return this.yTokenInfo.token_type.toTypeTag(); }
@@ -95,7 +96,7 @@ export class TradeStep {
 }
 
 export class TradeRoute {
-  tokens: TokenInfo[];
+  tokens: CoinInfo[];
   constructor(
     public readonly steps: TradeStep[],
   ) {
@@ -233,11 +234,11 @@ export interface RouteAndQuote {
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
 
-  abstract loadPoolList(client: AptosClient): Promise<TradingPool[]>;
+  abstract loadPoolList(app: App): Promise<TradingPool[]>;
 
-  async reloadAllPoolState(client: AptosClient) {
-    const pools = await this.loadPoolList(client);
-    const promises = pools.map(pool => pool.reloadState(client));
+  async reloadAllPoolState(app: App) {
+    const pools = await this.loadPoolList(app);
+    const promises = pools.map(pool => pool.reloadState(app));
     await Promise.all(promises);
   }
 }

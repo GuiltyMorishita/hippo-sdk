@@ -3,6 +3,9 @@ import { Command } from "commander";
 import * as fs from "fs";
 import * as yaml from "yaml";
 import { CONFIGS } from "../config";
+import { App } from "../generated";
+import {AptosDataCache, strToU8} from "@manahippo/move-to-ts";
+import * as Std from "../generated/std";
 
 export const readConfig = (program: Command) => {
   const {config, profile} = program.opts();
@@ -26,11 +29,12 @@ export const readConfig = (program: Command) => {
   const privateKey = new HexString(privateKeyStr);
   const isDevnet = (url as string).includes("devnet");
   const netConf = isDevnet? CONFIGS.devnet : CONFIGS.localhost;
-  const contractAddress = netConf.contractAddress;
+  const hippoDexAddress = netConf.hippoDexAddress;
   const client = new AptosClient(result.profiles[profile].rest_url);
+  const app = new App(client);
   const account = new AptosAccount(privateKey.toUint8Array());
   console.log(`Using address ${account.address().hex()}`);
-  return {client, account, contractAddress, netConf};
+  return {app, client, account, hippoDexAddress, netConf};
 }
 
 export async function sendPayloadTx(
@@ -61,4 +65,8 @@ export async function simulatePayloadTx(
   const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: `${max_gas}`});
   const outputs = await client.simulateTransaction(account, txnRequest);
   return outputs[0];
+}
+
+export function strToString(str: string, $c: AptosDataCache){
+  return Std.String.utf8_(strToU8(str), $c);
 }

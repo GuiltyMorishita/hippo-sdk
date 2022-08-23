@@ -43,11 +43,13 @@ export function buildPayload_add_liquidity_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_scripts::add_liquidity_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "cp_scripts",
+    "add_liquidity_script",
     typeParamStrings,
     [
-      $.payloadArg(amount_x),
-      $.payloadArg(amount_y),
+      amount_x,
+      amount_y,
     ]
   );
 
@@ -88,7 +90,7 @@ export function create_new_pool_ (
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
   }
   decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
-  decimals__1 = u64($.copy(decimals));
+  decimals__1 = u8($.copy(decimals));
   Cp_swap.create_token_pair_(admin, $.copy(fee_to), fee_on, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $c, [$p[0], $p[1]]);
   Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_($.copy(lp_logo_url), $c), Std.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "cp_swap", "LPToken", [$p[0], $p[1]])]);
   if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
@@ -132,15 +134,17 @@ export function buildPayload_create_new_pool_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_scripts::create_new_pool_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "cp_scripts",
+    "create_new_pool_script",
     typeParamStrings,
     [
-      $.payloadArg(fee_to),
-      $.payloadArg(fee_on),
-      $.u8ArrayArg(lp_name),
-      $.u8ArrayArg(lp_symbol),
-      $.u8ArrayArg(lp_logo_url),
-      $.u8ArrayArg(lp_project_url),
+      fee_to,
+      fee_on,
+      lp_name,
+      lp_symbol,
+      lp_logo_url,
+      lp_project_url,
     ]
   );
 
@@ -191,7 +195,9 @@ export function buildPayload_mock_deploy_script (
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_scripts::mock_deploy_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "cp_scripts",
+    "mock_deploy_script",
     typeParamStrings,
     []
   );
@@ -219,12 +225,14 @@ export function buildPayload_remove_liquidity_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_scripts::remove_liquidity_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "cp_scripts",
+    "remove_liquidity_script",
     typeParamStrings,
     [
-      $.payloadArg(liquidity),
-      $.payloadArg(amount_x_min),
-      $.payloadArg(amount_y_min),
+      liquidity,
+      amount_x_min,
+      amount_y_min,
     ]
   );
 
@@ -290,13 +298,15 @@ export function buildPayload_swap_script (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_scripts::swap_script",
+    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+    "cp_scripts",
+    "swap_script",
     typeParamStrings,
     [
-      $.payloadArg(x_in),
-      $.payloadArg(y_in),
-      $.payloadArg(x_min_out),
-      $.payloadArg(y_min_out),
+      x_in,
+      y_in,
+      x_min_out,
+      y_min_out,
     ]
   );
 

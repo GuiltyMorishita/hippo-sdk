@@ -1,30 +1,42 @@
-import { AptosParserRepo, getTypeTagFullname, parseMoveStructTag, StructTag, TypeTag } from "@manahippo/move-to-ts";
-import { AptosClient, HexString } from "aptos";
+import {
+  AptosParserRepo,
+  getTypeTagFullname,
+  parseMoveStructTag,
+  SimpleStructTag,
+  StructTag,
+  TypeTag
+} from "@manahippo/move-to-ts";
+import {AptosAccount, AptosClient, HexString} from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
 import { Cp_swap, Stable_curve_swap, Piece_swap } from "../generated/hippo_swap";
-import { Coin_registry } from "../generated/coin_registry";
+import {Coin_list} from "../generated/coin_list"
 import { CoinInfo } from "../generated/aptos_framework/coin";
-import { typeInfoToTypeTag } from "../utils";
+import {parseCoinInfoListFromCoinList, typeInfoToTypeTag} from "../utils";
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 import { HippoPieceSwapPool } from "./pieceSwapPool";
 import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
+import {App} from "../generated";
+import {CoinList, Nothing} from "../generated/coin_list/coin_list";
+import * as Aptos_std from "../generated/aptos_std";
+import * as Std from "../generated/std";
+import * as $ from "@manahippo/move-to-ts";
 
 
-export async function loadContractResources(netConf: NetworkConfiguration, client: AptosClient, repo: AptosParserRepo) {
-  const resources = await client.getAccountResources(netConf.contractAddress);
-  let registry: Coin_registry.TokenRegistry | null = null;
+export async function loadHippoDexResources(app: App, netConf: NetworkConfiguration) {
+  const resources = await app.client.getAccountResources(netConf.hippoDexAddress);
+  let coinList: Coin_list.CoinList | null = null;
   const cpPoolInfos: Cp_swap.TokenPairMetadata[] = [];
   const stablePoolInfos: Stable_curve_swap.StableCurvePoolInfo[] = [];
   const piecePoolInfos: PieceSwapPoolInfo[] = [];
   for(const resource of resources) {
     try{
       const typeTag = parseMoveStructTag(resource.type);
-      const parsed = repo.parse(resource.data, typeTag);
-      if (parsed instanceof Coin_registry.TokenRegistry) {
-        registry = parsed;
+      const parsed = app.parserRepo.parse(resource.data, typeTag);
+      if (parsed instanceof Coin_list.CoinList) {
+        coinList = parsed;
       }
       else if(parsed instanceof Cp_swap.TokenPairMetadata) {
         cpPoolInfos.push(parsed);
@@ -40,12 +52,45 @@ export async function loadContractResources(netConf: NetworkConfiguration, clien
       console.log(`Could not parse resource of type: ${resource.type}`);
     }
   }
-  if(!registry) {
-    throw new Error(`Failed to load TokenRegistry from contract account: ${netConf.contractAddress.hex()}`);
+  if(!coinList) {
+    throw new Error(`Failed to load CoinList from contract account: ${netConf.hippoDexAddress.hex()}`);
   }
-  return {registry, cpPoolInfos, stablePoolInfos, piecePoolInfos}
+  return {coinList, cpPoolInfos, stablePoolInfos, piecePoolInfos}
 }
+export async function loadCoinListResources(app: App, netConf: NetworkConfiguration){
+  let coinRegister: Coin_list.CoinRegistry | null = null;
+  const resources = await app.client.getAccountResources(netConf.coinListAddress);
+  for(const resource of resources) {
+    try{
+      const typeTag = parseMoveStructTag(resource.type);
+      const parsed = app.parserRepo.parse(resource.data, typeTag);
+      if (parsed instanceof Coin_list.CoinRegistry) {
+        coinRegister = parsed;
+      }
+    }
+    catch(e){
+      console.log(`Could not parse resource of type: ${resource.type}`);
+    }
+  }
+  if(!coinRegister) {
+    throw new Error(`Failed to load CoinRegistry from contract account: ${netConf.coinListAddress.hex()}`);
+  }
+  return {coinRegister}
+}
+export async function loadResources(app: App, netConf: NetworkConfiguration){
+ const resources = await Promise.all([
+    loadCoinListResources(app, netConf),
+    loadHippoDexResources(app, netConf),
 
+  ])
+  return {
+   coinRegister: resources[0].coinRegister,
+   coinList: resources[1].coinList,
+   cpPoolInfos: resources[1].cpPoolInfos,
+   stablePoolInfos: resources[1].stablePoolInfos,
+   piecePoolInfos: resources[1].piecePoolInfos
+ }
+}
 export class PoolSet {
   public poolTypeToPools: Map<PoolType, HippoPool>;
   constructor() {
@@ -64,43 +109,42 @@ export class PoolSet {
 
 export class HippoSwapClient {
   // supported single tokens
-  public singleTokens: Coin_registry.TokenInfo[];
+  public singleTokens: Coin_list.CoinInfo[];
   // maps TokenInfo.symbol to TokenInfo
-  public symbolToTokenInfo: Record<string, Coin_registry.TokenInfo>;
+  public symbolToTokenInfo: Record<string, Coin_list.CoinInfo>;
   // maps token-struct-fullname to TokenInfo
-  public tokenFullnameToTokenInfo: Record<string, Coin_registry.TokenInfo>;
+  public tokenFullnameToTokenInfo: Record<string, Coin_list.CoinInfo>;
   // maps `${xToken-struct-fullname}<->${yToken-struct-fullname}` to HippoPool[]
   public xyFullnameToPoolSet: Record<string, PoolSet>;
   public contractAddress: HexString;
 
-  static async createInOneCall(netConfig: NetworkConfiguration, aptosClient: AptosClient, repo: AptosParserRepo) {
-    const {registry, cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadContractResources(netConfig, aptosClient, repo);
+  static async createInOneCall(app: App, netConfig: NetworkConfiguration) {
+    const {coinRegister, coinList, cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadResources(app, netConfig);
+
     return new HippoSwapClient(
-      netConfig, 
-      aptosClient, 
-      registry.token_info_list, 
-      cpPoolInfos, 
-      stablePoolInfos, 
-      piecePoolInfos, 
-      repo
+      app,
+      netConfig,
+      parseCoinInfoListFromCoinList(coinRegister, coinList, app.cache),
+      cpPoolInfos,
+      stablePoolInfos,
+      piecePoolInfos,
     );
   }
   constructor(
+    public app: App,
     public netConfig: NetworkConfiguration,
-    public aptosClient: AptosClient,
-    public tokenList:  Coin_registry.TokenInfo[],
+    public coinInfoList:  Coin_list.CoinInfo[],
     public cpPoolInfos: Cp_swap.TokenPairMetadata[],
     public stablePoolInfos: Stable_curve_swap.StableCurvePoolInfo[],
     public piecePoolInfos: Piece_swap.PieceSwapPoolInfo[],
-    public repo: AptosParserRepo,
   ) {
     // init cached maps/lists
     this.singleTokens = [];
     this.symbolToTokenInfo = {};
     this.tokenFullnameToTokenInfo = {};
     this.xyFullnameToPoolSet = {};
-    this.contractAddress = netConfig.contractAddress;
-    // build maps and caches from tokenList
+    this.contractAddress = netConfig.hippoDexAddress;
+    // build maps and caches from coinInfoList
     this.buildCache();
   }
 
@@ -109,24 +153,21 @@ export class HippoSwapClient {
     this.symbolToTokenInfo = {};
     this.tokenFullnameToTokenInfo = {};
     this.xyFullnameToPoolSet = {};
-    for(const tokenInfo of this.tokenList) {
-      if(tokenInfo.delisted) {
-        continue;
-      }
-      const coinTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
+    for(const coinInfo of this.coinInfoList) {
+      const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
       const tokenFullname = getTypeTagFullname(coinTypeTag);
-      this.symbolToTokenInfo[tokenInfo.symbol.str()] = tokenInfo;
-      this.tokenFullnameToTokenInfo[tokenFullname] = tokenInfo;
+      this.symbolToTokenInfo[coinInfo.symbol.str()] = coinInfo;
+      this.tokenFullnameToTokenInfo[tokenFullname] = coinInfo;
       if (
         coinTypeTag instanceof StructTag &&
-        coinTypeTag.address.hex() === this.contractAddress.hex() &&
+        coinTypeTag.address.hex() === this.netConfig.hippoDexAddress.hex() &&
         [Cp_swap.moduleName, Stable_curve_swap.moduleName, Piece_swap.moduleName].includes(coinTypeTag.module)
       ) {
         // lp token
         continue;
       }
       else {
-        this.singleTokens.push(tokenInfo);
+        this.singleTokens.push(coinInfo);
       }
     }
     // add CP pools
@@ -362,8 +403,8 @@ export class HippoSwapClient {
     } else {
       throw new Error();
     }
-    const resource = await this.aptosClient.getAccountResource(this.contractAddress, tag.getAptosMoveTypeTag());
-    const parsed = this.repo.parse(resource.data, tag);
+    const resource = await this.app.client.getAccountResource(this.netConfig.hippoDexAddress, tag.getAptosMoveTypeTag());
+    const parsed = this.app.parserRepo.parse(resource.data, tag);
     if (parsed instanceof Cp_swap.TokenPairMetadata) {
       this.setCPPool(parsed);
     } else if (parsed instanceof Stable_curve_swap.StableCurvePoolInfo) {
@@ -375,8 +416,8 @@ export class HippoSwapClient {
   }
 
   async reloadAllPools() {
-    const {registry, cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadContractResources(this.netConfig, this.aptosClient, this.repo);
-    this.tokenList = registry.token_info_list;
+    const {coinRegister, coinList, cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadResources(this.app, this.netConfig);
+    this.coinInfoList = parseCoinInfoListFromCoinList(coinRegister, coinList, this.app.cache);
     this.cpPoolInfos = cpPoolInfos;
     this.stablePoolInfos = stablePoolInfos;
     this.piecePoolInfos = piecePoolInfos;
@@ -394,11 +435,11 @@ export class HippoSwapClient {
     return `${xFullname}<->${yFullname}`;
   }
 
-  async getTokenTotalSupply(tokenInfo: Coin_registry.TokenInfo) {
-    const coinTag = typeInfoToTypeTag(tokenInfo.token_type);
-    const coinInfo = await CoinInfo.load(this.repo, this.aptosClient, this.netConfig.contractAddress, [coinTag]);
-    if (coinInfo.supply.vec.length > 0) {
-      return coinInfo.supply.vec[0] as unknown as bigInt.BigInteger;
+  async getTokenTotalSupply(coinInfo: Coin_list.CoinInfo) {
+    const coinTag = typeInfoToTypeTag(coinInfo.token_type);
+    const aptosCoinInfo = await CoinInfo.load(this.app.parserRepo, this.app.client, this.netConfig.hippoDexAddress, [coinTag]);
+    if (aptosCoinInfo.supply.vec.length > 0) {
+      return aptosCoinInfo.supply.vec[0] as unknown as bigInt.BigInteger;
     }
     return null;
   }

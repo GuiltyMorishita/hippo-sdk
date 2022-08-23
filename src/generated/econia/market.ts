@@ -405,12 +405,14 @@ export function buildPayload_cancel_limit_order_user (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::cancel_limit_order_user",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "market",
+    "cancel_limit_order_user",
     typeParamStrings,
     [
-      $.payloadArg(host),
-      $.payloadArg(side),
-      $.payloadArg(order_id),
+      host,
+      side,
+      order_id,
     ]
   );
 
@@ -714,13 +716,15 @@ export function buildPayload_fill_market_order_user (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::fill_market_order_user",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "market",
+    "fill_market_order_user",
     typeParamStrings,
     [
-      $.payloadArg(host),
-      $.payloadArg(style),
-      $.payloadArg(max_base_parcels),
-      $.payloadArg(max_quote_units),
+      host,
+      style,
+      max_base_parcels,
+      max_quote_units,
     ]
   );
 
@@ -925,13 +929,15 @@ export function buildPayload_place_limit_order_user (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::place_limit_order_user",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "market",
+    "place_limit_order_user",
     typeParamStrings,
     [
-      $.payloadArg(host),
-      $.payloadArg(side),
-      $.payloadArg(base_parcels),
-      $.payloadArg(price),
+      host,
+      side,
+      base_parcels,
+      price,
     ]
   );
 
@@ -956,7 +962,9 @@ export function buildPayload_register_market (
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
-    "0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7::market::register_market",
+    new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
+    "market",
+    "register_market",
     typeParamStrings,
     []
   );

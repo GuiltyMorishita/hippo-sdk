@@ -1,7 +1,7 @@
 import { AptosParserRepo, StructTag, u8 } from "@manahippo/move-to-ts";
 import { AptosClient, Types } from "aptos";
 import { CONFIGS } from "../../config";
-import { getProjectRepo } from "../../generated";
+import {App, getProjectRepo} from "../../generated";
 import { TokenPairMetadata } from "../../generated/hippo_swap/cp_swap";
 import { PieceSwapPoolInfo } from "../../generated/hippo_swap/piece_swap";
 import { StableCurvePoolInfo } from "../../generated/hippo_swap/stable_curve_swap";
@@ -38,21 +38,21 @@ export class HippoTradingPool extends TradingPool {
   }
   get isRoutable() { return true; }
   // X-Y
-  get xTokenInfo() { return this.pool.xTokenInfo;}
-  get yTokenInfo() { return this.pool.yTokenInfo;}
+  get xCoinInfo() { return this.pool.xTokenInfo;}
+  get yCoinInfo() { return this.pool.yTokenInfo;}
   // state-dependent
   isStateLoaded(): boolean { return true; }
-  async reloadState(client: AptosClient): Promise<void> {
+  async reloadState(app: App): Promise<void> {
     if (this.pool instanceof HippoConstantProductPool) {
-      const resource = await TokenPairMetadata.load(this.repo, client, TokenPairMetadata.moduleAddress, (this.pool.cpPoolMeta.typeTag as StructTag).typeParams);
+      const resource = await TokenPairMetadata.load(this.repo, app.client, TokenPairMetadata.moduleAddress, (this.pool.cpPoolMeta.typeTag as StructTag).typeParams);
       this.pool.cpPoolMeta = resource;
     }
     else if (this.pool instanceof HippoStableCurvePool) {
-      const resource = await StableCurvePoolInfo.load(this.repo, client, TokenPairMetadata.moduleAddress, (this.pool.stablePoolInfo.typeTag as StructTag).typeParams);
+      const resource = await StableCurvePoolInfo.load(this.repo, app.client, TokenPairMetadata.moduleAddress, (this.pool.stablePoolInfo.typeTag as StructTag).typeParams);
       this.pool.stablePoolInfo = resource;
     }
     else if (this.pool instanceof HippoPieceSwapPool) {
-      const resource = await PieceSwapPoolInfo.load(this.repo, client, TokenPairMetadata.moduleAddress, (this.pool.poolInfo.typeTag as StructTag).typeParams);
+      const resource = await PieceSwapPoolInfo.load(this.repo, app.client, TokenPairMetadata.moduleAddress, (this.pool.poolInfo.typeTag as StructTag).typeParams);
       this.pool.poolInfo = resource;
     }
     else {
@@ -74,9 +74,9 @@ export class HippoTradingPool extends TradingPool {
 
 
 export class HippoPoolProvider extends TradingPoolProvider {
-  async loadPoolList(client: AptosClient): Promise<TradingPool[]> {
+  async loadPoolList(app: App): Promise<TradingPool[]> {
     const repo = getProjectRepo();
-    const swapClient = await HippoSwapClient.createInOneCall(CONFIGS.devnet, client, repo);
+    const swapClient = await HippoSwapClient.createInOneCall(app, CONFIGS.devnet);
     const poolList: TradingPool[] = [];
     for(const fullname in swapClient.xyFullnameToPoolSet) {
       const poolSet = swapClient.xyFullnameToPoolSet[fullname];

@@ -1,34 +1,35 @@
-import { getProjectRepo } from "../generated";
-import { TokenInfo } from "../generated/coin_registry/coin_registry";
+import {App, getProjectRepo} from "../generated";
+
 import { NetworkConfiguration } from "../config";
-import { TokenRegistryClient } from "../tokenRegistry";
+import { CoinListClient } from "../coinList";
 import { EconiaPoolProvider } from "./econia";
 import { HippoPoolProvider } from "./hippo";
 import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from "./types";
-import { AptosClient } from "aptos";
+import {AptosAccount, AptosClient} from "aptos";
 import { PontemPoolProvider } from "./pontem";
+import {CoinInfo} from "../generated/coin_list/coin_list";
 
 export class TradeAggregator {
   public allPools: TradingPool[];
   public xToAnyPools: Map<TokenTypeFullname, TradingPool[]>;
   constructor(
-    public registryClient: TokenRegistryClient,
-    public aptosClient: AptosClient,
+    public registryClient: CoinListClient,
+    public app: App,
     public readonly poolProviders: TradingPoolProvider[],
   ) {
     this.allPools = [];
     this.xToAnyPools = new Map();
   }
 
-  static async create(client: AptosClient, netConfig: NetworkConfiguration) {
-    const repo = getProjectRepo();
-    const registryClient =  await TokenRegistryClient.load(repo, client, netConfig);
+  static async create(app: App, fetcher: AptosAccount) {
+    const registryClient =  await CoinListClient.load(app, fetcher);
     const hippoProvider = new HippoPoolProvider();
     const econiaProvider = new EconiaPoolProvider(registryClient);
     const pontemProvider = new PontemPoolProvider(registryClient);
     const aggregator = new TradeAggregator(
-      registryClient, 
-      client, [
+      registryClient,
+      app,
+      [
         hippoProvider, 
         econiaProvider,
         pontemProvider
@@ -40,13 +41,13 @@ export class TradeAggregator {
   async loadAllPoolLists() {
     const promises = [];
     for (const provider of this.poolProviders) {
-      promises.push(provider.loadPoolList(this.aptosClient));
+      promises.push(provider.loadPoolList(this.app));
     }
     const allResult = await Promise.all(promises);
     this.allPools = allResult.flat();
     this.xToAnyPools = new Map();
     for (const pool of this.allPools) {
-      const xFullname = pool.xTokenInfo.token_type.typeFullname();
+      const xFullname = pool.xCoinInfo.token_type.typeFullname();
       if (!this.xToAnyPools.has(xFullname)) {
         this.xToAnyPools.set(xFullname, [pool]);
       }
@@ -60,7 +61,7 @@ export class TradeAggregator {
     }
   }
 
-  getXtoYDirectSteps(x: TokenInfo, y: TokenInfo, requireRoutable=true): TradeStep[] {
+  getXtoYDirectSteps(x: CoinInfo, y: CoinInfo, requireRoutable=true): TradeStep[] {
     const xFullname = x.token_type.typeFullname();
     const yFullname = y.token_type.typeFullname();
     if (xFullname === yFullname) {
@@ -74,14 +75,14 @@ export class TradeAggregator {
         if (requireRoutable && !pool.isRoutable) {
           continue;
         }
-        if (pool.yTokenInfo.token_type.typeFullname() === yFullname) {
+        if (pool.yCoinInfo.token_type.typeFullname() === yFullname) {
           steps.push(new TradeStep(pool, true));
         }
       }
     }
     if (yToXCandidates) {
       for (const pool of yToXCandidates) {
-        if (pool.yTokenInfo.token_type.typeFullname() === xFullname) {
+        if (pool.yCoinInfo.token_type.typeFullname() === xFullname) {
           if (requireRoutable && !pool.isRoutable) {
             continue;
           }
@@ -92,7 +93,7 @@ export class TradeAggregator {
     return steps;
   }
 
-  getOneStepRoutes(x: TokenInfo, y: TokenInfo): TradeRoute[] {
+  getOneStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
     const xFullname = x.token_type.typeFullname();
     if (xFullname === y.token_type.typeFullname()) {
       throw new Error(`Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`);
@@ -101,11 +102,11 @@ export class TradeAggregator {
     return steps.map(step => new TradeRoute([step]));
   }
 
-  getTwoStepRoutes(x: TokenInfo, y: TokenInfo): TradeRoute[] {
+  getTwoStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
     const xFullname = x.token_type.typeFullname();
     const yFullname = y.token_type.typeFullname();
     const results: TradeRoute[] = [];
-    for (const k of this.registryClient.getTokenInfoList()) {
+    for (const k of this.registryClient.getCoinInfoList()) {
       const kFullname = k.token_type.typeFullname();
       if (kFullname === xFullname || kFullname === yFullname) {
         continue;
@@ -130,12 +131,12 @@ export class TradeAggregator {
     return results;
   }
 
-  getThreeStepRoutes(x: TokenInfo, y: TokenInfo): TradeRoute[] {
+  getThreeStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
     const xFullname = x.token_type.typeFullname();
     const yFullname = y.token_type.typeFullname();
     const results: TradeRoute[] = [];
 
-    for (const k of this.registryClient.getTokenInfoList()) {
+    for (const k of this.registryClient.getCoinInfoList()) {
       const kFullname = k.token_type.typeFullname();
       if (kFullname === xFullname || kFullname === yFullname) {
         continue;
@@ -161,7 +162,7 @@ export class TradeAggregator {
     return results;
   }
 
-  getAllRoutes(x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip=false): TradeRoute[] {
+  getAllRoutes(x: CoinInfo, y: CoinInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip=false): TradeRoute[] {
     // max 3 steps
     const step1Routes = maxSteps >= 1 ? this.getOneStepRoutes(x, y) : [];
     const step2Routes = maxSteps >= 2 ? this.getTwoStepRoutes(x, y) : [];
@@ -175,13 +176,13 @@ export class TradeAggregator {
     }
   }
 
-  async getQuotes(inputUiAmt: number, x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, reloadState=true, allowRoundTrip=false): Promise<RouteAndQuote[]> {
+  async getQuotes(inputUiAmt: number, x: CoinInfo, y: CoinInfo, maxSteps: 1 | 2 | 3 = 3, reloadState=true, allowRoundTrip=false): Promise<RouteAndQuote[]> {
     const routes = this.getAllRoutes(x, y, maxSteps, allowRoundTrip);
     const poolSet = new Set(routes.flatMap(r => r.steps).map(s => s.pool));
     const promises: Promise<void>[] = [];
     for (const pool of poolSet) {
       if(!pool.isStateLoaded || reloadState) {
-        promises.push(pool.reloadState(this.aptosClient));
+        promises.push(pool.reloadState(this.app));
       }
     }
     await Promise.all(promises);
@@ -195,7 +196,7 @@ export class TradeAggregator {
     return result;
   }
 
-  async getBestQuote(inputUiAmt: number, x: TokenInfo, y: TokenInfo, maxSteps: 1 | 2 | 3 = 3, reloadState=true, allowRoundTrip=false) {
+  async getBestQuote(inputUiAmt: number, x: CoinInfo, y: CoinInfo, maxSteps: 1 | 2 | 3 = 3, reloadState=true, allowRoundTrip=false) {
     const quotes = await this.getQuotes(inputUiAmt, x, y, maxSteps, reloadState, allowRoundTrip);
     if (quotes.length === 0) {
       return null;
