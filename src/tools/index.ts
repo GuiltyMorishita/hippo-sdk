@@ -290,8 +290,8 @@ program
 const testCommand = new Command("test");
 
 const testHippoClient = async () => {
-  const {app, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const {app, netConf, account} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   swapClient.printSelf();
 }
 
@@ -316,7 +316,7 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
 
 const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
   const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -334,7 +334,7 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
 
 const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
   const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -352,8 +352,8 @@ const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmt
 }
 
 const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {app, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const {app, netConf, account} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if(uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -382,7 +382,7 @@ function cliPoolTypeToPoolType(poolType: string): PoolType {
 
 const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
   const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const lhsUiAmt = Number.parseFloat(lhsUiAmtStr);
   const rhsUiAmt = Number.parseFloat(rhsUiAmtStr);
   if(lhsUiAmt <= 0 || rhsUiAmt <= 0) {
@@ -408,7 +408,7 @@ const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhs
 
 const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, liquidityUiAmtStr: string) => {
   const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const liquidityUiAmt = Number.parseFloat(liquidityUiAmtStr);
   if(liquidityUiAmt <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -433,15 +433,15 @@ const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, 
 }
 
 const testShowSupply = async(symbol: string) => {
-  const {app, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const {app, netConf, account} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const supply = await swapClient.getTokenTotalSupplyBySymbol(symbol);
   console.log(supply);
 }
 
 const testShowRoutes = async(lhsSymbol: string, rhsSymbol: string) => {
-  const {app, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf);
+  const {app, netConf, account} = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, account);
   const routes = swapClient.getSteppedRoutesBySymbol(lhsSymbol, rhsSymbol, 3);
   printResources(routes.map(r=>r.summarize()));
 }

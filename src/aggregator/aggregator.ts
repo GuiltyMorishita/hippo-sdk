@@ -15,6 +15,7 @@ export class TradeAggregator {
   constructor(
     public registryClient: CoinListClient,
     public app: App,
+    public fetcher: AptosAccount,
     public readonly poolProviders: TradingPoolProvider[],
   ) {
     this.allPools = [];
@@ -29,6 +30,7 @@ export class TradeAggregator {
     const aggregator = new TradeAggregator(
       registryClient,
       app,
+      fetcher,
       [
         hippoProvider, 
         econiaProvider,
@@ -41,7 +43,7 @@ export class TradeAggregator {
   async loadAllPoolLists() {
     const promises = [];
     for (const provider of this.poolProviders) {
-      promises.push(provider.loadPoolList(this.app));
+      promises.push(provider.loadPoolList(this.app, this.fetcher));
     }
     const allResult = await Promise.all(promises);
     this.allPools = allResult.flat();

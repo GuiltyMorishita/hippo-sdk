@@ -16,7 +16,7 @@ describe('Integration Tests', () => {
     account = new AptosAccount();
     const faucetClient = new FaucetClient(HIPPO_CONF.fullNodeUrl, HIPPO_CONF.faucetUrl);
     await faucetClient.fundAccount(account.address(), 100000);
-    swapClient = await HippoSwapClient.createInOneCall(app, HIPPO_CONF);
+    swapClient = await HippoSwapClient.createInOneCall(app, HIPPO_CONF, account);
     walletClient = await HippoWalletClient.createInTwoCalls(HIPPO_CONF, app, account.address(), account);
 
   });

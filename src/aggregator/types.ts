@@ -1,5 +1,5 @@
 import { AtomicTypeTag, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
-import {AptosClient, TxnBuilderTypes, Types} from "aptos";
+import {AptosAccount, AptosClient, TxnBuilderTypes, Types} from "aptos";
 import {CoinInfo} from "../generated/coin_list/coin_list";
 import { Aggregatorv6 } from "../generated/hippo_aggregator";
 import {App} from "../generated";
@@ -234,10 +234,10 @@ export interface RouteAndQuote {
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
 
-  abstract loadPoolList(app: App): Promise<TradingPool[]>;
+  abstract loadPoolList(app: App, fetcher: AptosAccount): Promise<TradingPool[]>;
 
-  async reloadAllPoolState(app: App) {
-    const pools = await this.loadPoolList(app);
+  async reloadAllPoolState(app: App, fetcher: AptosAccount) {
+    const pools = await this.loadPoolList(app, fetcher);
     const promises = pools.map(pool => pool.reloadState(app));
     await Promise.all(promises);
   }

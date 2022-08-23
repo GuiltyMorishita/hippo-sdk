@@ -1,5 +1,5 @@
 import { AptosParserRepo, StructTag, u8 } from "@manahippo/move-to-ts";
-import { AptosClient, Types } from "aptos";
+import {AptosAccount, AptosClient, FaucetClient, Types} from "aptos";
 import { CONFIGS } from "../../config";
 import {App, getProjectRepo} from "../../generated";
 import { TokenPairMetadata } from "../../generated/hippo_swap/cp_swap";
@@ -74,15 +74,14 @@ export class HippoTradingPool extends TradingPool {
 
 
 export class HippoPoolProvider extends TradingPoolProvider {
-  async loadPoolList(app: App): Promise<TradingPool[]> {
-    const repo = getProjectRepo();
-    const swapClient = await HippoSwapClient.createInOneCall(app, CONFIGS.devnet);
+  async loadPoolList(app: App, fetcher: AptosAccount): Promise<TradingPool[]> {
+    const swapClient = await HippoSwapClient.createInOneCall(app, CONFIGS.devnet,fetcher);
     const poolList: TradingPool[] = [];
     for(const fullname in swapClient.xyFullnameToPoolSet) {
       const poolSet = swapClient.xyFullnameToPoolSet[fullname];
       const pools = poolSet.pools();
       for (const pool of pools) {
-        poolList.push(new HippoTradingPool(pool, repo));
+        poolList.push(new HippoTradingPool(pool, app.parserRepo));
       }
     }
     return poolList;
