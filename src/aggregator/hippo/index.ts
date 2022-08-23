@@ -66,7 +66,7 @@ export class HippoTradingPool extends TradingPool {
     return this.pool.getQuoteDirectional(inputUiAmt, isXtoY);
   }
   // build payload directly if not routable
-  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.ScriptFunctionPayload {
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
     throw new Error("Not Implemented");
   }
 }

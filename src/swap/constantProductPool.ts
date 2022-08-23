@@ -4,6 +4,7 @@ import { App } from "../generated";
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
 import { TransactionPayload } from 'aptos/dist/generated';
 import {CoinInfo} from "../generated/coin_list/coin_list";
+import {TransactionPayloadEntryFunction} from "aptos/dist/transaction_builder/aptos_types";
 
 export class HippoConstantProductPool extends HippoPool {
   constructor(
@@ -94,7 +95,7 @@ export class HippoConstantProductPool extends HippoPool {
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
     isXtoY: boolean
-  ): Promise<TransactionPayload> {
+  ): Promise<TransactionPayloadEntryFunction> {
     const fromTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
     const toTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
     const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
@@ -119,7 +120,7 @@ export class HippoConstantProductPool extends HippoPool {
     }
   }
 
-  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
+  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayloadEntryFunction> {
     const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
     const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
     return Cp_scripts.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
@@ -129,7 +130,7 @@ export class HippoConstantProductPool extends HippoPool {
     liquidityAmt: UITokenAmount,
     lhsMinAmt: UITokenAmount, 
     rhsMinAmt: UITokenAmount,
-  ): Promise<TransactionPayload> {
+  ): Promise<TransactionPayloadEntryFunction> {
     const liquidityRawAmt = u64(liquidityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
     const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
     const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));

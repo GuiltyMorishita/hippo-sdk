@@ -72,7 +72,7 @@ export class PontemTradingPool extends TradingPool {
   }
 
   // build payload directly if not routable
-  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.ScriptFunctionPayload {
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
     throw new Error("Not Implemented");
   }
 }

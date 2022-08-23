@@ -148,7 +148,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
   }
 
   // build payload directly if not routable
-  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.ScriptFunctionPayload {
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
     // routable, so no need to implement
     throw new Error("Not Implemented");
   }

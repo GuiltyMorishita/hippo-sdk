@@ -2,8 +2,8 @@ import { u64 } from '@manahippo/move-to-ts';
 import { Piece_swap_script } from '../generated/hippo_swap';
 import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
 import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
-import { TransactionPayload } from 'aptos/dist/generated';
 import {CoinInfo} from "../generated/coin_list/coin_list";
+import {TxnBuilderTypes} from "aptos";
 
 export class HippoPieceSwapPool extends HippoPool {
   constructor(
@@ -97,7 +97,7 @@ export class HippoPieceSwapPool extends HippoPool {
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
     isXtoY: boolean
-  ): Promise<TransactionPayload> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
     const toTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
     const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
@@ -122,7 +122,7 @@ export class HippoPieceSwapPool extends HippoPool {
     }
   }
 
-  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
+  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
     const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
     return Piece_swap_script.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
@@ -132,7 +132,7 @@ export class HippoPieceSwapPool extends HippoPool {
     liqiudityAmt: UITokenAmount, 
     _lhsMinAmt: UITokenAmount, 
     _rhsMinAmt: UITokenAmount,
-  ): Promise<TransactionPayload> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
     return Piece_swap_script.buildPayload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams);
   }

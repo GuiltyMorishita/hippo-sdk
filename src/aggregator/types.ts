@@ -1,5 +1,5 @@
 import { AtomicTypeTag, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
-import { AptosClient, Types } from "aptos";
+import {AptosClient, TxnBuilderTypes, Types} from "aptos";
 import {CoinInfo} from "../generated/coin_list/coin_list";
 import { Aggregatorv6 } from "../generated/hippo_aggregator";
 import {App} from "../generated";
@@ -52,7 +52,7 @@ export abstract class TradingPool {
   abstract getPrice(): PriceType;
   abstract getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType;
   // build payload directly if not routable
-  abstract makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.ScriptFunctionPayload;
+  abstract makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload;
   getTagE(): TypeTag {
     return AtomicTypeTag.U8;
   }
@@ -161,7 +161,7 @@ export class TradeRoute {
     return fullnameSet.size < this.tokens.length;
   }
 
-  makePaylod(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.TransactionPayload {
+  makePaylod(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): TxnBuilderTypes.TransactionPayloadEntryFunction {
     const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
     const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
     if (this.steps.length === 1) {

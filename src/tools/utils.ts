@@ -1,4 +1,4 @@
-import { AptosAccount, AptosClient, HexString, Types } from "aptos";
+import {AptosAccount, AptosClient, HexString, TxnBuilderTypes, Types} from "aptos";
 import { Command } from "commander";
 import * as fs from "fs";
 import * as yaml from "yaml";
@@ -35,36 +35,6 @@ export const readConfig = (program: Command) => {
   const account = new AptosAccount(privateKey.toUint8Array());
   console.log(`Using address ${account.address().hex()}`);
   return {app, client, account, hippoDexAddress, netConf};
-}
-
-export async function sendPayloadTx(
-  client: AptosClient, 
-  account: AptosAccount, 
-  payload: Types.TransactionPayload, 
-  max_gas=1000
-){
-  console.log("Building tx...");
-  const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: `${max_gas}`});
-  console.log("Built tx");
-  const signedTxn = await client.signTransaction(account, txnRequest);
-  console.log("Submitting...");
-  const txnResult = await client.submitTransaction(signedTxn);
-  console.log("Submitted");
-  await client.waitForTransaction(txnResult.hash);
-  console.log("Confirmed");
-  const txDetails = (await client.getTransactionByHash(txnResult.hash)) as Types.UserTransaction;
-  console.log(txDetails);
-}
-
-export async function simulatePayloadTx(
-  client: AptosClient, 
-  account: AptosAccount, 
-  payload: Types.TransactionPayload, 
-  max_gas=1000
-){
-  const txnRequest = await client.generateTransaction(account.address(), payload, {max_gas_amount: `${max_gas}`});
-  const outputs = await client.simulateTransaction(account, txnRequest);
-  return outputs[0];
 }
 
 export function strToString(str: string, $c: AptosDataCache){

@@ -1,8 +1,8 @@
 import { AptosAccount, AptosClient, FaucetClient } from 'aptos';
 import { CONFIGS, HippoSwapClient, HippoWalletClient } from '../src';
 import { printResource } from '../src/utils';
-import { sendPayloadTx } from '../src/tools/utils';
 import { App } from "../src/generated"
+import {sendPayloadTx} from "@manahippo/move-to-ts";
 const { localhost: HIPPO_CONF } = CONFIGS;
 
 

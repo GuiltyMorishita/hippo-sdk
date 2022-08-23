@@ -1,9 +1,9 @@
 import { getTypeTagFullname, StructTag, u64, u8 } from "@manahippo/move-to-ts";
-import { Types } from "aptos";
 import bigInt from "big-integer";
 import { Router } from "../generated/hippo_swap";
 import { typeInfoToTypeTag } from "../utils";
-import {CoinInfo} from "../generated/coin_list/coin_list";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import {TransactionPayloadEntryFunction} from "aptos/dist/transaction_builder/aptos_types";
 
 export type UITokenAmount = number;
 
@@ -65,7 +65,7 @@ export abstract class TradeRoute {
   abstract makeSwapPayload( 
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
-  ): Promise<Types.TransactionPayload>;
+  ): Promise<TransactionPayloadEntryFunction>;
 
 
 }
@@ -117,22 +117,22 @@ export abstract class HippoPool extends TradeRoute {
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
     isXtoY: boolean,
-  ): Promise<Types.TransactionPayload>;
+  ): Promise<TransactionPayloadEntryFunction>;
 
   makeSwapPayload( 
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
-  ): Promise<Types.TransactionPayload> {
+  ): Promise<TransactionPayloadEntryFunction> {
     return this.makeSwapPayloadDirectional(amountIn, minAmountOut, true);
   }
 
-  abstract makeAddLiquidityPayload(lhsAmt: UITokenAmount, rhsAmt: UITokenAmount): Promise<Types.TransactionPayload>;
+  abstract makeAddLiquidityPayload(lhsAmt: UITokenAmount, rhsAmt: UITokenAmount): Promise<TransactionPayloadEntryFunction>;
 
   abstract makeRemoveLiquidityPayload(
     liqiudityAmt: UITokenAmount, 
     lhsMinAmt: UITokenAmount, 
     rhsMinAmt: UITokenAmount,
-  ): Promise<Types.TransactionPayload>;
+  ): Promise<TransactionPayloadEntryFunction>;
 }
 
 export class RouteStep {
@@ -210,7 +210,7 @@ export class SteppedRoute extends TradeRoute {
   makeSwapPayload( 
     amountIn: UITokenAmount, 
     minAmountOut: UITokenAmount, 
-  ): Promise<Types.TransactionPayload> {
+  ): Promise<TransactionPayloadEntryFunction> {// TxnBuilderTypes.TransactionPayloadEntryFunction
     if (this.steps.length === 1) {
       return this.steps[0].pool.makeSwapPayloadDirectional(amountIn, minAmountOut, this.steps[0].isXtoY);
     } else if (this.steps.length === 2) {

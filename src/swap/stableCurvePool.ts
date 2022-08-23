@@ -3,6 +3,7 @@ import { Stable_curve_scripts, Stable_curve_swap } from '../generated/hippo_swap
 import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
 import { TransactionPayload } from 'aptos/dist/generated';
 import {CoinInfo} from "../generated/coin_list/coin_list";
+import {TxnBuilderTypes} from "aptos";
 
 export class HippoStableCurvePool extends HippoPool {
   static FEE_DENOMINATOR = 10 ** 6;
@@ -148,7 +149,7 @@ export class HippoStableCurvePool extends HippoPool {
     amountIn: UITokenAmount,
     minAmountOut: UITokenAmount,
     isXtoY: boolean
-  ): Promise<TransactionPayload> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
     const toTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
     const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
@@ -173,7 +174,7 @@ export class HippoStableCurvePool extends HippoPool {
     }
   }
 
-  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayload> {
+  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
     const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
     return Stable_curve_scripts.buildPayload_add_liquidity(xRawAmt, yRawAmt, this.lpTag().typeParams);
@@ -183,7 +184,7 @@ export class HippoStableCurvePool extends HippoPool {
     liqiudityAmt: UITokenAmount,
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount,
-  ): Promise<TransactionPayload> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
     const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
     const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
