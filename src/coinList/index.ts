@@ -1,8 +1,8 @@
-import {AptosAccount} from "aptos";
+import { AptosAccount } from "aptos";
 import { TypeInfo } from "../generated/aptos_std/type_info";
 import { Router } from "../generated/hippo_swap"
-import {CoinInfo} from "../generated/coin_list/coin_list";
-import {App} from "../generated";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { App } from "../generated";
 
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;

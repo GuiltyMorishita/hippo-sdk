@@ -1,7 +1,7 @@
 import { AptosParserRepo, StructTag, u8 } from "@manahippo/move-to-ts";
-import {AptosAccount, AptosClient, FaucetClient, Types} from "aptos";
+import { AptosAccount, Types } from "aptos";
 import { CONFIGS } from "../../config";
-import {App, getProjectRepo} from "../../generated";
+import { App } from "../../generated";
 import { TokenPairMetadata } from "../../generated/hippo_swap/cp_swap";
 import { PieceSwapPoolInfo } from "../../generated/hippo_swap/piece_swap";
 import { StableCurvePoolInfo } from "../../generated/hippo_swap/stable_curve_swap";
@@ -38,8 +38,8 @@ export class HippoTradingPool extends TradingPool {
   }
   get isRoutable() { return true; }
   // X-Y
-  get xCoinInfo() { return this.pool.xTokenInfo;}
-  get yCoinInfo() { return this.pool.yTokenInfo;}
+  get xCoinInfo() { return this.pool.xCoinInfo;}
+  get yCoinInfo() { return this.pool.yCoinInfo;}
   // state-dependent
   isStateLoaded(): boolean { return true; }
   async reloadState(app: App): Promise<void> {
@@ -71,17 +71,15 @@ export class HippoTradingPool extends TradingPool {
   }
 }
 
-
-
 export class HippoPoolProvider extends TradingPoolProvider {
-  async loadPoolList(app: App, fetcher: AptosAccount): Promise<TradingPool[]> {
-    const swapClient = await HippoSwapClient.createInOneCall(app, CONFIGS.devnet,fetcher);
+  async loadPoolList(): Promise<TradingPool[]> {
+    const swapClient = await HippoSwapClient.createInOneCall(this.app, this.netConfig, this.fetcher);
     const poolList: TradingPool[] = [];
     for(const fullname in swapClient.xyFullnameToPoolSet) {
       const poolSet = swapClient.xyFullnameToPoolSet[fullname];
       const pools = poolSet.pools();
       for (const pool of pools) {
-        poolList.push(new HippoTradingPool(pool, app.parserRepo));
+        poolList.push(new HippoTradingPool(pool, this.app.parserRepo));
       }
     }
     return poolList;

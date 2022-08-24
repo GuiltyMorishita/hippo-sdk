@@ -1,13 +1,12 @@
-import {App, getProjectRepo} from "../generated";
-
-import { NetworkConfiguration } from "../config";
+import { App } from "../generated";
 import { CoinListClient } from "../coinList";
 import { EconiaPoolProvider } from "./econia";
 import { HippoPoolProvider } from "./hippo";
 import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from "./types";
-import {AptosAccount, AptosClient} from "aptos";
+import { AptosAccount } from "aptos";
 import { PontemPoolProvider } from "./pontem";
-import {CoinInfo} from "../generated/coin_list/coin_list";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { CONFIGS } from "../config";
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -22,11 +21,11 @@ export class TradeAggregator {
     this.xToAnyPools = new Map();
   }
 
-  static async create(app: App, fetcher: AptosAccount) {
+  static async create(app: App, fetcher: AptosAccount, netConfig = CONFIGS.devnet) {
     const registryClient =  await CoinListClient.load(app, fetcher);
-    const hippoProvider = new HippoPoolProvider();
-    const econiaProvider = new EconiaPoolProvider(registryClient);
-    const pontemProvider = new PontemPoolProvider(registryClient);
+    const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
+    const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);
+    const pontemProvider = new PontemPoolProvider(app, fetcher, netConfig, registryClient);
     const aggregator = new TradeAggregator(
       registryClient,
       app,
@@ -43,7 +42,7 @@ export class TradeAggregator {
   async loadAllPoolLists() {
     const promises = [];
     for (const provider of this.poolProviders) {
-      promises.push(provider.loadPoolList(this.app, this.fetcher));
+      promises.push(provider.loadPoolList());
     }
     const allResult = await Promise.all(promises);
     this.allPools = allResult.flat();

@@ -1,8 +1,9 @@
 import { AtomicTypeTag, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
-import {AptosAccount, AptosClient, TxnBuilderTypes, Types} from "aptos";
-import {CoinInfo} from "../generated/coin_list/coin_list";
+import { AptosAccount, TxnBuilderTypes, Types} from "aptos";
+import { CoinInfo } from "../generated/coin_list/coin_list";
 import { Aggregatorv6 } from "../generated/hippo_aggregator";
-import {App} from "../generated";
+import { App } from "../generated";
+import { CONFIGS } from "../config";
 
 export type UITokenAmount = number;
 export type UITokenAmountRatio = number;
@@ -66,14 +67,14 @@ export class TradeStep {
   ) {
 
   }
-  get xTokenInfo() {
+  get xCoinInfo() {
     return this.isXtoY ? this.pool.xCoinInfo : this.pool.yCoinInfo;
   }
-  get yTokenInfo() {
+  get yCoinInfo() {
     return this.isXtoY ? this.pool.yCoinInfo : this.pool.xCoinInfo;
   }
-  get xTag() { return this.xTokenInfo.token_type.toTypeTag(); }
-  get yTag() { return this.yTokenInfo.token_type.toTypeTag(); }
+  get xTag() { return this.xCoinInfo.token_type.toTypeTag(); }
+  get yTag() { return this.yCoinInfo.token_type.toTypeTag(); }
 
   getPrice(): PriceType {
     const price = this.pool.getPrice();
@@ -106,29 +107,29 @@ export class TradeRoute {
     }
     this.tokens = [];
     // steps have matching ends
-    let tokFullname = steps[0].xTokenInfo.token_type.typeFullname();
-    this.tokens.push(steps[0].xTokenInfo);
+    let tokFullname = steps[0].xCoinInfo.token_type.typeFullname();
+    this.tokens.push(steps[0].xCoinInfo);
     for(const step of steps) {
-      const xFullname = step.xTokenInfo.token_type.typeFullname();
-      const yFullname = step.yTokenInfo.token_type.typeFullname();
+      const xFullname = step.xCoinInfo.token_type.typeFullname();
+      const yFullname = step.yCoinInfo.token_type.typeFullname();
       // make sure LHS matches tokFullname
       if (xFullname !== tokFullname) {
         throw new Error(`Mismatching tokens in route. Expected ${tokFullname} but received ${xFullname}`);
       }
       tokFullname = yFullname;
-      this.tokens.push(step.yTokenInfo);
+      this.tokens.push(step.yCoinInfo);
     }
   }
 
-  get xTokenInfo() {
-    return this.steps[0].xTokenInfo;
+  get xCoinInfo() {
+    return this.steps[0].xCoinInfo;
   }
 
-  get yTokenInfo() {
-    return this.steps[this.steps.length - 1].yTokenInfo;
+  get yCoinInfo() {
+    return this.steps[this.steps.length - 1].yCoinInfo;
   }
-  get xTag() { return this.xTokenInfo.token_type.toTypeTag(); }
-  get yTag() { return this.yTokenInfo.token_type.toTypeTag(); }
+  get xTag() { return this.xCoinInfo.token_type.toTypeTag(); }
+  get yTag() { return this.yCoinInfo.token_type.toTypeTag(); }
 
   getPrice(): PriceType {
     let xToY = 1;
@@ -147,8 +148,8 @@ export class TradeRoute {
       outputUiAmt = step.getQuote(outputUiAmt).outputUiAmt;
     }
     return {
-      inputSymbol: this.xTokenInfo.symbol.str(),
-      outputSymbol: this.yTokenInfo.symbol.str(),
+      inputSymbol: this.xCoinInfo.symbol.str(),
+      outputSymbol: this.yCoinInfo.symbol.str(),
       inputUiAmt,
       outputUiAmt,
       avgPrice: outputUiAmt / inputUiAmt,
@@ -161,17 +162,17 @@ export class TradeRoute {
     return fullnameSet.size < this.tokens.length;
   }
 
-  makePaylod(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): TxnBuilderTypes.TransactionPayloadEntryFunction {
-    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber()));
-    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber()));
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): TxnBuilderTypes.TransactionPayloadEntryFunction {
+    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
+    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
     if (this.steps.length === 1) {
       const step0 = this.steps[0];
       return Aggregatorv6.buildPayload_one_step_route(
         u8(step0.pool.dexType), step0.pool.poolType, step0.isXtoY,
         u64(inputSize), u64(minOutputSize),
         [
-          this.xTokenInfo.token_type.toTypeTag(), 
-          this.yTokenInfo.token_type.toTypeTag(), 
+          this.xCoinInfo.token_type.toTypeTag(),
+          this.yCoinInfo.token_type.toTypeTag(),
           step0.getTagE()
         ] // X, Y, E
       )
@@ -218,10 +219,10 @@ export class TradeRoute {
   }
 
   debugPrint() {
-    const lastSymbol = this.steps[this.steps.length - 1].yTokenInfo.symbol.str();
-    console.log(`Route: ${this.steps.map(step => step.xTokenInfo.symbol.str()).join(" -> ")} -> ${lastSymbol}`);
+    const lastSymbol = this.steps[this.steps.length - 1].yCoinInfo.symbol.str();
+    console.log(`Route: ${this.steps.map(step => step.xCoinInfo.symbol.str()).join(" -> ")} -> ${lastSymbol}`);
     this.steps.forEach((step, i) => {
-      console.log(`Step ${i}: ${step.xTokenInfo.symbol.str()} -> ${step.yTokenInfo.symbol.str()} (via ${DEX_TYPE_NAME[step.pool.dexType]})`);
+      console.log(`Step ${i}: ${step.xCoinInfo.symbol.str()} -> ${step.yCoinInfo.symbol.str()} (via ${DEX_TYPE_NAME[step.pool.dexType]})`);
     }) ;
   }
 }
@@ -233,12 +234,17 @@ export interface RouteAndQuote {
 
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
+  constructor(
+      public app: App,
+      public fetcher: AptosAccount,
+      public netConfig= CONFIGS.devnet
+  ) {
+  }
+  abstract loadPoolList(): Promise<TradingPool[]>;
 
-  abstract loadPoolList(app: App, fetcher: AptosAccount): Promise<TradingPool[]>;
-
-  async reloadAllPoolState(app: App, fetcher: AptosAccount) {
-    const pools = await this.loadPoolList(app, fetcher);
-    const promises = pools.map(pool => pool.reloadState(app));
+  async reloadAllPoolState() {
+    const pools = await this.loadPoolList();
+    const promises = pools.map(pool => pool.reloadState(this.app));
     await Promise.all(promises);
   }
 }

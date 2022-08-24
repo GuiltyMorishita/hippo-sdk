@@ -20,8 +20,6 @@ import { CoinInfo } from "../generated/aptos_framework/coin";
 import { PoolType } from "../swap/baseTypes";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
-import { Coin_list } from "../generated/coin_list"
-
 
 const actionShowTokenRegistry = async () => {
   const {app, hippoDexAddress, account} = readConfig(program);
@@ -397,7 +395,7 @@ const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhs
     console.log("Found multiple pools of the same type???");
     return;
   }
-  if (pools[0].xTokenInfo.symbol.str() !== lhsSymbol || pools[0].yTokenInfo.symbol.str() !== rhsSymbol) {
+  if (pools[0].xCoinInfo.symbol.str() !== lhsSymbol || pools[0].yCoinInfo.symbol.str() !== rhsSymbol) {
     console.log("Pool mismatch");
     return;
   }
@@ -423,7 +421,7 @@ const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, 
     console.log("Found multiple pools of the same type???");
     return;
   }
-  if (pools[0].xTokenInfo.symbol.str() !== lhsSymbol || pools[0].yTokenInfo.symbol.str() !== rhsSymbol) {
+  if (pools[0].xCoinInfo.symbol.str() !== lhsSymbol || pools[0].yCoinInfo.symbol.str() !== rhsSymbol) {
     console.log("Pool mismatch");
     return;
   }
@@ -691,7 +689,7 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
     console.log("No route available");
     return;
   }
-  const payload = quotes[0].route.makePaylod(inputAmt, 0);
+  const payload = quotes[0].route.makePayload(inputAmt, 0);
   await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
@@ -707,7 +705,7 @@ const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt
     console.log("No route available");
     return;
   }
-  const payload = quotes[parseInt(routeIdx)].route.makePaylod(inputAmt, 0);
+  const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, 0);
   await sendPayloadTx(app.client, account, payload);
   await testWalletClient();
 }
@@ -724,7 +722,7 @@ const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt:
     console.log("No route available");
     return;
   }
-  const payload = quotes[0].route.makePaylod(inputAmt, minOutUiAmt);
+  const payload = quotes[0].route.makePayload(inputAmt, minOutUiAmt);
   const simResult = await simulatePayloadTx(app.client, account, payload);
   printResource(simResult);
   await testWalletClient();
@@ -742,7 +740,7 @@ const aggSimulateSwapWithRoute = async (fromSymbol: string, toSymbol: string, in
     console.log("No route available");
     return;
   }
-  const payload = quotes[parseInt(routeIdx)].route.makePaylod(inputAmt, minOutUiAmt);
+  const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, minOutUiAmt);
   const simResult = await simulatePayloadTx(app.client, account, payload);
   printResource(simResult);
   await testWalletClient();

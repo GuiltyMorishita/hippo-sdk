@@ -45,9 +45,9 @@ describe('Integration Tests', () => {
 
   it('get direct pool', async () => {
     let pools = await swapClient.getDirectPoolsBySymbols('USDT', 'BTC');
-    printResource(pools.map(pool => pool.lpTokenInfo.name));
+    printResource(pools.map(pool => pool.lpCoinInfo.name));
     pools = await swapClient.getDirectPoolsBySymbols('USDC', 'DAI');
-    printResource(pools.map(pool => pool.lpTokenInfo.name));
+    printResource(pools.map(pool => pool.lpCoinInfo.name));
   });
 
 

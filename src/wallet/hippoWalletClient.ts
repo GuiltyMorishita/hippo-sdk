@@ -3,13 +3,13 @@ import {
   StructTag,
   u64
 } from "@manahippo/move-to-ts";
-import {AptosAccount, AptosClient, HexString} from "aptos";
+import { AptosAccount, AptosClient, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
 
 import { Router } from "../generated/hippo_swap"
 import * as AptosFramework from "../generated/aptos_framework";
 import * as CoinList from "../generated/coin_list";
-import {getCoinStoresForAddress, typeInfoToTypeTag} from "../utils";
+import { getCoinStoresForAddress, typeInfoToTypeTag } from "../utils";
 import { App } from "../generated";
 
 export class HippoWalletClient {

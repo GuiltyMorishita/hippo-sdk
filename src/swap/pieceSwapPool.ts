@@ -16,11 +16,11 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 
   xUiBalance() {
-    return this.poolInfo.reserve_x.value.toJsNumber() / Math.pow(10, this.xTokenInfo.decimals.toJsNumber());
+    return this.poolInfo.reserve_x.value.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
   }
 
   yUiBalance() {
-    return this.poolInfo.reserve_y.value.toJsNumber() / Math.pow(10, this.yTokenInfo.decimals.toJsNumber());
+    return this.poolInfo.reserve_y.value.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
   }
 
   getId(): string {
@@ -49,20 +49,20 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {
-    const inputTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
-    const outputTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
+    const inputCoinInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
+    const outputCoinInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
     const initialPrice = this.getCurrentPriceDirectional(isXtoY);
-    const amountIn = u64(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
+    const amountIn = u64(Math.floor(inputUiAmt * Math.pow(10, inputCoinInfo.decimals.toJsNumber())));
     const amountOut = isXtoY ? this.poolInfo.quote_x_to_y_after_fees(amountIn) : this.poolInfo.quote_y_to_x_after_fees(amountIn);
-    const outputUiAmt = amountOut.toJsNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber())
+    const outputUiAmt = amountOut.toJsNumber() / Math.pow(10, outputCoinInfo.decimals.toJsNumber())
     const finalPrice = this.getCurrentPriceDirectional(
       isXtoY, 
       isXtoY ? inputUiAmt : -outputUiAmt,
       isXtoY ? -outputUiAmt : inputUiAmt,
     );
     return {
-      inputSymbol: inputTokenInfo.symbol.str(),
-      outputSymbol: outputTokenInfo.symbol.str(),
+      inputSymbol: inputCoinInfo.symbol.str(),
+      outputSymbol: outputCoinInfo.symbol.str(),
       inputUiAmt: inputUiAmt,
       outputUiAmt: outputUiAmt,
       initialPrice: initialPrice.yToX,
@@ -98,10 +98,10 @@ export class HippoPieceSwapPool extends HippoPool {
     minAmountOut: UITokenAmount, 
     isXtoY: boolean
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const fromTokenInfo = isXtoY ? this.xTokenInfo : this.yTokenInfo;
-    const toTokenInfo = isXtoY ? this.yTokenInfo : this.xTokenInfo;
-    const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
-    const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const fromCoinInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
+    const toCoinInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
+    const fromRawAmount = u64((amountIn * Math.pow(10, fromCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const toRawAmount = u64((minAmountOut * Math.pow(10, toCoinInfo.decimals.toJsNumber())).toFixed(0));
     if(isXtoY) {
       return Piece_swap_script.buildPayload_swap_script(
         fromRawAmount, 
@@ -123,8 +123,8 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 
   async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xTokenInfo.decimals.toJsNumber())).toFixed(0));
-    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
     return Piece_swap_script.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams);
   }
 
@@ -133,7 +133,7 @@ export class HippoPieceSwapPool extends HippoPool {
     _lhsMinAmt: UITokenAmount, 
     _rhsMinAmt: UITokenAmount,
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpTokenInfo.decimals.toJsNumber()));
+    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
     return Piece_swap_script.buildPayload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams);
   }
 

@@ -3,7 +3,7 @@ import bigInt from "big-integer";
 import { Router } from "../generated/hippo_swap";
 import { typeInfoToTypeTag } from "../utils";
 import { CoinInfo } from "../generated/coin_list/coin_list";
-import {TransactionPayloadEntryFunction} from "aptos/dist/transaction_builder/aptos_types";
+import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
 
 export type UITokenAmount = number;
 
@@ -43,18 +43,18 @@ export function poolTypeToName(poolType: PoolType) {
 
 export abstract class TradeRoute {
   protected constructor(
-    public xTokenInfo: CoinInfo,
-    public yTokenInfo: CoinInfo,
+    public xCoinInfo: CoinInfo,
+    public yCoinInfo: CoinInfo,
   ) {
 
   }
 
   xTag(): StructTag {
-    return typeInfoToTypeTag(this.xTokenInfo.token_type) as StructTag;
+    return typeInfoToTypeTag(this.xCoinInfo.token_type) as StructTag;
   }
 
   yTag(): StructTag {
-    return typeInfoToTypeTag(this.yTokenInfo.token_type) as StructTag;
+    return typeInfoToTypeTag(this.yCoinInfo.token_type) as StructTag;
   }
 
   abstract getCurrentPrice(): PriceType;
@@ -72,11 +72,11 @@ export abstract class TradeRoute {
 
 export abstract class HippoPool extends TradeRoute {
   protected constructor(
-    xTokenInfo: CoinInfo,
-    yTokenInfo: CoinInfo,
-    public lpTokenInfo: CoinInfo,
+    xCoinInfo: CoinInfo,
+    yCoinInfo: CoinInfo,
+    public lpCoinInfo: CoinInfo,
   ) {
-    super(xTokenInfo, yTokenInfo);
+    super(xCoinInfo, yCoinInfo);
   }
 
   abstract estimateWithdrawalOutput(lpUiAmount: UITokenAmount, lpSupplyUiAmt: UITokenAmount): {xUiAmt: UITokenAmount; yUiAmt: UITokenAmount};
@@ -87,7 +87,7 @@ export abstract class HippoPool extends TradeRoute {
   abstract getPoolType(): PoolType;
 
   lpTag(): StructTag {
-    return typeInfoToTypeTag(this.lpTokenInfo.token_type) as StructTag;
+    return typeInfoToTypeTag(this.lpCoinInfo.token_type) as StructTag;
   }
 
   xyFullname(): string {
@@ -144,11 +144,11 @@ export class RouteStep {
   }
 
   lhsTokenInfo() {
-    return this.isXtoY ? this.pool.xTokenInfo : this.pool.yTokenInfo;
+    return this.isXtoY ? this.pool.xCoinInfo : this.pool.yCoinInfo;
   }
 
   rhsTokenInfo() {
-    return this.isXtoY ? this.pool.yTokenInfo : this.pool.xTokenInfo;
+    return this.isXtoY ? this.pool.yCoinInfo : this.pool.xCoinInfo;
   }
 }
 
@@ -195,8 +195,8 @@ export class SteppedRoute extends TradeRoute {
         finalPrice *= quote.finalPrice;
       }
       return {
-        inputSymbol: this.xTokenInfo.symbol.str(),
-        outputSymbol: this.yTokenInfo.symbol.str(),
+        inputSymbol: this.xCoinInfo.symbol.str(),
+        outputSymbol: this.yCoinInfo.symbol.str(),
         avgPrice,
         initialPrice,
         finalPrice,
@@ -262,7 +262,7 @@ export class SteppedRoute extends TradeRoute {
   }
 
   concat(next: SteppedRoute) {
-    if(this.yTokenInfo.symbol !== next.xTokenInfo.symbol) {
+    if(this.yCoinInfo.symbol !== next.xCoinInfo.symbol) {
       throw new Error(`Unable to join incompatible eroutes`);
     }
     return new SteppedRoute(this.steps.concat(next.steps));

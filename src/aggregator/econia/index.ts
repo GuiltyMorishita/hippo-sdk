@@ -1,13 +1,14 @@
 import { AptosLocalCache, AptosParserRepo, TypeTag, u64, U64, u8 } from "@manahippo/move-to-ts";
-import { AptosClient, HexString, Types } from "aptos";
-import {App, getProjectRepo} from "../../generated";
+import {AptosAccount, HexString, Types} from "aptos";
+import { App, getProjectRepo } from "../../generated";
 import { EconiaClient } from "./EconiaClient";
 import { get_orders_sdk_, OrderBook } from "../../generated/econia/market";
 import { MarketInfo } from "../../generated/econia/registry";
 import { CoinListClient } from "../../coinList";
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from "../types";
 import { Registry } from "../../generated/econia";
-import {CoinInfo} from "../../generated/coin_list/coin_list";
+import { CoinInfo } from "../../generated/coin_list/coin_list";
+import {CONFIGS} from "../../config";
 
 export * from "./EconiaClient";
 
@@ -156,13 +157,15 @@ export class EconiaTradingPoolV1 extends TradingPool {
 
 export class EconiaPoolProvider extends TradingPoolProvider {
   constructor(
+    app: App,
+    fetcher: AptosAccount,
+    netConfig= CONFIGS.devnet,
     public registry: CoinListClient,
   ) {
-    super();
+    super(app,fetcher,netConfig);
   }
-  async loadPoolList(app: App): Promise<TradingPool[]> {
-    const econiaClient = new EconiaClient(app.client, Registry.moduleAddress);
-    const repo = getProjectRepo();
+  async loadPoolList(): Promise<TradingPool[]> {
+    const econiaClient = new EconiaClient(this.app.client, Registry.moduleAddress);
     const markets = await econiaClient.getMarkets();
     const pools : TradingPool[] = [];
     const promises: Promise<void>[] = [];
@@ -174,7 +177,7 @@ export class EconiaPoolProvider extends TradingPoolProvider {
           null,
           mi,
           owner,
-          repo,
+          this.app.parserRepo,
         ));
       }
     });

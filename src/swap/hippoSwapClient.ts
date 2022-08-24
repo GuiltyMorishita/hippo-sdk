@@ -1,12 +1,10 @@
 import {
-  AptosParserRepo,
   getTypeTagFullname,
   parseMoveStructTag,
-  SimpleStructTag,
   StructTag,
   TypeTag
 } from "@manahippo/move-to-ts";
-import {AptosAccount, AptosClient, HexString} from "aptos";
+import { AptosAccount, HexString } from "aptos";
 import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
 import { Cp_swap, Stable_curve_swap, Piece_swap } from "../generated/hippo_swap";
@@ -18,11 +16,7 @@ import { HippoConstantProductPool } from "./constantProductPool";
 import { HippoStableCurvePool } from "./stableCurvePool";
 import { HippoPieceSwapPool } from "./pieceSwapPool";
 import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
-import {App} from "../generated";
-import {CoinList, Nothing} from "../generated/coin_list/coin_list";
-import * as Aptos_std from "../generated/aptos_std";
-import * as Std from "../generated/std";
-import * as $ from "@manahippo/move-to-ts";
+import { App } from "../generated";
 
 
 export async function loadHippoDexResources(app: App, netConf: NetworkConfiguration) {
@@ -109,11 +103,11 @@ export class PoolSet {
 
 export class HippoSwapClient {
   // supported single tokens
-  public singleTokens: Coin_list.CoinInfo[];
+  public singleCoins: Coin_list.CoinInfo[];
   // maps TokenInfo.symbol to TokenInfo
-  public symbolToTokenInfo: Record<string, Coin_list.CoinInfo>;
+  public symbolToCoinInfo: Record<string, Coin_list.CoinInfo>;
   // maps token-struct-fullname to TokenInfo
-  public tokenFullnameToTokenInfo: Record<string, Coin_list.CoinInfo>;
+  public coinFullnameToCoinInfo: Record<string, Coin_list.CoinInfo>;
   // maps `${xToken-struct-fullname}<->${yToken-struct-fullname}` to HippoPool[]
   public xyFullnameToPoolSet: Record<string, PoolSet>;
   public contractAddress: HexString;
@@ -141,9 +135,9 @@ export class HippoSwapClient {
     public fetcher: AptosAccount
   ) {
     // init cached maps/lists
-    this.singleTokens = [];
-    this.symbolToTokenInfo = {};
-    this.tokenFullnameToTokenInfo = {};
+    this.singleCoins = [];
+    this.symbolToCoinInfo = {};
+    this.coinFullnameToCoinInfo = {};
     this.xyFullnameToPoolSet = {};
     this.contractAddress = netConfig.hippoDexAddress;
     // build maps and caches from coinInfoList
@@ -151,15 +145,15 @@ export class HippoSwapClient {
   }
 
   buildCache() {
-    this.singleTokens = [];
-    this.symbolToTokenInfo = {};
-    this.tokenFullnameToTokenInfo = {};
+    this.singleCoins = [];
+    this.symbolToCoinInfo = {};
+    this.coinFullnameToCoinInfo = {};
     this.xyFullnameToPoolSet = {};
     for(const coinInfo of this.coinInfoList) {
       const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
       const tokenFullname = getTypeTagFullname(coinTypeTag);
-      this.symbolToTokenInfo[coinInfo.symbol.str()] = coinInfo;
-      this.tokenFullnameToTokenInfo[tokenFullname] = coinInfo;
+      this.symbolToCoinInfo[coinInfo.symbol.str()] = coinInfo;
+      this.coinFullnameToCoinInfo[tokenFullname] = coinInfo;
       if (
         coinTypeTag instanceof StructTag &&
         coinTypeTag.address.hex() === this.netConfig.hippoDexAddress.hex() &&
@@ -169,7 +163,7 @@ export class HippoSwapClient {
         continue;
       }
       else {
-        this.singleTokens.push(coinInfo);
+        this.singleCoins.push(coinInfo);
       }
     }
     // add CP pools
@@ -195,29 +189,29 @@ export class HippoSwapClient {
       throw new Error(`Unexpected typeparameter length: ${proto.typeTag.typeParams.length }`);
     }
     const [xTag, yTag] = typeTag.typeParams;
-    const xTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(xTag)];
-    const yTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(yTag)];
+    const xTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(xTag)];
+    const yTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(yTag)];
     return {xTokenInfo, yTokenInfo, xTag, yTag};
   }
 
   private setCPPool(cpMeta: Cp_swap.TokenPairMetadata) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(cpMeta);
     const lpTag = new StructTag(Cp_swap.moduleAddress, Cp_swap.moduleName, Cp_swap.LPToken.structName, [xTag, yTag]);
-    const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
+    const lpTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoConstantProductPool(xTokenInfo, yTokenInfo, lpTokenInfo, cpMeta));
   }
 
   private setStableCurvePool(stablePool: Stable_curve_swap.StableCurvePoolInfo) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(stablePool);
     const lpTag = new StructTag(Stable_curve_swap.moduleAddress, Stable_curve_swap.moduleName, Stable_curve_swap.LPToken.structName, [xTag, yTag]);
-    const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
+    const lpTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoStableCurvePool(xTokenInfo, yTokenInfo, lpTokenInfo, stablePool));
   }
 
   private setPiecePool(piecePool: Piece_swap.PieceSwapPoolInfo) {
     const {xTokenInfo, yTokenInfo, xTag, yTag} = this.getXYTokenInfo(piecePool);
     const lpTag = new StructTag(Piece_swap.moduleAddress, Piece_swap.moduleName, Piece_swap.LPToken.structName, [xTag, yTag]);
-    const lpTokenInfo = this.tokenFullnameToTokenInfo[getTypeTagFullname(lpTag)];
+    const lpTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoPieceSwapPool(xTokenInfo, yTokenInfo, lpTokenInfo, piecePool));
   }
   private setPool(pool: HippoPool) {
@@ -239,7 +233,7 @@ export class HippoSwapClient {
   }
 
   getTokenInfoBySymbol(symbol: string) {
-    return this.symbolToTokenInfo[symbol];
+    return this.symbolToCoinInfo[symbol];
   }
 
   get1StepRoutesBySymbol(symbolX: string, symbolY: string): SteppedRoute[] {
@@ -273,7 +267,7 @@ export class HippoSwapClient {
     }
     // enumarate S such that Step1Routes(X, S).length > 0 && Step1Routes(S, Y) > 0
     const routes: SteppedRoute[] = [];
-    for(const S of this.singleTokens) {
+    for(const S of this.singleCoins) {
       if([symbolX, symbolY].includes(S.symbol.str())) {
         continue;
       }
@@ -304,7 +298,7 @@ export class HippoSwapClient {
     }
     // enumarate S such that Step2Routes(X, S).length > 0 && Step1Routes(S, Y) > 0
     const routes: SteppedRoute[] = [];
-    for(const S of this.singleTokens) {
+    for(const S of this.singleCoins) {
       if([symbolX, symbolY].includes(S.symbol.str())) {
         continue;
       }
@@ -448,7 +442,7 @@ export class HippoSwapClient {
   }
 
   async getTokenTotalSupplyBySymbol(symbol: string) {
-    const tokenInfo = this.symbolToTokenInfo[symbol];
+    const tokenInfo = this.symbolToCoinInfo[symbol];
     if (!tokenInfo) {
       throw new Error("Symbol not found");
     }
@@ -456,12 +450,12 @@ export class HippoSwapClient {
   }
 
   printSelf() {
-    for(const token of this.singleTokens) {
+    for(const token of this.singleCoins) {
       console.log(`Single token: ${token.symbol.str()}`);
     }
     for(const pool of this.allPools()) {
-      const xTokenInfo = pool.xTokenInfo;
-      const yTokenInfo = pool.yTokenInfo;
+      const xTokenInfo = pool.xCoinInfo;
+      const yTokenInfo = pool.yCoinInfo;
       console.log("#############")
       console.log(`Pool: ${xTokenInfo.symbol.str()} <-> ${yTokenInfo.symbol.str()}`);
       console.log(`Type: ${poolTypeToName(pool.getPoolType())}`);

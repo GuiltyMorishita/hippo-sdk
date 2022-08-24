@@ -1,11 +1,12 @@
 import { parseMoveStructTag, StructTag, TypeTag, u8 } from "@manahippo/move-to-ts";
-import { AptosClient, HexString, Types } from "aptos";
+import {AptosAccount, HexString, Types} from "aptos";
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from "../types";
 import { CoinListClient } from "../../coinList";
 import { typeTagToTypeInfo } from "../../utils";
-import {App, hippo_swap} from "../../generated";
+import { App, hippo_swap } from "../../generated";
 import bigInt from "big-integer";
-import {CoinInfo} from "../../generated/coin_list/coin_list";
+import { CoinInfo } from "../../generated/coin_list/coin_list";
+import {CONFIGS} from "../../config";
 
 export enum PontemPoolTypes {
   Stable = 1,
@@ -81,26 +82,29 @@ export class PontemTradingPool extends TradingPool {
 
 export class PontemPoolProvider extends TradingPoolProvider {
   constructor(
+    app: App,
+    fetcher: AptosAccount,
+    netConfig= CONFIGS.devnet,
     public registry: CoinListClient,
   ) {
-    super();
+    super(app, fetcher, netConfig);
   }
-  async loadPoolList(app: App): Promise<TradingPool[]> {
+  async loadPoolList(): Promise<TradingPool[]> {
     const poolList: TradingPool[] = [];
     const ownerAddress = hippo_swap.Cp_swap.moduleAddress;
-    const resources = await app.client.getAccountResources(ownerAddress);
+    const resources = await this.app.client.getAccountResources(ownerAddress);
     for(const resource of resources) {
       if (resource.type.indexOf("liquidity_pool::LiquidityPool") >= 0) {
         const tag = parseMoveStructTag(resource.type);
         const xTag = tag.typeParams[0] as StructTag;
         const yTag = tag.typeParams[1] as StructTag;
         const lpTag = tag.typeParams[2] as StructTag;
-        const xTokInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
-        const yTokInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
-        if (!xTokInfo || !yTokInfo) {
+        const xCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
+        const yCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
+        if (!xCoinInfo || !yCoinInfo) {
           continue;
         }
-        const pool = new PontemTradingPool(ownerAddress, xTokInfo, yTokInfo, lpTag, tag);
+        const pool = new PontemTradingPool(ownerAddress, xCoinInfo, yCoinInfo, lpTag, tag);
         poolList.push(pool);
       }
     }
