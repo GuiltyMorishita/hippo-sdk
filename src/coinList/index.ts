@@ -1,20 +1,17 @@
 import { AptosAccount } from "aptos";
 import { TypeInfo } from "../generated/aptos_std/type_info";
-import { Router } from "../generated/hippo_swap"
+import { Router } from "../generated/hippo_swap";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { App } from "../generated";
 
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;
   symbolToCoinInfo: Record<string, CoinInfo>;
-  coinList: CoinInfo[]
-  constructor(
-    public app: App,
-    public fetcher: AptosAccount
-  ) {
+  coinList: CoinInfo[];
+  constructor(public app: App, public fetcher: AptosAccount) {
     this.fullnameToCoinInfo = {};
-    this.symbolToCoinInfo = {}
-    this.coinList = []
+    this.symbolToCoinInfo = {};
+    this.coinList = [];
   }
 
   hasTokenType(tokenType: TypeInfo) {
@@ -22,7 +19,7 @@ export class CoinListClient {
   }
 
   getCoinInfoList() {
-    return this.coinList
+    return this.coinList;
   }
 
   getCoinInfoBySymbol(symbol: string) {
@@ -34,19 +31,19 @@ export class CoinListClient {
   }
 
   static async load(app: App, fetcher: AptosAccount) {
-    let coinRegistry = new CoinListClient(app, fetcher)
-    await coinRegistry.buildCache()
+    let coinRegistry = new CoinListClient(app, fetcher);
+    await coinRegistry.buildCache();
     return coinRegistry;
   }
 
   private async buildCache() {
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
-        this.fetcher,
-        Router.moduleAddress,
-        []
-    )
-    this.coinList = fullList.coin_info_list
-    for(const tokenInfo of fullList.coin_info_list) {
+      this.fetcher,
+      Router.moduleAddress,
+      []
+    );
+    this.coinList = fullList.coin_info_list;
+    for (const tokenInfo of fullList.coin_info_list) {
       const fullname = tokenInfo.token_type.typeFullname();
       this.fullnameToCoinInfo[fullname] = tokenInfo;
       this.symbolToCoinInfo[tokenInfo.symbol.str()] = tokenInfo;

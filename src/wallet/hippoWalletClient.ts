@@ -1,12 +1,8 @@
-import {
-  getTypeTagFullname,
-  StructTag,
-  u64
-} from "@manahippo/move-to-ts";
-import { AptosAccount, AptosClient, HexString } from "aptos";
+import { getTypeTagFullname, StructTag, u64 } from "@manahippo/move-to-ts";
+import { AptosAccount, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
 
-import { Router } from "../generated/hippo_swap"
+import { Router } from "../generated/hippo_swap";
 import * as AptosFramework from "../generated/aptos_framework";
 import * as CoinList from "../generated/coin_list";
 import { getCoinStoresForAddress, typeInfoToTypeTag } from "../utils";
@@ -40,37 +36,38 @@ export class HippoWalletClient {
     this.symbolToTokenInfo = {};
     this.devnetCoinSymbols = [];
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
-        this.fetcher,
-        Router.moduleAddress,
-        []
-    )
-    for(const tokenInfo of fullList.coin_info_list) {
+      this.fetcher,
+      Router.moduleAddress,
+      []
+    );
+    for (const tokenInfo of fullList.coin_info_list) {
       const typeTag = typeInfoToTypeTag(tokenInfo.token_type);
       const fullname = getTypeTagFullname(typeTag);
       this.fullnameToTokenInfo[fullname] = tokenInfo;
       this.symbolToTokenInfo[tokenInfo.symbol.str()] = tokenInfo;
-      if(!(typeTag instanceof StructTag)) {
+      if (!(typeTag instanceof StructTag)) {
         throw new Error();
       }
-      if(
-        typeTag.address.hex() === this.app.coin_list.devnet_coins.moduleAddress.hex() &&
+      if (
+        typeTag.address.hex() ===
+          this.app.coin_list.devnet_coins.moduleAddress.hex() &&
         typeTag.module === this.app.coin_list.devnet_coins.moduleName
       ) {
         this.devnetCoinSymbols.push(tokenInfo.symbol.str());
       }
     }
-    for(const store of this.coinStores) {
-      if(!(store.typeTag instanceof StructTag)) {
+    for (const store of this.coinStores) {
+      if (!(store.typeTag instanceof StructTag)) {
         throw new Error();
       }
       const typeTag = store.typeTag.typeParams[0];
-      if(!typeTag) {
+      if (!typeTag) {
         throw new Error();
       }
       const fullname = getTypeTagFullname(typeTag);
       this.fullnameToCoinStore[fullname] = store;
       const tokenInfo = this.fullnameToTokenInfo[fullname];
-      if(!tokenInfo) {
+      if (!tokenInfo) {
         // token not part of our registry
         continue;
       }
@@ -79,7 +76,11 @@ export class HippoWalletClient {
   }
 
   async refreshStores() {
-    this.coinStores = await getCoinStoresForAddress(this.app.client, this.walletAddress, this.app.parserRepo);
+    this.coinStores = await getCoinStoresForAddress(
+      this.app.client,
+      this.walletAddress,
+      this.app.parserRepo
+    );
     await this.buildCache();
   }
 
@@ -89,30 +90,51 @@ export class HippoWalletClient {
     walletAddress: HexString,
     fetcher: AptosAccount
   ) {
-    const stores = await getCoinStoresForAddress(app.client, walletAddress, app.parserRepo);
-    const client = new HippoWalletClient(netConf, app, walletAddress, stores, fetcher)
-    await client.buildCache()
+    const stores = await getCoinStoresForAddress(
+      app.client,
+      walletAddress,
+      app.parserRepo
+    );
+    const client = new HippoWalletClient(
+      netConf,
+      app,
+      walletAddress,
+      stores,
+      fetcher
+    );
+    await client.buildCache();
     return client;
   }
 
   makeFaucetMintToPayload(uiAmount: number, symbol: string) {
-    if(!this.devnetCoinSymbols.includes(symbol)) {
-      throw new Error(`${symbol} is not a MockCoin and we are unable to mint it.`);
+    if (!this.devnetCoinSymbols.includes(symbol)) {
+      throw new Error(
+        `${symbol} is not a MockCoin and we are unable to mint it.`
+      );
     }
     const tokenInfo = this.symbolToTokenInfo[symbol];
-    if(!tokenInfo) {
+    if (!tokenInfo) {
       throw new Error(`Cannot find TokenInfo for ${symbol}`);
     }
-    const rawAmount = u64(Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber())))
+    const rawAmount = u64(
+      Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber()))
+    );
     const tokenTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
-    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [tokenTypeTag])
+    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [
+      tokenTypeTag,
+    ]);
   }
 
   debugPrint() {
-    for(const symbol in this.symbolToCoinStore) {
+    for (const symbol in this.symbolToCoinStore) {
       const store = this.symbolToCoinStore[symbol];
       const tokenInfo = this.symbolToTokenInfo[symbol];
-      console.log(`${tokenInfo.symbol.str()}: ${store.coin.value.toJsNumber() / Math.pow(10, tokenInfo.decimals.toJsNumber())}`);
+      console.log(
+        `${tokenInfo.symbol.str()}: ${
+          store.coin.value.toJsNumber() /
+          Math.pow(10, tokenInfo.decimals.toJsNumber())
+        }`
+      );
     }
   }
 }
