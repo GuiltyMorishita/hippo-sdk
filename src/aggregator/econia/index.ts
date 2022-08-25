@@ -27,6 +27,7 @@ import { CONFIGS } from "../../config";
 export * from "./EconiaClient";
 
 export enum EconiaPoolType {
+  // eslint-disable-next-line no-unused-vars
   V1 = 1,
 }
 

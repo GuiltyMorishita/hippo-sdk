@@ -25,8 +25,11 @@ export type QuoteType = {
 };
 
 export enum DexType {
+  // eslint-disable-next-line no-unused-vars
   Hippo = 1,
+  // eslint-disable-next-line no-unused-vars
   Econia = 2,
+  // eslint-disable-next-line no-unused-vars
   Pontem = 3,
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {

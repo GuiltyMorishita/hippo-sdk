@@ -207,9 +207,13 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 enum PieceStage {
+  // eslint-disable-next-line no-unused-vars
   LEFT,
+  // eslint-disable-next-line no-unused-vars
   MIDDLE,
+  // eslint-disable-next-line no-unused-vars
   RIGHT,
 }
 

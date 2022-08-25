@@ -24,8 +24,11 @@ export type QuoteType = {
 };
 
 export enum PoolType {
+  // eslint-disable-next-line no-unused-vars
   CONSTANT_PRODUCT = 1,
+  // eslint-disable-next-line no-unused-vars
   STABLE_CURVE = 2,
+  // eslint-disable-next-line no-unused-vars
   THREE_PIECE = 3,
 }
 

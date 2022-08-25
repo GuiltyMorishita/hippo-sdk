@@ -13,10 +13,10 @@ import { aptos_framework, hippo_swap } from "../generated/";
 import { Devnet_coins } from "../generated/coin_list";
 import { printResource, printResources, typeInfoToTypeTag } from "../utils";
 import { readConfig, strToString } from "./utils";
-import { HippoSwapClient } from "../swap/hippoSwapClient";
+import { HippoSwapClient } from "../swap";
 import { HippoWalletClient } from "../wallet";
 import { CoinInfo } from "../generated/aptos_framework/coin";
-import { PoolType } from "../swap/baseTypes";
+import { PoolType } from "../swap";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
 
@@ -134,7 +134,7 @@ const actionShowWallet = async () => {
       );
       console.log(`${coinInfo.symbol}: ${coin.coin.value}`);
     } catch (e) {
-      continue;
+      console.warn(e);
     }
   }
 };

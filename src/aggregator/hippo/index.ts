@@ -20,8 +20,11 @@ import {
 } from "../types";
 
 export enum HippoPoolTypes {
+  // eslint-disable-next-line no-unused-vars
   ConstantProduct = 1,
+  // eslint-disable-next-line no-unused-vars
   StableCurve = 2,
+  // eslint-disable-next-line no-unused-vars
   ThreePiece = 3,
 }
 
@@ -59,29 +62,26 @@ export class HippoTradingPool extends TradingPool {
   }
   async reloadState(app: App): Promise<void> {
     if (this.pool instanceof HippoConstantProductPool) {
-      const resource = await TokenPairMetadata.load(
+      this.pool.cpPoolMeta = await TokenPairMetadata.load(
         this.repo,
         app.client,
         TokenPairMetadata.moduleAddress,
         (this.pool.cpPoolMeta.typeTag as StructTag).typeParams
       );
-      this.pool.cpPoolMeta = resource;
     } else if (this.pool instanceof HippoStableCurvePool) {
-      const resource = await StableCurvePoolInfo.load(
+      this.pool.stablePoolInfo = await StableCurvePoolInfo.load(
         this.repo,
         app.client,
         TokenPairMetadata.moduleAddress,
         (this.pool.stablePoolInfo.typeTag as StructTag).typeParams
       );
-      this.pool.stablePoolInfo = resource;
     } else if (this.pool instanceof HippoPieceSwapPool) {
-      const resource = await PieceSwapPoolInfo.load(
+      this.pool.poolInfo = await PieceSwapPoolInfo.load(
         this.repo,
         app.client,
         TokenPairMetadata.moduleAddress,
         (this.pool.poolInfo.typeTag as StructTag).typeParams
       );
-      this.pool.poolInfo = resource;
     } else {
       throw new Error("Unreachable");
     }

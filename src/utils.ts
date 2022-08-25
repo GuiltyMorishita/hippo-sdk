@@ -93,7 +93,6 @@ export async function getCoinStoresForAddress(
       stores.push(store);
     } catch (e) {
       console.warn(`Failed to parse resource of type: ${resource.type}`);
-      continue;
     }
   }
   return stores;

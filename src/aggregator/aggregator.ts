@@ -21,7 +21,6 @@ export class TradeAggregator {
   constructor(
     public registryClient: CoinListClient,
     public app: App,
-    public fetcher: AptosAccount,
     public readonly poolProviders: TradingPoolProvider[]
   ) {
     this.allPools = [];
@@ -47,7 +46,7 @@ export class TradeAggregator {
       netConfig,
       registryClient
     );
-    const aggregator = new TradeAggregator(registryClient, app, fetcher, [
+    const aggregator = new TradeAggregator(registryClient, app, [
       hippoProvider,
       econiaProvider,
       pontemProvider,

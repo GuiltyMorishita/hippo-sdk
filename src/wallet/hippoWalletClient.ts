@@ -1,8 +1,6 @@
 import { getTypeTagFullname, StructTag, u64 } from "@manahippo/move-to-ts";
 import { AptosAccount, HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
-
-import { Router } from "../generated/hippo_swap";
 import * as AptosFramework from "../generated/aptos_framework";
 import * as CoinList from "../generated/coin_list";
 import { getCoinStoresForAddress, typeInfoToTypeTag } from "../utils";
@@ -37,7 +35,7 @@ export class HippoWalletClient {
     this.devnetCoinSymbols = [];
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
       this.fetcher,
-      Router.moduleAddress,
+      this.netConf.hippoDexAddress,
       []
     );
     for (const tokenInfo of fullList.coin_info_list) {
