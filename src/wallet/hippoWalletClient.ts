@@ -95,7 +95,7 @@ export class HippoWalletClient {
     return client;
   }
 
-  makeFaucetMintToPayload(uiAmount: number, symbol: string) {
+  makeFaucetMintToPayload(uiAmount: number, symbol: string, isJSONPayload = false) {
     if(!this.devnetCoinSymbols.includes(symbol)) {
       throw new Error(`${symbol} is not a MockCoin and we are unable to mint it.`);
     }
@@ -105,7 +105,7 @@ export class HippoWalletClient {
     }
     const rawAmount = u64(Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber())))
     const tokenTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
-    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [tokenTypeTag])
+    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [tokenTypeTag], isJSONPayload)
   }
 
   debugPrint() {

@@ -5,6 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
+import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
 import * as Aptos_framework from "../aptos_framework";
 import * as Aptos_std from "../aptos_std";
 import * as Std from "../std";
@@ -414,18 +415,27 @@ export function mint_to_wallet_ (
 export function buildPayload_mint_to_wallet (
   amount: U64,
   $p: TypeTag[], /* <CoinType>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
-  return $.buildPayload(
-    new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"),
-    "devnet_coins",
-    "mint_to_wallet",
-    typeParamStrings,
-    [
-      amount,
-    ]
-  );
-
+  if (!isJSON) {
+    return $.buildPayload(
+      new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"),
+      "devnet_coins",
+      "mint_to_wallet",
+      typeParamStrings,
+      [
+        amount,
+      ]
+    );
+  } else {
+    return {
+      type: "entry_function_payload",
+      function: "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::mint_to_wallet",
+      type_arguments: typeParamStrings,
+      arguments: [amount].map(arg => $.payloadArg(arg)),
+    };
+  }
 }
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -480,17 +490,19 @@ export class App {
   payload_mint_to_wallet(
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
+    isJSONPayload = false,
   ) {
-    return buildPayload_mint_to_wallet(amount, $p);
+    return buildPayload_mint_to_wallet(amount, $p, isJSONPayload);
   }
   async mint_to_wallet(
     _account: AptosAccount,
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
     _maxGas = 1000,
+    isJSONPayload = false,
   ) {
-    const payload = buildPayload_mint_to_wallet(amount, $p);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    const payload = buildPayload_mint_to_wallet(amount, $p, isJSONPayload);
+    return $.sendPayloadTx(this.client, _account, payload as TransactionPayloadEntryFunction, _maxGas);
   }
 }
 

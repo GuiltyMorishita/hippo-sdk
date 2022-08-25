@@ -162,7 +162,7 @@ export class TradeRoute {
     return fullnameSet.size < this.tokens.length;
   }
 
-  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): TxnBuilderTypes.TransactionPayloadEntryFunction {
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount, isJSONPayload = false) {
     const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
     const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
     if (this.steps.length === 1) {
@@ -174,7 +174,8 @@ export class TradeRoute {
           this.xCoinInfo.token_type.toTypeTag(),
           this.yCoinInfo.token_type.toTypeTag(),
           step0.getTagE()
-        ] // X, Y, E
+        ], // X, Y, E
+        isJSONPayload
       )
     }
     else if (this.steps.length === 2) {
@@ -190,7 +191,8 @@ export class TradeRoute {
           this.tokens[2].token_type.toTypeTag(), 
           step0.getTagE(),
           step1.getTagE(),
-        ] // X, Y, Z, E1, E2
+        ], // X, Y, Z, E1, E2
+        isJSONPayload
       )
     }
     else if (this.steps.length === 3) {
@@ -210,7 +212,8 @@ export class TradeRoute {
           step0.getTagE(),
           step1.getTagE(),
           step2.getTagE(),
-        ] // X, Y, Z, M, E1, E2, E3
+        ], // X, Y, Z, M, E1, E2, E3
+        isJSONPayload
       )
     }
     else {

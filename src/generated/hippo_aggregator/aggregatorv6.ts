@@ -5,6 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
+import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
 import * as Aptos_framework from "../aptos_framework";
 import * as Econia from "../econia";
 import * as Hippo_swap from "../hippo_swap";
@@ -263,22 +264,37 @@ export function buildPayload_one_step_route (
   x_in: U64,
   y_min_out: U64,
   $p: TypeTag[], /* <X, Y, E>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
-  return $.buildPayload(
-    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
-    "one_step_route",
-    typeParamStrings,
-    [
-      first_dex_type,
-      first_pool_type,
-      first_is_x_to_y,
-      x_in,
-      y_min_out,
-    ]
-  );
-
+  if (!isJSON) {
+    return $.buildPayload(
+      new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+      "aggregatorv6",
+      "one_step_route",
+      typeParamStrings,
+      [
+        first_dex_type,
+        first_pool_type,
+        first_is_x_to_y,
+        x_in,
+        y_min_out,
+      ]
+    );
+  } else {
+    return {
+      type: "entry_function_payload",
+      function: "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::one_step_route",
+      type_arguments: typeParamStrings,
+      arguments: [
+        first_dex_type,
+        first_pool_type,
+        first_is_x_to_y,
+        x_in,
+        y_min_out,
+      ].map(v => $.payloadArg(v)),
+    };
+  }
 }
 
 export function three_step_route_ (
@@ -326,28 +342,49 @@ export function buildPayload_three_step_route (
   x_in: U64,
   m_min_out: U64,
   $p: TypeTag[], /* <X, Y, Z, M, E1, E2, E3>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
-  return $.buildPayload(
-    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
-    "three_step_route",
-    typeParamStrings,
-    [
-      first_dex_type,
-      first_pool_type,
-      first_is_x_to_y,
-      second_dex_type,
-      second_pool_type,
-      second_is_x_to_y,
-      third_dex_type,
-      third_pool_type,
-      third_is_x_to_y,
-      x_in,
-      m_min_out,
-    ]
-  );
-
+  if (!isJSON) {
+    return $.buildPayload(
+      new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+      "aggregatorv6",
+      "three_step_route",
+      typeParamStrings,
+      [
+        first_dex_type,
+        first_pool_type,
+        first_is_x_to_y,
+        second_dex_type,
+        second_pool_type,
+        second_is_x_to_y,
+        third_dex_type,
+        third_pool_type,
+        third_is_x_to_y,
+        x_in,
+        m_min_out,
+      ]
+    );
+  } else {
+    return {
+      type: "entry_function_payload",
+      function: "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::three_step_route",
+      type_arguments: typeParamStrings,
+      arguments: [
+        first_dex_type,
+        first_pool_type,
+        first_is_x_to_y,
+        second_dex_type,
+        second_pool_type,
+        second_is_x_to_y,
+        third_dex_type,
+        third_pool_type,
+        third_is_x_to_y,
+        x_in,
+        m_min_out,
+      ].map(v => $.payloadArg(v)),
+    };
+  }
 }
 
 export function two_step_route_ (
@@ -387,25 +424,43 @@ export function buildPayload_two_step_route (
   x_in: U64,
   z_min_out: U64,
   $p: TypeTag[], /* <X, Y, Z, E1, E2>*/
+  isJSON = false
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
-  return $.buildPayload(
-    new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
-    "two_step_route",
-    typeParamStrings,
-    [
-      first_dex_type,
-      first_pool_type,
-      first_is_x_to_y,
-      second_dex_type,
-      second_pool_type,
-      second_is_x_to_y,
-      x_in,
-      z_min_out,
-    ]
-  );
-
+  if (!isJSON) {
+    return $.buildPayload(
+      new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
+      "aggregatorv6",
+      "two_step_route",
+      typeParamStrings,
+      [
+        first_dex_type,
+        first_pool_type,
+        first_is_x_to_y,
+        second_dex_type,
+        second_pool_type,
+        second_is_x_to_y,
+        x_in,
+        z_min_out,
+      ]
+    );
+  } else {
+    return {
+      type: "entry_function_payload",
+      function: "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::two_step_route",
+      type_arguments: typeParamStrings,
+      arguments: [
+        first_dex_type,
+        first_pool_type,
+        first_is_x_to_y,
+        second_dex_type,
+        second_pool_type,
+        second_is_x_to_y,
+        x_in,
+        z_min_out,
+      ].map(v => $.payloadArg(v)),
+    };
+  }
 }
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -463,7 +518,7 @@ export class App {
     _maxGas = 1000,
   ) {
     const payload = buildPayload_one_step_route(first_dex_type, first_pool_type, first_is_x_to_y, x_in, y_min_out, $p);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload as TransactionPayloadEntryFunction, _maxGas);
   }
   payload_three_step_route(
     first_dex_type: U8,
@@ -498,7 +553,7 @@ export class App {
     _maxGas = 1000,
   ) {
     const payload = buildPayload_three_step_route(first_dex_type, first_pool_type, first_is_x_to_y, second_dex_type, second_pool_type, second_is_x_to_y, third_dex_type, third_pool_type, third_is_x_to_y, x_in, m_min_out, $p);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload as TransactionPayloadEntryFunction, _maxGas);
   }
   payload_two_step_route(
     first_dex_type: U8,
@@ -527,7 +582,7 @@ export class App {
     _maxGas = 1000,
   ) {
     const payload = buildPayload_two_step_route(first_dex_type, first_pool_type, first_is_x_to_y, second_dex_type, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload as TransactionPayloadEntryFunction, _maxGas);
   }
 }
 

@@ -20,6 +20,7 @@ import { CoinInfo } from "../generated/aptos_framework/coin";
 import { PoolType } from "../swap/baseTypes";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
+import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
 
 const actionShowTokenRegistry = async () => {
   const {app, hippoDexAddress, account} = readConfig(program);
@@ -76,7 +77,7 @@ const actionHitFaucet = async (coinSymbol:string, rawAmount: string, _options: a
     if (coinInfo.symbol.str() === coinSymbol) {
       const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
       const payload = Devnet_coins.buildPayload_mint_to_wallet(amount, [coinTypeTag])
-      const result = sendPayloadTx(app.client, account, payload);
+      const result = sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
       console.log(result);
       return;
     }
@@ -307,7 +308,7 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
   const {app, account, netConf} = readConfig(program);
   const walletClient = await HippoWalletClient.createInTwoCalls(netConf, app, account.address(), account);
   const payload = await walletClient.makeFaucetMintToPayload(uiAmountNum, symbol);
-  await sendPayloadTx(app.client, account, payload);
+  await sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
   await walletClient.refreshStores();
   walletClient.debugPrint();
 }
@@ -690,7 +691,7 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
     return;
   }
   const payload = quotes[0].route.makePayload(inputAmt, 0);
-  await sendPayloadTx(app.client, account, payload);
+  await sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
   await testWalletClient();
 }
 
@@ -706,7 +707,7 @@ const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt
     return;
   }
   const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, 0);
-  await sendPayloadTx(app.client, account, payload);
+  await sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
   await testWalletClient();
 }
 
@@ -723,7 +724,7 @@ const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt:
     return;
   }
   const payload = quotes[0].route.makePayload(inputAmt, minOutUiAmt);
-  const simResult = await simulatePayloadTx(app.client, account, payload);
+  const simResult = await simulatePayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
   printResource(simResult);
   await testWalletClient();
 }
@@ -741,7 +742,7 @@ const aggSimulateSwapWithRoute = async (fromSymbol: string, toSymbol: string, in
     return;
   }
   const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, minOutUiAmt);
-  const simResult = await simulatePayloadTx(app.client, account, payload);
+  const simResult = await simulatePayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
   printResource(simResult);
   await testWalletClient();
 }
