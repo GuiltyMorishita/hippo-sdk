@@ -9,13 +9,11 @@ import { MarketInfo, Registry } from "../../generated/econia/registry";
 import { getProjectRepo } from "../../generated";
 
 export class EconiaClient {
-  public repo: AptosParserRepo;
   constructor(
     public aptosClient: AptosClient,
+    public repo: AptosParserRepo,
     public registryOwner: HexString
-  ) {
-    this.repo = getProjectRepo();
-  }
+  ) {}
 
   async getMarkets(): Promise<[MarketInfo, HexString][]> {
     const registry = await Registry.load(

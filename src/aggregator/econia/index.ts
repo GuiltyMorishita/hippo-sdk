@@ -239,6 +239,7 @@ export class EconiaPoolProvider extends TradingPoolProvider {
   async loadPoolList(): Promise<TradingPool[]> {
     const econiaClient = new EconiaClient(
       this.app.client,
+      this.app.parserRepo,
       Registry.moduleAddress
     );
     const markets = await econiaClient.getMarkets();
