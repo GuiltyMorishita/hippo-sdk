@@ -231,7 +231,7 @@ export class SteppedRoute extends TradeRoute {
           typeInfoToTypeTag(middleTokenInfo.token_type),
           typeInfoToTypeTag(toTokenInfo.token_type),
         ]
-      ));
+      ) as TransactionPayloadEntryFunction);
     } else if (this.steps.length === 3) {
       const fromTokenInfo = this.steps[0].lhsTokenInfo();
       const middle1TokenInfo = this.steps[0].rhsTokenInfo();
@@ -254,7 +254,7 @@ export class SteppedRoute extends TradeRoute {
           typeInfoToTypeTag(middle2TokenInfo.token_type),
           typeInfoToTypeTag(toTokenInfo.token_type),
         ]
-      ));
+      ) as TransactionPayloadEntryFunction);
     }
     else {
       throw new Error();

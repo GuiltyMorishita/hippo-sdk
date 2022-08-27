@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 export const packageName = "hippo-swap";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
 export const moduleName = "utils";
@@ -91,8 +91,8 @@ export function compute_pool_list_ (
   $c: AptosDataCache,
 ): PoolList {
   let list;
-  list = Std.Vector.empty_($c, [new SimpleStructTag(PoolInfo)]);
-  Std.Vector.push_back_(list, new PoolInfo({ pool_type: u8("0"), pool_idx: u8("0") }, new SimpleStructTag(PoolInfo)), $c, [new SimpleStructTag(PoolInfo)]);
+  list = Stdlib.Vector.empty_($c, [new SimpleStructTag(PoolInfo)]);
+  Stdlib.Vector.push_back_(list, new PoolInfo({ pool_type: u8("0"), pool_idx: u8("0") }, new SimpleStructTag(PoolInfo)), $c, [new SimpleStructTag(PoolInfo)]);
   return new PoolList({ list: $.copy(list) }, new SimpleStructTag(PoolList));
 }
 
@@ -100,8 +100,8 @@ export function get_pool_list_ (
   user: HexString,
   $c: AptosDataCache,
 ): void {
-  if ($c.exists(new SimpleStructTag(PoolList), Std.Signer.address_of_(user, $c))) {
-    $c.move_from<PoolList>(new SimpleStructTag(PoolList), Std.Signer.address_of_(user, $c));
+  if ($c.exists(new SimpleStructTag(PoolList), Stdlib.Signer.address_of_(user, $c))) {
+    $c.move_from<PoolList>(new SimpleStructTag(PoolList), Stdlib.Signer.address_of_(user, $c));
   }
   else{
   }
@@ -110,6 +110,7 @@ export function get_pool_list_ (
 
 
 export function buildPayload_get_pool_list (
+  isJSON = false,
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
@@ -117,28 +118,29 @@ export function buildPayload_get_pool_list (
     "utils",
     "get_pool_list",
     typeParamStrings,
-    []
+    [],
+    isJSON,
   );
 
 }
 
 export async function query_get_pool_list(
   client: AptosClient,
-  account: AptosAccount,
+  fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
   $p: TypeTag[],
 ) {
   const payload = buildPayload_get_pool_list();
   const outputTypeTag = new SimpleStructTag(PoolList);
-  const output = await $.simulatePayloadTx(client, account, payload);
+  const output = await $.simulatePayloadTx(client, fetcher, payload);
   return $.takeSimulationValue<PoolList>(output, outputTypeTag, repo)
 }
 function make_query_get_pool_list(app: App) {
   function maker(
-    account: AptosAccount,
+    fetcher: $.SimulationKeys,
     $p: TypeTag[],
   ) {
-    return query_get_pool_list(app.client, account, app.repo, $p)
+    return query_get_pool_list(app.client, fetcher, app.repo, $p)
   }
   return maker;
 }
@@ -168,14 +170,16 @@ export class App {
     return val;
   }
   payload_get_pool_list(
+    isJSON = false,
   ) {
-    return buildPayload_get_pool_list();
+    return buildPayload_get_pool_list(isJSON);
   }
   async get_pool_list(
     _account: AptosAccount,
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_get_pool_list();
+    const payload = buildPayload_get_pool_list(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   get query_get_pool_list() { return make_query_get_pool_list(this); }

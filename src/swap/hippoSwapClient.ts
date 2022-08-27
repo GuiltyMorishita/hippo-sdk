@@ -1,6 +1,7 @@
 import {
   getTypeTagFullname,
   parseMoveStructTag,
+  SimulationKeys,
   StructTag,
   TypeTag
 } from "@manahippo/move-to-ts";
@@ -9,7 +10,7 @@ import bigInt from "big-integer";
 import { NetworkConfiguration } from "../config";
 import { Cp_swap, Stable_curve_swap, Piece_swap } from "../generated/hippo_swap";
 import { Coin_list } from "../generated/coin_list"
-import { CoinInfo } from "../generated/aptos_framework/coin";
+import { CoinInfo } from "../generated/stdlib/coin";
 import { typeInfoToTypeTag } from "../utils";
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute} from "./baseTypes";
 import { HippoConstantProductPool } from "./constantProductPool";
@@ -112,7 +113,7 @@ export class HippoSwapClient {
   public xyFullnameToPoolSet: Record<string, PoolSet>;
   public contractAddress: HexString;
 
-  static async createInOneCall(app: App, netConfig: NetworkConfiguration, fetcher: AptosAccount) {
+  static async createInOneCall(app: App, netConfig: NetworkConfiguration, fetcher: SimulationKeys) {
     const {cpPoolInfos, stablePoolInfos, piecePoolInfos} = await loadHippoDexResources(app, netConfig);
     const fullList =  await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.hippoDexAddress, [])
     return new HippoSwapClient(
@@ -132,7 +133,7 @@ export class HippoSwapClient {
     public cpPoolInfos: Cp_swap.TokenPairMetadata[],
     public stablePoolInfos: Stable_curve_swap.StableCurvePoolInfo[],
     public piecePoolInfos: Piece_swap.PieceSwapPoolInfo[],
-    public fetcher: AptosAccount
+    public fetcher: SimulationKeys,
   ) {
     // init cached maps/lists
     this.singleCoins = [];

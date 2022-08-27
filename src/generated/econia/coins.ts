@@ -5,8 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Aptos_framework from "../aptos_framework";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 export const packageName = "Econia";
 export const moduleAddress = new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7");
 export const moduleName = "coins";
@@ -66,14 +65,14 @@ export class CoinCapabilities
   { name: "burn_capability", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new $.TypeParamIdx(0)]) },
   { name: "freeze_capability", typeTag: new StructTag(new HexString("0x1"), "coin", "FreezeCapability", [new $.TypeParamIdx(0)]) }];
 
-  mint_capability: Aptos_framework.Coin.MintCapability;
-  burn_capability: Aptos_framework.Coin.BurnCapability;
-  freeze_capability: Aptos_framework.Coin.FreezeCapability;
+  mint_capability: Stdlib.Coin.MintCapability;
+  burn_capability: Stdlib.Coin.BurnCapability;
+  freeze_capability: Stdlib.Coin.FreezeCapability;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.mint_capability = proto['mint_capability'] as Aptos_framework.Coin.MintCapability;
-    this.burn_capability = proto['burn_capability'] as Aptos_framework.Coin.BurnCapability;
-    this.freeze_capability = proto['freeze_capability'] as Aptos_framework.Coin.FreezeCapability;
+    this.mint_capability = proto['mint_capability'] as Stdlib.Coin.MintCapability;
+    this.burn_capability = proto['burn_capability'] as Stdlib.Coin.BurnCapability;
+    this.freeze_capability = proto['freeze_capability'] as Stdlib.Coin.FreezeCapability;
   }
 
   static CoinCapabilitiesParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : CoinCapabilities {
@@ -132,13 +131,13 @@ export class QC
 
 }
 export function burn_ (
-  coins: Aptos_framework.Coin.Coin,
+  coins: Stdlib.Coin.Coin,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let burn_capability;
   burn_capability = $c.borrow_global<CoinCapabilities>(new SimpleStructTag(CoinCapabilities, [$p[0]]), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).burn_capability;
-  Aptos_framework.Coin.burn_(coins, burn_capability, $c, [$p[0]]);
+  Stdlib.Coin.burn_(coins, burn_capability, $c, [$p[0]]);
   return;
 }
 
@@ -151,13 +150,13 @@ export function init_coin_type_ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let burn_capability, freeze_capability, mint_capability;
-  if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
+  if (!((Stdlib.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   if (!!$c.exists(new SimpleStructTag(CoinCapabilities, [$p[0]]), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_HAS_CAPABILITIES));
   }
-  [burn_capability, freeze_capability, mint_capability] = Aptos_framework.Coin.initialize_(account, Std.String.utf8_($.copy(coin_name), $c), Std.String.utf8_($.copy(coin_symbol), $c), $.copy(decimals), false, $c, [$p[0]]);
+  [burn_capability, freeze_capability, mint_capability] = Stdlib.Coin.initialize_(account, Stdlib.String.utf8_($.copy(coin_name), $c), Stdlib.String.utf8_($.copy(coin_symbol), $c), $.copy(decimals), false, $c, [$p[0]]);
   $c.move_to(new SimpleStructTag(CoinCapabilities, [$p[0]]), account, new CoinCapabilities({ mint_capability: $.copy(mint_capability), burn_capability: $.copy(burn_capability), freeze_capability: $.copy(freeze_capability) }, new SimpleStructTag(CoinCapabilities, [$p[0]])));
   return;
 }
@@ -173,6 +172,7 @@ export function init_coin_types_ (
 
 
 export function buildPayload_init_coin_types (
+  isJSON = false,
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
@@ -180,7 +180,8 @@ export function buildPayload_init_coin_types (
     "coins",
     "init_coin_types",
     typeParamStrings,
-    []
+    [],
+    isJSON,
   );
 
 }
@@ -190,9 +191,9 @@ export function mint_ (
   amount: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
-): Aptos_framework.Coin.Coin {
+): Stdlib.Coin.Coin {
   let account_address, mint_capability;
-  account_address = Std.Signer.address_of_(account, $c);
+  account_address = Stdlib.Signer.address_of_(account, $c);
   if (!(($.copy(account_address)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
   }
@@ -200,13 +201,14 @@ export function mint_ (
     throw $.abortCode($.copy(E_NO_CAPABILITIES));
   }
   mint_capability = $c.borrow_global<CoinCapabilities>(new SimpleStructTag(CoinCapabilities, [$p[0]]), $.copy(account_address)).mint_capability;
-  return Aptos_framework.Coin.mint_($.copy(amount), mint_capability, $c, [$p[0]]);
+  return Stdlib.Coin.mint_($.copy(amount), mint_capability, $c, [$p[0]]);
 }
 
 
 export function buildPayload_mint (
   amount: U64,
   $p: TypeTag[], /* <CoinType>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -216,7 +218,8 @@ export function buildPayload_mint (
     typeParamStrings,
     [
       amount,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -250,29 +253,33 @@ export class App {
   }
   get QC() { return QC; }
   payload_init_coin_types(
+    isJSON = false,
   ) {
-    return buildPayload_init_coin_types();
+    return buildPayload_init_coin_types(isJSON);
   }
   async init_coin_types(
     _account: AptosAccount,
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_init_coin_types();
+    const payload = buildPayload_init_coin_types(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mint(
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
+    isJSON = false,
   ) {
-    return buildPayload_mint(amount, $p);
+    return buildPayload_mint(amount, $p, isJSON);
   }
   async mint(
     _account: AptosAccount,
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_mint(amount, $p);
+    const payload = buildPayload_mint(amount, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

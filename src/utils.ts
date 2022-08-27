@@ -8,14 +8,14 @@ import {
   AptosParserRepo, parseMoveStructTag, SimpleStructTag, AptosLocalCache
 } from "@manahippo/move-to-ts";
 import {AptosClient, HexString} from "aptos";
-import * as AptosStdlib from "./generated/aptos_std";
-import * as AptosFramework from "./generated/aptos_framework";
+import * as AptosStdlib from "./generated/stdlib";
+import * as AptosFramework from "./generated/stdlib";
 import {Coin_list} from "./generated/coin_list"
-import * as Aptos_std from "./generated/aptos_std";
+import * as Aptos_std from "./generated/stdlib";
 import {Nothing} from "./generated/coin_list/coin_list";
-import * as Std from "./generated/std";
+import * as Std from "./generated/stdlib";
 import * as $ from "@manahippo/move-to-ts";
-import {CoinInfo} from "./generated/aptos_framework/coin";
+import {CoinInfo} from "./generated/stdlib/coin";
 
 export function typeInfoToTypeTag(typeInfo: AptosStdlib.Type_info.TypeInfo) {
   const fullname =  `${typeInfo.account_address.hex()}::${u8str(typeInfo.module_name)}::${u8str(typeInfo.struct_name)}`;

@@ -3,10 +3,10 @@ import { CoinListClient } from "../coinList";
 import { EconiaPoolProvider } from "./econia";
 import { HippoPoolProvider } from "./hippo";
 import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from "./types";
-import { AptosAccount } from "aptos";
 import { PontemPoolProvider } from "./pontem";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { CONFIGS } from "../config";
+import { SimulationKeys } from "@manahippo/move-to-ts";
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -14,14 +14,14 @@ export class TradeAggregator {
   constructor(
     public registryClient: CoinListClient,
     public app: App,
-    public fetcher: AptosAccount,
+    public fetcher: SimulationKeys,
     public readonly poolProviders: TradingPoolProvider[],
   ) {
     this.allPools = [];
     this.xToAnyPools = new Map();
   }
 
-  static async create(app: App, fetcher: AptosAccount, netConfig = CONFIGS.devnet) {
+  static async create(app: App, fetcher: SimulationKeys, netConfig = CONFIGS.devnet) {
     const registryClient =  await CoinListClient.load(app, fetcher);
     const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
     const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);

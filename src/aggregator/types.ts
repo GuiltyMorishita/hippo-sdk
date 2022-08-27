@@ -1,5 +1,5 @@
-import { AtomicTypeTag, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
-import { AptosAccount, TxnBuilderTypes, Types} from "aptos";
+import { AtomicTypeTag, SimulationKeys, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
+import { HexString, Types} from "aptos";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { Aggregatorv6 } from "../generated/hippo_aggregator";
 import { App } from "../generated";
@@ -239,7 +239,7 @@ export interface RouteAndQuote {
 export abstract class TradingPoolProvider {
   constructor(
       public app: App,
-      public fetcher: AptosAccount,
+      public fetcher: SimulationKeys,
       public netConfig= CONFIGS.devnet
   ) {
   }

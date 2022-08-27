@@ -5,9 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Aptos_framework from "../aptos_framework";
-import * as Aptos_std from "../aptos_std";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 import * as Capability from "./capability";
 import * as Open_table from "./open_table";
 export const packageName = "Econia";
@@ -692,14 +690,14 @@ export class MarketInfo
   { name: "quote_coin_type", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) },
   { name: "scale_exponent_type", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) }];
 
-  base_coin_type: Aptos_std.Type_info.TypeInfo;
-  quote_coin_type: Aptos_std.Type_info.TypeInfo;
-  scale_exponent_type: Aptos_std.Type_info.TypeInfo;
+  base_coin_type: Stdlib.Type_info.TypeInfo;
+  quote_coin_type: Stdlib.Type_info.TypeInfo;
+  scale_exponent_type: Stdlib.Type_info.TypeInfo;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.base_coin_type = proto['base_coin_type'] as Aptos_std.Type_info.TypeInfo;
-    this.quote_coin_type = proto['quote_coin_type'] as Aptos_std.Type_info.TypeInfo;
-    this.scale_exponent_type = proto['scale_exponent_type'] as Aptos_std.Type_info.TypeInfo;
+    this.base_coin_type = proto['base_coin_type'] as Stdlib.Type_info.TypeInfo;
+    this.quote_coin_type = proto['quote_coin_type'] as Stdlib.Type_info.TypeInfo;
+    this.scale_exponent_type = proto['scale_exponent_type'] as Stdlib.Type_info.TypeInfo;
   }
 
   static MarketInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : MarketInfo {
@@ -773,7 +771,7 @@ export function coin_is_base_coin_ (
   $p: TypeTag[], /* <CoinType>*/
 ): boolean {
   let coin_type_info;
-  coin_type_info = Aptos_std.Type_info.type_of_($c, [$p[0]]);
+  coin_type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
   if ($.deep_eq($.copy(coin_type_info), $.copy(market_info.base_coin_type))) {
     return true;
   }
@@ -793,7 +791,7 @@ export function coin_is_in_market_pair_ (
   $p: TypeTag[], /* <CoinType>*/
 ): boolean {
   let temp$1, coin_type_info;
-  coin_type_info = Aptos_std.Type_info.type_of_($c, [$p[0]]);
+  coin_type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
   if ($.deep_eq($.copy(coin_type_info), $.copy(market_info.base_coin_type))) {
     temp$1 = true;
   }
@@ -815,7 +813,7 @@ export function init_registry_ (
   $c: AptosDataCache,
 ): void {
   let scales;
-  if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
+  if (!((Stdlib.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   if (!!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
@@ -823,26 +821,26 @@ export function init_registry_ (
   }
   $c.move_to(new SimpleStructTag(Registry), account, new Registry({ scales: Open_table.empty_($c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]), markets: Open_table.empty_($c, [new SimpleStructTag(MarketInfo), AtomicTypeTag.Address]), n_custodians: u64("0") }, new SimpleStructTag(Registry)));
   scales = $c.borrow_global_mut<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).scales;
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E0)]), $.copy(F0), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E1)]), $.copy(F1), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E2)]), $.copy(F2), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E3)]), $.copy(F3), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E4)]), $.copy(F4), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E5)]), $.copy(F5), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E6)]), $.copy(F6), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E7)]), $.copy(F7), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E8)]), $.copy(F8), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E9)]), $.copy(F9), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E10)]), $.copy(F10), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E11)]), $.copy(F11), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E12)]), $.copy(F12), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E13)]), $.copy(F13), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E14)]), $.copy(F14), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E15)]), $.copy(F15), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E16)]), $.copy(F16), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E17)]), $.copy(F17), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E18)]), $.copy(F18), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
-  Open_table.add_(scales, Aptos_std.Type_info.type_of_($c, [new SimpleStructTag(E19)]), $.copy(F19), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E0)]), $.copy(F0), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E1)]), $.copy(F1), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E2)]), $.copy(F2), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E3)]), $.copy(F3), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E4)]), $.copy(F4), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E5)]), $.copy(F5), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E6)]), $.copy(F6), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E7)]), $.copy(F7), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E8)]), $.copy(F8), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E9)]), $.copy(F9), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E10)]), $.copy(F10), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E11)]), $.copy(F11), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E12)]), $.copy(F12), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E13)]), $.copy(F13), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E14)]), $.copy(F14), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E15)]), $.copy(F15), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E16)]), $.copy(F16), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E17)]), $.copy(F17), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E18)]), $.copy(F18), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
+  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E19)]), $.copy(F19), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64]);
   return;
 }
 
@@ -883,7 +881,7 @@ export function market_info_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <B, Q, E>*/
 ): MarketInfo {
-  return new MarketInfo({ base_coin_type: Aptos_std.Type_info.type_of_($c, [$p[0]]), quote_coin_type: Aptos_std.Type_info.type_of_($c, [$p[1]]), scale_exponent_type: Aptos_std.Type_info.type_of_($c, [$p[2]]) }, new SimpleStructTag(MarketInfo));
+  return new MarketInfo({ base_coin_type: Stdlib.Type_info.type_of_($c, [$p[0]]), quote_coin_type: Stdlib.Type_info.type_of_($c, [$p[1]]), scale_exponent_type: Stdlib.Type_info.type_of_($c, [$p[2]]) }, new SimpleStructTag(MarketInfo));
 }
 
 export function n_custodians_ (
@@ -918,18 +916,18 @@ export function register_market_internal_ (
   if (!$c.exists(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"))) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
-  if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[0]])) {
+  if (!Stdlib.Coin.is_coin_initialized_($c, [$p[0]])) {
     throw $.abortCode($.copy(E_NOT_COIN_BASE));
   }
-  if (!Aptos_framework.Coin.is_coin_initialized_($c, [$p[1]])) {
+  if (!Stdlib.Coin.is_coin_initialized_($c, [$p[1]])) {
     throw $.abortCode($.copy(E_NOT_COIN_QUOTE));
   }
-  base_coin_type = Aptos_std.Type_info.type_of_($c, [$p[0]]);
-  quote_coin_type = Aptos_std.Type_info.type_of_($c, [$p[1]]);
+  base_coin_type = Stdlib.Type_info.type_of_($c, [$p[0]]);
+  quote_coin_type = Stdlib.Type_info.type_of_($c, [$p[1]]);
   if (!!$.deep_eq($.copy(base_coin_type), $.copy(quote_coin_type))) {
     throw $.abortCode($.copy(E_SAME_COIN_TYPE));
   }
-  scale_exponent_type = Aptos_std.Type_info.type_of_($c, [$p[2]]);
+  scale_exponent_type = Stdlib.Type_info.type_of_($c, [$p[2]]);
   registry = $c.borrow_global_mut<Registry>(new SimpleStructTag(Registry), new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"));
   if (!Open_table.contains_(registry.scales, $.copy(scale_exponent_type), $c, [new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []), AtomicTypeTag.U64])) {
     throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
@@ -946,7 +944,7 @@ export function scale_factor_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <E>*/
 ): U64 {
-  return scale_factor_from_type_info_(Aptos_std.Type_info.type_of_($c, [$p[0]]), $c);
+  return scale_factor_from_type_info_(Stdlib.Type_info.type_of_($c, [$p[0]]), $c);
 }
 
 export function scale_factor_from_market_info_ (
@@ -957,7 +955,7 @@ export function scale_factor_from_market_info_ (
 }
 
 export function scale_factor_from_type_info_ (
-  scale_exponent_type_info: Aptos_std.Type_info.TypeInfo,
+  scale_exponent_type_info: Stdlib.Type_info.TypeInfo,
   $c: AptosDataCache,
 ): U64 {
   let scales;

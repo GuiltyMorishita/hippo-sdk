@@ -1,8 +1,8 @@
-import { AptosAccount } from "aptos";
-import { TypeInfo } from "../generated/aptos_std/type_info";
+import { TypeInfo } from "../generated/stdlib/type_info";
 import { Router } from "../generated/hippo_swap"
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { App } from "../generated";
+import { SimulationKeys } from "@manahippo/move-to-ts";
 
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;
@@ -10,7 +10,7 @@ export class CoinListClient {
   coinList: CoinInfo[]
   constructor(
     public app: App,
-    public fetcher: AptosAccount
+    public fetcher: SimulationKeys
   ) {
     this.fullnameToCoinInfo = {};
     this.symbolToCoinInfo = {}
@@ -33,8 +33,8 @@ export class CoinListClient {
     return this.fullnameToCoinInfo[tokenType.typeFullname()];
   }
 
-  static async load(app: App, fetcher: AptosAccount) {
-    let coinRegistry = new CoinListClient(app, fetcher)
+  static async load(app: App, fetcher: SimulationKeys) {
+    const coinRegistry = new CoinListClient(app, fetcher)
     await coinRegistry.buildCache()
     return coinRegistry;
   }

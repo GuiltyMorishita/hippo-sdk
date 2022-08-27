@@ -5,7 +5,7 @@ import * as yaml from "yaml";
 import { CONFIGS } from "../config";
 import { App } from "../generated";
 import { AptosDataCache, strToU8 } from "@manahippo/move-to-ts";
-import * as Std from "../generated/std";
+import * as Std from "../generated/stdlib";
 
 export const readConfig = (program: Command) => {
   const {config, profile} = program.opts();

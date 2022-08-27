@@ -20,7 +20,7 @@ export class EconiaClient {
     const entries: [MarketInfo, HexString][] = [];
     keys.forEach((mi) => {
       const loader = async() => {
-        const value = await this.aptosClient.getTableItem(registry.markets.base_table.handle.value.toString(), {
+        const value = await this.aptosClient.getTableItem(registry.markets.base_table.handle.toString(), {
           key_type: (mi.typeTag as StructTag).getFullname(),
           value_type: 'address',
           key: moveValueToOpenApiObject(mi, mi.typeTag),
