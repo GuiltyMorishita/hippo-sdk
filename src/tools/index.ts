@@ -5,7 +5,7 @@ import {
   parseMoveStructTag,
   sendPayloadTx,
   simulatePayloadTx,
-  getSimulationKeys
+  getSimulationKeys,
 } from "@manahippo/move-to-ts";
 import { AptosAccount, HexString } from "aptos";
 import { Command } from "commander";
@@ -23,9 +23,13 @@ import { DEX_TYPE_NAME } from "../aggregator/types";
 import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
 
 const actionShowTokenRegistry = async () => {
-  const {app, hippoDexAddress, account} = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, [])
-  for(const tokInfo of fullList.coin_info_list) {
+  const { app, hippoDexAddress, account } = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
+    getSimulationKeys(account),
+    hippoDexAddress,
+    []
+  );
+  for (const tokInfo of fullList.coin_info_list) {
     console.log(`########${tokInfo.symbol.str()}#######`);
     console.log(`name: ${tokInfo.name.str()}`);
     console.log(`decimals: ${tokInfo.decimals.toJsNumber()}`);
@@ -38,9 +42,13 @@ const actionShowTokenRegistry = async () => {
 };
 
 const actionShowPools = async () => {
-  const {app, hippoDexAddress, account} = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, [])
-  for(const coinInfo of fullList.coin_info_list) {
+  const { app, hippoDexAddress, account } = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
+    getSimulationKeys(account),
+    hippoDexAddress,
+    []
+  );
+  for (const coinInfo of fullList.coin_info_list) {
     const structTag = typeInfoToTypeTag(coinInfo.token_type);
     if (
       structTag instanceof StructTag &&
@@ -90,13 +98,23 @@ const actionHitFaucet = async (
   _options: any
 ) => {
   const amount = u64(rawAmount);
-  const {app, hippoDexAddress, account} = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, [])
-  for(const coinInfo of fullList.coin_info_list) {
+  const { app, hippoDexAddress, account } = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
+    getSimulationKeys(account),
+    hippoDexAddress,
+    []
+  );
+  for (const coinInfo of fullList.coin_info_list) {
     if (coinInfo.symbol.str() === coinSymbol) {
       const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
-      const payload = Devnet_coins.buildPayload_mint_to_wallet(amount, [coinTypeTag])
-      const result = sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
+      const payload = Devnet_coins.buildPayload_mint_to_wallet(amount, [
+        coinTypeTag,
+      ]);
+      const result = sendPayloadTx(
+        app.client,
+        account,
+        payload as TransactionPayloadEntryFunction
+      );
       console.log(result);
       return;
     }
@@ -104,13 +122,22 @@ const actionHitFaucet = async (
   throw new Error(`Did not find a token with symbol=${coinSymbol}}`);
 };
 
-const actionShowWallet = async() => {
-  const {app, hippoDexAddress, account} = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, [])
-  for(const coinInfo of fullList.coin_info_list) {
+const actionShowWallet = async () => {
+  const { app, hippoDexAddress, account } = readConfig(program);
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
+    getSimulationKeys(account),
+    hippoDexAddress,
+    []
+  );
+  for (const coinInfo of fullList.coin_info_list) {
     const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
-    try{
-      const coin = await stdlib.Coin.CoinStore.load(app.parserRepo, app.client, account.address(), [coinTypeTag])
+    try {
+      const coin = await stdlib.Coin.CoinStore.load(
+        app.parserRepo,
+        app.client,
+        account.address(),
+        [coinTypeTag]
+      );
       console.log(`${coinInfo.symbol}: ${coin.coin.value}`);
     } catch (e) {
       console.warn(e);
@@ -125,8 +152,11 @@ const getFromToAndLps = async (
   toSymbol: string,
   fetcher: AptosAccount
 ) => {
-
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(fetcher), hippoDexAddress, [])
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
+    getSimulationKeys(fetcher),
+    hippoDexAddress,
+    []
+  );
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -353,14 +383,23 @@ program
 const testCommand = new Command("test");
 
 const testHippoClient = async () => {
-  const {app, netConf, account} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+  const { app, netConf, account } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   swapClient.printSelf();
 };
 
 const testWalletClient = async () => {
-  const {app, account, netConf} = readConfig(program);
-  const walletClient = await HippoWalletClient.createInTwoCalls(netConf, app, account.address(), getSimulationKeys(account));
+  const { app, account, netConf } = readConfig(program);
+  const walletClient = await HippoWalletClient.createInTwoCalls(
+    netConf,
+    app,
+    account.address(),
+    getSimulationKeys(account)
+  );
   walletClient.debugPrint();
 };
 
@@ -369,17 +408,37 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
   if (uiAmountNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const {app, account, netConf} = readConfig(program);
-  const walletClient = await HippoWalletClient.createInTwoCalls(netConf, app, account.address(), getSimulationKeys(account));
-  const payload = await walletClient.makeFaucetMintToPayload(uiAmountNum, symbol);
-  await sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
+  const { app, account, netConf } = readConfig(program);
+  const walletClient = await HippoWalletClient.createInTwoCalls(
+    netConf,
+    app,
+    account.address(),
+    getSimulationKeys(account)
+  );
+  const payload = await walletClient.makeFaucetMintToPayload(
+    uiAmountNum,
+    symbol
+  );
+  await sendPayloadTx(
+    app.client,
+    account,
+    payload as TransactionPayloadEntryFunction
+  );
   await walletClient.refreshStores();
   walletClient.debugPrint();
 };
 
-const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testClientSwap = async (
+  fromSymbol: string,
+  toSymbol: string,
+  uiAmtIn: string
+) => {
+  const { app, account, netConf } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if (uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -400,9 +459,17 @@ const testClientSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: stri
   await testWalletClient();
 };
 
-const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testClientSimulateSwap = async (
+  fromSymbol: string,
+  toSymbol: string,
+  uiAmtIn: string
+) => {
+  const { app, account, netConf } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if (uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -419,14 +486,26 @@ const testClientSimulateSwap = async(fromSymbol: string, toSymbol: string, uiAmt
   }
   const { bestRoute } = result;
   const payload = await bestRoute.makeSwapPayload(uiAmtInNum, 0);
-  const simResult = await simulatePayloadTx(app.client, getSimulationKeys(account), payload);
+  const simResult = await simulatePayloadTx(
+    app.client,
+    getSimulationKeys(account),
+    payload
+  );
   printResource(simResult);
   await testWalletClient();
 };
 
-const testClientQuote = async(fromSymbol: string, toSymbol: string, uiAmtIn: string) => {
-  const {app, netConf, account} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testClientQuote = async (
+  fromSymbol: string,
+  toSymbol: string,
+  uiAmtIn: string
+) => {
+  const { app, netConf, account } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const uiAmtInNum = Number.parseFloat(uiAmtIn);
   if (uiAmtInNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -462,9 +541,19 @@ function cliPoolTypeToPoolType(poolType: string): PoolType {
   );
 }
 
-const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, lhsUiAmtStr: string, rhsUiAmtStr: string) => {
-  const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testClientAddLiquidity = async (
+  poolTypeStr: string,
+  lhsSymbol: string,
+  rhsSymbol: string,
+  lhsUiAmtStr: string,
+  rhsUiAmtStr: string
+) => {
+  const { app, account, netConf } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const lhsUiAmt = Number.parseFloat(lhsUiAmtStr);
   const rhsUiAmt = Number.parseFloat(rhsUiAmtStr);
   if (lhsUiAmt <= 0 || rhsUiAmt <= 0) {
@@ -495,9 +584,18 @@ const testClientAddLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhs
   await testWalletClient();
 };
 
-const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, rhsSymbol: string, liquidityUiAmtStr: string) => {
-  const {app, account, netConf} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testClientRemoveLiquidity = async (
+  poolTypeStr: string,
+  lhsSymbol: string,
+  rhsSymbol: string,
+  liquidityUiAmtStr: string
+) => {
+  const { app, account, netConf } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const liquidityUiAmt = Number.parseFloat(liquidityUiAmtStr);
   if (liquidityUiAmt <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
@@ -532,16 +630,24 @@ const testClientRemoveLiquidity = async(poolTypeStr: string, lhsSymbol: string, 
   await testWalletClient();
 };
 
-const testShowSupply = async(symbol: string) => {
-  const {app, netConf, account} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testShowSupply = async (symbol: string) => {
+  const { app, netConf, account } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const supply = await swapClient.getTokenTotalSupplyBySymbol(symbol);
   console.log(supply);
 };
 
-const testShowRoutes = async(lhsSymbol: string, rhsSymbol: string) => {
-  const {app, netConf, account} = readConfig(program);
-  const swapClient = await HippoSwapClient.createInOneCall(app, netConf, getSimulationKeys(account));
+const testShowRoutes = async (lhsSymbol: string, rhsSymbol: string) => {
+  const { app, netConf, account } = readConfig(program);
+  const swapClient = await HippoSwapClient.createInOneCall(
+    app,
+    netConf,
+    getSimulationKeys(account)
+  );
   const routes = swapClient.getSteppedRoutesBySymbol(lhsSymbol, rhsSymbol, 3);
   printResources(routes.map((r) => r.summarize()));
 };
@@ -616,10 +722,19 @@ const checkTestCoin = async () => {
     stdlib.Aptos_coin.AptosCoin.structName,
     []
   );
-  const testCoinInfo = await CoinInfo.load(repo, client, stdlib.Aptos_coin.moduleAddress, [testCoinTag])
+  const testCoinInfo = await CoinInfo.load(
+    repo,
+    client,
+    stdlib.Aptos_coin.moduleAddress,
+    [testCoinTag]
+  );
   printResource(testCoinInfo);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, [])
-  for(const tokenInfo of fullList.coin_info_list) {
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
+    getSimulationKeys(account),
+    hippoDexAddress,
+    []
+  );
+  for (const tokenInfo of fullList.coin_info_list) {
     const tag = typeInfoToTypeTag(tokenInfo.token_type);
     if (getTypeTagFullname(tag) === getTypeTagFullname(testCoinTag)) {
       console.log("Aptos already registered.");
@@ -651,12 +766,17 @@ const updateTokenRegistry = async (
 ) => {
   const { app, client, account } = readConfig(program);
   const testCoinTag = new StructTag(
-      stdlib.Aptos_coin.moduleAddress,
-      stdlib.Aptos_coin.moduleName,
-      stdlib.Aptos_coin.AptosCoin.structName,
-      []
+    stdlib.Aptos_coin.moduleAddress,
+    stdlib.Aptos_coin.moduleName,
+    stdlib.Aptos_coin.AptosCoin.structName,
+    []
   );
-  const testCoinInfo = await CoinInfo.load(app.parserRepo, client, stdlib.Aptos_coin.moduleAddress, [testCoinTag])
+  const testCoinInfo = await CoinInfo.load(
+    app.parserRepo,
+    client,
+    stdlib.Aptos_coin.moduleAddress,
+    [testCoinTag]
+  );
   printResource(testCoinInfo);
   const payload = app.coin_list.coin_list.payload_add_to_registry_by_signer(
     strToString(name, app.cache),
@@ -739,24 +859,25 @@ pontem.command("list-pools").action(pontemListPools);
 program.addCommand(pontem);
 
 const aggListTradingPools = async () => {
-  const {app, account} = readConfig(program);
+  const { app, account } = readConfig(program);
   try {
     const agg = await TradeAggregator.create(app, getSimulationKeys(account));
     for (const pool of agg.allPools) {
       console.log("###########");
-      console.log(`Pair: ${pool.xCoinInfo.symbol.str()} - ${pool.yCoinInfo.symbol.str()}`);
+      console.log(
+        `Pair: ${pool.xCoinInfo.symbol.str()} - ${pool.yCoinInfo.symbol.str()}`
+      );
       console.log(`Dex: ${DEX_TYPE_NAME[pool.dexType]}`);
       console.log(`PoolType: ${pool.poolType.toJsNumber()}`);
       console.log();
     }
-  }
-  catch(e) {
+  } catch (e) {
     console.log(e);
   }
 };
 
 const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
-  const {app, account} = readConfig(program);
+  const { app, account } = readConfig(program);
   const agg = await TradeAggregator.create(app, getSimulationKeys(account));
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
@@ -767,8 +888,12 @@ const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
   }
 };
 
-const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const {app, account} = readConfig(program);
+const aggListQuotes = async (
+  fromSymbol: string,
+  toSymbol: string,
+  inputUiAmt: string
+) => {
+  const { app, account } = readConfig(program);
   const agg = await TradeAggregator.create(app, getSimulationKeys(account));
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
@@ -782,8 +907,12 @@ const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: s
   }
 };
 
-const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const {app, account} = readConfig(program);
+const aggSwap = async (
+  fromSymbol: string,
+  toSymbol: string,
+  inputUiAmt: string
+) => {
+  const { app, account } = readConfig(program);
   const agg = await TradeAggregator.create(app, getSimulationKeys(account));
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
@@ -794,12 +923,21 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
     return;
   }
   const payload = quotes[0].route.makePayload(inputAmt, 0);
-  await sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
+  await sendPayloadTx(
+    app.client,
+    account,
+    payload as TransactionPayloadEntryFunction
+  );
   await testWalletClient();
 };
 
-const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, routeIdx: string) => {
-  const {app, account} = readConfig(program);
+const aggSwapWithRoute = async (
+  fromSymbol: string,
+  toSymbol: string,
+  inputUiAmt: string,
+  routeIdx: string
+) => {
+  const { app, account } = readConfig(program);
   const agg = await TradeAggregator.create(app, getSimulationKeys(account));
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
@@ -810,12 +948,21 @@ const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt
     return;
   }
   const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, 0);
-  await sendPayloadTx(app.client, account, payload as TransactionPayloadEntryFunction);
+  await sendPayloadTx(
+    app.client,
+    account,
+    payload as TransactionPayloadEntryFunction
+  );
   await testWalletClient();
 };
 
-const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string) => {
-  const {app, account} = readConfig(program);
+const aggSimulateSwap = async (
+  fromSymbol: string,
+  toSymbol: string,
+  inputUiAmt: string,
+  minOutAmt: string
+) => {
+  const { app, account } = readConfig(program);
   const agg = await TradeAggregator.create(app, getSimulationKeys(account));
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
@@ -827,13 +974,23 @@ const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt:
     return;
   }
   const payload = quotes[0].route.makePayload(inputAmt, minOutUiAmt);
-  const simResult = await simulatePayloadTx(app.client, getSimulationKeys(account), payload as TransactionPayloadEntryFunction);
+  const simResult = await simulatePayloadTx(
+    app.client,
+    getSimulationKeys(account),
+    payload as TransactionPayloadEntryFunction
+  );
   printResource(simResult);
   await testWalletClient();
 };
 
-const aggSimulateSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string, routeIdx: string) => {
-  const {app, account} = readConfig(program);
+const aggSimulateSwapWithRoute = async (
+  fromSymbol: string,
+  toSymbol: string,
+  inputUiAmt: string,
+  minOutAmt: string,
+  routeIdx: string
+) => {
+  const { app, account } = readConfig(program);
   const agg = await TradeAggregator.create(app, getSimulationKeys(account));
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
@@ -844,8 +1001,15 @@ const aggSimulateSwapWithRoute = async (fromSymbol: string, toSymbol: string, in
     console.log("No route available");
     return;
   }
-  const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, minOutUiAmt);
-  const simResult = await simulatePayloadTx(app.client, getSimulationKeys(account), payload as TransactionPayloadEntryFunction);
+  const payload = quotes[parseInt(routeIdx)].route.makePayload(
+    inputAmt,
+    minOutUiAmt
+  );
+  const simResult = await simulatePayloadTx(
+    app.client,
+    getSimulationKeys(account),
+    payload as TransactionPayloadEntryFunction
+  );
   printResource(simResult);
   await testWalletClient();
 };

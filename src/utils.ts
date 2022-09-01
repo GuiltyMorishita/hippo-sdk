@@ -8,15 +8,15 @@ import {
   SimpleStructTag,
   AptosLocalCache,
 } from "@manahippo/move-to-ts";
-import {AptosClient, HexString} from "aptos";
+import { AptosClient, HexString } from "aptos";
 import * as AptosStdlib from "./generated/stdlib";
 import * as AptosFramework from "./generated/stdlib";
-import {Coin_list} from "./generated/coin_list"
+import { Coin_list } from "./generated/coin_list";
 import * as Aptos_std from "./generated/stdlib";
-import {Nothing} from "./generated/coin_list/coin_list";
+import { Nothing } from "./generated/coin_list/coin_list";
 import * as Std from "./generated/stdlib";
 import * as $ from "@manahippo/move-to-ts";
-import {CoinInfo} from "./generated/stdlib/coin";
+import { CoinInfo } from "./generated/stdlib/coin";
 
 export function typeInfoToTypeTag(typeInfo: AptosStdlib.Type_info.TypeInfo) {
   const fullname = `${typeInfo.account_address.hex()}::${u8str(
@@ -133,5 +133,5 @@ export function parseCoinInfoListFromCoinList(
       tail = $.copy(prev);
     }
   }
-  return coinInfoList
+  return coinInfoList;
 }

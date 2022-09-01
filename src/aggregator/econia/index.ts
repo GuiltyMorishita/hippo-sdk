@@ -1,4 +1,4 @@
-import { AptosAccount, HexString, Types } from "aptos";
+import { HexString, Types } from "aptos";
 import { App } from "../../generated";
 import { AptosLocalCache, AptosParserRepo, SimulationKeys, TypeTag, u64, U64, u8 } from "@manahippo/move-to-ts";
 

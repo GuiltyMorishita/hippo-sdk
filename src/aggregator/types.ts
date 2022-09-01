@@ -1,5 +1,12 @@
-import { AtomicTypeTag, SimulationKeys, TypeTag, u64, u8, U8 } from "@manahippo/move-to-ts";
-import { HexString, Types} from "aptos";
+import {
+  AtomicTypeTag,
+  SimulationKeys,
+  TypeTag,
+  u64,
+  u8,
+  U8,
+} from "@manahippo/move-to-ts";
+import { Types } from "aptos";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { Aggregatorv6 } from "../generated/hippo_aggregator";
 import { App } from "../generated";
@@ -179,9 +186,17 @@ export class TradeRoute {
     return fullnameSet.size < this.tokens.length;
   }
 
-  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount, isJSONPayload = false) {
-    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
-    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+  makePayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload = false
+  ) {
+    const inputSize = Math.floor(
+      inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
+    const minOutputSize = Math.floor(
+      minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
     if (this.steps.length === 1) {
       const step0 = this.steps[0];
       return Aggregatorv6.buildPayload_one_step_route(
@@ -193,12 +208,11 @@ export class TradeRoute {
         [
           this.xCoinInfo.token_type.toTypeTag(),
           this.yCoinInfo.token_type.toTypeTag(),
-          step0.getTagE()
+          step0.getTagE(),
         ], // X, Y, E
         isJSONPayload
-      )
-    }
-    else if (this.steps.length === 2) {
+      );
+    } else if (this.steps.length === 2) {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
       return Aggregatorv6.buildPayload_two_step_route(
@@ -218,9 +232,8 @@ export class TradeRoute {
           step1.getTagE(),
         ], // X, Y, Z, E1, E2
         isJSONPayload
-      )
-    }
-    else if (this.steps.length === 3) {
+      );
+    } else if (this.steps.length === 3) {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
       const step2 = this.steps[2];
@@ -246,9 +259,8 @@ export class TradeRoute {
           step2.getTagE(),
         ], // X, Y, Z, M, E1, E2, E3
         isJSONPayload
-      )
-    }
-    else {
+      );
+    } else {
       throw new Error("Unreachable");
     }
   }
@@ -278,11 +290,10 @@ export interface RouteAndQuote {
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
   constructor(
-      public app: App,
-      public fetcher: SimulationKeys,
-      public netConfig= CONFIGS.devnet
-  ) {
-  }
+    public app: App,
+    public fetcher: SimulationKeys,
+    public netConfig = CONFIGS.devnet
+  ) {}
   abstract loadPoolList(): Promise<TradingPool[]>;
 
   async reloadAllPoolState() {

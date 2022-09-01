@@ -1,5 +1,6 @@
-import { TypeInfo } from "../generated/stdlib/type_info";
-import { Router } from "../generated/hippo_swap"
+
+import { TypeInfo } from "aptos/src/stdlib/type_info";
+import { Router } from "../generated/hippo_swap";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { App } from "../generated";
 import { SimulationKeys } from "@manahippo/move-to-ts";
@@ -7,11 +8,8 @@ import { SimulationKeys } from "@manahippo/move-to-ts";
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;
   symbolToCoinInfo: Record<string, CoinInfo>;
-  coinList: CoinInfo[]
-  constructor(
-    public app: App,
-    public fetcher: SimulationKeys
-  ) {
+  coinList: CoinInfo[];
+  constructor(public app: App, public fetcher: SimulationKeys) {
     this.fullnameToCoinInfo = {};
     this.symbolToCoinInfo = {};
     this.coinList = [];
@@ -34,8 +32,8 @@ export class CoinListClient {
   }
 
   static async load(app: App, fetcher: SimulationKeys) {
-    const coinRegistry = new CoinListClient(app, fetcher)
-    await coinRegistry.buildCache()
+    const coinRegistry = new CoinListClient(app, fetcher);
+    await coinRegistry.buildCache();
     return coinRegistry;
   }
 
