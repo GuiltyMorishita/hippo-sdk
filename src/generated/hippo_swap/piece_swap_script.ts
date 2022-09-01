@@ -5,9 +5,8 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Aptos_framework from "../aptos_framework";
 import * as Coin_list from "../coin_list";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 import * as Math from "./math";
 import * as Piece_swap from "./piece_swap";
 export const packageName = "hippo-swap";
@@ -40,6 +39,7 @@ export function buildPayload_add_liquidity_script (
   amount_x: U64,
   amount_y: U64,
   $p: TypeTag[], /* <X, Y>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -50,7 +50,8 @@ export function buildPayload_add_liquidity_script (
     [
       amount_x,
       amount_y,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -72,7 +73,7 @@ export function create_new_pool_ (
   $p: TypeTag[], /* <X, Y>*/
 ): void {
   let admin_addr, decimals, decimals__1;
-  admin_addr = Std.Signer.address_of_(admin, $c);
+  admin_addr = Stdlib.Signer.address_of_(admin, $c);
   if (!Coin_list.Coin_list.is_registry_initialized_($c)) {
     throw $.abortCode($.copy(E_TOKEN_REGISTRY_NOT_INITIALIZED));
   }
@@ -94,10 +95,10 @@ export function create_new_pool_ (
   if (!!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[1], $p[0]])])) {
     throw $.abortCode($.copy(E_LP_TOKEN_ALREADY_IN_COIN_LIST));
   }
-  decimals = Math.max_(u128(Aptos_framework.Coin.decimals_($c, [$p[0]])), u128(Aptos_framework.Coin.decimals_($c, [$p[1]])), $c);
+  decimals = Math.max_(u128(Stdlib.Coin.decimals_($c, [$p[0]])), u128(Stdlib.Coin.decimals_($c, [$p[1]])), $c);
   decimals__1 = u8($.copy(decimals));
   Piece_swap.create_new_pool_(admin, $.copy(lp_name), $.copy(lp_symbol), $.copy(decimals__1), $.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $.copy(w2_numerator), $.copy(w2_denominator), $.copy(swap_fee_per_million), $.copy(protocol_fee_share_per_thousand), $c, [$p[0], $p[1]]);
-  Coin_list.Coin_list.add_to_registry_by_signer_(admin, Std.String.utf8_($.copy(lp_name), $c), Std.String.utf8_($.copy(lp_symbol), $c), Std.String.utf8_(Std.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Std.String.utf8_($.copy(lp_logo_url), $c), Std.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
+  Coin_list.Coin_list.add_to_registry_by_signer_(admin, Stdlib.String.utf8_($.copy(lp_name), $c), Stdlib.String.utf8_($.copy(lp_symbol), $c), Stdlib.String.utf8_(Stdlib.Vector.empty_($c, [AtomicTypeTag.U8]), $c), Stdlib.String.utf8_($.copy(lp_logo_url), $c), Stdlib.String.utf8_($.copy(lp_project_url), $c), false, $c, [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "piece_swap", "LPToken", [$p[0], $p[1]])]);
   if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
     Coin_list.Coin_list.add_to_list_(admin, $c, [$p[0]]);
   }
@@ -141,6 +142,7 @@ export function buildPayload_create_new_pool_script (
   swap_fee_per_million: U64,
   protocol_fee_share_per_thousand: U64,
   $p: TypeTag[], /* <X, Y>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -158,7 +160,8 @@ export function buildPayload_create_new_pool_script (
       w2_denominator,
       swap_fee_per_million,
       protocol_fee_share_per_thousand,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -183,6 +186,7 @@ export function mock_deploy_script_ (
 
 
 export function buildPayload_mock_deploy_script (
+  isJSON = false,
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
@@ -190,7 +194,8 @@ export function buildPayload_mock_deploy_script (
     "piece_swap_script",
     "mock_deploy_script",
     typeParamStrings,
-    []
+    [],
+    isJSON,
   );
 
 }
@@ -209,6 +214,7 @@ export function remove_liquidity_script_ (
 export function buildPayload_remove_liquidity_script (
   liquidity: U64,
   $p: TypeTag[], /* <X, Y>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -218,7 +224,8 @@ export function buildPayload_remove_liquidity_script (
     typeParamStrings,
     [
       liquidity,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -280,6 +287,7 @@ export function buildPayload_swap_script (
   x_min_out: U64,
   y_min_out: U64,
   $p: TypeTag[], /* <X, Y>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -292,7 +300,8 @@ export function buildPayload_swap_script (
       y_in,
       x_min_out,
       y_min_out,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -312,8 +321,9 @@ export class App {
     amount_x: U64,
     amount_y: U64,
     $p: TypeTag[], /* <X, Y>*/
+    isJSON = false,
   ) {
-    return buildPayload_add_liquidity_script(amount_x, amount_y, $p);
+    return buildPayload_add_liquidity_script(amount_x, amount_y, $p, isJSON);
   }
   async add_liquidity_script(
     _account: AptosAccount,
@@ -321,8 +331,9 @@ export class App {
     amount_y: U64,
     $p: TypeTag[], /* <X, Y>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_add_liquidity_script(amount_x, amount_y, $p);
+    const payload = buildPayload_add_liquidity_script(amount_x, amount_y, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_create_new_pool_script(
@@ -336,8 +347,9 @@ export class App {
     swap_fee_per_million: U64,
     protocol_fee_share_per_thousand: U64,
     $p: TypeTag[], /* <X, Y>*/
+    isJSON = false,
   ) {
-    return buildPayload_create_new_pool_script(lp_name, lp_symbol, k, w1_numerator, w1_denominator, w2_numerator, w2_denominator, swap_fee_per_million, protocol_fee_share_per_thousand, $p);
+    return buildPayload_create_new_pool_script(lp_name, lp_symbol, k, w1_numerator, w1_denominator, w2_numerator, w2_denominator, swap_fee_per_million, protocol_fee_share_per_thousand, $p, isJSON);
   }
   async create_new_pool_script(
     _account: AptosAccount,
@@ -352,34 +364,39 @@ export class App {
     protocol_fee_share_per_thousand: U64,
     $p: TypeTag[], /* <X, Y>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_create_new_pool_script(lp_name, lp_symbol, k, w1_numerator, w1_denominator, w2_numerator, w2_denominator, swap_fee_per_million, protocol_fee_share_per_thousand, $p);
+    const payload = buildPayload_create_new_pool_script(lp_name, lp_symbol, k, w1_numerator, w1_denominator, w2_numerator, w2_denominator, swap_fee_per_million, protocol_fee_share_per_thousand, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mock_deploy_script(
+    isJSON = false,
   ) {
-    return buildPayload_mock_deploy_script();
+    return buildPayload_mock_deploy_script(isJSON);
   }
   async mock_deploy_script(
     _account: AptosAccount,
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_mock_deploy_script();
+    const payload = buildPayload_mock_deploy_script(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_remove_liquidity_script(
     liquidity: U64,
     $p: TypeTag[], /* <X, Y>*/
+    isJSON = false,
   ) {
-    return buildPayload_remove_liquidity_script(liquidity, $p);
+    return buildPayload_remove_liquidity_script(liquidity, $p, isJSON);
   }
   async remove_liquidity_script(
     _account: AptosAccount,
     liquidity: U64,
     $p: TypeTag[], /* <X, Y>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_remove_liquidity_script(liquidity, $p);
+    const payload = buildPayload_remove_liquidity_script(liquidity, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_swap_script(
@@ -388,8 +405,9 @@ export class App {
     x_min_out: U64,
     y_min_out: U64,
     $p: TypeTag[], /* <X, Y>*/
+    isJSON = false,
   ) {
-    return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+    return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p, isJSON);
   }
   async swap_script(
     _account: AptosAccount,
@@ -399,8 +417,9 @@ export class App {
     y_min_out: U64,
     $p: TypeTag[], /* <X, Y>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p);
+    const payload = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

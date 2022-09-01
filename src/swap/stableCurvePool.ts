@@ -1,17 +1,9 @@
-import { u64 } from "@manahippo/move-to-ts";
-import {
-  Stable_curve_scripts,
-  Stable_curve_swap,
-} from "../generated/hippo_swap";
-import {
-  HippoPool,
-  PoolType,
-  PriceType,
-  QuoteType,
-  UITokenAmount,
-} from "./baseTypes";
-import { CoinInfo } from "../generated/coin_list/coin_list";
-import { TxnBuilderTypes } from "aptos";
+import { u64 } from '@manahippo/move-to-ts';
+import { Stable_curve_scripts, Stable_curve_swap } from '../generated/hippo_swap';
+import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
+import { TransactionPayload } from 'aptos/dist/generated';
+import {CoinInfo} from "../generated/coin_list/coin_list";
+import {TxnBuilderTypes, Types} from "aptos";
 
 export class HippoStableCurvePool extends HippoPool {
   static FEE_DENOMINATOR = 10 ** 6;
@@ -218,33 +210,23 @@ export class HippoStableCurvePool extends HippoPool {
         u64(0),
         toRawAmount,
         this.lpTag().typeParams
-      );
-    } else {
+      ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
+    }
+    else {
       return Stable_curve_scripts.buildPayload_swap_script(
         u64(0),
         fromRawAmount,
         toRawAmount,
         u64(0),
         this.lpTag().typeParams
-      );
+      ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
     }
   }
 
-  async makeAddLiquidityPayload(
-    xUiAmt: UITokenAmount,
-    yUiAmt: UITokenAmount
-  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const xRawAmt = u64(
-      (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
-    );
-    const yRawAmt = u64(
-      (yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0)
-    );
-    return Stable_curve_scripts.buildPayload_add_liquidity(
-      xRawAmt,
-      yRawAmt,
-      this.lpTag().typeParams
-    );
+  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
+    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
+    return Stable_curve_scripts.buildPayload_add_liquidity(xRawAmt, yRawAmt, this.lpTag().typeParams) as TxnBuilderTypes.TransactionPayloadEntryFunction;
   }
 
   async makeRemoveLiquidityPayload(
@@ -252,20 +234,9 @@ export class HippoStableCurvePool extends HippoPool {
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(
-      liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
-    );
-    const lhsMinRawAmt = u64(
-      lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
-    );
-    const rhsMinRawAmt = u64(
-      rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
-    );
-    return Stable_curve_scripts.buildPayload_remove_liquidity(
-      liquidityRawAmt,
-      lhsMinRawAmt,
-      rhsMinRawAmt,
-      this.lpTag().typeParams
-    );
+    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
+    const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
+    const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+    return Stable_curve_scripts.buildPayload_remove_liquidity(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams) as TxnBuilderTypes.TransactionPayloadEntryFunction;
   }
 }

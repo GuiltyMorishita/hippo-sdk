@@ -31,6 +31,7 @@ export function buildPayload_register_pool_and_add_liquidity (
   _y_amount: U64,
   _y_min_amount: U64,
   $p: TypeTag[], /* <X, Y, LP>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -44,7 +45,8 @@ export function buildPayload_register_pool_and_add_liquidity (
       _x_min_amount,
       _y_amount,
       _y_min_amount,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -66,8 +68,9 @@ export class App {
     _y_amount: U64,
     _y_min_amount: U64,
     $p: TypeTag[], /* <X, Y, LP>*/
+    isJSON = false,
   ) {
-    return buildPayload_register_pool_and_add_liquidity(_pool_type, _x_amount, _x_min_amount, _y_amount, _y_min_amount, $p);
+    return buildPayload_register_pool_and_add_liquidity(_pool_type, _x_amount, _x_min_amount, _y_amount, _y_min_amount, $p, isJSON);
   }
   async register_pool_and_add_liquidity(
     _account: AptosAccount,
@@ -78,8 +81,9 @@ export class App {
     _y_min_amount: U64,
     $p: TypeTag[], /* <X, Y, LP>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_register_pool_and_add_liquidity(_pool_type, _x_amount, _x_min_amount, _y_amount, _y_min_amount, $p);
+    const payload = buildPayload_register_pool_and_add_liquidity(_pool_type, _x_amount, _x_min_amount, _y_amount, _y_min_amount, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

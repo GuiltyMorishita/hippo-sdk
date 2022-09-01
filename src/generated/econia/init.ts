@@ -5,7 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 import * as Market from "./market";
 import * as Registry from "./registry";
 export const packageName = "Econia";
@@ -18,7 +18,7 @@ export function init_econia_ (
   account: HexString,
   $c: AptosDataCache,
 ): void {
-  if (!((Std.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
+  if (!((Stdlib.Signer.address_of_(account, $c)).hex() === (new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7")).hex())) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
   }
   Registry.init_registry_(account, $c);
@@ -28,6 +28,7 @@ export function init_econia_ (
 
 
 export function buildPayload_init_econia (
+  isJSON = false,
 ) {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
@@ -35,7 +36,8 @@ export function buildPayload_init_econia (
     "init",
     "init_econia",
     typeParamStrings,
-    []
+    [],
+    isJSON,
   );
 
 }
@@ -52,14 +54,16 @@ export class App {
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
   payload_init_econia(
+    isJSON = false,
   ) {
-    return buildPayload_init_econia();
+    return buildPayload_init_econia(isJSON);
   }
   async init_econia(
     _account: AptosAccount,
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_init_econia();
+    const payload = buildPayload_init_econia(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

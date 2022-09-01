@@ -1,7 +1,14 @@
-import { getTypeTagFullname, StructTag, u64 } from "@manahippo/move-to-ts";
-import { AptosAccount, HexString } from "aptos";
+import {
+  getTypeTagFullname,
+  SimulationKeys,
+  StructTag,
+  u64
+} from "@manahippo/move-to-ts";
+import { HexString } from "aptos";
 import { NetworkConfiguration } from "../config";
-import * as AptosFramework from "../generated/aptos_framework";
+
+import { Router } from "../generated/hippo_swap"
+import * as AptosFramework from "../generated/stdlib";
 import * as CoinList from "../generated/coin_list";
 import { getCoinStoresForAddress, typeInfoToTypeTag } from "../utils";
 import { App } from "../generated";
@@ -18,7 +25,7 @@ export class HippoWalletClient {
     public app: App,
     public walletAddress: HexString,
     public coinStores: AptosFramework.Coin.CoinStore[],
-    public fetcher: AptosAccount
+    public fetcher: SimulationKeys,
   ) {
     this.symbolToCoinStore = {};
     this.fullnameToCoinStore = {};
@@ -86,7 +93,7 @@ export class HippoWalletClient {
     netConf: NetworkConfiguration,
     app: App,
     walletAddress: HexString,
-    fetcher: AptosAccount
+    fetcher: SimulationKeys,
   ) {
     const stores = await getCoinStoresForAddress(
       app.client,
@@ -104,11 +111,9 @@ export class HippoWalletClient {
     return client;
   }
 
-  makeFaucetMintToPayload(uiAmount: number, symbol: string) {
-    if (!this.devnetCoinSymbols.includes(symbol)) {
-      throw new Error(
-        `${symbol} is not a MockCoin and we are unable to mint it.`
-      );
+  makeFaucetMintToPayload(uiAmount: number, symbol: string, isJSONPayload = false) {
+    if(!this.devnetCoinSymbols.includes(symbol)) {
+      throw new Error(`${symbol} is not a MockCoin and we are unable to mint it.`);
     }
     const tokenInfo = this.symbolToTokenInfo[symbol];
     if (!tokenInfo) {
@@ -118,9 +123,7 @@ export class HippoWalletClient {
       Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber()))
     );
     const tokenTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
-    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [
-      tokenTypeTag,
-    ]);
+    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [tokenTypeTag], isJSONPayload)
   }
 
   debugPrint() {

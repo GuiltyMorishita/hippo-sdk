@@ -1,18 +1,6 @@
-import {
-  parseMoveStructTag,
-  StructTag,
-  TypeTag,
-  u8,
-} from "@manahippo/move-to-ts";
-import { AptosAccount, HexString, Types } from "aptos";
-import {
-  DexType,
-  PriceType,
-  QuoteType,
-  TradingPool,
-  TradingPoolProvider,
-  UITokenAmount,
-} from "../types";
+import { parseMoveStructTag, SimulationKeys, StructTag, TypeTag, u8 } from "@manahippo/move-to-ts";
+import {AptosAccount, HexString, Types} from "aptos";
+import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from "../types";
 import { CoinListClient } from "../../coinList";
 import { typeTagToTypeInfo } from "../../utils";
 import { App, hippo_swap } from "../../generated";
@@ -115,9 +103,9 @@ export class PontemTradingPool extends TradingPool {
 export class PontemPoolProvider extends TradingPoolProvider {
   constructor(
     app: App,
-    fetcher: AptosAccount,
-    netConfig = CONFIGS.devnet,
-    public registry: CoinListClient
+    fetcher: SimulationKeys,
+    netConfig= CONFIGS.devnet,
+    public registry: CoinListClient,
   ) {
     super(app, fetcher, netConfig);
   }

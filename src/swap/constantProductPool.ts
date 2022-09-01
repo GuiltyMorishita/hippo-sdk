@@ -142,33 +142,23 @@ export class HippoConstantProductPool extends HippoPool {
         u64(0),
         toRawAmount,
         this.lpTag().typeParams
-      );
-    } else {
+      ) as TransactionPayloadEntryFunction;
+    }
+    else {
       return Cp_scripts.buildPayload_swap_script(
         u64(0),
         fromRawAmount,
         toRawAmount,
         u64(0),
         this.lpTag().typeParams
-      );
+      ) as TransactionPayloadEntryFunction;
     }
   }
 
-  async makeAddLiquidityPayload(
-    xUiAmt: UITokenAmount,
-    yUiAmt: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction> {
-    const xRawAmt = u64(
-      (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
-    );
-    const yRawAmt = u64(
-      (yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0)
-    );
-    return Cp_scripts.buildPayload_add_liquidity_script(
-      xRawAmt,
-      yRawAmt,
-      this.lpTag().typeParams
-    );
+  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TransactionPayloadEntryFunction> {
+    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
+    return Cp_scripts.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams) as TransactionPayloadEntryFunction;
   }
 
   async makeRemoveLiquidityPayload(
@@ -176,20 +166,9 @@ export class HippoConstantProductPool extends HippoPool {
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
   ): Promise<TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(
-      liquidityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
-    );
-    const lhsMinRawAmt = u64(
-      lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
-    );
-    const rhsMinRawAmt = u64(
-      rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
-    );
-    return Cp_scripts.buildPayload_remove_liquidity_script(
-      liquidityRawAmt,
-      lhsMinRawAmt,
-      rhsMinRawAmt,
-      this.lpTag().typeParams
-    );
+    const liquidityRawAmt = u64(liquidityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
+    const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
+    const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+    return Cp_scripts.buildPayload_remove_liquidity_script(liquidityRawAmt, lhsMinRawAmt, rhsMinRawAmt, this.lpTag().typeParams) as TransactionPayloadEntryFunction;
   }
 }

@@ -5,8 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Aptos_framework from "../aptos_framework";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 import * as Capability from "./capability";
 import * as Critbit from "./critbit";
 import * as Open_table from "./open_table";
@@ -266,7 +265,7 @@ export function borrow_coin_counts_mut_ (
 export function deposit_collateral_ (
   user: HexString,
   market_account_info: MarketAccountInfo,
-  coins: Aptos_framework.Coin.Coin,
+  coins: Stdlib.Coin.Coin,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
 ): void {
@@ -276,11 +275,11 @@ export function deposit_collateral_ (
   }
   market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
   [coins_total_ref_mut, coins_available_ref_mut] = borrow_coin_counts_mut_(market_accounts_map, $.copy(market_account_info), $c, [$p[0]]);
-  $.set(coins_total_ref_mut, ($.copy(coins_total_ref_mut)).add(Aptos_framework.Coin.value_(coins, $c, [$p[0]])));
-  $.set(coins_available_ref_mut, ($.copy(coins_available_ref_mut)).add(Aptos_framework.Coin.value_(coins, $c, [$p[0]])));
+  $.set(coins_total_ref_mut, ($.copy(coins_total_ref_mut)).add(Stdlib.Coin.value_(coins, $c, [$p[0]])));
+  $.set(coins_available_ref_mut, ($.copy(coins_available_ref_mut)).add(Stdlib.Coin.value_(coins, $c, [$p[0]])));
   collateral_map = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user)).map;
   collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
-  Aptos_framework.Coin.merge_(collateral, coins, $c, [$p[0]]);
+  Stdlib.Coin.merge_(collateral, coins, $c, [$p[0]]);
   return;
 }
 
@@ -295,10 +294,10 @@ export function deposit_collateral_coinstore_ (
   let market_account_info;
   market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
   if (base) {
-    deposit_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), Aptos_framework.Coin.withdraw_(user, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
+    deposit_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), Stdlib.Coin.withdraw_(user, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
   }
   else{
-    deposit_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), Aptos_framework.Coin.withdraw_(user, $.copy(amount), $c, [$p[1]]), $c, [$p[1]]);
+    deposit_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), Stdlib.Coin.withdraw_(user, $.copy(amount), $c, [$p[1]]), $c, [$p[1]]);
   }
   return;
 }
@@ -309,6 +308,7 @@ export function buildPayload_deposit_collateral_coinstore (
   base: boolean,
   amount: U64,
   $p: TypeTag[], /* <B, Q, E>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -320,7 +320,8 @@ export function buildPayload_deposit_collateral_coinstore (
       custodian_id,
       base,
       amount,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -347,8 +348,8 @@ export function fill_order_internal_ (
   order_id: U128,
   complete_fill: boolean,
   base_parcels_filled: U64,
-  base_coins_ref_mut: Aptos_framework.Coin.Coin,
-  quote_coins_ref_mut: Aptos_framework.Coin.Coin,
+  base_coins_ref_mut: Stdlib.Coin.Coin,
+  quote_coins_ref_mut: Stdlib.Coin.Coin,
   base_to_route: U64,
   quote_to_route: U64,
   _econia_capability: Capability.EconiaCapability,
@@ -366,8 +367,8 @@ export function fill_order_route_collateral_ (
   user: HexString,
   market_account_info: MarketAccountInfo,
   side: boolean,
-  base_coins_ref_mut: Aptos_framework.Coin.Coin,
-  quote_coins_ref_mut: Aptos_framework.Coin.Coin,
+  base_coins_ref_mut: Stdlib.Coin.Coin,
+  quote_coins_ref_mut: Stdlib.Coin.Coin,
   base_to_route: U64,
   quote_to_route: U64,
   $c: AptosDataCache,
@@ -389,7 +390,7 @@ export function fill_order_route_collateral_ (
 export function fill_order_route_collateral_single_ (
   user: HexString,
   market_account_info: MarketAccountInfo,
-  external_coins_ref_mut: Aptos_framework.Coin.Coin,
+  external_coins_ref_mut: Stdlib.Coin.Coin,
   amount: U64,
   direction: boolean,
   $c: AptosDataCache,
@@ -399,10 +400,10 @@ export function fill_order_route_collateral_single_ (
   collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user)).map;
   collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_info), $c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
   if ((direction == $.copy(IN))) {
-    Aptos_framework.Coin.merge_(collateral_ref_mut, Aptos_framework.Coin.extract_(external_coins_ref_mut, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
+    Stdlib.Coin.merge_(collateral_ref_mut, Stdlib.Coin.extract_(external_coins_ref_mut, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
   }
   else{
-    Aptos_framework.Coin.merge_(external_coins_ref_mut, Aptos_framework.Coin.extract_(collateral_ref_mut, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
+    Stdlib.Coin.merge_(external_coins_ref_mut, Stdlib.Coin.extract_(collateral_ref_mut, $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
   }
   return;
 }
@@ -480,7 +481,7 @@ export function register_collateral_entry_ (
   $p: TypeTag[], /* <CoinType>*/
 ): void {
   let temp$1, temp$2, map, user_address;
-  user_address = Std.Signer.address_of_(user, $c);
+  user_address = Stdlib.Signer.address_of_(user, $c);
   if (!$c.exists(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user_address))) {
     $c.move_to(new SimpleStructTag(Collateral, [$p[0]]), user, new Collateral({ map: Open_table.empty_($c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]) }, new SimpleStructTag(Collateral, [$p[0]])));
   }
@@ -491,7 +492,7 @@ export function register_collateral_entry_ (
   if (!!Open_table.contains_(temp$1, temp$2, $c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])])) {
     throw $.abortCode($.copy(E_MARKET_ACCOUNT_REGISTERED));
   }
-  Open_table.add_(map, $.copy(market_account_info), Aptos_framework.Coin.zero_($c, [$p[0]]), $c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
+  Open_table.add_(map, $.copy(market_account_info), Stdlib.Coin.zero_($c, [$p[0]]), $c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
   return;
 }
 
@@ -520,6 +521,7 @@ export function register_market_account_ (
 export function buildPayload_register_market_account (
   custodian_id: U64,
   $p: TypeTag[], /* <B, Q, E>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -529,7 +531,8 @@ export function buildPayload_register_market_account (
     typeParamStrings,
     [
       custodian_id,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -540,7 +543,7 @@ export function register_market_accounts_entry_ (
   $c: AptosDataCache,
 ): void {
   let temp$1, temp$2, map, scale_factor, user_address;
-  user_address = Std.Signer.address_of_(user, $c);
+  user_address = Stdlib.Signer.address_of_(user, $c);
   if (!$c.exists(new SimpleStructTag(MarketAccounts), $.copy(user_address))) {
     $c.move_to(new SimpleStructTag(MarketAccounts), user, new MarketAccounts({ map: Open_table.empty_($c, [new SimpleStructTag(MarketAccountInfo), new SimpleStructTag(MarketAccount)]) }, new SimpleStructTag(MarketAccounts)));
   }
@@ -588,7 +591,7 @@ export function withdraw_collateral_ (
   amount: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
-): Aptos_framework.Coin.Coin {
+): Stdlib.Coin.Coin {
   let coins_available_ref_mut, coins_total_ref_mut, collateral, collateral_map, market_accounts_map;
   if (!exists_market_account_($.copy(market_account_info), $.copy(user), $c)) {
     throw $.abortCode($.copy(E_NO_MARKET_ACCOUNT));
@@ -602,7 +605,7 @@ export function withdraw_collateral_ (
   $.set(coins_available_ref_mut, ($.copy(coins_available_ref_mut)).sub($.copy(amount)));
   collateral_map = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user)).map;
   collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [new SimpleStructTag(MarketAccountInfo), new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
-  return Aptos_framework.Coin.extract_(collateral, $.copy(amount), $c, [$p[0]]);
+  return Stdlib.Coin.extract_(collateral, $.copy(amount), $c, [$p[0]]);
 }
 
 export function withdraw_collateral_coinstore_ (
@@ -619,10 +622,10 @@ export function withdraw_collateral_coinstore_ (
   }
   market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
   if (base) {
-    Aptos_framework.Coin.deposit_(Std.Signer.address_of_(user, $c), withdraw_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
+    Stdlib.Coin.deposit_(Stdlib.Signer.address_of_(user, $c), withdraw_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]), $c, [$p[0]]);
   }
   else{
-    Aptos_framework.Coin.deposit_(Std.Signer.address_of_(user, $c), withdraw_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[1]]), $c, [$p[1]]);
+    Stdlib.Coin.deposit_(Stdlib.Signer.address_of_(user, $c), withdraw_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[1]]), $c, [$p[1]]);
   }
   return;
 }
@@ -633,6 +636,7 @@ export function buildPayload_withdraw_collateral_coinstore (
   base: boolean,
   amount: U64,
   $p: TypeTag[], /* <B, Q, E>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -644,7 +648,8 @@ export function buildPayload_withdraw_collateral_coinstore (
       custodian_id,
       base,
       amount,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -656,7 +661,7 @@ export function withdraw_collateral_custodian_ (
   custodian_capability_ref: Registry.CustodianCapability,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
-): Aptos_framework.Coin.Coin {
+): Stdlib.Coin.Coin {
   if (!(Registry.custodian_id_(custodian_capability_ref, $c)).eq(($.copy(market_account_info.custodian_id)))) {
     throw $.abortCode($.copy(E_UNAUTHORIZED_CUSTODIAN));
   }
@@ -670,7 +675,7 @@ export function withdraw_collateral_internal_ (
   _econia_capability: Capability.EconiaCapability,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
-): Aptos_framework.Coin.Coin {
+): Stdlib.Coin.Coin {
   return withdraw_collateral_($.copy(user), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]);
 }
 
@@ -680,11 +685,11 @@ export function withdraw_collateral_user_ (
   amount: U64,
   $c: AptosDataCache,
   $p: TypeTag[], /* <CoinType>*/
-): Aptos_framework.Coin.Coin {
+): Stdlib.Coin.Coin {
   if (!($.copy(market_account_info.custodian_id)).eq(($.copy(NO_CUSTODIAN)))) {
     throw $.abortCode($.copy(E_CUSTODIAN_OVERRIDE));
   }
-  return withdraw_collateral_(Std.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]);
+  return withdraw_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -732,8 +737,9 @@ export class App {
     base: boolean,
     amount: U64,
     $p: TypeTag[], /* <B, Q, E>*/
+    isJSON = false,
   ) {
-    return buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p);
+    return buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p, isJSON);
   }
   async deposit_collateral_coinstore(
     _account: AptosAccount,
@@ -742,23 +748,26 @@ export class App {
     amount: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p);
+    const payload = buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_register_market_account(
     custodian_id: U64,
     $p: TypeTag[], /* <B, Q, E>*/
+    isJSON = false,
   ) {
-    return buildPayload_register_market_account(custodian_id, $p);
+    return buildPayload_register_market_account(custodian_id, $p, isJSON);
   }
   async register_market_account(
     _account: AptosAccount,
     custodian_id: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_register_market_account(custodian_id, $p);
+    const payload = buildPayload_register_market_account(custodian_id, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_withdraw_collateral_coinstore(
@@ -766,8 +775,9 @@ export class App {
     base: boolean,
     amount: U64,
     $p: TypeTag[], /* <B, Q, E>*/
+    isJSON = false,
   ) {
-    return buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p);
+    return buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p, isJSON);
   }
   async withdraw_collateral_coinstore(
     _account: AptosAccount,
@@ -776,8 +786,9 @@ export class App {
     amount: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p);
+    const payload = buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

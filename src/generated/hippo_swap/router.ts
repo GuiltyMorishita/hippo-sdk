@@ -5,8 +5,7 @@ import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
 import {HexString, AptosClient, AptosAccount} from "aptos";
-import * as Aptos_framework from "../aptos_framework";
-import * as Std from "../std";
+import * as Stdlib from "../stdlib";
 import * as Cp_swap from "./cp_swap";
 import * as Piece_swap from "./piece_swap";
 import * as Stable_curve_swap from "./stable_curve_swap";
@@ -53,20 +52,20 @@ export function add_liquidity_route_ (
 export function get_intermediate_output_ (
   pool_type: U8,
   is_x_to_y: boolean,
-  x_in: Aptos_framework.Coin.Coin,
+  x_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y>*/
-): Aptos_framework.Coin.Coin {
+): Stdlib.Coin.Coin {
   let temp$11, temp$12, temp$13, temp$14, temp$3, temp$8, x_out, x_out__2, y_out, y_out__1, y_out__10, y_out__4, y_out__6, y_out__9, zero, zero__5, zero2, zero2__7;
   if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_CONSTANT_PRODUCT)))) {
     if (is_x_to_y) {
       [x_out, y_out] = Cp_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
-      Aptos_framework.Coin.destroy_zero_(x_out, $c, [$p[0]]);
+      Stdlib.Coin.destroy_zero_(x_out, $c, [$p[0]]);
       temp$3 = y_out;
     }
     else{
       [y_out__1, x_out__2] = Cp_swap.swap_y_to_exact_x_direct_(x_in, $c, [$p[1], $p[0]]);
-      Aptos_framework.Coin.destroy_zero_(x_out__2, $c, [$p[0]]);
+      Stdlib.Coin.destroy_zero_(x_out__2, $c, [$p[0]]);
       temp$3 = y_out__1;
     }
     temp$14 = temp$3;
@@ -75,14 +74,14 @@ export function get_intermediate_output_ (
     if (($.copy(pool_type)).eq(($.copy(POOL_TYPE_STABLE_CURVE)))) {
       if (is_x_to_y) {
         [zero, zero2, y_out__4] = Stable_curve_swap.swap_x_to_exact_y_direct_(x_in, $c, [$p[0], $p[1]]);
-        Aptos_framework.Coin.destroy_zero_(zero, $c, [$p[0]]);
-        Aptos_framework.Coin.destroy_zero_(zero2, $c, [$p[0]]);
+        Stdlib.Coin.destroy_zero_(zero, $c, [$p[0]]);
+        Stdlib.Coin.destroy_zero_(zero2, $c, [$p[0]]);
         temp$8 = y_out__4;
       }
       else{
         [zero__5, y_out__6, zero2__7] = Stable_curve_swap.swap_y_to_exact_x_direct_(x_in, $c, [$p[1], $p[0]]);
-        Aptos_framework.Coin.destroy_zero_(zero__5, $c, [$p[0]]);
-        Aptos_framework.Coin.destroy_zero_(zero2__7, $c, [$p[0]]);
+        Stdlib.Coin.destroy_zero_(zero__5, $c, [$p[0]]);
+        Stdlib.Coin.destroy_zero_(zero2__7, $c, [$p[0]]);
         temp$8 = y_out__6;
       }
       temp$13 = temp$8;
@@ -154,20 +153,20 @@ export function three_step_route_ (
   $p: TypeTag[], /* <X, Y, Z, A>*/
 ): void {
   let coin_a, coin_x, coin_y, coin_z, sender_addr;
-  coin_x = Aptos_framework.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
+  coin_x = Stdlib.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
   coin_y = get_intermediate_output_($.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1]]);
   coin_z = get_intermediate_output_($.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2]]);
   coin_a = get_intermediate_output_($.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3]]);
-  if (!(Aptos_framework.Coin.value_(coin_a, $c, [$p[3]])).ge($.copy(a_min_out))) {
+  if (!(Stdlib.Coin.value_(coin_a, $c, [$p[3]])).ge($.copy(a_min_out))) {
     throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
-  sender_addr = Std.Signer.address_of_(sender, $c);
-  if (!Aptos_framework.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[3]])) {
-    Aptos_framework.Coins.register_internal_(sender, $c, [$p[3]]);
+  sender_addr = Stdlib.Signer.address_of_(sender, $c);
+  if (!Stdlib.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[3]])) {
+    Stdlib.Coin.register_(sender, $c, [$p[3]]);
   }
   else{
   }
-  Aptos_framework.Coin.deposit_($.copy(sender_addr), coin_a, $c, [$p[3]]);
+  Stdlib.Coin.deposit_($.copy(sender_addr), coin_a, $c, [$p[3]]);
   return;
 }
 
@@ -198,6 +197,7 @@ export function buildPayload_three_step_route_script (
   x_in: U64,
   a_min_out: U64,
   $p: TypeTag[], /* <X, Y, Z, A>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -214,7 +214,8 @@ export function buildPayload_three_step_route_script (
       third_is_x_to_y,
       x_in,
       a_min_out,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -231,20 +232,20 @@ export function two_step_route_ (
   $p: TypeTag[], /* <X, Y, Z>*/
 ): U64 {
   let coin_x, coin_y, coin_z, coin_z_amt, sender_addr;
-  coin_x = Aptos_framework.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
+  coin_x = Stdlib.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
   coin_y = get_intermediate_output_($.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1]]);
   coin_z = get_intermediate_output_($.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2]]);
-  coin_z_amt = Aptos_framework.Coin.value_(coin_z, $c, [$p[2]]);
+  coin_z_amt = Stdlib.Coin.value_(coin_z, $c, [$p[2]]);
   if (!($.copy(coin_z_amt)).ge($.copy(z_min_out))) {
     throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
-  sender_addr = Std.Signer.address_of_(sender, $c);
-  if (!Aptos_framework.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[2]])) {
-    Aptos_framework.Coins.register_internal_(sender, $c, [$p[2]]);
+  sender_addr = Stdlib.Signer.address_of_(sender, $c);
+  if (!Stdlib.Coin.is_account_registered_($.copy(sender_addr), $c, [$p[2]])) {
+    Stdlib.Coin.register_(sender, $c, [$p[2]]);
   }
   else{
   }
-  Aptos_framework.Coin.deposit_($.copy(sender_addr), coin_z, $c, [$p[2]]);
+  Stdlib.Coin.deposit_($.copy(sender_addr), coin_z, $c, [$p[2]]);
   return $.copy(coin_z_amt);
 }
 
@@ -272,6 +273,7 @@ export function buildPayload_two_step_route_script (
   x_in: U64,
   z_min_out: U64,
   $p: TypeTag[], /* <X, Y, Z>*/
+  isJSON = false,
 ) {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
@@ -286,7 +288,8 @@ export function buildPayload_two_step_route_script (
       second_is_x_to_y,
       x_in,
       z_min_out,
-    ]
+    ],
+    isJSON,
   );
 
 }
@@ -312,8 +315,9 @@ export class App {
     x_in: U64,
     a_min_out: U64,
     $p: TypeTag[], /* <X, Y, Z, A>*/
+    isJSON = false,
   ) {
-    return buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p);
+    return buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p, isJSON);
   }
   async three_step_route_script(
     _account: AptosAccount,
@@ -327,8 +331,9 @@ export class App {
     a_min_out: U64,
     $p: TypeTag[], /* <X, Y, Z, A>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p);
+    const payload = buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_two_step_route_script(
@@ -339,8 +344,9 @@ export class App {
     x_in: U64,
     z_min_out: U64,
     $p: TypeTag[], /* <X, Y, Z>*/
+    isJSON = false,
   ) {
-    return buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+    return buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p, isJSON);
   }
   async two_step_route_script(
     _account: AptosAccount,
@@ -352,8 +358,9 @@ export class App {
     z_min_out: U64,
     $p: TypeTag[], /* <X, Y, Z>*/
     _maxGas = 1000,
+    _isJSON = false,
   ) {
-    const payload = buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p);
+    const payload = buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

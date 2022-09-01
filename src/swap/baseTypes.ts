@@ -231,65 +231,46 @@ export class SteppedRoute extends TradeRoute {
       const fromTokenInfo = this.steps[0].lhsTokenInfo();
       const middleTokenInfo = this.steps[0].rhsTokenInfo();
       const toTokenInfo = this.steps[1].rhsTokenInfo();
-      const fromRawAmount = bigInt(
-        (amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(
-          0
-        )
-      );
-      const toRawAmount = bigInt(
-        (
-          minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())
-        ).toFixed(0)
-      );
-      return Promise.resolve(
-        Router.buildPayload_two_step_route_script(
-          u8(this.steps[0].pool.getPoolType()),
-          this.steps[0].isXtoY,
-          u8(this.steps[1].pool.getPoolType()),
-          this.steps[1].isXtoY,
-          u64(fromRawAmount),
-          u64(toRawAmount),
-          [
-            typeInfoToTypeTag(fromTokenInfo.token_type),
-            typeInfoToTypeTag(middleTokenInfo.token_type),
-            typeInfoToTypeTag(toTokenInfo.token_type),
-          ]
-        )
-      );
+      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
+      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+      return Promise.resolve(Router.buildPayload_two_step_route_script(
+        u8(this.steps[0].pool.getPoolType()),
+        this.steps[0].isXtoY,
+        u8(this.steps[1].pool.getPoolType()),
+        this.steps[1].isXtoY,
+        u64(fromRawAmount),
+        u64(toRawAmount),
+        [
+          typeInfoToTypeTag(fromTokenInfo.token_type),
+          typeInfoToTypeTag(middleTokenInfo.token_type),
+          typeInfoToTypeTag(toTokenInfo.token_type),
+        ]
+      ) as TransactionPayloadEntryFunction);
     } else if (this.steps.length === 3) {
       const fromTokenInfo = this.steps[0].lhsTokenInfo();
       const middle1TokenInfo = this.steps[0].rhsTokenInfo();
       const middle2TokenInfo = this.steps[1].rhsTokenInfo();
       const toTokenInfo = this.steps[2].rhsTokenInfo();
-      const fromRawAmount = bigInt(
-        (amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(
-          0
-        )
-      );
-      const toRawAmount = bigInt(
-        (
-          minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())
-        ).toFixed(0)
-      );
-      return Promise.resolve(
-        Router.buildPayload_three_step_route_script(
-          u8(this.steps[0].pool.getPoolType()),
-          this.steps[0].isXtoY,
-          u8(this.steps[1].pool.getPoolType()),
-          this.steps[1].isXtoY,
-          u8(this.steps[2].pool.getPoolType()),
-          this.steps[2].isXtoY,
-          u64(fromRawAmount),
-          u64(toRawAmount),
-          [
-            typeInfoToTypeTag(fromTokenInfo.token_type),
-            typeInfoToTypeTag(middle1TokenInfo.token_type),
-            typeInfoToTypeTag(middle2TokenInfo.token_type),
-            typeInfoToTypeTag(toTokenInfo.token_type),
-          ]
-        )
-      );
-    } else {
+      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
+      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+      return Promise.resolve(Router.buildPayload_three_step_route_script(
+        u8(this.steps[0].pool.getPoolType()),
+        this.steps[0].isXtoY,
+        u8(this.steps[1].pool.getPoolType()),
+        this.steps[1].isXtoY,
+        u8(this.steps[2].pool.getPoolType()),
+        this.steps[2].isXtoY,
+        u64(fromRawAmount),
+        u64(toRawAmount),
+        [
+          typeInfoToTypeTag(fromTokenInfo.token_type),
+          typeInfoToTypeTag(middle1TokenInfo.token_type),
+          typeInfoToTypeTag(middle2TokenInfo.token_type),
+          typeInfoToTypeTag(toTokenInfo.token_type),
+        ]
+      ) as TransactionPayloadEntryFunction);
+    }
+    else {
       throw new Error();
     }
   }
