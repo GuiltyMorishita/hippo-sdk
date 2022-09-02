@@ -1,5 +1,4 @@
-
-import { TypeInfo } from "aptos/src/stdlib/type_info";
+import { Type_info } from "../generated/stdlib";
 import { Router } from "../generated/hippo_swap";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { App } from "../generated";
@@ -15,7 +14,7 @@ export class CoinListClient {
     this.coinList = [];
   }
 
-  hasTokenType(tokenType: TypeInfo) {
+  hasTokenType(tokenType: Type_info.TypeInfo) {
     return tokenType.typeFullname() in this.fullnameToCoinInfo;
   }
 
@@ -27,7 +26,7 @@ export class CoinListClient {
     return this.symbolToCoinInfo[symbol];
   }
 
-  getCoinInfoByType(tokenType: TypeInfo) {
+  getCoinInfoByType(tokenType: Type_info.TypeInfo) {
     return this.fullnameToCoinInfo[tokenType.typeFullname()];
   }
 

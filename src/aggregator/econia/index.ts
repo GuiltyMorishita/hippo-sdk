@@ -1,6 +1,14 @@
 import { HexString, Types } from "aptos";
 import { App } from "../../generated";
-import { AptosLocalCache, AptosParserRepo, SimulationKeys, TypeTag, u64, U64, u8 } from "@manahippo/move-to-ts";
+import {
+  AptosLocalCache,
+  AptosParserRepo,
+  SimulationKeys,
+  TypeTag,
+  u64,
+  U64,
+  u8,
+} from "@manahippo/move-to-ts";
 
 import { EconiaClient } from "./EconiaClient";
 import { get_orders_sdk_, OrderBook } from "../../generated/econia/market";
@@ -225,8 +233,8 @@ export class EconiaPoolProvider extends TradingPoolProvider {
   constructor(
     app: App,
     fetcher: SimulationKeys,
-    netConfig= CONFIGS.devnet,
-    public registry: CoinListClient,
+    netConfig = CONFIGS.devnet,
+    public registry: CoinListClient
   ) {
     super(app, fetcher, netConfig);
   }

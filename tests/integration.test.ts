@@ -2,7 +2,7 @@ import { AptosAccount, AptosClient, FaucetClient } from "aptos";
 import { CONFIGS, HippoSwapClient, HippoWalletClient } from "../src";
 import { printResource } from "../src/utils";
 import { App } from "../src/generated";
-import { sendPayloadTx } from "@manahippo/move-to-ts";
+import {getSimulationKeys, sendPayloadTx} from "@manahippo/move-to-ts";
 const { localhost: HIPPO_CONF } = CONFIGS;
 
 describe("Integration Tests", () => {
@@ -23,13 +23,13 @@ describe("Integration Tests", () => {
     swapClient = await HippoSwapClient.createInOneCall(
       app,
       HIPPO_CONF,
-      account
+      getSimulationKeys(account)
     );
     walletClient = await HippoWalletClient.createInTwoCalls(
       HIPPO_CONF,
       app,
       account.address(),
-      account
+      getSimulationKeys(account)
     );
   });
 
