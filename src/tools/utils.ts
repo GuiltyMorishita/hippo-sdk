@@ -1,4 +1,4 @@
-import {AptosAccount, AptosClient, HexString, TxnBuilderTypes, Types} from "aptos";
+import { AptosAccount, AptosClient, HexString } from "aptos";
 import { Command } from "commander";
 import * as fs from "fs";
 import * as yaml from "yaml";
@@ -8,8 +8,8 @@ import { AptosDataCache, strToU8 } from "@manahippo/move-to-ts";
 import * as Std from "../generated/stdlib";
 
 export const readConfig = (program: Command) => {
-  const {config, profile} = program.opts();
-  const ymlContent = fs.readFileSync(config, {encoding: "utf-8"});
+  const { config, profile } = program.opts();
+  const ymlContent = fs.readFileSync(config, { encoding: "utf-8" });
   const result = yaml.parse(ymlContent);
   //console.log(result);
   if (!result.profiles) {
@@ -28,15 +28,15 @@ export const readConfig = (program: Command) => {
   }
   const privateKey = new HexString(privateKeyStr);
   const isDevnet = (url as string).includes("devnet");
-  const netConf = isDevnet? CONFIGS.devnet : CONFIGS.localhost;
+  const netConf = isDevnet ? CONFIGS.devnet : CONFIGS.localhost;
   const hippoDexAddress = netConf.hippoDexAddress;
   const client = new AptosClient(result.profiles[profile].rest_url);
   const app = new App(client);
   const account = new AptosAccount(privateKey.toUint8Array());
   console.log(`Using address ${account.address().hex()}`);
-  return {app, client, account, hippoDexAddress, netConf};
-}
+  return { app, client, account, hippoDexAddress, netConf };
+};
 
-export function strToString(str: string, $c: AptosDataCache){
+export function strToString(str: string, $c: AptosDataCache) {
   return Std.String.utf8_(strToU8(str), $c);
 }

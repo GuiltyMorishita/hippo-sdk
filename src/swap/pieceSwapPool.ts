@@ -1,33 +1,49 @@
-import { u64 } from '@manahippo/move-to-ts';
-import { Piece_swap_script } from '../generated/hippo_swap';
-import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
-import {HippoPool, PoolType, PriceType, QuoteType, UITokenAmount} from './baseTypes';
-import {CoinInfo} from "../generated/coin_list/coin_list";
-import {TxnBuilderTypes} from "aptos";
+import { u64 } from "@manahippo/move-to-ts";
+import { Piece_swap_script } from "../generated/hippo_swap";
+import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
+import {
+  HippoPool,
+  PoolType,
+  PriceType,
+  QuoteType,
+  UITokenAmount,
+} from "./baseTypes";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { TxnBuilderTypes } from "aptos";
 
 export class HippoPieceSwapPool extends HippoPool {
   constructor(
     xCoinInfo: CoinInfo,
     yCoinInfo: CoinInfo,
     lpCoinInfo: CoinInfo,
-    public poolInfo: PieceSwapPoolInfo,
+    public poolInfo: PieceSwapPoolInfo
   ) {
     super(xCoinInfo, yCoinInfo, lpCoinInfo);
   }
 
   xUiBalance() {
-    return this.poolInfo.reserve_x.value.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+    return (
+      this.poolInfo.reserve_x.value.toJsNumber() /
+      Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
   }
 
   yUiBalance() {
-    return this.poolInfo.reserve_y.value.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+    return (
+      this.poolInfo.reserve_y.value.toJsNumber() /
+      Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
   }
 
   getId(): string {
     return `HippoPieceSwapPool<${this.xyFullname()}>`;
   }
 
-  getCurrentPriceDirectional(isXtoY: boolean, xShift = 0, yShift = 0): PriceType {
+  getCurrentPriceDirectional(
+    isXtoY: boolean,
+    xShift = 0,
+    yShift = 0
+  ): PriceType {
     const delta_x = 0.001;
     const delta_y = get_swap_x_to_y_out(
       this.xUiBalance() + xShift,
@@ -38,27 +54,40 @@ export class HippoPieceSwapPool extends HippoPool {
       this.poolInfo.Xa.toJsNumber(),
       this.poolInfo.Xb.toJsNumber(),
       this.poolInfo.m.toJsNumber(),
-      this.poolInfo.n.toJsNumber(),
-    )
-    const feeDiscountFactor = (1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000);
+      this.poolInfo.n.toJsNumber()
+    );
+    const feeDiscountFactor =
+      1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000;
     if (isXtoY) {
-      return {xToY: delta_x / delta_y * feeDiscountFactor, yToX: delta_y / delta_x * feeDiscountFactor};
+      return {
+        xToY: (delta_x / delta_y) * feeDiscountFactor,
+        yToX: (delta_y / delta_x) * feeDiscountFactor,
+      };
     } else {
-      return {yToX: delta_x / delta_y * feeDiscountFactor, xToY: delta_y / delta_x * feeDiscountFactor};
+      return {
+        yToX: (delta_x / delta_y) * feeDiscountFactor,
+        xToY: (delta_y / delta_x) * feeDiscountFactor,
+      };
     }
   }
 
-  getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean) : QuoteType {
+  getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
     const inputCoinInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const outputCoinInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
     const initialPrice = this.getCurrentPriceDirectional(isXtoY);
-    const amountIn = u64(Math.floor(inputUiAmt * Math.pow(10, inputCoinInfo.decimals.toJsNumber())));
-    const amountOut = isXtoY ? this.poolInfo.quote_x_to_y_after_fees(amountIn) : this.poolInfo.quote_y_to_x_after_fees(amountIn);
-    const outputUiAmt = amountOut.toJsNumber() / Math.pow(10, outputCoinInfo.decimals.toJsNumber())
+    const amountIn = u64(
+      Math.floor(inputUiAmt * Math.pow(10, inputCoinInfo.decimals.toJsNumber()))
+    );
+    const amountOut = isXtoY
+      ? this.poolInfo.quote_x_to_y_after_fees(amountIn)
+      : this.poolInfo.quote_y_to_x_after_fees(amountIn);
+    const outputUiAmt =
+      amountOut.toJsNumber() /
+      Math.pow(10, outputCoinInfo.decimals.toJsNumber());
     const finalPrice = this.getCurrentPriceDirectional(
-      isXtoY, 
+      isXtoY,
       isXtoY ? inputUiAmt : -outputUiAmt,
-      isXtoY ? -outputUiAmt : inputUiAmt,
+      isXtoY ? -outputUiAmt : inputUiAmt
     );
     return {
       inputSymbol: inputCoinInfo.symbol.str(),
@@ -69,16 +98,18 @@ export class HippoPieceSwapPool extends HippoPool {
       avgPrice: outputUiAmt / inputUiAmt,
       finalPrice: finalPrice.yToX,
       priceImpact: (finalPrice.yToX - initialPrice.yToX) / initialPrice.yToX,
-    }
+    };
   }
 
-  estimateWithdrawalOutput(lpUiAmount: UITokenAmount, lpSupplyUiAmt: UITokenAmount): {xUiAmt: UITokenAmount; yUiAmt: UITokenAmount} {
+  estimateWithdrawalOutput(
+    lpUiAmount: UITokenAmount,
+    lpSupplyUiAmt: UITokenAmount
+  ): { xUiAmt: UITokenAmount; yUiAmt: UITokenAmount } {
     const fraction = lpUiAmount / lpSupplyUiAmt;
     return {
       xUiAmt: this.xUiBalance() * fraction,
       yUiAmt: this.yUiBalance() * fraction,
     };
-
   }
   estimateNeededYFromXDeposit(xUiAmt: UITokenAmount): UITokenAmount {
     const fraction = xUiAmt / this.xUiBalance();
@@ -93,52 +124,70 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 
   // transactions
-  async makeSwapPayloadDirectional( 
-    amountIn: UITokenAmount, 
-    minAmountOut: UITokenAmount, 
+  async makeSwapPayloadDirectional(
+    amountIn: UITokenAmount,
+    minAmountOut: UITokenAmount,
     isXtoY: boolean
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromCoinInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const toCoinInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
-    const fromRawAmount = u64((amountIn * Math.pow(10, fromCoinInfo.decimals.toJsNumber())).toFixed(0));
-    const toRawAmount = u64((minAmountOut * Math.pow(10, toCoinInfo.decimals.toJsNumber())).toFixed(0));
-    if(isXtoY) {
+    const fromRawAmount = u64(
+      (amountIn * Math.pow(10, fromCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const toRawAmount = u64(
+      (minAmountOut * Math.pow(10, toCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    if (isXtoY) {
       return Piece_swap_script.buildPayload_swap_script(
-        fromRawAmount, 
-        u64(0), 
-        u64(0), 
-        toRawAmount, 
+        fromRawAmount,
+        u64(0),
+        u64(0),
+        toRawAmount,
         this.lpTag().typeParams
       ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
-    }
-    else {
+    } else {
       return Piece_swap_script.buildPayload_swap_script(
-        u64(0), 
-        fromRawAmount, 
-        toRawAmount, 
-        u64(0), 
+        u64(0),
+        fromRawAmount,
+        toRawAmount,
+        u64(0),
         this.lpTag().typeParams
       ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
     }
   }
 
-  async makeAddLiquidityPayload(xUiAmt: UITokenAmount, yUiAmt: UITokenAmount): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
-    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
-    return Piece_swap_script.buildPayload_add_liquidity_script(xRawAmt, yRawAmt, this.lpTag().typeParams) as TxnBuilderTypes.TransactionPayloadEntryFunction;
+  async makeAddLiquidityPayload(
+    xUiAmt: UITokenAmount,
+    yUiAmt: UITokenAmount
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
+    const xRawAmt = u64(
+      (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const yRawAmt = u64(
+      (yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    return Piece_swap_script.buildPayload_add_liquidity_script(
+      xRawAmt,
+      yRawAmt,
+      this.lpTag().typeParams
+    ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
   }
 
   async makeRemoveLiquidityPayload(
-    liqiudityAmt: UITokenAmount, 
-    _lhsMinAmt: UITokenAmount, 
-    _rhsMinAmt: UITokenAmount,
+    liqiudityAmt: UITokenAmount,
+    _lhsMinAmt: UITokenAmount,
+    _rhsMinAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
-    return Piece_swap_script.buildPayload_remove_liquidity_script(liquidityRawAmt, this.lpTag().typeParams) as TxnBuilderTypes.TransactionPayloadEntryFunction;
+    const liquidityRawAmt = u64(
+      liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
+    );
+    return Piece_swap_script.buildPayload_remove_liquidity_script(
+      liquidityRawAmt,
+      this.lpTag().typeParams
+    ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
   }
 
-
-  getStage() : PieceStage {
+  getStage(): PieceStage {
     const current_x = this.xUiBalance();
     const current_y = this.yUiBalance();
     const xa = this.poolInfo.Xa.toJsNumber();
@@ -146,7 +195,7 @@ export class HippoPieceSwapPool extends HippoPool {
     return getStage(current_x, current_y, xa, xb);
   }
 
-  getScalingFactor() : number {
+  getScalingFactor(): number {
     const x = this.xUiBalance();
     const y = this.yUiBalance();
     const k = this.poolInfo.K.toJsNumber();
@@ -158,18 +207,22 @@ export class HippoPieceSwapPool extends HippoPool {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 enum PieceStage {
+  // eslint-disable-next-line no-unused-vars
   LEFT,
+  // eslint-disable-next-line no-unused-vars
   MIDDLE,
-  RIGHT
+  // eslint-disable-next-line no-unused-vars
+  RIGHT,
 }
 
 function getStage(
   current_x: number,
   current_y: number,
   xa: number,
-  xb: number,
-) : PieceStage {
+  xb: number
+): PieceStage {
   if (current_x / current_y < xa / xb) {
     return PieceStage.LEFT;
   } else if (current_x / current_y < xb / xa) {
@@ -188,9 +241,9 @@ function get_swap_x_to_y_out(
   xa: number,
   xb: number,
   m: number,
-  n: number,
-  ): number {
-    /*
+  n: number
+): number {
+  /*
     Steps:
     0. normalize (current_x, current_y, input_x) to appropriate range
     1. Use ratio to find out which stage we're on
@@ -199,101 +252,96 @@ function get_swap_x_to_y_out(
     4. return delta y
     */
 
-    /*
+  /*
     if x-to-y < xa-to-xb: upper-left stage
     if x-to-y < xb-to-xa: middle stage
     if x-to-y > xb-to-xa: bottom-right stage
     */
 
-    const stage = getStage(current_x, current_y, xa, xb);
-    const F = getScalingFactor(current_x, current_y, k, k2, m, n, stage);
+  const stage = getStage(current_x, current_y, xa, xb);
+  const F = getScalingFactor(current_x, current_y, k, k2, m, n, stage);
 
-    if (stage === PieceStage.LEFT) {
-        // upper-left stage
-        // (xF) (yF - n) = k2
-        // xyF^2 - (xn)F - k2 = 0
-        // F = [ (xn) + sqrt((xn)^2 + 4xy*k2)] / 2xy
-        
-        const current_xF = current_x * F;
-        const current_yF = current_y * F;
-        const input_xF = input_x * F;
-        const new_xF = current_xF + input_xF;
+  if (stage === PieceStage.LEFT) {
+    // upper-left stage
+    // (xF) (yF - n) = k2
+    // xyF^2 - (xn)F - k2 = 0
+    // F = [ (xn) + sqrt((xn)^2 + 4xy*k2)] / 2xy
 
-        if (new_xF > xa) {
-            // crossed into the middle stage
-            const delta_yF_this_stage = current_yF - xb; // xb = ya
-            const input_xF_next_stage = new_xF - xa;
-            const output_yF_next_stage = get_swap_x_to_y_out(
-              xa,
-              xb,
-              input_xF_next_stage,
-              k,
-              k2,
-              xa,
-              xb,
-              m,
-              n
-            );
-            return (delta_yF_this_stage + output_yF_next_stage) / F;
-        }
-        else {
-            const new_yF = k2 / new_xF + n;
-            const delta_yF = Math.max(current_yF - new_yF, 0);
-            return delta_yF / F;
-        }
+    const current_xF = current_x * F;
+    const current_yF = current_y * F;
+    const input_xF = input_x * F;
+    const new_xF = current_xF + input_xF;
+
+    if (new_xF > xa) {
+      // crossed into the middle stage
+      const delta_yF_this_stage = current_yF - xb; // xb = ya
+      const input_xF_next_stage = new_xF - xa;
+      const output_yF_next_stage = get_swap_x_to_y_out(
+        xa,
+        xb,
+        input_xF_next_stage,
+        k,
+        k2,
+        xa,
+        xb,
+        m,
+        n
+      );
+      return (delta_yF_this_stage + output_yF_next_stage) / F;
+    } else {
+      const new_yF = k2 / new_xF + n;
+      const delta_yF = Math.max(current_yF - new_yF, 0);
+      return delta_yF / F;
     }
-    else if(stage === PieceStage.MIDDLE) {
-        // middle stage
-        // (xF + m) (yF + m) = k
-        // xyF^2 + (x + y)mF + (mm -k) = 0
-        // F = [-(x+y)m + sqrt( ((x+y)m)^2 - 4xy(mm-k) ) ] / 2xy
-        const current_xF = current_x * F;
-        const current_yF = current_y * F;
-        const input_xF = input_x * F;
-        const new_xF = current_xF + input_xF;
-        if (new_xF > xb) {
-            // crossed into the bottom-right stage
-            const delta_yF_this_stage = current_yF - xa; // xa = yb
-            const input_xF_next_stage = new_xF - xb;
-            const output_yF_next_stage = get_swap_x_to_y_out(
-                xb,
-                xa,
-                input_xF_next_stage,
-                k,
-                k2,
-                xa,
-                xb,
-                m,
-                n
-            );
-            return (delta_yF_this_stage + output_yF_next_stage) / F;
-        }
-        else {
-            /*
+  } else if (stage === PieceStage.MIDDLE) {
+    // middle stage
+    // (xF + m) (yF + m) = k
+    // xyF^2 + (x + y)mF + (mm -k) = 0
+    // F = [-(x+y)m + sqrt( ((x+y)m)^2 - 4xy(mm-k) ) ] / 2xy
+    const current_xF = current_x * F;
+    const current_yF = current_y * F;
+    const input_xF = input_x * F;
+    const new_xF = current_xF + input_xF;
+    if (new_xF > xb) {
+      // crossed into the bottom-right stage
+      const delta_yF_this_stage = current_yF - xa; // xa = yb
+      const input_xF_next_stage = new_xF - xb;
+      const output_yF_next_stage = get_swap_x_to_y_out(
+        xb,
+        xa,
+        input_xF_next_stage,
+        k,
+        k2,
+        xa,
+        xb,
+        m,
+        n
+      );
+      return (delta_yF_this_stage + output_yF_next_stage) / F;
+    } else {
+      /*
             let p_new_yF = p_k / (p_new_xF + p_m) - p_m;
             let p_delta_yF = p_current_yF - p_new_yF;
             let output_y = p_delta_yF * f_denominator * 10000 / (f_numerator * PRECISION_FACTOR);
             */
-            const new_yF = k / (new_xF + m) - m;
-            const delta_yF = current_yF - new_yF;
-            return delta_yF / F;
-        }
+      const new_yF = k / (new_xF + m) - m;
+      const delta_yF = current_yF - new_yF;
+      return delta_yF / F;
     }
-    else {
-        // bottom-right stage
-        // (xF - n) (yF) = k2
-        // xyF^2 -nyF -k2 = 0
-        // [ny + sqrt( (ny)^2 +4xyk2) ] / 2xy
-        const current_xF = current_x * F;
-        const current_yF = current_y * F;
-        const input_xF = input_x * F;
-        const new_xF = current_xF + input_xF;
-        const new_yF = k2 / (new_xF - n);
-        const delta_yF =  Math.max(current_yF - new_yF, 0);
-        return delta_yF / F;
-    }
+  } else {
+    // bottom-right stage
+    // (xF - n) (yF) = k2
+    // xyF^2 -nyF -k2 = 0
+    // [ny + sqrt( (ny)^2 +4xyk2) ] / 2xy
+    const current_xF = current_x * F;
+    const current_yF = current_y * F;
+    const input_xF = input_x * F;
+    const new_xF = current_xF + input_xF;
+    const new_yF = k2 / (new_xF - n);
+    const delta_yF = Math.max(current_yF - new_yF, 0);
+    return delta_yF / F;
+  }
 }
-
 
 function getScalingFactor(
   x: number,
@@ -302,32 +350,30 @@ function getScalingFactor(
   k2: number,
   m: number,
   n: number,
-  stage: PieceStage,
-) : number {
-
+  stage: PieceStage
+): number {
   if (stage === PieceStage.MIDDLE) {
-      // (xF + m)(yF + m) = k
-      // xy*FF + (x + y)m*F + (mm - k) = 0
-      // F = [-(x+y)m + sqrt( ((x+y)m)^2 - 4xy(mm-k) ) ] / 2xy
+    // (xF + m)(yF + m) = k
+    // xy*FF + (x + y)m*F + (mm - k) = 0
+    // F = [-(x+y)m + sqrt( ((x+y)m)^2 - 4xy(mm-k) ) ] / 2xy
 
-      const xy = x * y;
-      const x_plus_y = x + y;
-      const b = x_plus_y * m;
-      const numerator = Math.sqrt(b*b + 4 * xy * (k - m*m)) - b; // k > mm is guaranteed
-      return numerator / (2 * xy);
-
+    const xy = x * y;
+    const x_plus_y = x + y;
+    const b = x_plus_y * m;
+    const numerator = Math.sqrt(b * b + 4 * xy * (k - m * m)) - b; // k > mm is guaranteed
+    return numerator / (2 * xy);
   } else {
-      // (xF)(yF - n) = k2
-      // xy*FF -nx*F - k2 = 0
-      // F = [ (xn) + sqrt((xn)^2 + 4xy*k2)] / 2xy
+    // (xF)(yF - n) = k2
+    // xy*FF -nx*F - k2 = 0
+    // F = [ (xn) + sqrt((xn)^2 + 4xy*k2)] / 2xy
 
-      if (stage === PieceStage.RIGHT) {
-        // just swap x and y
-        [x, y] = [y, x];
-      }
-      const xn = x * n;
-      const xy = x * y;
-      const numerator = xn + Math.sqrt(xn * xn + 4 * xy * k2);
-      return numerator / (2 * xy);
+    if (stage === PieceStage.RIGHT) {
+      // just swap x and y
+      [x, y] = [y, x];
+    }
+    const xn = x * n;
+    const xy = x * y;
+    const numerator = xn + Math.sqrt(xn * xn + 4 * xy * k2);
+    return numerator / (2 * xy);
   }
 }

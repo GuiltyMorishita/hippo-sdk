@@ -235,6 +235,17 @@ export function buildPayload_initialize (
 
 }
 
+export function one_step_direct_ (
+  dex_type: U8,
+  pool_type: U8,
+  is_x_to_y: boolean,
+  x_in: Stdlib.Coin.Coin,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y, E>*/
+): [Stdlib.Option.Option, Stdlib.Coin.Coin] {
+  return get_intermediate_output_($.copy(dex_type), $.copy(pool_type), is_x_to_y, x_in, $c, [$p[0], $p[1], $p[2]]);
+}
+
 export function one_step_route_ (
   sender: HexString,
   first_dex_type: U8,
@@ -247,7 +258,7 @@ export function one_step_route_ (
 ): void {
   let coin_in, coin_out, coin_remain_opt;
   coin_in = Stdlib.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
-  [coin_remain_opt, coin_out] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_in, $c, [$p[0], $p[1], $p[2]]);
+  [coin_remain_opt, coin_out] = one_step_direct_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_in, $c, [$p[0], $p[1], $p[2]]);
   if (!(Stdlib.Coin.value_(coin_out, $c, [$p[1]])).ge($.copy(y_min_out))) {
     throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
@@ -284,6 +295,27 @@ export function buildPayload_one_step_route (
 
 }
 
+export function three_step_direct_ (
+  first_dex_type: U8,
+  first_pool_type: U8,
+  first_is_x_to_y: boolean,
+  second_dex_type: U8,
+  second_pool_type: U8,
+  second_is_x_to_y: boolean,
+  third_dex_type: U8,
+  third_pool_type: U8,
+  third_is_x_to_y: boolean,
+  x_in: Stdlib.Coin.Coin,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y, Z, M, E1, E2, E3>*/
+): [Stdlib.Option.Option, Stdlib.Option.Option, Stdlib.Option.Option, Stdlib.Coin.Coin] {
+  let coin_m, coin_x_remain, coin_y, coin_y_remain, coin_z, coin_z_remain;
+  [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, x_in, $c, [$p[0], $p[1], $p[4]]);
+  [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[5]]);
+  [coin_z_remain, coin_m] = get_intermediate_output_($.copy(third_dex_type), $.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3], $p[6]]);
+  return [coin_x_remain, coin_y_remain, coin_z_remain, coin_m];
+}
+
 export function three_step_route_ (
   sender: HexString,
   first_dex_type: U8,
@@ -300,11 +332,9 @@ export function three_step_route_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, Z, M, E1, E2, E3>*/
 ): void {
-  let coin_m, coin_x, coin_x_remain, coin_y, coin_y_remain, coin_z, coin_z_remain;
+  let coin_m, coin_x, coin_x_remain, coin_y_remain, coin_z_remain;
   coin_x = Stdlib.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
-  [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[4]]);
-  [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[5]]);
-  [coin_z_remain, coin_m] = get_intermediate_output_($.copy(third_dex_type), $.copy(third_pool_type), third_is_x_to_y, coin_z, $c, [$p[2], $p[3], $p[6]]);
+  [coin_x_remain, coin_y_remain, coin_z_remain, coin_m] = three_step_direct_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, $.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, $.copy(third_dex_type), $.copy(third_pool_type), third_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6]]);
   if (!(Stdlib.Coin.value_(coin_m, $c, [$p[3]])).ge($.copy(m_min_out))) {
     throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
@@ -355,6 +385,23 @@ export function buildPayload_three_step_route (
 
 }
 
+export function two_step_direct_ (
+  first_dex_type: U8,
+  first_pool_type: U8,
+  first_is_x_to_y: boolean,
+  second_dex_type: U8,
+  second_pool_type: U8,
+  second_is_x_to_y: boolean,
+  x_in: Stdlib.Coin.Coin,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <X, Y, Z, E1, E2>*/
+): [Stdlib.Option.Option, Stdlib.Option.Option, Stdlib.Coin.Coin] {
+  let coin_x_remain, coin_y, coin_y_remain, coin_z;
+  [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, x_in, $c, [$p[0], $p[1], $p[3]]);
+  [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[4]]);
+  return [coin_x_remain, coin_y_remain, coin_z];
+}
+
 export function two_step_route_ (
   sender: HexString,
   first_dex_type: U8,
@@ -368,10 +415,9 @@ export function two_step_route_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, Z, E1, E2>*/
 ): void {
-  let coin_x, coin_x_remain, coin_y, coin_y_remain, coin_z;
+  let coin_x, coin_x_remain, coin_y_remain, coin_z;
   coin_x = Stdlib.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
-  [coin_x_remain, coin_y] = get_intermediate_output_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[3]]);
-  [coin_y_remain, coin_z] = get_intermediate_output_($.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_y, $c, [$p[1], $p[2], $p[4]]);
+  [coin_x_remain, coin_y_remain, coin_z] = two_step_direct_($.copy(first_dex_type), $.copy(first_pool_type), first_is_x_to_y, $.copy(second_dex_type), $.copy(second_pool_type), second_is_x_to_y, coin_x, $c, [$p[0], $p[1], $p[2], $p[3], $p[4]]);
   if (!(Stdlib.Coin.value_(coin_z, $c, [$p[2]])).ge($.copy(z_min_out))) {
     throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
   }
