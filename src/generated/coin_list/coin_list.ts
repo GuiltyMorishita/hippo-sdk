@@ -335,6 +335,54 @@ export function add_to_registry_ (
   return;
 }
 
+export function add_to_registry_by_admin_ (
+  admin: HexString,
+  name: Stdlib.String.String,
+  symbol: Stdlib.String.String,
+  coingecko_id: Stdlib.String.String,
+  logo_url: Stdlib.String.String,
+  project_url: Stdlib.String.String,
+  is_update: boolean,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <CoinType>*/
+): void {
+  if (!((Stdlib.Signer.address_of_(admin, $c)).hex() === (new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68")).hex())) {
+    throw $.abortCode($.copy(E_CONTRACT_OWNER_ONLY));
+  }
+  add_to_registry_($.copy(name), $.copy(symbol), $.copy(coingecko_id), $.copy(logo_url), $.copy(project_url), is_update, $c, [$p[0]]);
+  return;
+}
+
+
+export function buildPayload_add_to_registry_by_admin (
+  name: Stdlib.String.String,
+  symbol: Stdlib.String.String,
+  coingecko_id: Stdlib.String.String,
+  logo_url: Stdlib.String.String,
+  project_url: Stdlib.String.String,
+  is_update: boolean,
+  $p: TypeTag[], /* <CoinType>*/
+  isJSON = false,
+) {
+  const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
+  return $.buildPayload(
+    new HexString("0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"),
+    "coin_list",
+    "add_to_registry_by_admin",
+    typeParamStrings,
+    [
+      name,
+      symbol,
+      coingecko_id,
+      logo_url,
+      project_url,
+      is_update,
+    ],
+    isJSON,
+  );
+
+}
+
 export function add_to_registry_by_proof_ (
   _ownership_proof: any,
   name: Stdlib.String.String,
@@ -787,6 +835,33 @@ export class App {
     _isJSON = false,
   ) {
     const payload = buildPayload_add_to_list($p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_add_to_registry_by_admin(
+    name: Stdlib.String.String,
+    symbol: Stdlib.String.String,
+    coingecko_id: Stdlib.String.String,
+    logo_url: Stdlib.String.String,
+    project_url: Stdlib.String.String,
+    is_update: boolean,
+    $p: TypeTag[], /* <CoinType>*/
+    isJSON = false,
+  ) {
+    return buildPayload_add_to_registry_by_admin(name, symbol, coingecko_id, logo_url, project_url, is_update, $p, isJSON);
+  }
+  async add_to_registry_by_admin(
+    _account: AptosAccount,
+    name: Stdlib.String.String,
+    symbol: Stdlib.String.String,
+    coingecko_id: Stdlib.String.String,
+    logo_url: Stdlib.String.String,
+    project_url: Stdlib.String.String,
+    is_update: boolean,
+    $p: TypeTag[], /* <CoinType>*/
+    _maxGas = 1000,
+    _isJSON = false,
+  ) {
+    const payload = buildPayload_add_to_registry_by_admin(name, symbol, coingecko_id, logo_url, project_url, is_update, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_add_to_registry_by_signer(
