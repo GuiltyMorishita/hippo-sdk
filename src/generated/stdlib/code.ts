@@ -279,7 +279,7 @@ export function initialize_ (
   System_addresses.assert_aptos_framework_(aptos_framework, $c);
   addr = Signer.address_of_(package_owner, $c);
   if (!$c.exists(new SimpleStructTag(PackageRegistry), $.copy(addr))) {
-    $c.move_to(new SimpleStructTag(PackageRegistry), package_owner, new PackageRegistry({ packages: metadata }, new SimpleStructTag(PackageRegistry)));
+    $c.move_to(new SimpleStructTag(PackageRegistry), package_owner, new PackageRegistry({ packages: [metadata] }, new SimpleStructTag(PackageRegistry)));
   }
   else{
     Vector.push_back_($c.borrow_global_mut<PackageRegistry>(new SimpleStructTag(PackageRegistry), $.copy(addr)).packages, metadata, $c, [new SimpleStructTag(PackageMetadata)]);
