@@ -1,16 +1,16 @@
 
 import { AptosClient } from "aptos";
 import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
-import * as Aggregatorv6 from './aggregatorv6';
-import * as Devnetv6 from './devnetv6';
+import * as Aggregator from './aggregator';
+import * as Devnet from './devnet';
 
-export * as Aggregatorv6 from './aggregatorv6';
-export * as Devnetv6 from './devnetv6';
+export * as Aggregator from './aggregator';
+export * as Devnet from './devnet';
 
 
 export function loadParsers(repo: AptosParserRepo) {
-  Aggregatorv6.loadParsers(repo);
-  Devnetv6.loadParsers(repo);
+  Aggregator.loadParsers(repo);
+  Devnet.loadParsers(repo);
 }
 
 export function getPackageRepo(): AptosParserRepo {
@@ -27,14 +27,14 @@ export type AppType = {
 };
 
 export class App {
-  aggregatorv6 : Aggregatorv6.App
-  devnetv6 : Devnetv6.App
+  aggregator : Aggregator.App
+  devnet : Devnet.App
   constructor(
     public client: AptosClient,
     public repo: AptosParserRepo,
     public cache: AptosLocalCache,
   ) {
-    this.aggregatorv6 = new Aggregatorv6.App(client, repo, cache);
-    this.devnetv6 = new Devnetv6.App(client, repo, cache);
+    this.aggregator = new Aggregator.App(client, repo, cache);
+    this.devnet = new Devnet.App(client, repo, cache);
   }
 }

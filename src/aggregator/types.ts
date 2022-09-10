@@ -8,7 +8,7 @@ import {
 } from "@manahippo/move-to-ts";
 import { Types } from "aptos";
 import { CoinInfo } from "../generated/coin_list/coin_list";
-import { Aggregatorv6 } from "../generated/hippo_aggregator";
+import { Aggregator } from "../generated/hippo_aggregator";
 import { App } from "../generated";
 import { CONFIGS } from "../config";
 
@@ -199,7 +199,7 @@ export class TradeRoute {
     );
     if (this.steps.length === 1) {
       const step0 = this.steps[0];
-      return Aggregatorv6.buildPayload_one_step_route(
+      return Aggregator.buildPayload_one_step_route(
         u8(step0.pool.dexType),
         step0.pool.poolType,
         step0.isXtoY,
@@ -215,7 +215,7 @@ export class TradeRoute {
     } else if (this.steps.length === 2) {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
-      return Aggregatorv6.buildPayload_two_step_route(
+      return Aggregator.buildPayload_two_step_route(
         u8(step0.pool.dexType),
         step0.pool.poolType,
         step0.isXtoY,
@@ -237,7 +237,7 @@ export class TradeRoute {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
       const step2 = this.steps[2];
-      return Aggregatorv6.buildPayload_three_step_route(
+      return Aggregator.buildPayload_three_step_route(
         u8(step0.pool.dexType),
         step0.pool.poolType,
         step0.isXtoY,

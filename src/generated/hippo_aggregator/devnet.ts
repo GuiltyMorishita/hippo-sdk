@@ -11,7 +11,7 @@ import * as Pontem from "../pontem";
 import * as Stdlib from "../stdlib";
 export const packageName = "HippoAggregator";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
-export const moduleName = "devnetv6";
+export const moduleName = "devnet";
 
 export const BTC_AMOUNT : U64 = (u64("100000000")).mul(u64("1000"));
 export const USDC_AMOUNT : U64 = ((u64("100000000")).mul(u64("1000"))).mul(u64("10000"));
@@ -69,7 +69,7 @@ export function buildPayload_mock_deploy_econia (
   const typeParamStrings = [] as string[];
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "devnetv6",
+    "devnet",
     "mock_deploy_econia",
     typeParamStrings,
     [],
@@ -94,7 +94,7 @@ export function buildPayload_mock_deploy_pontem (
   const typeParamStrings = [] as string[];
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "devnetv6",
+    "devnet",
     "mock_deploy_pontem",
     typeParamStrings,
     [],
@@ -104,7 +104,7 @@ export function buildPayload_mock_deploy_pontem (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnetv6::PontemLP", PontemLP.PontemLPParser);
+  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnet::PontemLP", PontemLP.PontemLPParser);
 }
 export class App {
   constructor(

@@ -11,7 +11,7 @@ import * as Pontem from "../pontem";
 import * as Stdlib from "../stdlib";
 export const packageName = "HippoAggregator";
 export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
-export const moduleName = "aggregatorv6";
+export const moduleName = "aggregator";
 
 export const DEX_ECONIA : U8 = u8("2");
 export const DEX_HIPPO : U8 = u8("1");
@@ -26,6 +26,48 @@ export const HIPPO_PIECEWISE : U8 = u8("3");
 export const HIPPO_STABLE_CURVE : U8 = u8("2");
 export const MAX_SIZE : U64 = u64("9223372036854775808");
 
+
+export class EventStore 
+{
+  static moduleAddress = moduleAddress;
+  static moduleName = moduleName;
+  __app: $.AppType | null = null;
+  static structName: string = "EventStore";
+  static typeParameters: TypeParamDeclType[] = [
+
+  ];
+  static fields: FieldDeclType[] = [
+  { name: "swap_step_events", typeTag: new StructTag(new HexString("0x1"), "event", "EventHandle", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "aggregator", "SwapStepEvent", [])]) }];
+
+  swap_step_events: Stdlib.Event.EventHandle;
+
+  constructor(proto: any, public typeTag: TypeTag) {
+    this.swap_step_events = proto['swap_step_events'] as Stdlib.Event.EventHandle;
+  }
+
+  static EventStoreParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : EventStore {
+    const proto = $.parseStructProto(data, typeTag, repo, EventStore);
+    return new EventStore(proto, typeTag);
+  }
+
+  static async load(repo: AptosParserRepo, client: AptosClient, address: HexString, typeParams: TypeTag[]) {
+    const result = await repo.loadResource(client, address, EventStore, typeParams);
+    return result as unknown as EventStore;
+  }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, EventStore, typeParams);
+    await result.loadFullState(app)
+    return result as unknown as EventStore;
+  }
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "EventStore", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.swap_step_events.loadFullState(app);
+    this.__app = app;
+  }
+
+}
 
 export class SignerStore 
 {
@@ -64,6 +106,58 @@ export class SignerStore
   }
   async loadFullState(app: $.AppType) {
     await this.signer_cap.loadFullState(app);
+    this.__app = app;
+  }
+
+}
+
+export class SwapStepEvent 
+{
+  static moduleAddress = moduleAddress;
+  static moduleName = moduleName;
+  __app: $.AppType | null = null;
+  static structName: string = "SwapStepEvent";
+  static typeParameters: TypeParamDeclType[] = [
+
+  ];
+  static fields: FieldDeclType[] = [
+  { name: "dex_type", typeTag: AtomicTypeTag.U8 },
+  { name: "pool_type", typeTag: AtomicTypeTag.U8 },
+  { name: "x_type_info", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) },
+  { name: "y_type_info", typeTag: new StructTag(new HexString("0x1"), "type_info", "TypeInfo", []) },
+  { name: "input_amount", typeTag: AtomicTypeTag.U64 },
+  { name: "output_amount", typeTag: AtomicTypeTag.U64 },
+  { name: "time_stamp", typeTag: AtomicTypeTag.U64 }];
+
+  dex_type: U8;
+  pool_type: U8;
+  x_type_info: Stdlib.Type_info.TypeInfo;
+  y_type_info: Stdlib.Type_info.TypeInfo;
+  input_amount: U64;
+  output_amount: U64;
+  time_stamp: U64;
+
+  constructor(proto: any, public typeTag: TypeTag) {
+    this.dex_type = proto['dex_type'] as U8;
+    this.pool_type = proto['pool_type'] as U8;
+    this.x_type_info = proto['x_type_info'] as Stdlib.Type_info.TypeInfo;
+    this.y_type_info = proto['y_type_info'] as Stdlib.Type_info.TypeInfo;
+    this.input_amount = proto['input_amount'] as U64;
+    this.output_amount = proto['output_amount'] as U64;
+    this.time_stamp = proto['time_stamp'] as U64;
+  }
+
+  static SwapStepEventParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : SwapStepEvent {
+    const proto = $.parseStructProto(data, typeTag, repo, SwapStepEvent);
+    return new SwapStepEvent(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, "SwapStepEvent", []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.x_type_info.loadFullState(app);
+    await this.y_type_info.loadFullState(app);
     this.__app = app;
   }
 
@@ -107,6 +201,20 @@ export function check_and_deposit_opt_ (
   return Stdlib.Option.destroy_none_(coin_opt, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]);
 }
 
+export function emit_swap_step_event_ (
+  dex_type: U8,
+  pool_type: U8,
+  input_amount: U64,
+  output_amount: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[], /* <Input, Output>*/
+): void {
+  let event_store;
+  event_store = $c.borrow_global_mut<EventStore>(new SimpleStructTag(EventStore), new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"));
+  Stdlib.Event.emit_event_(event_store.swap_step_events, new SwapStepEvent({ dex_type: $.copy(dex_type), pool_type: $.copy(pool_type), x_type_info: Stdlib.Type_info.type_of_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), y_type_info: Stdlib.Type_info.type_of_($c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[1]])]), input_amount: $.copy(input_amount), output_amount: $.copy(output_amount), time_stamp: Stdlib.Timestamp.now_microseconds_($c) }, new SimpleStructTag(SwapStepEvent)), $c, [new SimpleStructTag(SwapStepEvent)]);
+  return;
+}
+
 export function get_intermediate_output_ (
   dex_type: U8,
   pool_type: U8,
@@ -115,7 +223,8 @@ export function get_intermediate_output_ (
   $c: AptosDataCache,
   $p: TypeTag[], /* <X, Y, E>*/
 ): [Stdlib.Option.Option, Stdlib.Coin.Coin] {
-  let temp$10, temp$13, temp$14, temp$15, temp$16, temp$17, temp$18, temp$19, temp$20, temp$22, temp$23, temp$24, temp$25, temp$26, temp$27, temp$28, temp$29, temp$3, temp$30, temp$31, temp$4, temp$9, x_out, x_out__2, y_out, y_out__1, y_out__11, y_out__12, y_out__21, y_out__5, y_out__7, zero, zero__6, zero2, zero2__8;
+  let temp$10, temp$13, temp$14, temp$15, temp$16, temp$17, temp$18, temp$19, temp$20, temp$22, temp$23, temp$24, temp$25, temp$26, temp$27, temp$28, temp$29, temp$3, temp$30, temp$31, temp$33, temp$4, temp$9, coin_in_value, coin_in_value__34, x_out, x_out__2, x_out_opt, y_out, y_out__1, y_out__11, y_out__12, y_out__21, y_out__32, y_out__5, y_out__7, zero, zero__6, zero2, zero2__8;
+  coin_in_value = Stdlib.Coin.value_(x_in, $c, [$p[0]]);
   if (($.copy(dex_type)).eq(($.copy(DEX_HIPPO)))) {
     if (($.copy(pool_type)).eq(($.copy(HIPPO_CONSTANT_PRODUCT)))) {
       if (is_x_to_y) {
@@ -202,7 +311,16 @@ export function get_intermediate_output_ (
     }
     [temp$30, temp$31] = [temp$28, temp$29];
   }
-  return [temp$30, temp$31];
+  [x_out_opt, y_out__32] = [temp$30, temp$31];
+  if (Stdlib.Option.is_some_(x_out_opt, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])])) {
+    temp$33 = ($.copy(coin_in_value)).sub(Stdlib.Coin.value_(Stdlib.Option.borrow_(x_out_opt, $c, [new StructTag(new HexString("0x1"), "coin", "Coin", [$p[0]])]), $c, [$p[0]]));
+  }
+  else{
+    temp$33 = $.copy(coin_in_value);
+  }
+  coin_in_value__34 = temp$33;
+  emit_swap_step_event_($.copy(dex_type), $.copy(pool_type), $.copy(coin_in_value__34), Stdlib.Coin.value_(y_out__32, $c, [$p[1]]), $c, [$p[0], $p[1]]);
+  return [x_out_opt, y_out__32];
 }
 
 export function initialize_ (
@@ -216,6 +334,7 @@ export function initialize_ (
   }
   [, signer_cap] = Stdlib.Account.create_resource_account_(admin, [u8("115"), u8("105"), u8("103"), u8("110"), u8("101"), u8("114"), u8("118"), u8("51")], $c);
   $c.move_to(new SimpleStructTag(SignerStore), admin, new SignerStore({ signer_cap: signer_cap }, new SimpleStructTag(SignerStore)));
+  $c.move_to(new SimpleStructTag(EventStore), admin, new EventStore({ swap_step_events: Stdlib.Account.new_event_handle_(admin, $c, [new SimpleStructTag(SwapStepEvent)]) }, new SimpleStructTag(EventStore)));
   return;
 }
 
@@ -226,7 +345,7 @@ export function buildPayload_initialize (
   const typeParamStrings = [] as string[];
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
+    "aggregator",
     "initialize",
     typeParamStrings,
     [],
@@ -280,7 +399,7 @@ export function buildPayload_one_step_route (
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
+    "aggregator",
     "one_step_route",
     typeParamStrings,
     [
@@ -364,7 +483,7 @@ export function buildPayload_three_step_route (
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
+    "aggregator",
     "three_step_route",
     typeParamStrings,
     [
@@ -443,7 +562,7 @@ export function buildPayload_two_step_route (
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
-    "aggregatorv6",
+    "aggregator",
     "two_step_route",
     typeParamStrings,
     [
@@ -462,7 +581,9 @@ export function buildPayload_two_step_route (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregatorv6::SignerStore", SignerStore.SignerStoreParser);
+  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregator::EventStore", EventStore.EventStoreParser);
+  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregator::SignerStore", SignerStore.SignerStoreParser);
+  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregator::SwapStepEvent", SwapStepEvent.SwapStepEventParser);
 }
 export class App {
   constructor(
@@ -473,6 +594,17 @@ export class App {
   }
   get moduleAddress() {{ return moduleAddress; }}
   get moduleName() {{ return moduleName; }}
+  get EventStore() { return EventStore; }
+  async loadEventStore(
+    owner: HexString,
+    loadFull=true,
+  ) {
+    const val = await EventStore.load(this.repo, this.client, owner, [] as TypeTag[]);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    return val;
+  }
   get SignerStore() { return SignerStore; }
   async loadSignerStore(
     owner: HexString,
@@ -484,6 +616,7 @@ export class App {
     }
     return val;
   }
+  get SwapStepEvent() { return SwapStepEvent; }
   payload_initialize(
     isJSON = false,
   ) {
