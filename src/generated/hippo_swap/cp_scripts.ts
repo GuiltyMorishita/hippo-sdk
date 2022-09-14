@@ -4,7 +4,7 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount} from "aptos";
+import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
 import * as Coin_list from "../coin_list";
 import * as Stdlib from "../stdlib";
 import * as Cp_swap from "./cp_swap";
@@ -40,7 +40,8 @@ export function buildPayload_add_liquidity_script (
   amount_y: U64,
   $p: TypeTag[], /* <X, Y>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -133,7 +134,8 @@ export function buildPayload_create_new_pool_script (
   lp_project_url: U8[],
   $p: TypeTag[], /* <X, Y>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -196,7 +198,8 @@ export function mock_deploy_script_ (
 
 export function buildPayload_mock_deploy_script (
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -228,7 +231,8 @@ export function buildPayload_remove_liquidity_script (
   amount_y_min: U64,
   $p: TypeTag[], /* <X, Y>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -303,7 +307,8 @@ export function buildPayload_swap_script (
   y_min_out: U64,
   $p: TypeTag[], /* <X, Y>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -337,7 +342,8 @@ export class App {
     amount_y: U64,
     $p: TypeTag[], /* <X, Y>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_add_liquidity_script(amount_x, amount_y, $p, isJSON);
   }
   async add_liquidity_script(
@@ -360,7 +366,8 @@ export class App {
     lp_project_url: U8[],
     $p: TypeTag[], /* <X, Y>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_create_new_pool_script(fee_to, fee_on, lp_name, lp_symbol, lp_logo_url, lp_project_url, $p, isJSON);
   }
   async create_new_pool_script(
@@ -380,7 +387,8 @@ export class App {
   }
   payload_mock_deploy_script(
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_script(isJSON);
   }
   async mock_deploy_script(
@@ -397,7 +405,8 @@ export class App {
     amount_y_min: U64,
     $p: TypeTag[], /* <X, Y>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_remove_liquidity_script(liquidity, amount_x_min, amount_y_min, $p, isJSON);
   }
   async remove_liquidity_script(
@@ -419,7 +428,8 @@ export class App {
     y_min_out: U64,
     $p: TypeTag[], /* <X, Y>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p, isJSON);
   }
   async swap_script(

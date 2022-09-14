@@ -6,7 +6,7 @@ import {
   u8,
   U8,
 } from "@manahippo/move-to-ts";
-import { Types } from "aptos";
+import { TxnBuilderTypes, Types } from "aptos";
 import { CoinInfo } from "../generated/coin_list/coin_list";
 import { Aggregator } from "../generated/hippo_aggregator";
 import { App } from "../generated";
@@ -190,7 +190,9 @@ export class TradeRoute {
     inputUiAmt: UITokenAmount,
     minOutAmt: UITokenAmount,
     isJSONPayload = false
-  ) {
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
     const inputSize = Math.floor(
       inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
     );

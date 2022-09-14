@@ -20,7 +20,7 @@ import { CoinInfo } from "../generated/stdlib/coin";
 import { PoolType } from "../swap/baseTypes";
 import { TradeAggregator } from "../aggregator/aggregator";
 import { DEX_TYPE_NAME } from "../aggregator/types";
-import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
+import { TxnBuilderTypes } from "aptos";
 
 const actionShowTokenRegistry = async () => {
   const { app, hippoDexAddress, account } = readConfig(program);
@@ -113,7 +113,7 @@ const actionHitFaucet = async (
       const result = sendPayloadTx(
         app.client,
         account,
-        payload as TransactionPayloadEntryFunction
+        payload as TxnBuilderTypes.TransactionPayloadEntryFunction
       );
       console.log(result);
       return;
@@ -422,7 +422,7 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
   await sendPayloadTx(
     app.client,
     account,
-    payload as TransactionPayloadEntryFunction
+    payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   await walletClient.refreshStores();
   walletClient.debugPrint();
@@ -926,7 +926,7 @@ const aggSwap = async (
   await sendPayloadTx(
     app.client,
     account,
-    payload as TransactionPayloadEntryFunction
+    payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   await testWalletClient();
 };
@@ -951,7 +951,7 @@ const aggSwapWithRoute = async (
   await sendPayloadTx(
     app.client,
     account,
-    payload as TransactionPayloadEntryFunction
+    payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   await testWalletClient();
 };
@@ -977,7 +977,7 @@ const aggSimulateSwap = async (
   const simResult = await simulatePayloadTx(
     app.client,
     getSimulationKeys(account),
-    payload as TransactionPayloadEntryFunction
+    payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   printResource(simResult);
   await testWalletClient();
@@ -1008,7 +1008,7 @@ const aggSimulateSwapWithRoute = async (
   const simResult = await simulatePayloadTx(
     app.client,
     getSimulationKeys(account),
-    payload as TransactionPayloadEntryFunction
+    payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   printResource(simResult);
   await testWalletClient();

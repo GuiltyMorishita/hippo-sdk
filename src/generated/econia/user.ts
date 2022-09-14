@@ -4,7 +4,7 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount} from "aptos";
+import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
 import * as Stdlib from "../stdlib";
 import * as Capability from "./capability";
 import * as Critbit from "./critbit";
@@ -309,7 +309,8 @@ export function buildPayload_deposit_collateral_coinstore (
   amount: U64,
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -522,7 +523,8 @@ export function buildPayload_register_market_account (
   custodian_id: U64,
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -637,7 +639,8 @@ export function buildPayload_withdraw_collateral_coinstore (
   amount: U64,
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -738,7 +741,8 @@ export class App {
     amount: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p, isJSON);
   }
   async deposit_collateral_coinstore(
@@ -757,7 +761,8 @@ export class App {
     custodian_id: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_register_market_account(custodian_id, $p, isJSON);
   }
   async register_market_account(
@@ -776,7 +781,8 @@ export class App {
     amount: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p, isJSON);
   }
   async withdraw_collateral_coinstore(

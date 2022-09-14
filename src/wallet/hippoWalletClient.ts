@@ -4,7 +4,7 @@ import {
   StructTag,
   u64,
 } from "@manahippo/move-to-ts";
-import { HexString } from "aptos";
+import { HexString, TxnBuilderTypes, Types } from "aptos";
 import { NetworkConfiguration } from "../config";
 
 import * as AptosFramework from "../generated/stdlib";
@@ -114,7 +114,9 @@ export class HippoWalletClient {
     uiAmount: number,
     symbol: string,
     isJSONPayload = false
-  ) {
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
     if (!this.devnetCoinSymbols.includes(symbol)) {
       throw new Error(
         `${symbol} is not a MockCoin and we are unable to mint it.`

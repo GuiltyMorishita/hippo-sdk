@@ -4,7 +4,7 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount} from "aptos";
+import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
 import * as Stdlib from "../stdlib";
 import * as Capability from "./capability";
 import * as Critbit from "./critbit";
@@ -402,7 +402,8 @@ export function buildPayload_cancel_limit_order_user (
   order_id: U128,
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -715,7 +716,8 @@ export function buildPayload_fill_market_order_user (
   max_quote_units: U64,
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -930,7 +932,8 @@ export function buildPayload_place_limit_order_user (
   price: U64,
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -965,7 +968,8 @@ export function register_market_ (
 export function buildPayload_register_market (
   $p: TypeTag[], /* <B, Q, E>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -1121,7 +1125,8 @@ export class App {
     order_id: U128,
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_cancel_limit_order_user(host, side, order_id, $p, isJSON);
   }
   async cancel_limit_order_user(
@@ -1143,7 +1148,8 @@ export class App {
     max_quote_units: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_fill_market_order_user(host, style, max_base_parcels, max_quote_units, $p, isJSON);
   }
   async fill_market_order_user(
@@ -1166,7 +1172,8 @@ export class App {
     price: U64,
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_place_limit_order_user(host, side, base_parcels, price, $p, isJSON);
   }
   async place_limit_order_user(
@@ -1185,7 +1192,8 @@ export class App {
   payload_register_market(
     $p: TypeTag[], /* <B, Q, E>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_register_market($p, isJSON);
   }
   async register_market(

@@ -3,7 +3,7 @@ import bigInt from "big-integer";
 import { Router } from "../generated/hippo_swap";
 import { typeInfoToTypeTag } from "../utils";
 import { CoinInfo } from "../generated/coin_list/coin_list";
-import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
+import { TxnBuilderTypes } from "aptos";
 
 export type UITokenAmount = number;
 
@@ -66,7 +66,7 @@ export abstract class TradeRoute {
   abstract makeSwapPayload(
     amountIn: UITokenAmount,
     minAmountOut: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction>;
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
 }
 
 export abstract class HippoPool extends TradeRoute {
@@ -124,25 +124,25 @@ export abstract class HippoPool extends TradeRoute {
     amountIn: UITokenAmount,
     minAmountOut: UITokenAmount,
     isXtoY: boolean
-  ): Promise<TransactionPayloadEntryFunction>;
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
 
   makeSwapPayload(
     amountIn: UITokenAmount,
     minAmountOut: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     return this.makeSwapPayloadDirectional(amountIn, minAmountOut, true);
   }
 
   abstract makeAddLiquidityPayload(
     lhsAmt: UITokenAmount,
     rhsAmt: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction>;
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
 
   abstract makeRemoveLiquidityPayload(
     liqiudityAmt: UITokenAmount,
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction>;
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction>;
 }
 
 export class RouteStep {
@@ -219,8 +219,8 @@ export class SteppedRoute extends TradeRoute {
   makeSwapPayload(
     amountIn: UITokenAmount,
     minAmountOut: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction> {
-    // TxnBuilderTypes.TransactionPayloadEntryFunction
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
+    // TxnBuilderTypes.TxnBuilderTypes.TransactionPayloadEntryFunction
     if (this.steps.length === 1) {
       return this.steps[0].pool.makeSwapPayloadDirectional(
         amountIn,
@@ -254,7 +254,7 @@ export class SteppedRoute extends TradeRoute {
             typeInfoToTypeTag(middleTokenInfo.token_type),
             typeInfoToTypeTag(toTokenInfo.token_type),
           ]
-        ) as TransactionPayloadEntryFunction
+        ) as TxnBuilderTypes.TransactionPayloadEntryFunction
       );
     } else if (this.steps.length === 3) {
       const fromTokenInfo = this.steps[0].lhsTokenInfo();
@@ -287,7 +287,7 @@ export class SteppedRoute extends TradeRoute {
             typeInfoToTypeTag(middle2TokenInfo.token_type),
             typeInfoToTypeTag(toTokenInfo.token_type),
           ]
-        ) as TransactionPayloadEntryFunction
+        ) as TxnBuilderTypes.TransactionPayloadEntryFunction
       );
     } else {
       throw new Error();

@@ -4,7 +4,7 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount} from "aptos";
+import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
 import * as Stdlib from "../stdlib";
 export const packageName = "Econia";
 export const moduleAddress = new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7");
@@ -173,7 +173,8 @@ export function init_coin_types_ (
 
 export function buildPayload_init_coin_types (
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -209,7 +210,8 @@ export function buildPayload_mint (
   amount: U64,
   $p: TypeTag[], /* <CoinType>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xb1d4c0de8bc24468608637dfdbff975a0888f8935aa63338a44078eec5c7b6c7"),
@@ -254,7 +256,8 @@ export class App {
   get QC() { return QC; }
   payload_init_coin_types(
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_init_coin_types(isJSON);
   }
   async init_coin_types(
@@ -269,7 +272,8 @@ export class App {
     amount: U64,
     $p: TypeTag[], /* <CoinType>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mint(amount, $p, isJSON);
   }
   async mint(

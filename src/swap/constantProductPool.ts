@@ -8,7 +8,7 @@ import {
   UITokenAmount,
 } from "./baseTypes";
 import { CoinInfo } from "../generated/coin_list/coin_list";
-import { TransactionPayloadEntryFunction } from "aptos/dist/transaction_builder/aptos_types";
+import { TxnBuilderTypes } from "aptos";
 
 export class HippoConstantProductPool extends HippoPool {
   constructor(
@@ -124,7 +124,7 @@ export class HippoConstantProductPool extends HippoPool {
     amountIn: UITokenAmount,
     minAmountOut: UITokenAmount,
     isXtoY: boolean
-  ): Promise<TransactionPayloadEntryFunction> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const toTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
     const fromRawAmount = u64(
@@ -142,7 +142,7 @@ export class HippoConstantProductPool extends HippoPool {
         u64(0),
         toRawAmount,
         this.lpTag().typeParams
-      ) as TransactionPayloadEntryFunction;
+      ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
     } else {
       return Cp_scripts.buildPayload_swap_script(
         u64(0),
@@ -150,14 +150,14 @@ export class HippoConstantProductPool extends HippoPool {
         toRawAmount,
         u64(0),
         this.lpTag().typeParams
-      ) as TransactionPayloadEntryFunction;
+      ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
     }
   }
 
   async makeAddLiquidityPayload(
     xUiAmt: UITokenAmount,
     yUiAmt: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const xRawAmt = u64(
       (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
     );
@@ -168,14 +168,14 @@ export class HippoConstantProductPool extends HippoPool {
       xRawAmt,
       yRawAmt,
       this.lpTag().typeParams
-    ) as TransactionPayloadEntryFunction;
+    ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
   }
 
   async makeRemoveLiquidityPayload(
     liquidityAmt: UITokenAmount,
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
-  ): Promise<TransactionPayloadEntryFunction> {
+  ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const liquidityRawAmt = u64(
       liquidityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
     );
@@ -190,6 +190,6 @@ export class HippoConstantProductPool extends HippoPool {
       lhsMinRawAmt,
       rhsMinRawAmt,
       this.lpTag().typeParams
-    ) as TransactionPayloadEntryFunction;
+    ) as TxnBuilderTypes.TransactionPayloadEntryFunction;
   }
 }

@@ -4,7 +4,7 @@ import {U8, U64, U128} from "@manahippo/move-to-ts";
 import {u8, u64, u128} from "@manahippo/move-to-ts";
 import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
 import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount} from "aptos";
+import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
 import * as Stdlib from "../stdlib";
 import * as Cp_swap from "./cp_swap";
 import * as Piece_swap from "./piece_swap";
@@ -198,7 +198,8 @@ export function buildPayload_three_step_route_script (
   a_min_out: U64,
   $p: TypeTag[], /* <X, Y, Z, A>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -274,7 +275,8 @@ export function buildPayload_two_step_route_script (
   z_min_out: U64,
   $p: TypeTag[], /* <X, Y, Z>*/
   isJSON = false,
-) {
+): TxnBuilderTypes.TransactionPayloadEntryFunction
+   | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map(t=>$.getTypeTagFullname(t));
   return $.buildPayload(
     new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"),
@@ -316,7 +318,8 @@ export class App {
     a_min_out: U64,
     $p: TypeTag[], /* <X, Y, Z, A>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_three_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, third_pool_type, third_is_x_to_y, x_in, a_min_out, $p, isJSON);
   }
   async three_step_route_script(
@@ -345,7 +348,8 @@ export class App {
     z_min_out: U64,
     $p: TypeTag[], /* <X, Y, Z>*/
     isJSON = false,
-  ) {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction
+        | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_two_step_route_script(first_pool_type, first_is_x_to_y, second_pool_type, second_is_x_to_y, x_in, z_min_out, $p, isJSON);
   }
   async two_step_route_script(
