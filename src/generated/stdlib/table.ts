@@ -1,27 +1,21 @@
-import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
-import {U8, U64, U128} from "@manahippo/move-to-ts";
-import {u8, u64, u128} from "@manahippo/move-to-ts";
-import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
-export const packageName = "AptosStdlib";
-export const moduleAddress = new HexString("0x1");
-export const moduleName = "table";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+export const packageName = 'AptosStdlib';
+export const moduleAddress = new HexString('0x1');
+export const moduleName = 'table';
 
-
-
-export class Box 
-{
+export class Box {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "Box";
-  static typeParameters: TypeParamDeclType[] = [
-    { name: "V", isPhantom: false }
-  ];
-  static fields: FieldDeclType[] = [
-  { name: "val", typeTag: new $.TypeParamIdx(0) }];
+  static structName: string = 'Box';
+  static typeParameters: TypeParamDeclType[] = [{ name: 'V', isPhantom: false }];
+  static fields: FieldDeclType[] = [{ name: 'val', typeTag: new $.TypeParamIdx(0) }];
 
   val: any;
 
@@ -29,7 +23,7 @@ export class Box
     this.val = proto['val'] as any;
   }
 
-  static BoxParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Box {
+  static BoxParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): Box {
     const proto = $.parseStructProto(data, typeTag, repo, Box);
     return new Box(proto, typeTag);
   }
@@ -40,31 +34,30 @@ export class Box
   }
   static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
     const result = await app.repo.loadResource(app.client, address, Box, typeParams);
-    await result.loadFullState(app)
+    await result.loadFullState(app);
     return result as unknown as Box;
   }
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "Box", $p);
+    return new StructTag(moduleAddress, moduleName, 'Box', $p);
   }
   async loadFullState(app: $.AppType) {
-    if (this.val.typeTag instanceof StructTag) {await this.val.loadFullState(app);}
+    if (this.val.typeTag instanceof StructTag) {
+      await this.val.loadFullState(app);
+    }
     this.__app = app;
   }
-
 }
 
-export class Table 
-{
+export class Table {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "Table";
+  static structName: string = 'Table';
   static typeParameters: TypeParamDeclType[] = [
-    { name: "K", isPhantom: true },
-    { name: "V", isPhantom: true }
+    { name: 'K', isPhantom: true },
+    { name: 'V', isPhantom: true }
   ];
-  static fields: FieldDeclType[] = [
-  { name: "handle", typeTag: AtomicTypeTag.Address }];
+  static fields: FieldDeclType[] = [{ name: 'handle', typeTag: AtomicTypeTag.Address }];
 
   handle: HexString;
 
@@ -72,184 +65,103 @@ export class Table
     this.handle = proto['handle'] as HexString;
   }
 
-  static TableParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : Table {
+  static TableParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): Table {
     const proto = $.parseStructProto(data, typeTag, repo, Table);
     return new Table(proto, typeTag);
   }
 
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "Table", $p);
+    return new StructTag(moduleAddress, moduleName, 'Table', $p);
   }
 
-  toTypedTable<K = any, V = any>() { return TypedTable.fromTable<K, V>(this); }
+  toTypedTable<K = any, V = any>() {
+    return TypedTable.fromTable<K, V>(this);
+  }
 
   async loadFullState(app: $.AppType) {
     throw new Error('Cannot enumertate full state of Table');
   }
-
 }
-export function add_ (
-  table: Table,
-  key: any,
-  val: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): void {
-  return add_box_(table, $.copy(key), new Box({ val: val }, new SimpleStructTag(Box, [$p[1]])), $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]);
+export function add_(table: Table, key: any, val: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): void {
+  return add_box_(table, $.copy(key), new Box({ val: val }, new SimpleStructTag(Box, [$p[1]])), $c, [
+    $p[0],
+    $p[1],
+    new SimpleStructTag(Box, [$p[1]])
+  ]);
 }
 
-export function add_box_ (
-  table: Table,
-  key: any,
-  val: Box,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): void {
+export function add_box_(table: Table, key: any, val: Box, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): void {
   return $.aptos_std_table_add_box(table, key, val, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function borrow_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): any {
+export function borrow_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): any {
   return borrow_box_(table, $.copy(key), $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]).val;
 }
 
-export function borrow_box_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): Box {
+export function borrow_box_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): Box {
   return $.aptos_std_table_borrow_box(table, key, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function borrow_box_mut_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): Box {
+export function borrow_box_mut_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): Box {
   return $.aptos_std_table_borrow_box_mut(table, key, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function borrow_mut_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): any {
+export function borrow_mut_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): any {
   return borrow_box_mut_(table, $.copy(key), $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]).val;
 }
 
-export function borrow_mut_with_default_ (
+export function borrow_mut_with_default_(
   table: Table,
   key: any,
   default__: any,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
+  $p: TypeTag[] /* <K, V>*/
 ): any {
   let temp$1, temp$2;
   [temp$1, temp$2] = [table, $.copy(key)];
   if (!contains_(temp$1, temp$2, $c, [$p[0], $p[1]])) {
     add_(table, $.copy(key), default__, $c, [$p[0], $p[1]]);
-  }
-  else{
+  } else {
   }
   return borrow_mut_(table, $.copy(key), $c, [$p[0], $p[1]]);
 }
 
-export function contains_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): boolean {
+export function contains_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): boolean {
   return contains_box_(table, $.copy(key), $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]);
 }
 
-export function contains_box_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): boolean {
+export function contains_box_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): boolean {
   return $.aptos_std_table_contains_box(table, key, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function destroy_ (
-  table: Table,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): void {
+export function destroy_(table: Table, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): void {
   destroy_empty_box_(table, $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]);
   return drop_unchecked_box_(table, $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]);
 }
 
-export function destroy_empty_box_ (
-  table: Table,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): void {
+export function destroy_empty_box_(table: Table, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): void {
   return $.aptos_std_table_destroy_empty_box(table, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function drop_unchecked_box_ (
-  table: Table,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): void {
+export function drop_unchecked_box_(table: Table, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): void {
   return $.aptos_std_table_drop_unchecked_box(table, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function new___ (
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): Table {
+export function new___($c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): Table {
   return new Table({ handle: new_table_handle_($c, [$p[0], $p[1]]) }, new SimpleStructTag(Table, [$p[0], $p[1]]));
 }
 
-export function new_table_handle_ (
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): HexString {
+export function new_table_handle_($c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): HexString {
   return $.aptos_std_table_new_table_handle($c, [$p[0], $p[1]]);
-
 }
-export function remove_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): any {
+export function remove_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): any {
   let { val: val } = remove_box_(table, $.copy(key), $c, [$p[0], $p[1], new SimpleStructTag(Box, [$p[1]])]);
   return val;
 }
 
-export function remove_box_ (
-  table: Table,
-  key: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V, B>*/
-): Box {
+export function remove_box_(table: Table, key: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V, B>*/): Box {
   return $.aptos_std_table_remove_box(table, key, $c, [$p[0], $p[1], $p[2]]);
-
 }
-export function upsert_ (
-  table: Table,
-  key: any,
-  value: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <K, V>*/
-): void {
+export function upsert_(table: Table, key: any, value: any, $c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): void {
   let temp$1, temp$2, ref;
   [temp$1, temp$2] = [table, $.copy(key)];
   if (!contains_(temp$1, temp$2, $c, [$p[0], $p[1]])) {
     add_(table, $.copy(key), value, $c, [$p[0], $p[1]]);
-  }
-  else{
+  } else {
     ref = borrow_mut_(table, $.copy(key), $c, [$p[0], $p[1]]);
     $.set(ref, value);
   }
@@ -257,35 +169,38 @@ export function upsert_ (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0x1::table::Box", Box.BoxParser);
-  repo.addParser("0x1::table::Table", Table.TableParser);
+  repo.addParser('0x1::table::Box', Box.BoxParser);
+  repo.addParser('0x1::table::Table', Table.TableParser);
 }
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache,
-  ) {
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
+  get moduleAddress() {
+    {
+      return moduleAddress;
+    }
   }
-  get moduleAddress() {{ return moduleAddress; }}
-  get moduleName() {{ return moduleName; }}
-  get Box() { return Box; }
-  async loadBox(
-    owner: HexString,
-    $p: TypeTag[], /* <V> */
-    loadFull=true,
-  ) {
+  get moduleName() {
+    {
+      return moduleName;
+    }
+  }
+  get Box() {
+    return Box;
+  }
+  async loadBox(owner: HexString, $p: TypeTag[] /* <V> */, loadFull = true) {
     const val = await Box.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
     }
     return val;
   }
-  get Table() { return Table; }
+  get Table() {
+    return Table;
+  }
 }
 
-export class TypedTable<K=any, V=any> {
-  static fromTable<K=any, V=any>(table: Table): TypedTable<K, V> {
+export class TypedTable<K = any, V = any> {
+  static fromTable<K = any, V = any>(table: Table): TypedTable<K, V> {
     const tag = table.typeTag;
     if (!(tag instanceof StructTag)) {
       throw new Error();
@@ -300,18 +215,13 @@ export class TypedTable<K=any, V=any> {
     return new TypedTable<K, V>(table, keyTag, valueTag);
   }
 
-  constructor(
-    public table: Table,
-    public keyTag: TypeTag,
-    public valueTag: TypeTag
-  ) {
-  }
+  constructor(public table: Table, public keyTag: TypeTag, public valueTag: TypeTag) {}
 
   async loadEntryRaw(client: AptosClient, key: K): Promise<any> {
     return await client.getTableItem(this.table.handle.toString(), {
       key_type: $.getTypeTagFullname(this.keyTag),
       value_type: $.getTypeTagFullname(this.valueTag),
-      key: $.moveValueToOpenApiObject(key, this.keyTag),
+      key: $.moveValueToOpenApiObject(key, this.keyTag)
     });
   }
 
@@ -320,5 +230,3 @@ export class TypedTable<K=any, V=any> {
     return repo.parse(rawVal, this.valueTag);
   }
 }
-
-

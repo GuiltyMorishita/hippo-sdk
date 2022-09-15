@@ -1,19 +1,12 @@
-import { App } from "../generated";
-import { CoinListClient } from "../coinList";
-import { EconiaPoolProvider } from "./econia";
-import { HippoPoolProvider } from "./hippo";
-import {
-  RouteAndQuote,
-  TokenTypeFullname,
-  TradeRoute,
-  TradeStep,
-  TradingPool,
-  TradingPoolProvider,
-} from "./types";
-import { PontemPoolProvider } from "./pontem";
-import { CoinInfo } from "../generated/coin_list/coin_list";
-import { CONFIGS } from "../config";
-import { SimulationKeys } from "@manahippo/move-to-ts";
+import { App } from '../generated';
+import { CoinListClient } from '../coinList';
+import { EconiaPoolProvider } from './econia';
+import { HippoPoolProvider } from './hippo';
+import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from './types';
+import { PontemPoolProvider } from './pontem';
+import { CoinInfo } from '../generated/coin_list/coin_list';
+import { CONFIGS } from '../config';
+import { SimulationKeys } from '@manahippo/move-to-ts';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -28,29 +21,15 @@ export class TradeAggregator {
     this.xToAnyPools = new Map();
   }
 
-  static async create(
-    app: App,
-    fetcher: SimulationKeys,
-    netConfig = CONFIGS.devnet
-  ) {
+  static async create(app: App, fetcher: SimulationKeys, netConfig = CONFIGS.devnet) {
     const registryClient = await CoinListClient.load(app, fetcher);
     const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
-    const econiaProvider = new EconiaPoolProvider(
-      app,
-      fetcher,
-      netConfig,
-      registryClient
-    );
-    const pontemProvider = new PontemPoolProvider(
-      app,
-      fetcher,
-      netConfig,
-      registryClient
-    );
+    const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);
+    const pontemProvider = new PontemPoolProvider(app, fetcher, netConfig, registryClient);
     const aggregator = new TradeAggregator(registryClient, app, fetcher, [
       hippoProvider,
       econiaProvider,
-      pontemProvider,
+      pontemProvider
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;
@@ -71,24 +50,18 @@ export class TradeAggregator {
       } else {
         const xToAny = this.xToAnyPools.get(xFullname);
         if (!xToAny) {
-          throw new Error("Unreachable");
+          throw new Error('Unreachable');
         }
         xToAny.push(pool);
       }
     }
   }
 
-  getXtoYDirectSteps(
-    x: CoinInfo,
-    y: CoinInfo,
-    requireRoutable = true
-  ): TradeStep[] {
+  getXtoYDirectSteps(x: CoinInfo, y: CoinInfo, requireRoutable = true): TradeStep[] {
     const xFullname = x.token_type.typeFullname();
     const yFullname = y.token_type.typeFullname();
     if (xFullname === yFullname) {
-      throw new Error(
-        `Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`
-      );
+      throw new Error(`Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`);
     }
     const steps: TradeStep[] = [];
     const xToYCandidates = this.xToAnyPools.get(xFullname);
@@ -119,9 +92,7 @@ export class TradeAggregator {
   getOneStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
     const xFullname = x.token_type.typeFullname();
     if (xFullname === y.token_type.typeFullname()) {
-      throw new Error(
-        `Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`
-      );
+      throw new Error(`Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`);
     }
     const steps = this.getXtoYDirectSteps(x, y, false);
     return steps.map((step) => new TradeRoute([step]));
@@ -179,9 +150,7 @@ export class TradeAggregator {
       // cartesian product
       for (const xToKRoute of xtoKRoutes) {
         for (const kToY of kToYSteps) {
-          results.push(
-            new TradeRoute([xToKRoute.steps[0], xToKRoute.steps[1], kToY])
-          );
+          results.push(new TradeRoute([xToKRoute.steps[0], xToKRoute.steps[1], kToY]));
         }
       }
     }
@@ -189,12 +158,7 @@ export class TradeAggregator {
     return results;
   }
 
-  getAllRoutes(
-    x: CoinInfo,
-    y: CoinInfo,
-    maxSteps: 1 | 2 | 3 = 3,
-    allowRoundTrip = false
-  ): TradeRoute[] {
+  getAllRoutes(x: CoinInfo, y: CoinInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip = false): TradeRoute[] {
     // max 3 steps
     const step1Routes = maxSteps >= 1 ? this.getOneStepRoutes(x, y) : [];
     const step2Routes = maxSteps >= 2 ? this.getTwoStepRoutes(x, y) : [];
@@ -227,7 +191,7 @@ export class TradeAggregator {
     const result = routes.map((route) => {
       return {
         route: route,
-        quote: route.getQuote(inputUiAmt),
+        quote: route.getQuote(inputUiAmt)
       };
     });
     result.sort((a, b) => b.quote.outputUiAmt - a.quote.outputUiAmt);
@@ -242,14 +206,7 @@ export class TradeAggregator {
     reloadState = true,
     allowRoundTrip = false
   ) {
-    const quotes = await this.getQuotes(
-      inputUiAmt,
-      x,
-      y,
-      maxSteps,
-      reloadState,
-      allowRoundTrip
-    );
+    const quotes = await this.getQuotes(inputUiAmt, x, y, maxSteps, reloadState, allowRoundTrip);
     if (quotes.length === 0) {
       return null;
     }

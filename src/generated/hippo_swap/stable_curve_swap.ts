@@ -1,52 +1,81 @@
-import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
-import {U8, U64, U128} from "@manahippo/move-to-ts";
-import {u8, u64, u128} from "@manahippo/move-to-ts";
-import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
-import * as Stdlib from "../stdlib";
-import * as Hippo_config from "./hippo_config";
-import * as Math from "./math";
-import * as Stable_curve_numeral from "./stable_curve_numeral";
-export const packageName = "hippo-swap";
-export const moduleAddress = new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a");
-export const moduleName = "stable_curve_swap";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Stdlib from '../stdlib';
+import * as Hippo_config from './hippo_config';
+import * as Math from './math';
+import * as Stable_curve_numeral from './stable_curve_numeral';
+export const packageName = 'hippo-swap';
+export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleName = 'stable_curve_swap';
 
-export const ERROR_ALREADY_INITIALIZED : U64 = u64("1");
-export const ERROR_EXCEEDED : U64 = u64("1001");
-export const ERROR_ITERATE_END : U64 = u64("1000");
-export const ERROR_SWAP_ADDLIQUIDITY_INVALID : U64 = u64("2007");
-export const ERROR_SWAP_A_VALUE : U64 = u64("2010");
-export const ERROR_SWAP_BURN_CALC_INVALID : U64 = u64("2004");
-export const ERROR_SWAP_INVALID_DERIVIATION : U64 = u64("2020");
-export const ERROR_SWAP_INVALID_TOKEN_PAIR : U64 = u64("2000");
-export const ERROR_SWAP_PRECONDITION : U64 = u64("2001");
-export const ERROR_SWAP_PRIVILEGE_INSUFFICIENT : U64 = u64("2003");
-export const ERROR_SWAP_RAMP_TIME : U64 = u64("2009");
-export const ERROR_SWAP_TOKEN_NOT_EXISTS : U64 = u64("2008");
-export const FEE_DENOMINATOR : U128 = u128("1000000");
-export const MAX_A : U64 = u64("1000000");
-export const MAX_ADMIN_FEE : U64 = u64("1000000");
-export const MAX_A_CHANGE : U64 = u64("10");
-export const MAX_FEE : U64 = u64("500000");
-export const MIN_RAMP_TIME : U64 = u64("86400");
+export const ERROR_ALREADY_INITIALIZED: U64 = u64('1');
+export const ERROR_EXCEEDED: U64 = u64('1001');
+export const ERROR_ITERATE_END: U64 = u64('1000');
+export const ERROR_SWAP_ADDLIQUIDITY_INVALID: U64 = u64('2007');
+export const ERROR_SWAP_A_VALUE: U64 = u64('2010');
+export const ERROR_SWAP_BURN_CALC_INVALID: U64 = u64('2004');
+export const ERROR_SWAP_INVALID_DERIVIATION: U64 = u64('2020');
+export const ERROR_SWAP_INVALID_TOKEN_PAIR: U64 = u64('2000');
+export const ERROR_SWAP_PRECONDITION: U64 = u64('2001');
+export const ERROR_SWAP_PRIVILEGE_INSUFFICIENT: U64 = u64('2003');
+export const ERROR_SWAP_RAMP_TIME: U64 = u64('2009');
+export const ERROR_SWAP_TOKEN_NOT_EXISTS: U64 = u64('2008');
+export const FEE_DENOMINATOR: U128 = u128('1000000');
+export const MAX_A: U64 = u64('1000000');
+export const MAX_ADMIN_FEE: U64 = u64('1000000');
+export const MAX_A_CHANGE: U64 = u64('10');
+export const MAX_FEE: U64 = u64('500000');
+export const MIN_RAMP_TIME: U64 = u64('86400');
 
-
-export class LPCapability 
-{
+export class LPCapability {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "LPCapability";
+  static structName: string = 'LPCapability';
   static typeParameters: TypeParamDeclType[] = [
-    { name: "X", isPhantom: true },
-    { name: "Y", isPhantom: true }
+    { name: 'X', isPhantom: true },
+    { name: 'Y', isPhantom: true }
   ];
   static fields: FieldDeclType[] = [
-  { name: "mint_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "MintCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
-  { name: "burn_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "BurnCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) },
-  { name: "freeze_cap", typeTag: new StructTag(new HexString("0x1"), "coin", "FreezeCapability", [new StructTag(new HexString("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"), "stable_curve_swap", "LPToken", [new $.TypeParamIdx(0), new $.TypeParamIdx(1)])]) }];
+    {
+      name: 'mint_cap',
+      typeTag: new StructTag(new HexString('0x1'), 'coin', 'MintCapability', [
+        new StructTag(
+          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          'stable_curve_swap',
+          'LPToken',
+          [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
+        )
+      ])
+    },
+    {
+      name: 'burn_cap',
+      typeTag: new StructTag(new HexString('0x1'), 'coin', 'BurnCapability', [
+        new StructTag(
+          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          'stable_curve_swap',
+          'LPToken',
+          [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
+        )
+      ])
+    },
+    {
+      name: 'freeze_cap',
+      typeTag: new StructTag(new HexString('0x1'), 'coin', 'FreezeCapability', [
+        new StructTag(
+          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          'stable_curve_swap',
+          'LPToken',
+          [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
+        )
+      ])
+    }
+  ];
 
   mint_cap: Stdlib.Coin.MintCapability;
   burn_cap: Stdlib.Coin.BurnCapability;
@@ -58,7 +87,7 @@ export class LPCapability
     this.freeze_cap = proto['freeze_cap'] as Stdlib.Coin.FreezeCapability;
   }
 
-  static LPCapabilityParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : LPCapability {
+  static LPCapabilityParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): LPCapability {
     const proto = $.parseStructProto(data, typeTag, repo, LPCapability);
     return new LPCapability(proto, typeTag);
   }
@@ -69,11 +98,11 @@ export class LPCapability
   }
   static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
     const result = await app.repo.loadResource(app.client, address, LPCapability, typeParams);
-    await result.loadFullState(app)
+    await result.loadFullState(app);
     return result as unknown as LPCapability;
   }
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "LPCapability", $p);
+    return new StructTag(moduleAddress, moduleName, 'LPCapability', $p);
   }
   async loadFullState(app: $.AppType) {
     await this.mint_cap.loadFullState(app);
@@ -81,65 +110,59 @@ export class LPCapability
     await this.freeze_cap.loadFullState(app);
     this.__app = app;
   }
-
 }
 
-export class LPToken 
-{
+export class LPToken {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "LPToken";
+  static structName: string = 'LPToken';
   static typeParameters: TypeParamDeclType[] = [
-    { name: "X", isPhantom: true },
-    { name: "Y", isPhantom: true }
+    { name: 'X', isPhantom: true },
+    { name: 'Y', isPhantom: true }
   ];
-  static fields: FieldDeclType[] = [
-  ];
+  static fields: FieldDeclType[] = [];
 
-  constructor(proto: any, public typeTag: TypeTag) {
+  constructor(proto: any, public typeTag: TypeTag) {}
 
-  }
-
-  static LPTokenParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : LPToken {
+  static LPTokenParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): LPToken {
     const proto = $.parseStructProto(data, typeTag, repo, LPToken);
     return new LPToken(proto, typeTag);
   }
 
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "LPToken", $p);
+    return new StructTag(moduleAddress, moduleName, 'LPToken', $p);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
   }
-
 }
 
-export class StableCurvePoolInfo 
-{
+export class StableCurvePoolInfo {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "StableCurvePoolInfo";
+  static structName: string = 'StableCurvePoolInfo';
   static typeParameters: TypeParamDeclType[] = [
-    { name: "X", isPhantom: true },
-    { name: "Y", isPhantom: true }
+    { name: 'X', isPhantom: true },
+    { name: 'Y', isPhantom: true }
   ];
   static fields: FieldDeclType[] = [
-  { name: "disabled", typeTag: AtomicTypeTag.Bool },
-  { name: "reserve_x", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(0)]) },
-  { name: "reserve_y", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(1)]) },
-  { name: "fee_x", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(0)]) },
-  { name: "fee_y", typeTag: new StructTag(new HexString("0x1"), "coin", "Coin", [new $.TypeParamIdx(1)]) },
-  { name: "lp_precision", typeTag: AtomicTypeTag.U8 },
-  { name: "multiplier_x", typeTag: AtomicTypeTag.U64 },
-  { name: "multiplier_y", typeTag: AtomicTypeTag.U64 },
-  { name: "fee", typeTag: AtomicTypeTag.U64 },
-  { name: "admin_fee", typeTag: AtomicTypeTag.U64 },
-  { name: "initial_A", typeTag: AtomicTypeTag.U64 },
-  { name: "future_A", typeTag: AtomicTypeTag.U64 },
-  { name: "initial_A_time", typeTag: AtomicTypeTag.U64 },
-  { name: "future_A_time", typeTag: AtomicTypeTag.U64 }];
+    { name: 'disabled', typeTag: AtomicTypeTag.Bool },
+    { name: 'reserve_x', typeTag: new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(0)]) },
+    { name: 'reserve_y', typeTag: new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(1)]) },
+    { name: 'fee_x', typeTag: new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(0)]) },
+    { name: 'fee_y', typeTag: new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(1)]) },
+    { name: 'lp_precision', typeTag: AtomicTypeTag.U8 },
+    { name: 'multiplier_x', typeTag: AtomicTypeTag.U64 },
+    { name: 'multiplier_y', typeTag: AtomicTypeTag.U64 },
+    { name: 'fee', typeTag: AtomicTypeTag.U64 },
+    { name: 'admin_fee', typeTag: AtomicTypeTag.U64 },
+    { name: 'initial_A', typeTag: AtomicTypeTag.U64 },
+    { name: 'future_A', typeTag: AtomicTypeTag.U64 },
+    { name: 'initial_A_time', typeTag: AtomicTypeTag.U64 },
+    { name: 'future_A_time', typeTag: AtomicTypeTag.U64 }
+  ];
 
   disabled: boolean;
   reserve_x: Stdlib.Coin.Coin;
@@ -173,7 +196,7 @@ export class StableCurvePoolInfo
     this.future_A_time = proto['future_A_time'] as U64;
   }
 
-  static StableCurvePoolInfoParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : StableCurvePoolInfo {
+  static StableCurvePoolInfoParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): StableCurvePoolInfo {
     const proto = $.parseStructProto(data, typeTag, repo, StableCurvePoolInfo);
     return new StableCurvePoolInfo(proto, typeTag);
   }
@@ -184,11 +207,11 @@ export class StableCurvePoolInfo
   }
   static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
     const result = await app.repo.loadResource(app.client, address, StableCurvePoolInfo, typeParams);
-    await result.loadFullState(app)
+    await result.loadFullState(app);
     return result as unknown as StableCurvePoolInfo;
   }
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "StableCurvePoolInfo", $p);
+    return new StructTag(moduleAddress, moduleName, 'StableCurvePoolInfo', $p);
   }
   async loadFullState(app: $.AppType) {
     await this.reserve_x.loadFullState(app);
@@ -198,30 +221,24 @@ export class StableCurvePoolInfo
     this.__app = app;
   }
 
-
-  quote_x_to_y_after_fees(
-    amount_x_in: U64,
-  ) {
+  quote_x_to_y_after_fees(amount_x_in: U64) {
     const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return quote_x_to_y_after_fees_(this, amount_x_in, cache, tags);
   }
 
-  quote_y_to_x_after_fees(
-    amount_y_in: U64,
-  ) {
+  quote_y_to_x_after_fees(amount_y_in: U64) {
     const cache = this.__app?.cache || new AptosLocalCache();
     const tags = (this.typeTag as StructTag).typeParams;
     return quote_y_to_x_after_fees_(this, amount_y_in, cache, tags);
   }
-
 }
-export function add_liquidity_ (
+export function add_liquidity_(
   sender: HexString,
   amount_x: U64,
   amount_y: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [U64, U64, U64] {
   let addr, lp_amt, minted_lp_token, x, x_coin, y, y_coin;
   x_coin = Stdlib.Coin.withdraw_(sender, $.copy(amount_x), $c, [$p[0]]);
@@ -235,53 +252,130 @@ export function add_liquidity_ (
   return [$.copy(amount_x), $.copy(amount_y), $.copy(lp_amt)];
 }
 
-export function add_liquidity_direct_ (
+export function add_liquidity_direct_(
   x: Stdlib.Coin.Coin,
   y: Stdlib.Coin.Coin,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [Stdlib.Coin.Coin, Stdlib.Coin.Coin, Stdlib.Coin.Coin] {
-  let temp$1, _r_b_x, _r_b_y, amp, d0, d1, d2, fee, fee_coin_x, fee_coin_y, fee_x, fee_y, mint_amount, mint_token, n_b_x, n_b_y, new_reserve_x, new_reserve_y, p, reserve_amt_x, reserve_amt_y, token_pair, token_pair__2, token_supply, x_value_prev, y_value_prev;
-  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  [reserve_amt_x, reserve_amt_y] = [Stdlib.Coin.value_(p.reserve_x, $c, [$p[0]]), Stdlib.Coin.value_(p.reserve_y, $c, [$p[1]])];
+  let temp$1,
+    _r_b_x,
+    _r_b_y,
+    amp,
+    d0,
+    d1,
+    d2,
+    fee,
+    fee_coin_x,
+    fee_coin_y,
+    fee_x,
+    fee_y,
+    mint_amount,
+    mint_token,
+    n_b_x,
+    n_b_y,
+    new_reserve_x,
+    new_reserve_y,
+    p,
+    reserve_amt_x,
+    reserve_amt_y,
+    token_pair,
+    token_pair__2,
+    token_supply,
+    x_value_prev,
+    y_value_prev;
+  p = $c.borrow_global<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
+  [reserve_amt_x, reserve_amt_y] = [
+    Stdlib.Coin.value_(p.reserve_x, $c, [$p[0]]),
+    Stdlib.Coin.value_(p.reserve_y, $c, [$p[1]])
+  ];
   x_value_prev = Stdlib.Coin.value_(x, $c, [$p[0]]);
   y_value_prev = Stdlib.Coin.value_(y, $c, [$p[1]]);
   amp = get_current_A_($.copy(p.initial_A), $.copy(p.future_A), $.copy(p.initial_A_time), $.copy(p.future_A_time), $c);
-  d0 = get_D_flat_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(amp), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
+  d0 = get_D_flat_(
+    $.copy(reserve_amt_x),
+    $.copy(reserve_amt_y),
+    $.copy(amp),
+    $.copy(p.multiplier_x),
+    $.copy(p.multiplier_y),
+    $c
+  );
   temp$1 = Stdlib.Coin.supply_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   token_supply = u128($.copy(Stdlib.Option.borrow_(temp$1, $c, [AtomicTypeTag.U128])));
-  if (($.copy(token_supply)).eq((u128("0")))) {
-    if (!($.copy(x_value_prev)).gt(u64("0"))) {
+  if ($.copy(token_supply).eq(u128('0'))) {
+    if (!$.copy(x_value_prev).gt(u64('0'))) {
       throw $.abortCode($.copy(ERROR_SWAP_ADDLIQUIDITY_INVALID));
     }
-    if (!($.copy(y_value_prev)).gt(u64("0"))) {
+    if (!$.copy(y_value_prev).gt(u64('0'))) {
       throw $.abortCode($.copy(ERROR_SWAP_ADDLIQUIDITY_INVALID));
     }
+  } else {
   }
-  else{
-  }
-  [new_reserve_x, new_reserve_y] = [($.copy(reserve_amt_x)).add($.copy(x_value_prev)), ($.copy(reserve_amt_y)).add($.copy(y_value_prev))];
-  d1 = get_D_flat_($.copy(new_reserve_x), $.copy(new_reserve_y), $.copy(amp), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
-  if (!($.copy(d1)).gt($.copy(d0))) {
+  [new_reserve_x, new_reserve_y] = [
+    $.copy(reserve_amt_x).add($.copy(x_value_prev)),
+    $.copy(reserve_amt_y).add($.copy(y_value_prev))
+  ];
+  d1 = get_D_flat_(
+    $.copy(new_reserve_x),
+    $.copy(new_reserve_y),
+    $.copy(amp),
+    $.copy(p.multiplier_x),
+    $.copy(p.multiplier_y),
+    $c
+  );
+  if (!$.copy(d1).gt($.copy(d0))) {
     throw $.abortCode($.copy(ERROR_SWAP_INVALID_DERIVIATION));
   }
-  if (($.copy(token_supply)).gt(u128("0"))) {
-    fee = (($.copy(p.fee)).mul(u64("2"))).div(u64("4"));
-    [n_b_x, _r_b_x, fee_x] = calc_reserve_and_fees_(u128($.copy(new_reserve_x)), u128($.copy(reserve_amt_x)), $.copy(d0), $.copy(d1), u128($.copy(fee)), u128($.copy(p.admin_fee)), $c);
-    [n_b_y, _r_b_y, fee_y] = calc_reserve_and_fees_(u128($.copy(new_reserve_y)), u128($.copy(reserve_amt_y)), $.copy(d0), $.copy(d1), u128($.copy(fee)), u128($.copy(p.admin_fee)), $c);
-    d2 = get_D_flat_(u64($.copy(n_b_x)), u64($.copy(n_b_y)), $.copy(amp), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
+  if ($.copy(token_supply).gt(u128('0'))) {
+    fee = $.copy(p.fee).mul(u64('2')).div(u64('4'));
+    [n_b_x, _r_b_x, fee_x] = calc_reserve_and_fees_(
+      u128($.copy(new_reserve_x)),
+      u128($.copy(reserve_amt_x)),
+      $.copy(d0),
+      $.copy(d1),
+      u128($.copy(fee)),
+      u128($.copy(p.admin_fee)),
+      $c
+    );
+    [n_b_y, _r_b_y, fee_y] = calc_reserve_and_fees_(
+      u128($.copy(new_reserve_y)),
+      u128($.copy(reserve_amt_y)),
+      $.copy(d0),
+      $.copy(d1),
+      u128($.copy(fee)),
+      u128($.copy(p.admin_fee)),
+      $c
+    );
+    d2 = get_D_flat_(
+      u64($.copy(n_b_x)),
+      u64($.copy(n_b_y)),
+      $.copy(amp),
+      $.copy(p.multiplier_x),
+      $.copy(p.multiplier_y),
+      $c
+    );
     fee_coin_x = Stdlib.Coin.extract_(x, u64($.copy(fee_x)), $c, [$p[0]]);
     fee_coin_y = Stdlib.Coin.extract_(y, u64($.copy(fee_y)), $c, [$p[1]]);
-    token_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+    token_pair = $c.borrow_global_mut<StableCurvePoolInfo>(
+      new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+      Hippo_config.admin_address_($c)
+    );
     Stdlib.Coin.merge_(token_pair.reserve_x, x, $c, [$p[0]]);
     Stdlib.Coin.merge_(token_pair.reserve_y, y, $c, [$p[1]]);
     Stdlib.Coin.merge_(token_pair.fee_x, fee_coin_x, $c, [$p[0]]);
     Stdlib.Coin.merge_(token_pair.fee_y, fee_coin_y, $c, [$p[1]]);
-    mint_amount = (($.copy(token_supply)).mul(($.copy(d2)).sub($.copy(d0)))).div($.copy(d0));
-  }
-  else{
+    mint_amount = $.copy(token_supply)
+      .mul($.copy(d2).sub($.copy(d0)))
+      .div($.copy(d0));
+  } else {
     mint_amount = $.copy(d1);
-    token_pair__2 = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+    token_pair__2 = $c.borrow_global_mut<StableCurvePoolInfo>(
+      new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+      Hippo_config.admin_address_($c)
+    );
     Stdlib.Coin.merge_(token_pair__2.reserve_x, x, $c, [$p[0]]);
     Stdlib.Coin.merge_(token_pair__2.reserve_y, y, $c, [$p[1]]);
   }
@@ -289,75 +383,65 @@ export function add_liquidity_direct_ (
   return [Stdlib.Coin.zero_($c, [$p[0]]), Stdlib.Coin.zero_($c, [$p[1]]), mint_token];
 }
 
-export function assert_admin_ (
-  signer: HexString,
-  $c: AptosDataCache,
-): void {
-  if (!((Stdlib.Signer.address_of_(signer, $c)).hex() === (Hippo_config.admin_address_($c)).hex())) {
+export function assert_admin_(signer: HexString, $c: AptosDataCache): void {
+  if (!(Stdlib.Signer.address_of_(signer, $c).hex() === Hippo_config.admin_address_($c).hex())) {
     throw $.abortCode($.copy(ERROR_SWAP_PRIVILEGE_INSUFFICIENT));
   }
   return;
 }
 
-export function balance_ (
-  addr: HexString,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
-): U64 {
+export function balance_(addr: HexString, $c: AptosDataCache, $p: TypeTag[] /* <X, Y>*/): U64 {
   return Stdlib.Coin.balance_($.copy(addr), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
 }
 
-export function burn_ (
-  to_burn: Stdlib.Coin.Coin,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
-): void {
+export function burn_(to_burn: Stdlib.Coin.Coin, $c: AptosDataCache, $p: TypeTag[] /* <X, Y>*/): void {
   let liquidity_cap;
-  liquidity_cap = $c.borrow_global<LPCapability>(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  liquidity_cap = $c.borrow_global<LPCapability>(
+    new SimpleStructTag(LPCapability, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   Stdlib.Coin.burn_(to_burn, liquidity_cap.burn_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
 }
 
-export function calc_reserve_and_fees_ (
+export function calc_reserve_and_fees_(
   new_reserve: U128,
   old_reserve: U128,
   d0: U128,
   d1: U128,
   average_fee: U128,
   admin_fee: U128,
-  $c: AptosDataCache,
+  $c: AptosDataCache
 ): [U128, U128, U128] {
   let admin_fee_amount, difference, fee_amount, ideal_reserve, name_balance, real_balance;
-  ideal_reserve = (($.copy(d1)).mul($.copy(old_reserve))).div($.copy(d0));
-  if (($.copy(ideal_reserve)).gt($.copy(new_reserve))) {
-    difference = ($.copy(ideal_reserve)).sub($.copy(new_reserve));
+  ideal_reserve = $.copy(d1).mul($.copy(old_reserve)).div($.copy(d0));
+  if ($.copy(ideal_reserve).gt($.copy(new_reserve))) {
+    difference = $.copy(ideal_reserve).sub($.copy(new_reserve));
+  } else {
+    difference = $.copy(new_reserve).sub($.copy(ideal_reserve));
   }
-  else{
-    difference = ($.copy(new_reserve)).sub($.copy(ideal_reserve));
-  }
-  fee_amount = (($.copy(average_fee)).mul($.copy(difference))).div($.copy(FEE_DENOMINATOR));
-  admin_fee_amount = (($.copy(fee_amount)).mul($.copy(admin_fee))).div($.copy(FEE_DENOMINATOR));
-  real_balance = ($.copy(new_reserve)).sub($.copy(admin_fee_amount));
-  name_balance = ($.copy(new_reserve)).sub($.copy(fee_amount));
+  fee_amount = $.copy(average_fee).mul($.copy(difference)).div($.copy(FEE_DENOMINATOR));
+  admin_fee_amount = $.copy(fee_amount).mul($.copy(admin_fee)).div($.copy(FEE_DENOMINATOR));
+  real_balance = $.copy(new_reserve).sub($.copy(admin_fee_amount));
+  name_balance = $.copy(new_reserve).sub($.copy(fee_amount));
   return [$.copy(name_balance), $.copy(real_balance), $.copy(admin_fee_amount)];
 }
 
-export function check_and_deposit_ (
+export function check_and_deposit_(
   to: HexString,
   coin: Stdlib.Coin.Coin,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <TokenType>*/
+  $p: TypeTag[] /* <TokenType>*/
 ): void {
   if (!Stdlib.Coin.is_account_registered_(Stdlib.Signer.address_of_(to, $c), $c, [$p[0]])) {
     Stdlib.Coin.register_(to, $c, [$p[0]]);
-  }
-  else{
+  } else {
   }
   Stdlib.Coin.deposit_(Stdlib.Signer.address_of_(to, $c), coin, $c, [$p[0]]);
   return;
 }
 
-export function create_pool_info_ (
+export function create_pool_info_(
   lp_decimals: U8,
   multiplier_x: U64,
   multiplier_y: U64,
@@ -368,45 +452,75 @@ export function create_pool_info_ (
   fee: U64,
   admin_fee: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): StableCurvePoolInfo {
-  return new StableCurvePoolInfo({ disabled: false, reserve_x: Stdlib.Coin.zero_($c, [$p[0]]), reserve_y: Stdlib.Coin.zero_($c, [$p[1]]), fee_x: Stdlib.Coin.zero_($c, [$p[0]]), fee_y: Stdlib.Coin.zero_($c, [$p[1]]), lp_precision: $.copy(lp_decimals), multiplier_x: $.copy(multiplier_x), multiplier_y: $.copy(multiplier_y), fee: $.copy(fee), admin_fee: $.copy(admin_fee), initial_A: $.copy(initial_A), future_A: $.copy(future_A), initial_A_time: $.copy(initial_A_time), future_A_time: $.copy(future_A_time) }, new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]));
+  return new StableCurvePoolInfo(
+    {
+      disabled: false,
+      reserve_x: Stdlib.Coin.zero_($c, [$p[0]]),
+      reserve_y: Stdlib.Coin.zero_($c, [$p[1]]),
+      fee_x: Stdlib.Coin.zero_($c, [$p[0]]),
+      fee_y: Stdlib.Coin.zero_($c, [$p[1]]),
+      lp_precision: $.copy(lp_decimals),
+      multiplier_x: $.copy(multiplier_x),
+      multiplier_y: $.copy(multiplier_y),
+      fee: $.copy(fee),
+      admin_fee: $.copy(admin_fee),
+      initial_A: $.copy(initial_A),
+      future_A: $.copy(future_A),
+      initial_A_time: $.copy(initial_A_time),
+      future_A_time: $.copy(future_A_time)
+    },
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]])
+  );
 }
 
-export function get_D_flat_ (
+export function get_D_flat_(
   amount_x: U64,
   amount_y: U64,
   amp: U64,
   multiplier_x: U64,
   multiplier_y: U64,
-  $c: AptosDataCache,
+  $c: AptosDataCache
 ): U128 {
-  return Stable_curve_numeral.get_D_(u128(($.copy(multiplier_x)).mul($.copy(amount_x))), u128(($.copy(multiplier_y)).mul($.copy(amount_y))), $.copy(amp), $c);
+  return Stable_curve_numeral.get_D_(
+    u128($.copy(multiplier_x).mul($.copy(amount_x))),
+    u128($.copy(multiplier_y).mul($.copy(amount_y))),
+    $.copy(amp),
+    $c
+  );
 }
 
-export function get_current_A_ (
+export function get_current_A_(
   initial_A: U64,
   future_A: U64,
   initial_A_time: U64,
   future_A_time: U64,
-  $c: AptosDataCache,
+  $c: AptosDataCache
 ): U64 {
   let block_timestamp;
   block_timestamp = Stdlib.Timestamp.now_microseconds_($c);
-  return Stable_curve_numeral.get_A_($.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(block_timestamp), $c);
+  return Stable_curve_numeral.get_A_(
+    $.copy(initial_A),
+    $.copy(future_A),
+    $.copy(initial_A_time),
+    $.copy(future_A_time),
+    $.copy(block_timestamp),
+    $c
+  );
 }
 
-export function get_xp_mem_ (
+export function get_xp_mem_(
   reserve_x: U64,
   reserve_y: U64,
   multiplier_x: U64,
   multiplier_y: U64,
-  $c: AptosDataCache,
+  $c: AptosDataCache
 ): [U64, U64] {
-  return [($.copy(multiplier_x)).mul($.copy(reserve_x)), ($.copy(multiplier_y)).mul($.copy(reserve_y))];
+  return [$.copy(multiplier_x).mul($.copy(reserve_x)), $.copy(multiplier_y).mul($.copy(reserve_y))];
 }
 
-export function get_y_ (
+export function get_y_(
   i: U64,
   dx: U64,
   xp: U64,
@@ -415,22 +529,21 @@ export function get_y_ (
   initial_A_time: U64,
   future_A: U64,
   future_A_time: U64,
-  $c: AptosDataCache,
+  $c: AptosDataCache
 ): U64 {
   let temp$1, amp, d, x;
   amp = get_current_A_($.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $c);
   d = Stable_curve_numeral.get_D_(u128($.copy(xp)), u128($.copy(yp)), $.copy(amp), $c);
-  if (($.copy(i)).eq((u64("0")))) {
-    temp$1 = ($.copy(dx)).add($.copy(xp));
-  }
-  else{
-    temp$1 = ($.copy(dx)).add($.copy(yp));
+  if ($.copy(i).eq(u64('0'))) {
+    temp$1 = $.copy(dx).add($.copy(xp));
+  } else {
+    temp$1 = $.copy(dx).add($.copy(yp));
   }
   x = temp$1;
   return u64(Stable_curve_numeral.get_y_($.copy(x), $.copy(amp), $.copy(d), $c));
 }
 
-export function initialize_ (
+export function initialize_(
   signer: HexString,
   lp_name: Stdlib.String.String,
   lp_symbol: Stdlib.String.String,
@@ -442,26 +555,38 @@ export function initialize_ (
   fee: U64,
   admin_fee: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): void {
   let token_pair, x_decimal, x_rate, y_decimal, y_rate;
   assert_admin_(signer, $c);
   [x_decimal, y_decimal] = [Stdlib.Coin.decimals_($c, [$p[0]]), Stdlib.Coin.decimals_($c, [$p[1]])];
-  x_rate = u64(Math.pow_(u128("10"), u8(($.copy(lp_decimal)).sub($.copy(x_decimal))), $c));
-  y_rate = u64(Math.pow_(u128("10"), u8(($.copy(lp_decimal)).sub($.copy(y_decimal))), $c));
+  x_rate = u64(Math.pow_(u128('10'), u8($.copy(lp_decimal).sub($.copy(x_decimal))), $c));
+  y_rate = u64(Math.pow_(u128('10'), u8($.copy(lp_decimal).sub($.copy(y_decimal))), $c));
   initialize_coin_(signer, $.copy(lp_name), $.copy(lp_symbol), $.copy(lp_decimal), $c, [$p[0], $p[1]]);
-  token_pair = create_pool_info_($.copy(lp_decimal), $.copy(x_rate), $.copy(y_rate), $.copy(initial_A), $.copy(future_A), $.copy(initial_A_time), $.copy(future_A_time), $.copy(fee), $.copy(admin_fee), $c, [$p[0], $p[1]]);
+  token_pair = create_pool_info_(
+    $.copy(lp_decimal),
+    $.copy(x_rate),
+    $.copy(y_rate),
+    $.copy(initial_A),
+    $.copy(future_A),
+    $.copy(initial_A_time),
+    $.copy(future_A_time),
+    $.copy(fee),
+    $.copy(admin_fee),
+    $c,
+    [$p[0], $p[1]]
+  );
   $c.move_to(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), signer, token_pair);
   return;
 }
 
-export function initialize_coin_ (
+export function initialize_coin_(
   signer: HexString,
   name: Stdlib.String.String,
   symbol: Stdlib.String.String,
   decimals: U8,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): void {
   let addr, burn_capability, freeze_capability, mint_capability;
   addr = Stdlib.Signer.address_of_(signer, $c);
@@ -477,92 +602,161 @@ export function initialize_coin_ (
   if (!Stdlib.Coin.is_coin_initialized_($c, [$p[1]])) {
     throw $.abortCode($.copy(ERROR_SWAP_INVALID_TOKEN_PAIR));
   }
-  [burn_capability, freeze_capability, mint_capability] = Stdlib.Coin.initialize_(signer, $.copy(name), $.copy(symbol), $.copy(decimals), true, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  [burn_capability, freeze_capability, mint_capability] = Stdlib.Coin.initialize_(
+    signer,
+    $.copy(name),
+    $.copy(symbol),
+    $.copy(decimals),
+    true,
+    $c,
+    [new SimpleStructTag(LPToken, [$p[0], $p[1]])]
+  );
   Stdlib.Coin.register_(signer, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
-  $c.move_to(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), signer, new LPCapability({ mint_cap: $.copy(mint_capability), burn_cap: $.copy(burn_capability), freeze_cap: $.copy(freeze_capability) }, new SimpleStructTag(LPCapability, [$p[0], $p[1]])));
+  $c.move_to(
+    new SimpleStructTag(LPCapability, [$p[0], $p[1]]),
+    signer,
+    new LPCapability(
+      { mint_cap: $.copy(mint_capability), burn_cap: $.copy(burn_capability), freeze_cap: $.copy(freeze_capability) },
+      new SimpleStructTag(LPCapability, [$p[0], $p[1]])
+    )
+  );
   return;
 }
 
-export function mint_ (
-  amount: U64,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
-): Stdlib.Coin.Coin {
+export function mint_(amount: U64, $c: AptosDataCache, $p: TypeTag[] /* <X, Y>*/): Stdlib.Coin.Coin {
   let liquidity_cap, mint_token;
-  liquidity_cap = $c.borrow_global<LPCapability>(new SimpleStructTag(LPCapability, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  mint_token = Stdlib.Coin.mint_($.copy(amount), liquidity_cap.mint_cap, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
+  liquidity_cap = $c.borrow_global<LPCapability>(
+    new SimpleStructTag(LPCapability, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
+  mint_token = Stdlib.Coin.mint_($.copy(amount), liquidity_cap.mint_cap, $c, [
+    new SimpleStructTag(LPToken, [$p[0], $p[1]])
+  ]);
   return mint_token;
 }
 
-export function quote_x_to_y_after_fees_ (
+export function quote_x_to_y_after_fees_(
   pool: StableCurvePoolInfo,
   amount_x_in: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): U64 {
   let amount_dy, amount_dy_fee, charged_amt_dy, dx_rated, reserve_amt_x, reserve_amt_y, xp, y, yp;
-  [reserve_amt_x, reserve_amt_y] = [Stdlib.Coin.value_(pool.reserve_x, $c, [$p[0]]), Stdlib.Coin.value_(pool.reserve_y, $c, [$p[1]])];
-  [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(pool.multiplier_x), $.copy(pool.multiplier_y), $c);
-  dx_rated = ($.copy(amount_x_in)).mul($.copy(pool.multiplier_x));
-  y = get_y_(u64("0"), $.copy(dx_rated), $.copy(xp), $.copy(yp), $.copy(pool.initial_A), $.copy(pool.initial_A_time), $.copy(pool.future_A), $.copy(pool.future_A_time), $c);
-  amount_dy = ((($.copy(yp)).sub($.copy(y))).sub(u64("1"))).div($.copy(pool.multiplier_y));
-  amount_dy_fee = (($.copy(amount_dy)).mul($.copy(pool.fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  charged_amt_dy = ($.copy(amount_dy)).sub($.copy(amount_dy_fee));
+  [reserve_amt_x, reserve_amt_y] = [
+    Stdlib.Coin.value_(pool.reserve_x, $c, [$p[0]]),
+    Stdlib.Coin.value_(pool.reserve_y, $c, [$p[1]])
+  ];
+  [xp, yp] = get_xp_mem_(
+    $.copy(reserve_amt_x),
+    $.copy(reserve_amt_y),
+    $.copy(pool.multiplier_x),
+    $.copy(pool.multiplier_y),
+    $c
+  );
+  dx_rated = $.copy(amount_x_in).mul($.copy(pool.multiplier_x));
+  y = get_y_(
+    u64('0'),
+    $.copy(dx_rated),
+    $.copy(xp),
+    $.copy(yp),
+    $.copy(pool.initial_A),
+    $.copy(pool.initial_A_time),
+    $.copy(pool.future_A),
+    $.copy(pool.future_A_time),
+    $c
+  );
+  amount_dy = $.copy(yp).sub($.copy(y)).sub(u64('1')).div($.copy(pool.multiplier_y));
+  amount_dy_fee = $.copy(amount_dy)
+    .mul($.copy(pool.fee))
+    .div(u64($.copy(FEE_DENOMINATOR)));
+  charged_amt_dy = $.copy(amount_dy).sub($.copy(amount_dy_fee));
   return $.copy(charged_amt_dy);
 }
 
-export function quote_y_to_x_after_fees_ (
+export function quote_y_to_x_after_fees_(
   pool: StableCurvePoolInfo,
   amount_y_in: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): U64 {
   let amount_dx, amount_dx_fee, charged_amt_dx, dy_rated, reserve_amt_x, reserve_amt_y, x, xp, yp;
-  [reserve_amt_x, reserve_amt_y] = [Stdlib.Coin.value_(pool.reserve_x, $c, [$p[0]]), Stdlib.Coin.value_(pool.reserve_y, $c, [$p[1]])];
-  [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(pool.multiplier_x), $.copy(pool.multiplier_y), $c);
-  dy_rated = ($.copy(amount_y_in)).mul($.copy(pool.multiplier_y));
-  x = get_y_(u64("0"), $.copy(dy_rated), $.copy(xp), $.copy(yp), $.copy(pool.initial_A), $.copy(pool.initial_A_time), $.copy(pool.future_A), $.copy(pool.future_A_time), $c);
-  amount_dx = ((($.copy(xp)).sub($.copy(x))).sub(u64("1"))).div($.copy(pool.multiplier_x));
-  amount_dx_fee = (($.copy(amount_dx)).mul($.copy(pool.fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  charged_amt_dx = ($.copy(amount_dx)).sub($.copy(amount_dx_fee));
+  [reserve_amt_x, reserve_amt_y] = [
+    Stdlib.Coin.value_(pool.reserve_x, $c, [$p[0]]),
+    Stdlib.Coin.value_(pool.reserve_y, $c, [$p[1]])
+  ];
+  [xp, yp] = get_xp_mem_(
+    $.copy(reserve_amt_x),
+    $.copy(reserve_amt_y),
+    $.copy(pool.multiplier_x),
+    $.copy(pool.multiplier_y),
+    $c
+  );
+  dy_rated = $.copy(amount_y_in).mul($.copy(pool.multiplier_y));
+  x = get_y_(
+    u64('0'),
+    $.copy(dy_rated),
+    $.copy(xp),
+    $.copy(yp),
+    $.copy(pool.initial_A),
+    $.copy(pool.initial_A_time),
+    $.copy(pool.future_A),
+    $.copy(pool.future_A_time),
+    $c
+  );
+  amount_dx = $.copy(xp).sub($.copy(x)).sub(u64('1')).div($.copy(pool.multiplier_x));
+  amount_dx_fee = $.copy(amount_dx)
+    .mul($.copy(pool.fee))
+    .div(u64($.copy(FEE_DENOMINATOR)));
+  charged_amt_dx = $.copy(amount_dx).sub($.copy(amount_dx_fee));
   return $.copy(charged_amt_dx);
 }
 
-export function ramp_A_ (
+export function ramp_A_(
   account: HexString,
   new_future_A: U64,
   future_time: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): void {
   let block_timestamp, cond_a, cond_b, future_A_p, initial_A, p, pair;
   assert_admin_(account, $c);
-  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  p = $c.borrow_global<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   block_timestamp = Stdlib.Timestamp.now_microseconds_($c);
-  if (!($.copy(block_timestamp)).ge(($.copy(p.initial_A_time)).add($.copy(MIN_RAMP_TIME)))) {
+  if (!$.copy(block_timestamp).ge($.copy(p.initial_A_time).add($.copy(MIN_RAMP_TIME)))) {
     throw $.abortCode($.copy(ERROR_SWAP_RAMP_TIME));
   }
-  if (!($.copy(future_time)).ge(($.copy(block_timestamp)).add($.copy(MIN_RAMP_TIME)))) {
+  if (!$.copy(future_time).ge($.copy(block_timestamp).add($.copy(MIN_RAMP_TIME)))) {
     throw $.abortCode($.copy(ERROR_SWAP_RAMP_TIME));
   }
-  initial_A = get_current_A_($.copy(p.initial_A), $.copy(p.future_A), $.copy(p.initial_A_time), $.copy(p.future_A_time), $c);
+  initial_A = get_current_A_(
+    $.copy(p.initial_A),
+    $.copy(p.future_A),
+    $.copy(p.initial_A_time),
+    $.copy(p.future_A_time),
+    $c
+  );
   future_A_p = $.copy(new_future_A);
-  cond_a = ($.copy(new_future_A)).gt(u64("0"));
-  cond_b = ($.copy(new_future_A)).lt($.copy(MAX_A));
+  cond_a = $.copy(new_future_A).gt(u64('0'));
+  cond_b = $.copy(new_future_A).lt($.copy(MAX_A));
   if (!(cond_a && cond_b)) {
     throw $.abortCode($.copy(ERROR_SWAP_A_VALUE));
   }
-  if (($.copy(future_A_p)).lt($.copy(initial_A))) {
-    if (!(($.copy(future_A_p)).mul($.copy(MAX_A_CHANGE))).ge($.copy(initial_A))) {
+  if ($.copy(future_A_p).lt($.copy(initial_A))) {
+    if (!$.copy(future_A_p).mul($.copy(MAX_A_CHANGE)).ge($.copy(initial_A))) {
+      throw $.abortCode($.copy(ERROR_SWAP_A_VALUE));
+    }
+  } else {
+    if (!$.copy(future_A_p).le($.copy(initial_A).mul($.copy(MAX_A_CHANGE)))) {
       throw $.abortCode($.copy(ERROR_SWAP_A_VALUE));
     }
   }
-  else{
-    if (!($.copy(future_A_p)).le(($.copy(initial_A)).mul($.copy(MAX_A_CHANGE)))) {
-      throw $.abortCode($.copy(ERROR_SWAP_A_VALUE));
-    }
-  }
-  pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  pair = $c.borrow_global_mut<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   pair.initial_A = $.copy(initial_A);
   pair.future_A = $.copy(future_A_p);
   pair.initial_A_time = $.copy(block_timestamp);
@@ -570,22 +764,22 @@ export function ramp_A_ (
   return;
 }
 
-export function remove_liquidity_ (
+export function remove_liquidity_(
   sender: HexString,
   liquidity: U64,
   min_amount_x: U64,
   min_amount_y: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [U64, U64] {
   let amount_x, amount_y, coin, coin_x, coin_y;
   coin = Stdlib.Coin.withdraw_(sender, $.copy(liquidity), $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   [coin_x, coin_y] = withdraw_liquidity_(coin, $c, [$p[0], $p[1]]);
   [amount_x, amount_y] = [Stdlib.Coin.value_(coin_x, $c, [$p[0]]), Stdlib.Coin.value_(coin_y, $c, [$p[1]])];
-  if (!($.copy(amount_x)).gt($.copy(min_amount_x))) {
+  if (!$.copy(amount_x).gt($.copy(min_amount_x))) {
     throw $.abortCode($.copy(ERROR_SWAP_PRECONDITION));
   }
-  if (!($.copy(amount_y)).gt($.copy(min_amount_y))) {
+  if (!$.copy(amount_y).gt($.copy(min_amount_y))) {
     throw $.abortCode($.copy(ERROR_SWAP_PRECONDITION));
   }
   Stdlib.Coin.deposit_(Stdlib.Signer.address_of_(sender, $c), coin_x, $c, [$p[0]]);
@@ -593,17 +787,25 @@ export function remove_liquidity_ (
   return [$.copy(amount_x), $.copy(amount_y)];
 }
 
-export function stop_ramp_A_ (
-  account: HexString,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
-): void {
+export function stop_ramp_A_(account: HexString, $c: AptosDataCache, $p: TypeTag[] /* <X, Y>*/): void {
   let block_timestamp, current_A, p, pair;
   assert_admin_(account, $c);
-  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  current_A = get_current_A_($.copy(p.initial_A), $.copy(p.future_A), $.copy(p.initial_A_time), $.copy(p.future_A_time), $c);
+  p = $c.borrow_global<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
+  current_A = get_current_A_(
+    $.copy(p.initial_A),
+    $.copy(p.future_A),
+    $.copy(p.initial_A_time),
+    $.copy(p.future_A_time),
+    $c
+  );
   block_timestamp = Stdlib.Timestamp.now_microseconds_($c);
-  pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  pair = $c.borrow_global_mut<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   pair.initial_A = $.copy(current_A);
   pair.future_A = $.copy(current_A);
   pair.initial_A_time = $.copy(block_timestamp);
@@ -611,12 +813,12 @@ export function stop_ramp_A_ (
   return;
 }
 
-export function swap_x_to_exact_y_ (
+export function swap_x_to_exact_y_(
   sender: HexString,
   amount_in: U64,
   to: HexString,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [U64, U64, U64] {
   let coin_x, coin_y, out_amount, x_out, x_remain;
   coin_x = Stdlib.Coin.withdraw_(sender, $.copy(amount_in), $c, [$p[0]]);
@@ -625,27 +827,71 @@ export function swap_x_to_exact_y_ (
   Stdlib.Coin.merge_(x_out, x_remain, $c, [$p[0]]);
   Stdlib.Coin.deposit_($.copy(to), x_out, $c, [$p[0]]);
   Stdlib.Coin.deposit_($.copy(to), coin_y, $c, [$p[1]]);
-  return [$.copy(amount_in), u64("0"), $.copy(out_amount)];
+  return [$.copy(amount_in), u64('0'), $.copy(out_amount)];
 }
 
-export function swap_x_to_exact_y_direct_ (
+export function swap_x_to_exact_y_direct_(
   coins_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [Stdlib.Coin.Coin, Stdlib.Coin.Coin, Stdlib.Coin.Coin] {
-  let amount_dy, amount_dy_fee, charged_amt_dy, coin_dy, coin_fee, dx, dx_rated, dy_admin_fee, i, p, reserve_amt_x, reserve_amt_y, swap_pair, xp, y, yp;
-  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  [reserve_amt_x, reserve_amt_y] = [Stdlib.Coin.value_(p.reserve_x, $c, [$p[0]]), Stdlib.Coin.value_(p.reserve_y, $c, [$p[1]])];
-  [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
-  i = u64("0");
+  let amount_dy,
+    amount_dy_fee,
+    charged_amt_dy,
+    coin_dy,
+    coin_fee,
+    dx,
+    dx_rated,
+    dy_admin_fee,
+    i,
+    p,
+    reserve_amt_x,
+    reserve_amt_y,
+    swap_pair,
+    xp,
+    y,
+    yp;
+  p = $c.borrow_global<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
+  [reserve_amt_x, reserve_amt_y] = [
+    Stdlib.Coin.value_(p.reserve_x, $c, [$p[0]]),
+    Stdlib.Coin.value_(p.reserve_y, $c, [$p[1]])
+  ];
+  [xp, yp] = get_xp_mem_(
+    $.copy(reserve_amt_x),
+    $.copy(reserve_amt_y),
+    $.copy(p.multiplier_x),
+    $.copy(p.multiplier_y),
+    $c
+  );
+  i = u64('0');
   dx = Stdlib.Coin.value_(coins_in, $c, [$p[0]]);
-  dx_rated = ($.copy(dx)).mul($.copy(p.multiplier_x));
-  y = get_y_($.copy(i), $.copy(dx_rated), $.copy(xp), $.copy(yp), $.copy(p.initial_A), $.copy(p.initial_A_time), $.copy(p.future_A), $.copy(p.future_A_time), $c);
-  amount_dy = ((($.copy(yp)).sub($.copy(y))).sub(u64("1"))).div($.copy(p.multiplier_y));
-  amount_dy_fee = (($.copy(amount_dy)).mul($.copy(p.fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  charged_amt_dy = ($.copy(amount_dy)).sub($.copy(amount_dy_fee));
-  dy_admin_fee = (($.copy(amount_dy_fee)).mul($.copy(p.admin_fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  dx_rated = $.copy(dx).mul($.copy(p.multiplier_x));
+  y = get_y_(
+    $.copy(i),
+    $.copy(dx_rated),
+    $.copy(xp),
+    $.copy(yp),
+    $.copy(p.initial_A),
+    $.copy(p.initial_A_time),
+    $.copy(p.future_A),
+    $.copy(p.future_A_time),
+    $c
+  );
+  amount_dy = $.copy(yp).sub($.copy(y)).sub(u64('1')).div($.copy(p.multiplier_y));
+  amount_dy_fee = $.copy(amount_dy)
+    .mul($.copy(p.fee))
+    .div(u64($.copy(FEE_DENOMINATOR)));
+  charged_amt_dy = $.copy(amount_dy).sub($.copy(amount_dy_fee));
+  dy_admin_fee = $.copy(amount_dy_fee)
+    .mul($.copy(p.admin_fee))
+    .div(u64($.copy(FEE_DENOMINATOR)));
+  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   Stdlib.Coin.merge_(swap_pair.reserve_x, coins_in, $c, [$p[0]]);
   coin_dy = Stdlib.Coin.extract_(swap_pair.reserve_y, $.copy(charged_amt_dy), $c, [$p[1]]);
   coin_fee = Stdlib.Coin.extract_(swap_pair.reserve_y, $.copy(dy_admin_fee), $c, [$p[1]]);
@@ -653,12 +899,12 @@ export function swap_x_to_exact_y_direct_ (
   return [Stdlib.Coin.zero_($c, [$p[0]]), Stdlib.Coin.zero_($c, [$p[0]]), coin_dy];
 }
 
-export function swap_y_to_exact_x_ (
+export function swap_y_to_exact_x_(
   sender: HexString,
   amount_in: U64,
   to: HexString,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [U64, U64, U64] {
   let coin_y, out_amount, x_out, y_out, y_remain;
   coin_y = Stdlib.Coin.withdraw_(sender, $.copy(amount_in), $c, [$p[1]]);
@@ -667,27 +913,71 @@ export function swap_y_to_exact_x_ (
   Stdlib.Coin.merge_(y_out, y_remain, $c, [$p[1]]);
   Stdlib.Coin.deposit_($.copy(to), x_out, $c, [$p[0]]);
   Stdlib.Coin.deposit_($.copy(to), y_out, $c, [$p[1]]);
-  return [$.copy(amount_in), $.copy(out_amount), u64("0")];
+  return [$.copy(amount_in), $.copy(out_amount), u64('0')];
 }
 
-export function swap_y_to_exact_x_direct_ (
+export function swap_y_to_exact_x_direct_(
   coins_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [Stdlib.Coin.Coin, Stdlib.Coin.Coin, Stdlib.Coin.Coin] {
-  let amount_dx, amount_dx_fee, charged_amt_dx, coin_dx, coin_fee, dx_admin_fee, dy, dy_rated, i, p, reserve_amt_x, reserve_amt_y, swap_pair, x, xp, yp;
-  p = $c.borrow_global<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
-  [reserve_amt_x, reserve_amt_y] = [Stdlib.Coin.value_(p.reserve_x, $c, [$p[0]]), Stdlib.Coin.value_(p.reserve_y, $c, [$p[1]])];
-  [xp, yp] = get_xp_mem_($.copy(reserve_amt_x), $.copy(reserve_amt_y), $.copy(p.multiplier_x), $.copy(p.multiplier_y), $c);
-  i = u64("1");
+  let amount_dx,
+    amount_dx_fee,
+    charged_amt_dx,
+    coin_dx,
+    coin_fee,
+    dx_admin_fee,
+    dy,
+    dy_rated,
+    i,
+    p,
+    reserve_amt_x,
+    reserve_amt_y,
+    swap_pair,
+    x,
+    xp,
+    yp;
+  p = $c.borrow_global<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
+  [reserve_amt_x, reserve_amt_y] = [
+    Stdlib.Coin.value_(p.reserve_x, $c, [$p[0]]),
+    Stdlib.Coin.value_(p.reserve_y, $c, [$p[1]])
+  ];
+  [xp, yp] = get_xp_mem_(
+    $.copy(reserve_amt_x),
+    $.copy(reserve_amt_y),
+    $.copy(p.multiplier_x),
+    $.copy(p.multiplier_y),
+    $c
+  );
+  i = u64('1');
   dy = Stdlib.Coin.value_(coins_in, $c, [$p[1]]);
-  dy_rated = ($.copy(dy)).mul($.copy(p.multiplier_y));
-  x = get_y_($.copy(i), $.copy(dy_rated), $.copy(xp), $.copy(yp), $.copy(p.initial_A), $.copy(p.initial_A_time), $.copy(p.future_A), $.copy(p.future_A_time), $c);
-  amount_dx = ((($.copy(xp)).sub($.copy(x))).sub(u64("1"))).div($.copy(p.multiplier_x));
-  amount_dx_fee = (($.copy(amount_dx)).mul($.copy(p.fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  charged_amt_dx = ($.copy(amount_dx)).sub($.copy(amount_dx_fee));
-  dx_admin_fee = (($.copy(amount_dx_fee)).mul($.copy(p.admin_fee))).div(u64($.copy(FEE_DENOMINATOR)));
-  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  dy_rated = $.copy(dy).mul($.copy(p.multiplier_y));
+  x = get_y_(
+    $.copy(i),
+    $.copy(dy_rated),
+    $.copy(xp),
+    $.copy(yp),
+    $.copy(p.initial_A),
+    $.copy(p.initial_A_time),
+    $.copy(p.future_A),
+    $.copy(p.future_A_time),
+    $c
+  );
+  amount_dx = $.copy(xp).sub($.copy(x)).sub(u64('1')).div($.copy(p.multiplier_x));
+  amount_dx_fee = $.copy(amount_dx)
+    .mul($.copy(p.fee))
+    .div(u64($.copy(FEE_DENOMINATOR)));
+  charged_amt_dx = $.copy(amount_dx).sub($.copy(amount_dx_fee));
+  dx_admin_fee = $.copy(amount_dx_fee)
+    .mul($.copy(p.admin_fee))
+    .div(u64($.copy(FEE_DENOMINATOR)));
+  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   Stdlib.Coin.merge_(swap_pair.reserve_y, coins_in, $c, [$p[1]]);
   coin_dx = Stdlib.Coin.extract_(swap_pair.reserve_x, $.copy(charged_amt_dx), $c, [$p[0]]);
   coin_fee = Stdlib.Coin.extract_(swap_pair.reserve_x, $.copy(dx_admin_fee), $c, [$p[0]]);
@@ -695,20 +985,23 @@ export function swap_y_to_exact_x_direct_ (
   return [Stdlib.Coin.zero_($c, [$p[1]]), coin_dx, Stdlib.Coin.zero_($c, [$p[1]])];
 }
 
-export function withdraw_liquidity_ (
+export function withdraw_liquidity_(
   to_burn: Stdlib.Coin.Coin,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <X, Y>*/
+  $p: TypeTag[] /* <X, Y>*/
 ): [Stdlib.Coin.Coin, Stdlib.Coin.Coin] {
   let temp$1, coin_x, coin_y, reserve_x, reserve_y, swap_pair, to_burn_value, total_supply, x, y;
   to_burn_value = u128(Stdlib.Coin.value_(to_burn, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]));
-  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]), Hippo_config.admin_address_($c));
+  swap_pair = $c.borrow_global_mut<StableCurvePoolInfo>(
+    new SimpleStructTag(StableCurvePoolInfo, [$p[0], $p[1]]),
+    Hippo_config.admin_address_($c)
+  );
   reserve_x = u128(Stdlib.Coin.value_(swap_pair.reserve_x, $c, [$p[0]]));
   reserve_y = u128(Stdlib.Coin.value_(swap_pair.reserve_y, $c, [$p[1]]));
   temp$1 = Stdlib.Coin.supply_($c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   total_supply = u128($.copy(Stdlib.Option.borrow_(temp$1, $c, [AtomicTypeTag.U128])));
-  x = u64((($.copy(to_burn_value)).mul($.copy(reserve_x))).div($.copy(total_supply)));
-  y = u64((($.copy(to_burn_value)).mul($.copy(reserve_y))).div($.copy(total_supply)));
+  x = u64($.copy(to_burn_value).mul($.copy(reserve_x)).div($.copy(total_supply)));
+  y = u64($.copy(to_burn_value).mul($.copy(reserve_y)).div($.copy(total_supply)));
   burn_(to_burn, $c, [$p[0], $p[1]]);
   coin_x = Stdlib.Coin.extract_(swap_pair.reserve_x, $.copy(x), $c, [$p[0]]);
   coin_y = Stdlib.Coin.extract_(swap_pair.reserve_y, $.copy(y), $c, [$p[1]]);
@@ -716,38 +1009,48 @@ export function withdraw_liquidity_ (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::LPCapability", LPCapability.LPCapabilityParser);
-  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::LPToken", LPToken.LPTokenParser);
-  repo.addParser("0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::StableCurvePoolInfo", StableCurvePoolInfo.StableCurvePoolInfoParser);
+  repo.addParser(
+    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::LPCapability',
+    LPCapability.LPCapabilityParser
+  );
+  repo.addParser(
+    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::LPToken',
+    LPToken.LPTokenParser
+  );
+  repo.addParser(
+    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::stable_curve_swap::StableCurvePoolInfo',
+    StableCurvePoolInfo.StableCurvePoolInfoParser
+  );
 }
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache,
-  ) {
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
+  get moduleAddress() {
+    {
+      return moduleAddress;
+    }
   }
-  get moduleAddress() {{ return moduleAddress; }}
-  get moduleName() {{ return moduleName; }}
-  get LPCapability() { return LPCapability; }
-  async loadLPCapability(
-    owner: HexString,
-    $p: TypeTag[], /* <X, Y> */
-    loadFull=true,
-  ) {
+  get moduleName() {
+    {
+      return moduleName;
+    }
+  }
+  get LPCapability() {
+    return LPCapability;
+  }
+  async loadLPCapability(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true) {
     const val = await LPCapability.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
     }
     return val;
   }
-  get LPToken() { return LPToken; }
-  get StableCurvePoolInfo() { return StableCurvePoolInfo; }
-  async loadStableCurvePoolInfo(
-    owner: HexString,
-    $p: TypeTag[], /* <X, Y> */
-    loadFull=true,
-  ) {
+  get LPToken() {
+    return LPToken;
+  }
+  get StableCurvePoolInfo() {
+    return StableCurvePoolInfo;
+  }
+  async loadStableCurvePoolInfo(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true) {
     const val = await StableCurvePoolInfo.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
@@ -755,4 +1058,3 @@ export class App {
     return val;
   }
 }
-

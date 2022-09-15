@@ -1,6 +1,5 @@
-
-import { AptosClient } from "aptos";
-import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
+import { AptosClient } from 'aptos';
+import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
 import * as coin_list from './coin_list';
 import * as econia from './econia';
 import * as hippo_aggregator from './hippo_aggregator';
@@ -14,7 +13,6 @@ export * as hippo_aggregator from './hippo_aggregator';
 export * as hippo_swap from './hippo_swap';
 export * as pontem from './pontem';
 export * as stdlib from './stdlib';
-
 
 export function getProjectRepo(): AptosParserRepo {
   const repo = new AptosParserRepo();
@@ -31,15 +29,13 @@ export function getProjectRepo(): AptosParserRepo {
 export class App {
   parserRepo: AptosParserRepo;
   cache: AptosLocalCache;
-  coin_list : coin_list.App
-  econia : econia.App
-  hippo_aggregator : hippo_aggregator.App
-  hippo_swap : hippo_swap.App
-  pontem : pontem.App
-  stdlib : stdlib.App
-  constructor(
-    public client: AptosClient,
-  ) {
+  coin_list: coin_list.App;
+  econia: econia.App;
+  hippo_aggregator: hippo_aggregator.App;
+  hippo_swap: hippo_swap.App;
+  pontem: pontem.App;
+  stdlib: stdlib.App;
+  constructor(public client: AptosClient) {
     this.parserRepo = getProjectRepo();
     this.cache = new AptosLocalCache();
     this.coin_list = new coin_list.App(client, this.parserRepo, this.cache);

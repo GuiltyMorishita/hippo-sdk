@@ -1,6 +1,5 @@
-
-import { AptosClient } from "aptos";
-import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
+import { AptosClient } from 'aptos';
+import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
 import * as Cp_scripts from './cp_scripts';
 import * as Cp_swap from './cp_swap';
 import * as Cp_swap_utils from './cp_swap_utils';
@@ -33,7 +32,6 @@ export * as Stable_curve_scripts from './stable_curve_scripts';
 export * as Stable_curve_swap from './stable_curve_swap';
 export * as Utils from './utils';
 
-
 export function loadParsers(repo: AptosParserRepo) {
   Cp_scripts.loadParsers(repo);
   Cp_swap.loadParsers(repo);
@@ -60,32 +58,28 @@ export function getPackageRepo(): AptosParserRepo {
 }
 
 export type AppType = {
-  client: AptosClient,
-  repo: AptosParserRepo,
-  cache: AptosLocalCache,
+  client: AptosClient;
+  repo: AptosParserRepo;
+  cache: AptosLocalCache;
 };
 
 export class App {
-  cp_scripts : Cp_scripts.App
-  cp_swap : Cp_swap.App
-  cp_swap_utils : Cp_swap_utils.App
-  devcoin_util : Devcoin_util.App
-  hippo_config : Hippo_config.App
-  math : Math.App
-  piece_swap : Piece_swap.App
-  piece_swap_math : Piece_swap_math.App
-  piece_swap_script : Piece_swap_script.App
-  router : Router.App
-  safe_math : Safe_math.App
-  stable_curve_numeral : Stable_curve_numeral.App
-  stable_curve_scripts : Stable_curve_scripts.App
-  stable_curve_swap : Stable_curve_swap.App
-  utils : Utils.App
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache,
-  ) {
+  cp_scripts: Cp_scripts.App;
+  cp_swap: Cp_swap.App;
+  cp_swap_utils: Cp_swap_utils.App;
+  devcoin_util: Devcoin_util.App;
+  hippo_config: Hippo_config.App;
+  math: Math.App;
+  piece_swap: Piece_swap.App;
+  piece_swap_math: Piece_swap_math.App;
+  piece_swap_script: Piece_swap_script.App;
+  router: Router.App;
+  safe_math: Safe_math.App;
+  stable_curve_numeral: Stable_curve_numeral.App;
+  stable_curve_scripts: Stable_curve_scripts.App;
+  stable_curve_swap: Stable_curve_swap.App;
+  utils: Utils.App;
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
     this.cp_scripts = new Cp_scripts.App(client, repo, cache);
     this.cp_swap = new Cp_swap.App(client, repo, cache);
     this.cp_swap_utils = new Cp_swap_utils.App(client, repo, cache);
