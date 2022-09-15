@@ -645,9 +645,9 @@ pontem.command('list-pools').action(pontemListPools);
 program.addCommand(pontem);
 
 const aggListTradingPools = async () => {
-  const { client, account } = readConfig(program);
+  const { client } = readConfig(program);
   try {
-    const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+    const agg = await TradeAggregator.create(client);
     for (const pool of agg.allPools) {
       console.log('###########');
       console.log(`Pair: ${pool.xCoinInfo.symbol.str()} - ${pool.yCoinInfo.symbol.str()}`);
@@ -661,8 +661,8 @@ const aggListTradingPools = async () => {
 };
 
 const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
-  const { client, account } = readConfig(program);
-  const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+  const { client } = readConfig(program);
+  const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const routes = agg.getAllRoutes(xCoinInfo, yCoinInfo);
@@ -673,8 +673,8 @@ const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
 };
 
 const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const { client, account } = readConfig(program);
-  const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+  const { client } = readConfig(program);
+  const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -689,7 +689,7 @@ const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: s
 
 const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
   const { client, account } = readConfig(program);
-  const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+  const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -705,7 +705,7 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
 
 const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, routeIdx: string) => {
   const { client, account } = readConfig(program);
-  const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+  const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -720,8 +720,8 @@ const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt
 };
 
 const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string) => {
-  const { client, account } = readConfig(program);
-  const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+  const { client } = readConfig(program);
+  const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -734,7 +734,7 @@ const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt:
   const payload = quotes[0].route.makePayload(inputAmt, minOutUiAmt);
   const simResult = await simulatePayloadTx(
     client,
-    getSimulationKeys(account),
+    agg.fetcher,
     payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   printResource(simResult);
@@ -749,7 +749,7 @@ const aggSimulateSwapWithRoute = async (
   routeIdx: string
 ) => {
   const { client, account } = readConfig(program);
-  const agg = await TradeAggregator.create(client, getSimulationKeys(account));
+  const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -762,7 +762,7 @@ const aggSimulateSwapWithRoute = async (
   const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, minOutUiAmt);
   const simResult = await simulatePayloadTx(
     client,
-    getSimulationKeys(account),
+    agg.fetcher,
     payload as TxnBuilderTypes.TransactionPayloadEntryFunction
   );
   printResource(simResult);

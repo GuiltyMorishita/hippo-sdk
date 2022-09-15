@@ -22,8 +22,12 @@ export class TradeAggregator {
     this.xToAnyPools = new Map();
   }
 
-  static async create(aptosClient: AptosClient, fetcher: SimulationKeys, netConfig = CONFIGS.devnet) {
+  static async create(aptosClient: AptosClient, netConfig = CONFIGS.devnet) {
     const app = new App(aptosClient);
+    const fetcher: SimulationKeys = {
+      pubkey: netConfig.hippoDexPubkey,
+      address: netConfig.hippoDexAddress,
+    };
     const registryClient = await CoinListClient.load(app, fetcher);
     const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
     const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);
