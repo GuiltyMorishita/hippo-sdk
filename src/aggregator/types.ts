@@ -1,5 +1,5 @@
-import { AtomicTypeTag, SimulationKeys, TypeTag, u64, u8, U8 } from '@manahippo/move-to-ts';
-import { TxnBuilderTypes, Types } from 'aptos';
+import { AtomicTypeTag, SimulationKeys, TypeTag, u64, u8, U64 } from '@manahippo/move-to-ts';
+import { Types, TxnBuilderTypes } from 'aptos';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { Aggregator } from '../generated/hippo_aggregator';
 import { App } from '../generated';
@@ -40,7 +40,7 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Pontem]: 'Pontem',
   [DexType.Basiq]: 'Basiq'
 };
-export type PoolType = U8;
+export type PoolType = U64;
 
 // An AMM pool or ohchain orderbook that supports trading directly between X and Y
 export abstract class TradingPool {

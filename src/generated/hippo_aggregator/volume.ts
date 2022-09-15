@@ -7,7 +7,7 @@ import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@ma
 import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
 import * as Stdlib from "../stdlib";
 export const packageName = "HippoAggregator";
-export const moduleAddress = new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d");
+export const moduleAddress = new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33");
 export const moduleName = "volume";
 
 export const E_NOT_ADMIN : U64 = u64("1");
@@ -146,12 +146,12 @@ export class Volume
   { name: "data_end_sequence_number", typeTag: AtomicTypeTag.U64 },
   { name: "data_end_time", typeTag: AtomicTypeTag.U64 },
   { name: "volume_decimals", typeTag: AtomicTypeTag.U64 },
-  { name: "total_volume_history_24h", typeTag: new VectorTag(new StructTag(new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"), "volume", "TotalVolume", [])) },
-  { name: "total_volume_history_7d", typeTag: new VectorTag(new StructTag(new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"), "volume", "TotalVolume", [])) },
-  { name: "top_trading_pairs_24h", typeTag: new VectorTag(new StructTag(new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"), "volume", "TradingPair", [])) },
-  { name: "top_trading_pairs_7d", typeTag: new VectorTag(new StructTag(new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"), "volume", "TradingPair", [])) },
-  { name: "top_pool_provider_24h", typeTag: new VectorTag(new StructTag(new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"), "volume", "PoolProvider", [])) },
-  { name: "top_pool_provider_7d", typeTag: new VectorTag(new StructTag(new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"), "volume", "PoolProvider", [])) }];
+  { name: "total_volume_history_24h", typeTag: new VectorTag(new StructTag(new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"), "volume", "TotalVolume", [])) },
+  { name: "total_volume_history_7d", typeTag: new VectorTag(new StructTag(new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"), "volume", "TotalVolume", [])) },
+  { name: "top_trading_pairs_24h", typeTag: new VectorTag(new StructTag(new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"), "volume", "TradingPair", [])) },
+  { name: "top_trading_pairs_7d", typeTag: new VectorTag(new StructTag(new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"), "volume", "TradingPair", [])) },
+  { name: "top_pool_provider_24h", typeTag: new VectorTag(new StructTag(new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"), "volume", "PoolProvider", [])) },
+  { name: "top_pool_provider_7d", typeTag: new VectorTag(new StructTag(new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"), "volume", "PoolProvider", [])) }];
 
   poster: HexString;
   data_end_sequence_number: U64;
@@ -241,7 +241,7 @@ export function clean_ (
   $c: AptosDataCache,
 ): void {
   let volume;
-  volume = $c.borrow_global_mut<Volume>(new SimpleStructTag(Volume), new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"));
+  volume = $c.borrow_global_mut<Volume>(new SimpleStructTag(Volume), new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"));
   if (!((Stdlib.Signer.address_of_(poster, $c)).hex() === ($.copy(volume.poster)).hex())) {
     throw $.abortCode($.copy(E_NOT_POSTER));
   }
@@ -263,7 +263,7 @@ export function buildPayload_clean (
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"),
+    new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"),
     "volume",
     "clean",
     typeParamStrings,
@@ -287,7 +287,7 @@ export function buildPayload_fetch_volume (
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"),
+    new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"),
     "volume",
     "fetch_volume",
     typeParamStrings,
@@ -320,7 +320,7 @@ function make_query_fetch_volume(app: App) {
 export function get_volume_ (
   $c: AptosDataCache,
 ): Volume {
-  return $.copy($c.borrow_global<Volume>(new SimpleStructTag(Volume), new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d")));
+  return $.copy($c.borrow_global<Volume>(new SimpleStructTag(Volume), new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33")));
 }
 
 
@@ -330,7 +330,7 @@ export function buildPayload_get_volume (
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"),
+    new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"),
     "volume",
     "get_volume",
     typeParamStrings,
@@ -346,7 +346,7 @@ export function initialize_ (
 ): void {
   let admin_addr;
   admin_addr = Stdlib.Signer.address_of_(admin, $c);
-  if (!(($.copy(admin_addr)).hex() === (new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d")).hex())) {
+  if (!(($.copy(admin_addr)).hex() === (new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33")).hex())) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
   }
   return $c.move_to(new SimpleStructTag(Volume), admin, new Volume({ poster: $.copy(poster), data_end_sequence_number: u64("0"), data_end_time: u64("0"), volume_decimals: u64("4"), total_volume_history_24h: Stdlib.Vector.empty_($c, [new SimpleStructTag(TotalVolume)]), total_volume_history_7d: Stdlib.Vector.empty_($c, [new SimpleStructTag(TotalVolume)]), top_trading_pairs_24h: Stdlib.Vector.empty_($c, [new SimpleStructTag(TradingPair)]), top_trading_pairs_7d: Stdlib.Vector.empty_($c, [new SimpleStructTag(TradingPair)]), top_pool_provider_24h: Stdlib.Vector.empty_($c, [new SimpleStructTag(PoolProvider)]), top_pool_provider_7d: Stdlib.Vector.empty_($c, [new SimpleStructTag(PoolProvider)]) }, new SimpleStructTag(Volume)));
@@ -360,7 +360,7 @@ export function buildPayload_initialize (
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"),
+    new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"),
     "volume",
     "initialize",
     typeParamStrings,
@@ -427,7 +427,7 @@ export function post_ (
   $c: AptosDataCache,
 ): void {
   let volume;
-  volume = $c.borrow_global_mut<Volume>(new SimpleStructTag(Volume), new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"));
+  volume = $c.borrow_global_mut<Volume>(new SimpleStructTag(Volume), new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"));
   if (!((Stdlib.Signer.address_of_(poster, $c)).hex() === ($.copy(volume.poster)).hex())) {
     throw $.abortCode($.copy(E_NOT_POSTER));
   }
@@ -486,7 +486,7 @@ export function buildPayload_post (
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"),
+    new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"),
     "volume",
     "post",
     typeParamStrings,
@@ -518,7 +518,7 @@ export function set_poster_ (
 ): void {
   let admin_addr, volume;
   admin_addr = Stdlib.Signer.address_of_(admin, $c);
-  if (!(($.copy(admin_addr)).hex() === (new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d")).hex())) {
+  if (!(($.copy(admin_addr)).hex() === (new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33")).hex())) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
   }
   volume = $c.borrow_global_mut<Volume>(new SimpleStructTag(Volume), $.copy(admin_addr));
@@ -534,7 +534,7 @@ export function buildPayload_set_poster (
    | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d"),
+    new HexString("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33"),
     "volume",
     "set_poster",
     typeParamStrings,
@@ -547,10 +547,10 @@ export function buildPayload_set_poster (
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d::volume::PoolProvider", PoolProvider.PoolProviderParser);
-  repo.addParser("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d::volume::TotalVolume", TotalVolume.TotalVolumeParser);
-  repo.addParser("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d::volume::TradingPair", TradingPair.TradingPairParser);
-  repo.addParser("0xbea364fb21fc95c4f37d88270d7995c75c826739c992ef676ee98d7ecbb28e5d::volume::Volume", Volume.VolumeParser);
+  repo.addParser("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::volume::PoolProvider", PoolProvider.PoolProviderParser);
+  repo.addParser("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::volume::TotalVolume", TotalVolume.TotalVolumeParser);
+  repo.addParser("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::volume::TradingPair", TradingPair.TradingPairParser);
+  repo.addParser("0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::volume::Volume", Volume.VolumeParser);
 }
 export class App {
   constructor(

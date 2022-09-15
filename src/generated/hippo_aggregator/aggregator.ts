@@ -11,21 +11,21 @@ import * as Hippo_swap from '../hippo_swap';
 import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
 export const moduleName = 'aggregator';
 
 export const DEX_BASIQ: U8 = u8('4');
 export const DEX_ECONIA: U8 = u8('2');
 export const DEX_HIPPO: U8 = u8('1');
 export const DEX_PONTEM: U8 = u8('3');
-export const ECONIA_V1: U8 = u8('1');
 export const E_NOT_ADMIN: U64 = u64('4');
 export const E_OUTPUT_LESS_THAN_MINIMUM: U64 = u64('2');
 export const E_UNKNOWN_DEX: U64 = u64('3');
 export const E_UNKNOWN_POOL_TYPE: U64 = u64('1');
-export const HIPPO_CONSTANT_PRODUCT: U8 = u8('1');
-export const HIPPO_PIECEWISE: U8 = u8('3');
-export const HIPPO_STABLE_CURVE: U8 = u8('2');
+export const HIPPO_CONSTANT_PRODUCT: U64 = u64('1');
+export const HIPPO_PIECEWISE: U64 = u64('3');
+export const HIPPO_STABLE_CURVE: U64 = u64('2');
+export const HI_64: U64 = u64('18446744073709551615');
 
 export class EventStore {
   static moduleAddress = moduleAddress;
@@ -38,7 +38,7 @@ export class EventStore {
       name: 'swap_step_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
           'aggregator',
           'SwapStepEvent',
           []
@@ -84,7 +84,7 @@ export class SwapStepEvent {
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
     { name: 'dex_type', typeTag: AtomicTypeTag.U8 },
-    { name: 'pool_type', typeTag: AtomicTypeTag.U8 },
+    { name: 'pool_type', typeTag: AtomicTypeTag.U64 },
     { name: 'x_type_info', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
     { name: 'y_type_info', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
     { name: 'input_amount', typeTag: AtomicTypeTag.U64 },
@@ -93,7 +93,7 @@ export class SwapStepEvent {
   ];
 
   dex_type: U8;
-  pool_type: U8;
+  pool_type: U64;
   x_type_info: Stdlib.Type_info.TypeInfo;
   y_type_info: Stdlib.Type_info.TypeInfo;
   input_amount: U64;
@@ -102,7 +102,7 @@ export class SwapStepEvent {
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.dex_type = proto['dex_type'] as U8;
-    this.pool_type = proto['pool_type'] as U8;
+    this.pool_type = proto['pool_type'] as U64;
     this.x_type_info = proto['x_type_info'] as Stdlib.Type_info.TypeInfo;
     this.y_type_info = proto['y_type_info'] as Stdlib.Type_info.TypeInfo;
     this.input_amount = proto['input_amount'] as U64;
@@ -162,7 +162,7 @@ export function check_and_deposit_opt_(
 
 export function emit_swap_step_event_(
   dex_type: U8,
-  pool_type: U8,
+  pool_type: U64,
   input_amount: U64,
   output_amount: U64,
   $c: AptosDataCache,
@@ -171,7 +171,7 @@ export function emit_swap_step_event_(
   let event_store;
   event_store = $c.borrow_global_mut<EventStore>(
     new SimpleStructTag(EventStore),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
   );
   Stdlib.Event.emit_event_(
     event_store.swap_step_events,
@@ -195,7 +195,7 @@ export function emit_swap_step_event_(
 
 export function get_intermediate_output_(
   dex_type: U8,
-  pool_type: U8,
+  pool_type: U64,
   is_x_to_y: boolean,
   x_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
@@ -221,22 +221,22 @@ export function get_intermediate_output_(
     temp$3,
     temp$30,
     temp$31,
-    temp$32,
     temp$33,
-    temp$35,
     temp$4,
     temp$9,
     coin_in_value,
-    coin_in_value__36,
+    coin_in_value__34,
+    market_id,
     x_out,
     x_out__2,
     x_out_opt,
+    x_value,
     y_out,
     y_out__1,
     y_out__11,
     y_out__12,
     y_out__21,
-    y_out__34,
+    y_out__32,
     y_out__5,
     y_out__7,
     zero,
@@ -308,53 +308,62 @@ export function get_intermediate_output_(
       }
       [temp$19, temp$20] = [temp$17, temp$18];
     }
-    [temp$32, temp$33] = [temp$19, temp$20];
+    [temp$30, temp$31] = [temp$19, temp$20];
   } else {
     if ($.copy(dex_type).eq($.copy(DEX_ECONIA))) {
-      if ($.copy(pool_type).eq($.copy(ECONIA_V1))) {
-        y_out__21 = Stdlib.Coin.zero_($c, [$p[1]]);
-        if (is_x_to_y) {
-          Econia.Market.swap_(
-            false,
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-            x_in,
-            y_out__21,
-            $c,
-            [$p[0], $p[1], $p[2]]
-          );
-        } else {
-          Econia.Market.swap_(
-            true,
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-            y_out__21,
-            x_in,
-            $c,
-            [$p[1], $p[0], $p[2]]
-          );
-        }
-        if (Stdlib.Coin.value_(x_in, $c, [$p[0]]).eq(u64('0'))) {
-          Stdlib.Coin.destroy_zero_(x_in, $c, [$p[0]]);
-          [temp$22, temp$23] = [
-            Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-            y_out__21
-          ];
-        } else {
-          [temp$22, temp$23] = [
-            Stdlib.Option.some_(x_in, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-            y_out__21
-          ];
-        }
-        [temp$24, temp$25] = [temp$22, temp$23];
+      y_out__21 = Stdlib.Coin.zero_($c, [$p[1]]);
+      x_value = Stdlib.Coin.value_(x_in, $c, [$p[0]]);
+      market_id = $.copy(pool_type);
+      if (is_x_to_y) {
+        Econia.Market.swap_coins_(
+          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          $.copy(market_id),
+          false,
+          u64('0'),
+          $.copy(x_value),
+          u64('0'),
+          $.copy(HI_64),
+          u64('0'),
+          x_in,
+          y_out__21,
+          $c,
+          [$p[0], $p[1]]
+        );
       } else {
-        throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
+        Econia.Market.swap_coins_(
+          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          $.copy(market_id),
+          true,
+          u64('0'),
+          $.copy(HI_64),
+          u64('0'),
+          $.copy(x_value),
+          $.copy(HI_64),
+          y_out__21,
+          x_in,
+          $c,
+          [$p[1], $p[0]]
+        );
       }
-      [temp$30, temp$31] = [temp$24, temp$25];
+      if (Stdlib.Coin.value_(x_in, $c, [$p[0]]).eq(u64('0'))) {
+        Stdlib.Coin.destroy_zero_(x_in, $c, [$p[0]]);
+        [temp$22, temp$23] = [
+          Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+          y_out__21
+        ];
+      } else {
+        [temp$22, temp$23] = [
+          Stdlib.Option.some_(x_in, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+          y_out__21
+        ];
+      }
+      [temp$28, temp$29] = [temp$22, temp$23];
     } else {
       if ($.copy(dex_type).eq($.copy(DEX_PONTEM))) {
-        [temp$28, temp$29] = [
+        [temp$26, temp$27] = [
           Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           Pontem.Router.swap_exact_coin_for_coin_(
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+            new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
             x_in,
             u64('0'),
             $c,
@@ -363,22 +372,22 @@ export function get_intermediate_output_(
         ];
       } else {
         if ($.copy(dex_type).eq($.copy(DEX_BASIQ))) {
-          [temp$26, temp$27] = [
+          [temp$24, temp$25] = [
             Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
             Basiq.Dex.swap_(x_in, $c, [$p[0], $p[1]])
           ];
         } else {
           throw $.abortCode($.copy(E_UNKNOWN_DEX));
         }
-        [temp$28, temp$29] = [temp$26, temp$27];
+        [temp$26, temp$27] = [temp$24, temp$25];
       }
-      [temp$30, temp$31] = [temp$28, temp$29];
+      [temp$28, temp$29] = [temp$26, temp$27];
     }
-    [temp$32, temp$33] = [temp$30, temp$31];
+    [temp$30, temp$31] = [temp$28, temp$29];
   }
-  [x_out_opt, y_out__34] = [temp$32, temp$33];
+  [x_out_opt, y_out__32] = [temp$30, temp$31];
   if (Stdlib.Option.is_some_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])) {
-    temp$35 = $.copy(coin_in_value).sub(
+    temp$33 = $.copy(coin_in_value).sub(
       Stdlib.Coin.value_(
         Stdlib.Option.borrow_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
         $c,
@@ -386,27 +395,27 @@ export function get_intermediate_output_(
       )
     );
   } else {
-    temp$35 = $.copy(coin_in_value);
+    temp$33 = $.copy(coin_in_value);
   }
-  coin_in_value__36 = temp$35;
+  coin_in_value__34 = temp$33;
   emit_swap_step_event_(
     $.copy(dex_type),
     $.copy(pool_type),
-    $.copy(coin_in_value__36),
-    Stdlib.Coin.value_(y_out__34, $c, [$p[1]]),
+    $.copy(coin_in_value__34),
+    Stdlib.Coin.value_(y_out__32, $c, [$p[1]]),
     $c,
     [$p[0], $p[1]]
   );
-  return [x_out_opt, y_out__34];
+  return [x_out_opt, y_out__32];
 }
 
-export function initialize_(admin: HexString, $c: AptosDataCache): void {
+export function init_module_(admin: HexString, $c: AptosDataCache): void {
   let admin_addr;
   admin_addr = Stdlib.Signer.address_of_(admin, $c);
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a').hex()
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
@@ -422,22 +431,9 @@ export function initialize_(admin: HexString, $c: AptosDataCache): void {
   return;
 }
 
-export function buildPayload_initialize(
-  isJSON = false
-): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-  const typeParamStrings = [] as string[];
-  return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-    'aggregator',
-    'initialize',
-    typeParamStrings,
-    [],
-    isJSON
-  );
-}
 export function one_step_direct_(
   dex_type: U8,
-  pool_type: U8,
+  pool_type: U64,
   is_x_to_y: boolean,
   x_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
@@ -449,7 +445,7 @@ export function one_step_direct_(
 export function one_step_route_(
   sender: HexString,
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   x_in: U64,
   y_min_out: U64,
@@ -476,7 +472,7 @@ export function one_step_route_(
 
 export function buildPayload_one_step_route(
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   x_in: U64,
   y_min_out: U64,
@@ -485,7 +481,7 @@ export function buildPayload_one_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'aggregator',
     'one_step_route',
     typeParamStrings,
@@ -496,13 +492,13 @@ export function buildPayload_one_step_route(
 
 export function three_step_direct_(
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   second_dex_type: U8,
-  second_pool_type: U8,
+  second_pool_type: U64,
   second_is_x_to_y: boolean,
   third_dex_type: U8,
-  third_pool_type: U8,
+  third_pool_type: U64,
   third_is_x_to_y: boolean,
   x_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
@@ -539,13 +535,13 @@ export function three_step_direct_(
 export function three_step_route_(
   sender: HexString,
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   second_dex_type: U8,
-  second_pool_type: U8,
+  second_pool_type: U64,
   second_is_x_to_y: boolean,
   third_dex_type: U8,
-  third_pool_type: U8,
+  third_pool_type: U64,
   third_is_x_to_y: boolean,
   x_in: U64,
   m_min_out: U64,
@@ -580,13 +576,13 @@ export function three_step_route_(
 
 export function buildPayload_three_step_route(
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   second_dex_type: U8,
-  second_pool_type: U8,
+  second_pool_type: U64,
   second_is_x_to_y: boolean,
   third_dex_type: U8,
-  third_pool_type: U8,
+  third_pool_type: U64,
   third_is_x_to_y: boolean,
   x_in: U64,
   m_min_out: U64,
@@ -595,7 +591,7 @@ export function buildPayload_three_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'aggregator',
     'three_step_route',
     typeParamStrings,
@@ -618,10 +614,10 @@ export function buildPayload_three_step_route(
 
 export function two_step_direct_(
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   second_dex_type: U8,
-  second_pool_type: U8,
+  second_pool_type: U64,
   second_is_x_to_y: boolean,
   x_in: Stdlib.Coin.Coin,
   $c: AptosDataCache,
@@ -650,10 +646,10 @@ export function two_step_direct_(
 export function two_step_route_(
   sender: HexString,
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   second_dex_type: U8,
-  second_pool_type: U8,
+  second_pool_type: U64,
   second_is_x_to_y: boolean,
   x_in: U64,
   z_min_out: U64,
@@ -684,10 +680,10 @@ export function two_step_route_(
 
 export function buildPayload_two_step_route(
   first_dex_type: U8,
-  first_pool_type: U8,
+  first_pool_type: U64,
   first_is_x_to_y: boolean,
   second_dex_type: U8,
-  second_pool_type: U8,
+  second_pool_type: U64,
   second_is_x_to_y: boolean,
   x_in: U64,
   z_min_out: U64,
@@ -696,7 +692,7 @@ export function buildPayload_two_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'aggregator',
     'two_step_route',
     typeParamStrings,
@@ -716,11 +712,11 @@ export function buildPayload_two_step_route(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregator::EventStore',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::aggregator::EventStore',
     EventStore.EventStoreParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::aggregator::SwapStepEvent',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::aggregator::SwapStepEvent',
     SwapStepEvent.SwapStepEventParser
   );
 }
@@ -749,18 +745,9 @@ export class App {
   get SwapStepEvent() {
     return SwapStepEvent;
   }
-  payload_initialize(
-    isJSON = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_initialize(isJSON);
-  }
-  async initialize(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
-    const payload = buildPayload_initialize(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
-  }
   payload_one_step_route(
     first_dex_type: U8,
-    first_pool_type: U8,
+    first_pool_type: U64,
     first_is_x_to_y: boolean,
     x_in: U64,
     y_min_out: U64,
@@ -772,7 +759,7 @@ export class App {
   async one_step_route(
     _account: AptosAccount,
     first_dex_type: U8,
-    first_pool_type: U8,
+    first_pool_type: U64,
     first_is_x_to_y: boolean,
     x_in: U64,
     y_min_out: U64,
@@ -793,13 +780,13 @@ export class App {
   }
   payload_three_step_route(
     first_dex_type: U8,
-    first_pool_type: U8,
+    first_pool_type: U64,
     first_is_x_to_y: boolean,
     second_dex_type: U8,
-    second_pool_type: U8,
+    second_pool_type: U64,
     second_is_x_to_y: boolean,
     third_dex_type: U8,
-    third_pool_type: U8,
+    third_pool_type: U64,
     third_is_x_to_y: boolean,
     x_in: U64,
     m_min_out: U64,
@@ -825,13 +812,13 @@ export class App {
   async three_step_route(
     _account: AptosAccount,
     first_dex_type: U8,
-    first_pool_type: U8,
+    first_pool_type: U64,
     first_is_x_to_y: boolean,
     second_dex_type: U8,
-    second_pool_type: U8,
+    second_pool_type: U64,
     second_is_x_to_y: boolean,
     third_dex_type: U8,
-    third_pool_type: U8,
+    third_pool_type: U64,
     third_is_x_to_y: boolean,
     x_in: U64,
     m_min_out: U64,
@@ -858,10 +845,10 @@ export class App {
   }
   payload_two_step_route(
     first_dex_type: U8,
-    first_pool_type: U8,
+    first_pool_type: U64,
     first_is_x_to_y: boolean,
     second_dex_type: U8,
-    second_pool_type: U8,
+    second_pool_type: U64,
     second_is_x_to_y: boolean,
     x_in: U64,
     z_min_out: U64,
@@ -884,10 +871,10 @@ export class App {
   async two_step_route(
     _account: AptosAccount,
     first_dex_type: U8,
-    first_pool_type: U8,
+    first_pool_type: U64,
     first_is_x_to_y: boolean,
     second_dex_type: U8,
-    second_pool_type: U8,
+    second_pool_type: U64,
     second_is_x_to_y: boolean,
     x_in: U64,
     z_min_out: U64,

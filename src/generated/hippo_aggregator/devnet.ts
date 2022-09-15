@@ -11,7 +11,7 @@ import * as Econia from '../econia';
 import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
 export const moduleName = 'devnet';
 
 export const BTC_AMOUNT: U64 = u64('100000000').mul(u64('1000'));
@@ -110,7 +110,7 @@ export function buildPayload_mock_deploy_basiq(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'devnet',
     'mock_deploy_basiq',
     typeParamStrings,
@@ -119,8 +119,11 @@ export function buildPayload_mock_deploy_basiq(
   );
 }
 
-export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void {
-  Econia.Market.register_market_(admin, $c, [
+export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosDataCache): void {
+  let lot_size, tick_size;
+  lot_size = u64('1000');
+  tick_size = u64('1');
+  Econia.Market.register_market_pure_coin_(admin, $.copy(lot_size), $.copy(tick_size), $c, [
     new StructTag(
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
       'devnet_coins',
@@ -131,16 +134,10 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
       'devnet_coins',
       'DevnetUSDC',
-      []
-    ),
-    new StructTag(
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-      'registry',
-      'E0',
       []
     )
   ]);
-  Econia.User.register_market_account_(admin, u64('0'), $c, [
+  Econia.User.register_market_account_(admin, $.copy(market_id), u64('0'), $c, [
     new StructTag(
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
       'devnet_coins',
@@ -151,12 +148,6 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
       'devnet_coins',
       'DevnetUSDC',
-      []
-    ),
-    new StructTag(
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-      'registry',
-      'E0',
       []
     )
   ]);
@@ -176,52 +167,32 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
       []
     )
   ]);
-  Econia.User.deposit_collateral_coinstore_(admin, u64('0'), true, $.copy(BTC_AMOUNT), $c, [
+  Econia.User.deposit_from_coinstore_(admin, $.copy(market_id), u64('0'), $.copy(BTC_AMOUNT), $c, [
     new StructTag(
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
       'devnet_coins',
       'DevnetBTC',
-      []
-    ),
-    new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
-      'devnet_coins',
-      'DevnetUSDC',
-      []
-    ),
-    new StructTag(
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-      'registry',
-      'E0',
       []
     )
   ]);
-  Econia.User.deposit_collateral_coinstore_(admin, u64('0'), false, $.copy(USDC_AMOUNT), $c, [
-    new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
-      'devnet_coins',
-      'DevnetBTC',
-      []
-    ),
+  Econia.User.deposit_from_coinstore_(admin, $.copy(market_id), u64('0'), $.copy(USDC_AMOUNT), $c, [
     new StructTag(
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
       'devnet_coins',
       'DevnetUSDC',
-      []
-    ),
-    new StructTag(
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-      'registry',
-      'E0',
       []
     )
   ]);
   Econia.Market.place_limit_order_user_(
     admin,
     Stdlib.Signer.address_of_(admin, $c),
+    $.copy(market_id),
     true,
-    $.copy(BTC_AMOUNT),
-    u64('10001'),
+    $.copy(BTC_AMOUNT).div($.copy(lot_size)),
+    u64('10001').mul($.copy(lot_size).div($.copy(tick_size))),
+    true,
+    false,
+    false,
     $c,
     [
       new StructTag(
@@ -234,12 +205,6 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
         new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
         'devnet_coins',
         'DevnetUSDC',
-        []
-      ),
-      new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-        'registry',
-        'E0',
         []
       )
     ]
@@ -247,9 +212,13 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
   Econia.Market.place_limit_order_user_(
     admin,
     Stdlib.Signer.address_of_(admin, $c),
+    $.copy(market_id),
     false,
-    $.copy(BTC_AMOUNT),
-    u64('10000'),
+    $.copy(BTC_AMOUNT).div($.copy(lot_size)),
+    u64('10000').mul($.copy(lot_size).div($.copy(tick_size))),
+    true,
+    false,
+    false,
     $c,
     [
       new StructTag(
@@ -262,12 +231,6 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
         new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
         'devnet_coins',
         'DevnetUSDC',
-        []
-      ),
-      new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-        'registry',
-        'E0',
         []
       )
     ]
@@ -276,15 +239,16 @@ export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void 
 }
 
 export function buildPayload_mock_deploy_econia(
+  market_id: U64,
   isJSON = false
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'devnet',
     'mock_deploy_econia',
     typeParamStrings,
-    [],
+    [market_id],
     isJSON
   );
 }
@@ -350,7 +314,7 @@ export function buildPayload_mock_deploy_pontem(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'devnet',
     'mock_deploy_pontem',
     typeParamStrings,
@@ -361,7 +325,7 @@ export function buildPayload_mock_deploy_pontem(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnet::PontemLP',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::devnet::PontemLP',
     PontemLP.PontemLPParser
   );
 }
@@ -390,12 +354,13 @@ export class App {
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mock_deploy_econia(
+    market_id: U64,
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_mock_deploy_econia(isJSON);
+    return buildPayload_mock_deploy_econia(market_id, isJSON);
   }
-  async mock_deploy_econia(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
-    const payload = buildPayload_mock_deploy_econia(_isJSON);
+  async mock_deploy_econia(_account: AptosAccount, market_id: U64, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_mock_deploy_econia(market_id, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mock_deploy_pontem(

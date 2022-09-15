@@ -6,33 +6,39 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
-import * as Capability from './capability';
 import * as Critbit from './critbit';
 import * as Open_table from './open_table';
 import * as Order_id from './order_id';
 import * as Registry from './registry';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
 export const moduleName = 'user';
 
 export const ASK: boolean = true;
 export const BID: boolean = false;
-export const E_BASE_PARCELS_0: U64 = u64('9');
-export const E_CUSTODIAN_OVERRIDE: U64 = u64('6');
-export const E_INVALID_CUSTODIAN_ID: U64 = u64('1');
-export const E_MARKET_ACCOUNT_REGISTERED: U64 = u64('2');
-export const E_NOT_ENOUGH_COLLATERAL: U64 = u64('4');
-export const E_NO_MARKET: U64 = u64('0');
+export const COIN_ASSET_TRANSFER: U64 = u64('0');
+export const E_DEPOSIT_OVERFLOW_ASSET_CEILING: U64 = u64('5');
+export const E_EXISTS_MARKET_ACCOUNT: U64 = u64('2');
+export const E_NOT_COIN_ASSET: U64 = u64('13');
+export const E_NOT_ENOUGH_ASSET_AVAILABLE: U64 = u64('4');
+export const E_NOT_GENERIC_ASSET: U64 = u64('12');
+export const E_NOT_IN_MARKET_PAIR: U64 = u64('0');
 export const E_NO_MARKET_ACCOUNT: U64 = u64('3');
 export const E_NO_MARKET_ACCOUNTS: U64 = u64('7');
-export const E_OVERFLOW_BASE: U64 = u64('10');
-export const E_OVERFLOW_QUOTE: U64 = u64('11');
-export const E_PRICE_0: U64 = u64('8');
-export const E_UNAUTHORIZED_CUSTODIAN: U64 = u64('5');
+export const E_NO_ORDERS: U64 = u64('15');
+export const E_OVERFLOW_ASSET_IN: U64 = u64('10');
+export const E_OVERFLOW_ASSET_OUT: U64 = u64('11');
+export const E_PRICE_0: U64 = u64('9');
+export const E_SIZE_0: U64 = u64('8');
+export const E_TICKS_OVERFLOW: U64 = u64('6');
+export const E_UNAUTHORIZED_CUSTODIAN: U64 = u64('14');
+export const E_UNREGISTERED_CUSTODIAN_ID: U64 = u64('1');
+export const FIRST_64: U8 = u8('64');
 export const HI_64: U64 = u64('18446744073709551615');
 export const IN: boolean = true;
 export const NO_CUSTODIAN: U64 = u64('0');
 export const OUT: boolean = false;
+export const PURE_COIN_PAIR: U64 = u64('0');
 
 export class Collateral {
   static moduleAddress = moduleAddress;
@@ -44,18 +50,10 @@ export class Collateral {
     {
       name: 'map',
       typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
         'open_table',
         'OpenTable',
-        [
-          new StructTag(
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-            'user',
-            'MarketAccountInfo',
-            []
-          ),
-          new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(0)])
-        ]
+        [AtomicTypeTag.U128, new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(0)])]
       )
     }
   ];
@@ -96,11 +94,13 @@ export class MarketAccount {
   static structName: string = 'MarketAccount';
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
-    { name: 'scale_factor', typeTag: AtomicTypeTag.U64 },
+    { name: 'base_type_info', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
+    { name: 'quote_type_info', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
+    { name: 'generic_asset_transfer_custodian_id', typeTag: AtomicTypeTag.U64 },
     {
       name: 'asks',
       typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
         'critbit',
         'CritBitTree',
         [AtomicTypeTag.U64]
@@ -109,34 +109,44 @@ export class MarketAccount {
     {
       name: 'bids',
       typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
         'critbit',
         'CritBitTree',
         [AtomicTypeTag.U64]
       )
     },
-    { name: 'base_coins_total', typeTag: AtomicTypeTag.U64 },
-    { name: 'base_coins_available', typeTag: AtomicTypeTag.U64 },
-    { name: 'quote_coins_total', typeTag: AtomicTypeTag.U64 },
-    { name: 'quote_coins_available', typeTag: AtomicTypeTag.U64 }
+    { name: 'base_total', typeTag: AtomicTypeTag.U64 },
+    { name: 'base_available', typeTag: AtomicTypeTag.U64 },
+    { name: 'base_ceiling', typeTag: AtomicTypeTag.U64 },
+    { name: 'quote_total', typeTag: AtomicTypeTag.U64 },
+    { name: 'quote_available', typeTag: AtomicTypeTag.U64 },
+    { name: 'quote_ceiling', typeTag: AtomicTypeTag.U64 }
   ];
 
-  scale_factor: U64;
+  base_type_info: Stdlib.Type_info.TypeInfo;
+  quote_type_info: Stdlib.Type_info.TypeInfo;
+  generic_asset_transfer_custodian_id: U64;
   asks: Critbit.CritBitTree;
   bids: Critbit.CritBitTree;
-  base_coins_total: U64;
-  base_coins_available: U64;
-  quote_coins_total: U64;
-  quote_coins_available: U64;
+  base_total: U64;
+  base_available: U64;
+  base_ceiling: U64;
+  quote_total: U64;
+  quote_available: U64;
+  quote_ceiling: U64;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.scale_factor = proto['scale_factor'] as U64;
+    this.base_type_info = proto['base_type_info'] as Stdlib.Type_info.TypeInfo;
+    this.quote_type_info = proto['quote_type_info'] as Stdlib.Type_info.TypeInfo;
+    this.generic_asset_transfer_custodian_id = proto['generic_asset_transfer_custodian_id'] as U64;
     this.asks = proto['asks'] as Critbit.CritBitTree;
     this.bids = proto['bids'] as Critbit.CritBitTree;
-    this.base_coins_total = proto['base_coins_total'] as U64;
-    this.base_coins_available = proto['base_coins_available'] as U64;
-    this.quote_coins_total = proto['quote_coins_total'] as U64;
-    this.quote_coins_available = proto['quote_coins_available'] as U64;
+    this.base_total = proto['base_total'] as U64;
+    this.base_available = proto['base_available'] as U64;
+    this.base_ceiling = proto['base_ceiling'] as U64;
+    this.quote_total = proto['quote_total'] as U64;
+    this.quote_available = proto['quote_available'] as U64;
+    this.quote_ceiling = proto['quote_ceiling'] as U64;
   }
 
   static MarketAccountParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): MarketAccount {
@@ -148,49 +158,10 @@ export class MarketAccount {
     return new StructTag(moduleAddress, moduleName, 'MarketAccount', []);
   }
   async loadFullState(app: $.AppType) {
+    await this.base_type_info.loadFullState(app);
+    await this.quote_type_info.loadFullState(app);
     await this.asks.loadFullState(app);
     await this.bids.loadFullState(app);
-    this.__app = app;
-  }
-}
-
-export class MarketAccountInfo {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'MarketAccountInfo';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [
-    {
-      name: 'market_info',
-      typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-        'registry',
-        'MarketInfo',
-        []
-      )
-    },
-    { name: 'custodian_id', typeTag: AtomicTypeTag.U64 }
-  ];
-
-  market_info: Registry.MarketInfo;
-  custodian_id: U64;
-
-  constructor(proto: any, public typeTag: TypeTag) {
-    this.market_info = proto['market_info'] as Registry.MarketInfo;
-    this.custodian_id = proto['custodian_id'] as U64;
-  }
-
-  static MarketAccountInfoParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): MarketAccountInfo {
-    const proto = $.parseStructProto(data, typeTag, repo, MarketAccountInfo);
-    return new MarketAccountInfo(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'MarketAccountInfo', []);
-  }
-  async loadFullState(app: $.AppType) {
-    await this.market_info.loadFullState(app);
     this.__app = app;
   }
 }
@@ -205,18 +176,13 @@ export class MarketAccounts {
     {
       name: 'map',
       typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
         'open_table',
         'OpenTable',
         [
+          AtomicTypeTag.U128,
           new StructTag(
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-            'user',
-            'MarketAccountInfo',
-            []
-          ),
-          new StructTag(
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+            new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
             'user',
             'MarketAccount',
             []
@@ -254,216 +220,259 @@ export class MarketAccounts {
     this.__app = app;
   }
 }
-export function add_order_internal_(
-  user: HexString,
-  custodian_id: U64,
-  side: boolean,
-  order_id: U128,
-  base_parcels: U64,
-  price: U64,
-  _econia_capability: Capability.EconiaCapability,
+export function borrow_transfer_fields_mixed_(
+  market_accounts_map_ref_mut: Open_table.OpenTable,
+  market_account_id: U128,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
-): void {
-  let temp$1,
-    temp$2,
-    temp$3,
-    temp$4,
-    temp$5,
-    base_to_fill,
-    coins_available_ref_mut,
-    coins_required,
-    market_account,
-    market_account_info,
-    market_accounts_map,
-    quote_to_fill,
-    tree_ref_mut;
-  if (!$c.exists(new SimpleStructTag(MarketAccounts), $.copy(user))) {
-    throw $.abortCode($.copy(E_NO_MARKET_ACCOUNTS));
-  }
-  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
-  [temp$1, temp$2] = [market_accounts_map, $.copy(market_account_info)];
-  if (
-    !Open_table.contains_(temp$1, temp$2, $c, [
-      new SimpleStructTag(MarketAccountInfo),
-      new SimpleStructTag(MarketAccount)
-    ])
-  ) {
-    throw $.abortCode($.copy(E_NO_MARKET_ACCOUNT));
-  }
-  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
+  $p: TypeTag[] /* <AssetType>*/
+): [U64, U64, U64, U64] {
+  let asset_type_info, market_account_ref_mut;
+  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
     new SimpleStructTag(MarketAccount)
   ]);
-  [base_to_fill, quote_to_fill] = range_check_order_fills_(
-    $.copy(market_account.scale_factor),
-    $.copy(base_parcels),
-    $.copy(price),
-    $c
-  );
-  if (side == $.copy(ASK)) {
-    [temp$3, temp$4, temp$5] = [market_account.asks, market_account.base_coins_available, $.copy(base_to_fill)];
+  asset_type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
+  if ($.deep_eq($.copy(asset_type_info), $.copy(market_account_ref_mut.base_type_info))) {
+    return [
+      market_account_ref_mut.base_total,
+      market_account_ref_mut.base_available,
+      market_account_ref_mut.base_ceiling,
+      market_account_ref_mut.generic_asset_transfer_custodian_id
+    ];
   } else {
-    [temp$3, temp$4, temp$5] = [market_account.bids, market_account.quote_coins_available, $.copy(quote_to_fill)];
+    if ($.deep_eq($.copy(asset_type_info), $.copy(market_account_ref_mut.quote_type_info))) {
+      return [
+        market_account_ref_mut.quote_total,
+        market_account_ref_mut.quote_available,
+        market_account_ref_mut.quote_ceiling,
+        market_account_ref_mut.generic_asset_transfer_custodian_id
+      ];
+    } else {
+    }
   }
-  [tree_ref_mut, coins_available_ref_mut, coins_required] = [temp$3, temp$4, temp$5];
-  if (!$.copy(coins_required).le($.copy(coins_available_ref_mut))) {
-    throw $.abortCode($.copy(E_NOT_ENOUGH_COLLATERAL));
-  }
-  $.set(coins_available_ref_mut, $.copy(coins_available_ref_mut).sub($.copy(coins_required)));
-  Critbit.insert_(tree_ref_mut, $.copy(order_id), $.copy(base_parcels), $c, [AtomicTypeTag.U64]);
-  return;
+  throw $.abortCode($.copy(E_NOT_IN_MARKET_PAIR));
 }
 
-export function borrow_coin_counts_mut_(
-  market_accounts_map: Open_table.OpenTable,
-  market_account_info: MarketAccountInfo,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): [U64, U64] {
-  let temp$1, temp$2, is_base_coin, market_account;
-  is_base_coin = Registry.coin_is_base_coin_(market_account_info.market_info, $c, [$p[0]]);
-  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
-    new SimpleStructTag(MarketAccount)
-  ]);
-  if (is_base_coin) {
-    [temp$1, temp$2] = [market_account.base_coins_total, market_account.base_coins_available];
-  } else {
-    [temp$1, temp$2] = [market_account.quote_coins_total, market_account.quote_coins_available];
-  }
-  return [temp$1, temp$2];
-}
-
-export function deposit_collateral_(
+export function deposit_asset_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
-  coins: Stdlib.Coin.Coin,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): void {
-  let coins_available_ref_mut, coins_total_ref_mut, collateral, collateral_map, market_accounts_map;
-  if (!exists_market_account_($.copy(market_account_info), $.copy(user), $c)) {
-    throw $.abortCode($.copy(E_NO_MARKET_ACCOUNT));
-  }
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
-  [coins_total_ref_mut, coins_available_ref_mut] = borrow_coin_counts_mut_(
-    market_accounts_map,
-    $.copy(market_account_info),
-    $c,
-    [$p[0]]
-  );
-  $.set(coins_total_ref_mut, $.copy(coins_total_ref_mut).add(Stdlib.Coin.value_(coins, $c, [$p[0]])));
-  $.set(coins_available_ref_mut, $.copy(coins_available_ref_mut).add(Stdlib.Coin.value_(coins, $c, [$p[0]])));
-  collateral_map = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user)).map;
-  collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
-    new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
-  ]);
-  Stdlib.Coin.merge_(collateral, coins, $c, [$p[0]]);
-  return;
-}
-
-export function deposit_collateral_coinstore_(
-  user: HexString,
-  custodian_id: U64,
-  base: boolean,
+  market_account_id: U128,
   amount: U64,
+  optional_coins: Stdlib.Option.Option,
+  generic_asset_transfer_custodian_id: U64,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
+  $p: TypeTag[] /* <AssetType>*/
 ): void {
-  let market_account_info;
-  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
-  if (base) {
-    deposit_collateral_(
-      Stdlib.Signer.address_of_(user, $c),
-      $.copy(market_account_info),
-      Stdlib.Coin.withdraw_(user, $.copy(amount), $c, [$p[0]]),
+  let asset_available_ref_mut,
+    asset_ceiling_ref_mut,
+    asset_total_ref_mut,
+    collateral_map_ref_mut,
+    collateral_ref_mut,
+    generic_asset_transfer_custodian_id_ref,
+    market_accounts_map_ref_mut;
+  verify_market_account_exists_($.copy(user), $.copy(market_account_id), $c);
+  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(
+    new SimpleStructTag(MarketAccounts),
+    $.copy(user)
+  ).map;
+  [asset_total_ref_mut, asset_available_ref_mut, asset_ceiling_ref_mut, generic_asset_transfer_custodian_id_ref] =
+    borrow_transfer_fields_mixed_(market_accounts_map_ref_mut, $.copy(market_account_id), $c, [$p[0]]);
+  if (
+    !!u128($.copy(asset_ceiling_ref_mut))
+      .add(u128($.copy(amount)))
+      .gt(u128($.copy(HI_64)))
+  ) {
+    throw $.abortCode($.copy(E_DEPOSIT_OVERFLOW_ASSET_CEILING));
+  }
+  $.set(asset_total_ref_mut, $.copy(asset_total_ref_mut).add($.copy(amount)));
+  $.set(asset_available_ref_mut, $.copy(asset_available_ref_mut).add($.copy(amount)));
+  $.set(asset_ceiling_ref_mut, $.copy(asset_ceiling_ref_mut).add($.copy(amount)));
+  if (Stdlib.Option.is_some_(optional_coins, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])) {
+    collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(
+      new SimpleStructTag(Collateral, [$p[0]]),
+      $.copy(user)
+    ).map;
+    collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_id), $c, [
+      AtomicTypeTag.U128,
+      new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
+    ]);
+    Stdlib.Coin.merge_(
+      collateral_ref_mut,
+      Stdlib.Option.destroy_some_(optional_coins, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
       $c,
       [$p[0]]
     );
   } else {
-    deposit_collateral_(
-      Stdlib.Signer.address_of_(user, $c),
-      $.copy(market_account_info),
-      Stdlib.Coin.withdraw_(user, $.copy(amount), $c, [$p[1]]),
-      $c,
-      [$p[1]]
-    );
+    if (!$.copy(generic_asset_transfer_custodian_id).eq($.copy(generic_asset_transfer_custodian_id_ref))) {
+      throw $.abortCode($.copy(E_UNAUTHORIZED_CUSTODIAN));
+    }
+    Stdlib.Option.destroy_none_(optional_coins, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]);
   }
   return;
 }
 
-export function buildPayload_deposit_collateral_coinstore(
-  custodian_id: U64,
-  base: boolean,
+export function deposit_asset_as_option_internal_(
+  user: HexString,
+  market_account_id: U128,
   amount: U64,
-  $p: TypeTag[] /* <B, Q, E>*/,
+  optional_coins: Stdlib.Option.Option,
+  generic_asset_transfer_custodian_id: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <AssetType>*/
+): void {
+  return deposit_asset_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(amount),
+    optional_coins,
+    $.copy(generic_asset_transfer_custodian_id),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function deposit_assets_as_option_internal_(
+  user: HexString,
+  market_account_id: U128,
+  base_amount: U64,
+  quote_amount: U64,
+  optional_base_coins: Stdlib.Option.Option,
+  optional_quote_coins: Stdlib.Option.Option,
+  generic_asset_transfer_custodian_id: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
+): void {
+  deposit_asset_as_option_internal_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(base_amount),
+    optional_base_coins,
+    $.copy(generic_asset_transfer_custodian_id),
+    $c,
+    [$p[0]]
+  );
+  deposit_asset_as_option_internal_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(quote_amount),
+    optional_quote_coins,
+    $.copy(generic_asset_transfer_custodian_id),
+    $c,
+    [$p[1]]
+  );
+  return;
+}
+
+export function deposit_coins_(
+  user: HexString,
+  market_id: U64,
+  general_custodian_id: U64,
+  coins: Stdlib.Coin.Coin,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <CoinType>*/
+): void {
+  return deposit_asset_(
+    $.copy(user),
+    get_market_account_id_($.copy(market_id), $.copy(general_custodian_id), $c),
+    Stdlib.Coin.value_(coins, $c, [$p[0]]),
+    Stdlib.Option.some_(coins, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+    $.copy(COIN_ASSET_TRANSFER),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function deposit_from_coinstore_(
+  user: HexString,
+  market_id: U64,
+  general_custodian_id: U64,
+  amount: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <CoinType>*/
+): void {
+  return deposit_coins_(
+    Stdlib.Signer.address_of_(user, $c),
+    $.copy(market_id),
+    $.copy(general_custodian_id),
+    Stdlib.Coin.withdraw_(user, $.copy(amount), $c, [$p[0]]),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function buildPayload_deposit_from_coinstore(
+  market_id: U64,
+  general_custodian_id: U64,
+  amount: U64,
+  $p: TypeTag[] /* <CoinType>*/,
   isJSON = false
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'user',
-    'deposit_collateral_coinstore',
+    'deposit_from_coinstore',
     typeParamStrings,
-    [custodian_id, base, amount],
+    [market_id, general_custodian_id, amount],
     isJSON
   );
 }
 
-export function exists_market_account_(
-  market_account_info: MarketAccountInfo,
+export function deposit_generic_asset_(
   user: HexString,
-  $c: AptosDataCache
-): boolean {
-  let market_accounts_map;
-  if (!$c.exists(new SimpleStructTag(MarketAccounts), $.copy(user))) {
-    return false;
-  } else {
+  market_id: U64,
+  general_custodian_id: U64,
+  amount: U64,
+  generic_asset_transfer_custodian_capability_ref: Registry.CustodianCapability,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <AssetType>*/
+): void {
+  let generic_asset_transfer_custodian_id;
+  if (!!Stdlib.Coin.is_coin_initialized_($c, [$p[0]])) {
+    throw $.abortCode($.copy(E_NOT_GENERIC_ASSET));
   }
-  market_accounts_map = $c.borrow_global<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
-  return Open_table.contains_(market_accounts_map, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
-    new SimpleStructTag(MarketAccount)
-  ]);
+  generic_asset_transfer_custodian_id = Registry.custodian_id_(generic_asset_transfer_custodian_capability_ref, $c);
+  return deposit_asset_(
+    $.copy(user),
+    get_market_account_id_($.copy(market_id), $.copy(general_custodian_id), $c),
+    $.copy(amount),
+    Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+    $.copy(generic_asset_transfer_custodian_id),
+    $c,
+    [$p[0]]
+  );
 }
 
 export function fill_order_internal_(
   user: HexString,
-  custodian_id: U64,
+  market_account_id: U128,
   side: boolean,
   order_id: U128,
   complete_fill: boolean,
-  base_parcels_filled: U64,
-  base_coins_ref_mut: Stdlib.Coin.Coin,
-  quote_coins_ref_mut: Stdlib.Coin.Coin,
+  fill_size: U64,
+  optional_base_coins_ref_mut: Stdlib.Option.Option,
+  optional_quote_coins_ref_mut: Stdlib.Option.Option,
   base_to_route: U64,
   quote_to_route: U64,
-  _econia_capability: Capability.EconiaCapability,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
 ): void {
-  let market_account_info;
-  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
   fill_order_update_market_account_(
     $.copy(user),
-    $.copy(market_account_info),
+    $.copy(market_account_id),
     side,
     $.copy(order_id),
     complete_fill,
-    $.copy(base_parcels_filled),
+    $.copy(fill_size),
     $.copy(base_to_route),
     $.copy(quote_to_route),
     $c
   );
   fill_order_route_collateral_(
     $.copy(user),
-    $.copy(market_account_info),
+    $.copy(market_account_id),
     side,
-    base_coins_ref_mut,
-    quote_coins_ref_mut,
+    optional_base_coins_ref_mut,
+    optional_quote_coins_ref_mut,
     $.copy(base_to_route),
     $.copy(quote_to_route),
     $c,
@@ -474,14 +483,14 @@ export function fill_order_internal_(
 
 export function fill_order_route_collateral_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
+  market_account_id: U128,
   side: boolean,
-  base_coins_ref_mut: Stdlib.Coin.Coin,
-  quote_coins_ref_mut: Stdlib.Coin.Coin,
+  optional_base_coins_ref_mut: Stdlib.Option.Option,
+  optional_quote_coins_ref_mut: Stdlib.Option.Option,
   base_to_route: U64,
   quote_to_route: U64,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q>*/
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
 ): void {
   let temp$1, temp$2, base_direction, quote_direction;
   if (side == $.copy(ASK)) {
@@ -490,30 +499,48 @@ export function fill_order_route_collateral_(
     [temp$1, temp$2] = [$.copy(IN), $.copy(OUT)];
   }
   [base_direction, quote_direction] = [temp$1, temp$2];
-  fill_order_route_collateral_single_(
-    $.copy(user),
-    $.copy(market_account_info),
-    base_coins_ref_mut,
-    $.copy(base_to_route),
-    base_direction,
-    $c,
-    [$p[0]]
-  );
-  fill_order_route_collateral_single_(
-    $.copy(user),
-    $.copy(market_account_info),
-    quote_coins_ref_mut,
-    $.copy(quote_to_route),
-    quote_direction,
-    $c,
-    [$p[1]]
-  );
+  if (
+    Stdlib.Option.is_some_(optional_base_coins_ref_mut, $c, [
+      new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
+    ])
+  ) {
+    fill_order_route_collateral_single_(
+      $.copy(user),
+      $.copy(market_account_id),
+      Stdlib.Option.borrow_mut_(optional_base_coins_ref_mut, $c, [
+        new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
+      ]),
+      $.copy(base_to_route),
+      base_direction,
+      $c,
+      [$p[0]]
+    );
+  } else {
+  }
+  if (
+    Stdlib.Option.is_some_(optional_quote_coins_ref_mut, $c, [
+      new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[1]])
+    ])
+  ) {
+    fill_order_route_collateral_single_(
+      $.copy(user),
+      $.copy(market_account_id),
+      Stdlib.Option.borrow_mut_(optional_quote_coins_ref_mut, $c, [
+        new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[1]])
+      ]),
+      $.copy(quote_to_route),
+      quote_direction,
+      $c,
+      [$p[1]]
+    );
+  } else {
+  }
   return;
 }
 
 export function fill_order_route_collateral_single_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
+  market_account_id: U128,
   external_coins_ref_mut: Stdlib.Coin.Coin,
   amount: U64,
   direction: boolean,
@@ -522,8 +549,8 @@ export function fill_order_route_collateral_single_(
 ): void {
   let collateral_map_ref_mut, collateral_ref_mut;
   collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user)).map;
-  collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
+  collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
     new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
   ]);
   if (direction == $.copy(IN)) {
@@ -546,11 +573,11 @@ export function fill_order_route_collateral_single_(
 
 export function fill_order_update_market_account_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
+  market_account_id: U128,
   side: boolean,
   order_id: U128,
   complete_fill: boolean,
-  base_parcels_filled: U64,
+  fill_size: U64,
   base_to_route: U64,
   quote_to_route: U64,
   $c: AptosDataCache
@@ -561,104 +588,241 @@ export function fill_order_update_market_account_(
     temp$4,
     temp$5,
     temp$6,
-    coins_in,
-    coins_in_available_ref_mut,
-    coins_in_total_ref_mut,
-    coins_out,
-    coins_out_total_ref_mut,
+    temp$7,
+    asset_in,
+    asset_in_available_ref_mut,
+    asset_in_total_ref_mut,
+    asset_out,
+    asset_out_ceiling_ref_mut,
+    asset_out_total_ref_mut,
     market_account_ref_mut,
     market_accounts_map_ref_mut,
-    order_base_parcels_ref_mut,
-    order_tree_ref_mut;
+    order_size_ref_mut,
+    tree_ref_mut;
   market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(
     new SimpleStructTag(MarketAccounts),
     $.copy(user)
   ).map;
-  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
+  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
     new SimpleStructTag(MarketAccount)
   ]);
   if (side == $.copy(ASK)) {
-    [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6] = [
+    [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7] = [
       market_account_ref_mut.asks,
       $.copy(quote_to_route),
-      market_account_ref_mut.quote_coins_total,
-      market_account_ref_mut.quote_coins_available,
+      market_account_ref_mut.quote_total,
+      market_account_ref_mut.quote_available,
       $.copy(base_to_route),
-      market_account_ref_mut.base_coins_total
+      market_account_ref_mut.base_total,
+      market_account_ref_mut.base_ceiling
     ];
   } else {
-    [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6] = [
+    [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7] = [
       market_account_ref_mut.bids,
       $.copy(base_to_route),
-      market_account_ref_mut.base_coins_total,
-      market_account_ref_mut.base_coins_available,
+      market_account_ref_mut.base_total,
+      market_account_ref_mut.base_available,
       $.copy(quote_to_route),
-      market_account_ref_mut.quote_coins_total
+      market_account_ref_mut.quote_total,
+      market_account_ref_mut.quote_ceiling
     ];
   }
   [
-    order_tree_ref_mut,
-    coins_in,
-    coins_in_total_ref_mut,
-    coins_in_available_ref_mut,
-    coins_out,
-    coins_out_total_ref_mut
-  ] = [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6];
+    tree_ref_mut,
+    asset_in,
+    asset_in_total_ref_mut,
+    asset_in_available_ref_mut,
+    asset_out,
+    asset_out_total_ref_mut,
+    asset_out_ceiling_ref_mut
+  ] = [temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7];
   if (complete_fill) {
-    Critbit.pop_(order_tree_ref_mut, $.copy(order_id), $c, [AtomicTypeTag.U64]);
+    Critbit.pop_(tree_ref_mut, $.copy(order_id), $c, [AtomicTypeTag.U64]);
   } else {
-    order_base_parcels_ref_mut = Critbit.borrow_mut_(order_tree_ref_mut, $.copy(order_id), $c, [AtomicTypeTag.U64]);
-    $.set(order_base_parcels_ref_mut, $.copy(order_base_parcels_ref_mut).sub($.copy(base_parcels_filled)));
+    order_size_ref_mut = Critbit.borrow_mut_(tree_ref_mut, $.copy(order_id), $c, [AtomicTypeTag.U64]);
+    $.set(order_size_ref_mut, $.copy(order_size_ref_mut).sub($.copy(fill_size)));
   }
-  $.set(coins_in_total_ref_mut, $.copy(coins_in_total_ref_mut).add($.copy(coins_in)));
-  $.set(coins_in_available_ref_mut, $.copy(coins_in_available_ref_mut).add($.copy(coins_in)));
-  $.set(coins_out_total_ref_mut, $.copy(coins_out_total_ref_mut).sub($.copy(coins_out)));
+  $.set(asset_in_total_ref_mut, $.copy(asset_in_total_ref_mut).add($.copy(asset_in)));
+  $.set(asset_in_available_ref_mut, $.copy(asset_in_available_ref_mut).add($.copy(asset_in)));
+  $.set(asset_out_total_ref_mut, $.copy(asset_out_total_ref_mut).sub($.copy(asset_out)));
+  $.set(asset_out_ceiling_ref_mut, $.copy(asset_out_ceiling_ref_mut).sub($.copy(asset_out)));
   return;
 }
 
-export function market_account_info_(
-  custodian_id: U64,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
-): MarketAccountInfo {
-  return new MarketAccountInfo(
-    { market_info: Registry.market_info_($c, [$p[0], $p[1], $p[2]]), custodian_id: $.copy(custodian_id) },
-    new SimpleStructTag(MarketAccountInfo)
+export function get_asset_counts_(
+  user: HexString,
+  market_account_id: U128,
+  $c: AptosDataCache
+): [U64, U64, U64, U64, U64, U64] {
+  let market_account_ref, market_accounts_map_ref;
+  verify_market_account_exists_($.copy(user), $.copy(market_account_id), $c);
+  market_accounts_map_ref = $c.borrow_global<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
+  market_account_ref = Open_table.borrow_(market_accounts_map_ref, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
+    new SimpleStructTag(MarketAccount)
+  ]);
+  return [
+    $.copy(market_account_ref.base_total),
+    $.copy(market_account_ref.base_available),
+    $.copy(market_account_ref.base_ceiling),
+    $.copy(market_account_ref.quote_total),
+    $.copy(market_account_ref.quote_available),
+    $.copy(market_account_ref.quote_ceiling)
+  ];
+}
+
+export function get_asset_counts_custodian_(
+  user: HexString,
+  market_id: U64,
+  general_custodian_capability_ref: Registry.CustodianCapability,
+  $c: AptosDataCache
+): [U64, U64, U64, U64, U64, U64] {
+  return get_asset_counts_(
+    $.copy(user),
+    get_market_account_id_($.copy(market_id), Registry.custodian_id_(general_custodian_capability_ref, $c), $c),
+    $c
   );
 }
 
-export function range_check_order_fills_(
-  scale_factor: U64,
-  base_parcels: U64,
+export function get_asset_counts_internal_(
+  user: HexString,
+  market_account_id: U128,
+  $c: AptosDataCache
+): [U64, U64, U64, U64, U64, U64] {
+  return get_asset_counts_($.copy(user), $.copy(market_account_id), $c);
+}
+
+export function get_asset_counts_user_(
+  user: HexString,
+  market_id: U64,
+  $c: AptosDataCache
+): [U64, U64, U64, U64, U64, U64] {
+  return get_asset_counts_(
+    Stdlib.Signer.address_of_(user, $c),
+    get_market_account_id_($.copy(market_id), $.copy(NO_CUSTODIAN), $c),
+    $c
+  );
+}
+
+export function get_general_custodian_id_(market_account_id: U128, $c: AptosDataCache): U64 {
+  return u64($.copy(market_account_id).and(u128($.copy(HI_64))));
+}
+
+export function get_market_account_id_(market_id: U64, general_custodian_id: U64, $c: AptosDataCache): U128 {
+  return u128($.copy(market_id))
+    .shl($.copy(FIRST_64))
+    .or(u128($.copy(general_custodian_id)));
+}
+
+export function get_market_id_(market_account_id: U128, $c: AptosDataCache): U64 {
+  return u64($.copy(market_account_id).shr($.copy(FIRST_64)));
+}
+
+export function get_n_orders_internal_(
+  user: HexString,
+  market_account_id: U128,
+  side: boolean,
+  $c: AptosDataCache
+): U64 {
+  let temp$1, market_account_ref, market_accounts_map_ref, tree_ref;
+  verify_market_account_exists_($.copy(user), $.copy(market_account_id), $c);
+  market_accounts_map_ref = $c.borrow_global<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
+  market_account_ref = Open_table.borrow_(market_accounts_map_ref, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
+    new SimpleStructTag(MarketAccount)
+  ]);
+  if (side == $.copy(ASK)) {
+    temp$1 = market_account_ref.asks;
+  } else {
+    temp$1 = market_account_ref.bids;
+  }
+  tree_ref = temp$1;
+  return Critbit.length_(tree_ref, $c, [AtomicTypeTag.U64]);
+}
+
+export function get_order_id_nearest_spread_internal_(
+  user: HexString,
+  market_account_id: U128,
+  side: boolean,
+  $c: AptosDataCache
+): U128 {
+  let temp$1, temp$2, market_account_ref, market_accounts_map_ref, tree_ref;
+  verify_market_account_exists_($.copy(user), $.copy(market_account_id), $c);
+  market_accounts_map_ref = $c.borrow_global<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
+  market_account_ref = Open_table.borrow_(market_accounts_map_ref, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
+    new SimpleStructTag(MarketAccount)
+  ]);
+  if (side == $.copy(ASK)) {
+    temp$1 = market_account_ref.asks;
+  } else {
+    temp$1 = market_account_ref.bids;
+  }
+  tree_ref = temp$1;
+  if (!!Critbit.is_empty_(tree_ref, $c, [AtomicTypeTag.U64])) {
+    throw $.abortCode($.copy(E_NO_ORDERS));
+  }
+  if (side == $.copy(ASK)) {
+    temp$2 = Critbit.min_key_(tree_ref, $c, [AtomicTypeTag.U64]);
+  } else {
+    temp$2 = Critbit.max_key_(tree_ref, $c, [AtomicTypeTag.U64]);
+  }
+  return temp$2;
+}
+
+export function range_check_new_order_(
+  side: boolean,
+  size: U64,
   price: U64,
+  lot_size: U64,
+  tick_size: U64,
+  in_asset_ceiling: U64,
+  out_asset_available: U64,
   $c: AptosDataCache
 ): [U64, U64] {
-  let base_to_fill, quote_to_fill;
+  let temp$1, temp$2, base_fill, in_asset_fill, out_asset_fill, quote_fill, ticks;
+  if (!$.copy(size).gt(u64('0'))) {
+    throw $.abortCode($.copy(E_SIZE_0));
+  }
   if (!$.copy(price).gt(u64('0'))) {
     throw $.abortCode($.copy(E_PRICE_0));
   }
-  if (!$.copy(base_parcels).gt(u64('0'))) {
-    throw $.abortCode($.copy(E_BASE_PARCELS_0));
+  base_fill = u128($.copy(size)).mul(u128($.copy(lot_size)));
+  ticks = u128($.copy(size)).mul(u128($.copy(price)));
+  if (!!$.copy(ticks).gt(u128($.copy(HI_64)))) {
+    throw $.abortCode($.copy(E_TICKS_OVERFLOW));
   }
-  base_to_fill = u128($.copy(scale_factor)).mul(u128($.copy(base_parcels)));
-  if (!!$.copy(base_to_fill).gt(u128($.copy(HI_64)))) {
-    throw $.abortCode($.copy(E_OVERFLOW_BASE));
+  quote_fill = $.copy(ticks).mul(u128($.copy(tick_size)));
+  if (side == $.copy(ASK)) {
+    [temp$1, temp$2] = [$.copy(quote_fill), $.copy(base_fill)];
+  } else {
+    [temp$1, temp$2] = [$.copy(base_fill), $.copy(quote_fill)];
   }
-  quote_to_fill = u128($.copy(price)).mul(u128($.copy(base_parcels)));
-  if (!!$.copy(quote_to_fill).gt(u128($.copy(HI_64)))) {
-    throw $.abortCode($.copy(E_OVERFLOW_QUOTE));
+  [in_asset_fill, out_asset_fill] = [temp$1, temp$2];
+  if (
+    !!$.copy(in_asset_fill)
+      .add(u128($.copy(in_asset_ceiling)))
+      .gt(u128($.copy(HI_64)))
+  ) {
+    throw $.abortCode($.copy(E_OVERFLOW_ASSET_IN));
   }
-  return [u64($.copy(base_to_fill)), u64($.copy(quote_to_fill))];
+  if (!!$.copy(out_asset_fill).gt(u128($.copy(HI_64)))) {
+    throw $.abortCode($.copy(E_OVERFLOW_ASSET_OUT));
+  }
+  if (!!$.copy(out_asset_fill).gt(u128($.copy(out_asset_available)))) {
+    throw $.abortCode($.copy(E_NOT_ENOUGH_ASSET_AVAILABLE));
+  }
+  return [u64($.copy(in_asset_fill)), u64($.copy(out_asset_fill))];
 }
 
 export function register_collateral_entry_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
+  market_account_id: U128,
   $c: AptosDataCache,
   $p: TypeTag[] /* <CoinType>*/
 ): void {
-  let temp$1, temp$2, map, user_address;
+  let temp$1, temp$2, collateral_map_ref_mut, user_address;
   user_address = Stdlib.Signer.address_of_(user, $c);
   if (!$c.exists(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user_address))) {
     $c.move_to(
@@ -666,28 +830,28 @@ export function register_collateral_entry_(
       user,
       new Collateral(
         {
-          map: Open_table.empty_($c, [
-            new SimpleStructTag(MarketAccountInfo),
-            new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
-          ])
+          map: Open_table.empty_($c, [AtomicTypeTag.U128, new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])
         },
         new SimpleStructTag(Collateral, [$p[0]])
       )
     );
   } else {
   }
-  map = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user_address)).map;
-  [temp$1, temp$2] = [map, $.copy(market_account_info)];
+  collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(
+    new SimpleStructTag(Collateral, [$p[0]]),
+    $.copy(user_address)
+  ).map;
+  [temp$1, temp$2] = [collateral_map_ref_mut, $.copy(market_account_id)];
   if (
     !!Open_table.contains_(temp$1, temp$2, $c, [
-      new SimpleStructTag(MarketAccountInfo),
+      AtomicTypeTag.U128,
       new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
     ])
   ) {
-    throw $.abortCode($.copy(E_MARKET_ACCOUNT_REGISTERED));
+    throw $.abortCode($.copy(E_EXISTS_MARKET_ACCOUNT));
   }
-  Open_table.add_(map, $.copy(market_account_info), Stdlib.Coin.zero_($c, [$p[0]]), $c, [
-    new SimpleStructTag(MarketAccountInfo),
+  Open_table.add_(collateral_map_ref_mut, $.copy(market_account_id), Stdlib.Coin.zero_($c, [$p[0]]), $c, [
+    AtomicTypeTag.U128,
     new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
   ]);
   return;
@@ -695,279 +859,492 @@ export function register_collateral_entry_(
 
 export function register_market_account_(
   user: HexString,
-  custodian_id: U64,
+  market_id: U64,
+  general_custodian_id: U64,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
 ): void {
-  let market_account_info, market_info;
-  market_info = Registry.market_info_($c, [$p[0], $p[1], $p[2]]);
-  if (!Registry.is_registered_($.copy(market_info), $c)) {
-    throw $.abortCode($.copy(E_NO_MARKET));
+  let market_account_id;
+  if ($.copy(general_custodian_id).neq($.copy(NO_CUSTODIAN))) {
+    if (!Registry.is_registered_custodian_id_($.copy(general_custodian_id), $c)) {
+      throw $.abortCode($.copy(E_UNREGISTERED_CUSTODIAN_ID));
+    }
+  } else {
   }
-  if (!Registry.is_valid_custodian_id_($.copy(custodian_id), $c)) {
-    throw $.abortCode($.copy(E_INVALID_CUSTODIAN_ID));
+  market_account_id = get_market_account_id_($.copy(market_id), $.copy(general_custodian_id), $c);
+  register_market_accounts_entry_(user, $.copy(market_account_id), $c, [$p[0], $p[1]]);
+  if (Stdlib.Coin.is_coin_initialized_($c, [$p[0]])) {
+    register_collateral_entry_(user, $.copy(market_account_id), $c, [$p[0]]);
+  } else {
   }
-  market_account_info = new MarketAccountInfo(
-    { market_info: $.copy(market_info), custodian_id: $.copy(custodian_id) },
-    new SimpleStructTag(MarketAccountInfo)
-  );
-  register_market_accounts_entry_(user, $.copy(market_account_info), $c);
-  register_collateral_entry_(user, $.copy(market_account_info), $c, [$p[0]]);
-  register_collateral_entry_(user, $.copy(market_account_info), $c, [$p[1]]);
+  if (Stdlib.Coin.is_coin_initialized_($c, [$p[1]])) {
+    register_collateral_entry_(user, $.copy(market_account_id), $c, [$p[1]]);
+  } else {
+  }
   return;
 }
 
 export function buildPayload_register_market_account(
-  custodian_id: U64,
-  $p: TypeTag[] /* <B, Q, E>*/,
+  market_id: U64,
+  general_custodian_id: U64,
+  $p: TypeTag[] /* <BaseType, QuoteType>*/,
   isJSON = false
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'user',
     'register_market_account',
     typeParamStrings,
-    [custodian_id],
+    [market_id, general_custodian_id],
     isJSON
   );
 }
 
 export function register_market_accounts_entry_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
-  $c: AptosDataCache
+  market_account_id: U128,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
 ): void {
-  let temp$1, temp$2, map, scale_factor, user_address;
+  let temp$1, temp$2, generic_asset_transfer_custodian_id, market_accounts_map_ref_mut, user_address;
+  generic_asset_transfer_custodian_id = Registry.get_verified_market_custodian_id_(
+    get_market_id_($.copy(market_account_id), $c),
+    $c,
+    [$p[0], $p[1]]
+  );
   user_address = Stdlib.Signer.address_of_(user, $c);
   if (!$c.exists(new SimpleStructTag(MarketAccounts), $.copy(user_address))) {
     $c.move_to(
       new SimpleStructTag(MarketAccounts),
       user,
       new MarketAccounts(
-        { map: Open_table.empty_($c, [new SimpleStructTag(MarketAccountInfo), new SimpleStructTag(MarketAccount)]) },
+        { map: Open_table.empty_($c, [AtomicTypeTag.U128, new SimpleStructTag(MarketAccount)]) },
         new SimpleStructTag(MarketAccounts)
       )
     );
   } else {
   }
-  map = $c.borrow_global_mut<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user_address)).map;
-  [temp$1, temp$2] = [map, $.copy(market_account_info)];
-  if (
-    !!Open_table.contains_(temp$1, temp$2, $c, [
-      new SimpleStructTag(MarketAccountInfo),
-      new SimpleStructTag(MarketAccount)
-    ])
-  ) {
-    throw $.abortCode($.copy(E_MARKET_ACCOUNT_REGISTERED));
+  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(
+    new SimpleStructTag(MarketAccounts),
+    $.copy(user_address)
+  ).map;
+  [temp$1, temp$2] = [market_accounts_map_ref_mut, $.copy(market_account_id)];
+  if (!!Open_table.contains_(temp$1, temp$2, $c, [AtomicTypeTag.U128, new SimpleStructTag(MarketAccount)])) {
+    throw $.abortCode($.copy(E_EXISTS_MARKET_ACCOUNT));
   }
-  scale_factor = Registry.scale_factor_from_market_info_(market_account_info.market_info, $c);
   Open_table.add_(
-    map,
-    $.copy(market_account_info),
+    market_accounts_map_ref_mut,
+    $.copy(market_account_id),
     new MarketAccount(
       {
-        scale_factor: $.copy(scale_factor),
+        base_type_info: Stdlib.Type_info.type_of_($c, [$p[0]]),
+        quote_type_info: Stdlib.Type_info.type_of_($c, [$p[1]]),
+        generic_asset_transfer_custodian_id: $.copy(generic_asset_transfer_custodian_id),
         asks: Critbit.empty_($c, [AtomicTypeTag.U64]),
         bids: Critbit.empty_($c, [AtomicTypeTag.U64]),
-        base_coins_total: u64('0'),
-        base_coins_available: u64('0'),
-        quote_coins_total: u64('0'),
-        quote_coins_available: u64('0')
+        base_total: u64('0'),
+        base_available: u64('0'),
+        base_ceiling: u64('0'),
+        quote_total: u64('0'),
+        quote_available: u64('0'),
+        quote_ceiling: u64('0')
       },
       new SimpleStructTag(MarketAccount)
     ),
     $c,
-    [new SimpleStructTag(MarketAccountInfo), new SimpleStructTag(MarketAccount)]
+    [AtomicTypeTag.U128, new SimpleStructTag(MarketAccount)]
   );
+  return;
+}
+
+export function register_order_internal_(
+  user: HexString,
+  market_account_id: U128,
+  side: boolean,
+  order_id: U128,
+  size: U64,
+  price: U64,
+  lot_size: U64,
+  tick_size: U64,
+  $c: AptosDataCache
+): void {
+  let temp$1,
+    temp$2,
+    temp$3,
+    in_asset_ceiling_ref_mut,
+    in_asset_fill,
+    market_account_ref_mut,
+    market_accounts_map_ref_mut,
+    out_asset_available_ref_mut,
+    out_asset_fill,
+    tree_ref_mut;
+  verify_market_account_exists_($.copy(user), $.copy(market_account_id), $c);
+  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(
+    new SimpleStructTag(MarketAccounts),
+    $.copy(user)
+  ).map;
+  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
+    new SimpleStructTag(MarketAccount)
+  ]);
+  if (side == $.copy(ASK)) {
+    [temp$1, temp$2, temp$3] = [
+      market_account_ref_mut.asks,
+      market_account_ref_mut.quote_ceiling,
+      market_account_ref_mut.base_available
+    ];
+  } else {
+    [temp$1, temp$2, temp$3] = [
+      market_account_ref_mut.bids,
+      market_account_ref_mut.base_ceiling,
+      market_account_ref_mut.quote_available
+    ];
+  }
+  [tree_ref_mut, in_asset_ceiling_ref_mut, out_asset_available_ref_mut] = [temp$1, temp$2, temp$3];
+  [in_asset_fill, out_asset_fill] = range_check_new_order_(
+    side,
+    $.copy(size),
+    $.copy(price),
+    $.copy(lot_size),
+    $.copy(tick_size),
+    $.copy(in_asset_ceiling_ref_mut),
+    $.copy(out_asset_available_ref_mut),
+    $c
+  );
+  Critbit.insert_(tree_ref_mut, $.copy(order_id), $.copy(size), $c, [AtomicTypeTag.U64]);
+  $.set(in_asset_ceiling_ref_mut, $.copy(in_asset_ceiling_ref_mut).add($.copy(in_asset_fill)));
+  $.set(out_asset_available_ref_mut, $.copy(out_asset_available_ref_mut).sub($.copy(out_asset_fill)));
   return;
 }
 
 export function remove_order_internal_(
   user: HexString,
-  custodian_id: U64,
+  market_account_id: U128,
+  lot_size: U64,
+  tick_size: U64,
   side: boolean,
   order_id: U128,
-  _econia_capability: Capability.EconiaCapability,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
+  $c: AptosDataCache
 ): void {
   let temp$1,
     temp$2,
     temp$3,
-    base_parcel_multiplier,
-    base_parcels,
-    coins_available_ref_mut,
-    coins_unlocked,
-    market_account,
-    market_account_info,
-    market_accounts_map,
-    tree_ref_mut;
-  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
-  market_account = Open_table.borrow_mut_(market_accounts_map, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
+    temp$4,
+    temp$5,
+    asset_available_ref_mut,
+    asset_ceiling_ref_mut,
+    ceiling_decrement_amount,
+    market_account_ref_mut,
+    market_accounts_map_ref_mut,
+    size,
+    size_multiplier_available,
+    size_multiplier_ceiling,
+    tree_ref_mut,
+    unlocked;
+  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(
+    new SimpleStructTag(MarketAccounts),
+    $.copy(user)
+  ).map;
+  market_account_ref_mut = Open_table.borrow_mut_(market_accounts_map_ref_mut, $.copy(market_account_id), $c, [
+    AtomicTypeTag.U128,
     new SimpleStructTag(MarketAccount)
   ]);
   if (side == $.copy(ASK)) {
-    [temp$1, temp$2, temp$3] = [
-      market_account.asks,
-      market_account.base_coins_available,
-      $.copy(market_account.scale_factor)
+    [temp$1, temp$2, temp$3, temp$4, temp$5] = [
+      market_account_ref_mut.asks,
+      market_account_ref_mut.base_available,
+      market_account_ref_mut.quote_ceiling,
+      $.copy(lot_size),
+      Order_id.price_($.copy(order_id), $c).mul($.copy(tick_size))
     ];
   } else {
-    [temp$1, temp$2, temp$3] = [
-      market_account.bids,
-      market_account.quote_coins_available,
-      Order_id.price_($.copy(order_id), $c)
+    [temp$1, temp$2, temp$3, temp$4, temp$5] = [
+      market_account_ref_mut.bids,
+      market_account_ref_mut.quote_available,
+      market_account_ref_mut.base_ceiling,
+      Order_id.price_($.copy(order_id), $c).mul($.copy(tick_size)),
+      $.copy(lot_size)
     ];
   }
-  [tree_ref_mut, coins_available_ref_mut, base_parcel_multiplier] = [temp$1, temp$2, temp$3];
-  base_parcels = Critbit.pop_(tree_ref_mut, $.copy(order_id), $c, [AtomicTypeTag.U64]);
-  coins_unlocked = $.copy(base_parcels).mul($.copy(base_parcel_multiplier));
-  $.set(coins_available_ref_mut, $.copy(coins_available_ref_mut).add($.copy(coins_unlocked)));
+  [tree_ref_mut, asset_available_ref_mut, asset_ceiling_ref_mut, size_multiplier_available, size_multiplier_ceiling] = [
+    temp$1,
+    temp$2,
+    temp$3,
+    temp$4,
+    temp$5
+  ];
+  size = Critbit.pop_(tree_ref_mut, $.copy(order_id), $c, [AtomicTypeTag.U64]);
+  unlocked = $.copy(size).mul($.copy(size_multiplier_available));
+  $.set(asset_available_ref_mut, $.copy(asset_available_ref_mut).add($.copy(unlocked)));
+  ceiling_decrement_amount = $.copy(size).mul($.copy(size_multiplier_ceiling));
+  $.set(asset_ceiling_ref_mut, $.copy(asset_ceiling_ref_mut).sub($.copy(ceiling_decrement_amount)));
   return;
 }
 
-export function withdraw_collateral_(
+export function verify_market_account_exists_(user: HexString, market_account_id: U128, $c: AptosDataCache): void {
+  let market_accounts_map_ref;
+  if (!$c.exists(new SimpleStructTag(MarketAccounts), $.copy(user))) {
+    throw $.abortCode($.copy(E_NO_MARKET_ACCOUNTS));
+  }
+  market_accounts_map_ref = $c.borrow_global<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
+  if (
+    !Open_table.contains_(market_accounts_map_ref, $.copy(market_account_id), $c, [
+      AtomicTypeTag.U128,
+      new SimpleStructTag(MarketAccount)
+    ])
+  ) {
+    throw $.abortCode($.copy(E_NO_MARKET_ACCOUNT));
+  }
+  return;
+}
+
+export function withdraw_asset_(
   user: HexString,
-  market_account_info: MarketAccountInfo,
+  market_account_id: U128,
+  amount: U64,
+  asset_is_coin: boolean,
+  generic_asset_transfer_custodian_id: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <AssetType>*/
+): Stdlib.Option.Option {
+  let asset_available_ref_mut,
+    asset_ceiling_ref_mut,
+    asset_total_ref_mut,
+    collateral_map_ref_mut,
+    collateral_ref_mut,
+    generic_asset_transfer_custodian_id_ref,
+    market_accounts_map_ref_mut;
+  verify_market_account_exists_($.copy(user), $.copy(market_account_id), $c);
+  market_accounts_map_ref_mut = $c.borrow_global_mut<MarketAccounts>(
+    new SimpleStructTag(MarketAccounts),
+    $.copy(user)
+  ).map;
+  [asset_total_ref_mut, asset_available_ref_mut, asset_ceiling_ref_mut, generic_asset_transfer_custodian_id_ref] =
+    borrow_transfer_fields_mixed_(market_accounts_map_ref_mut, $.copy(market_account_id), $c, [$p[0]]);
+  if (!!$.copy(amount).gt($.copy(asset_available_ref_mut))) {
+    throw $.abortCode($.copy(E_NOT_ENOUGH_ASSET_AVAILABLE));
+  }
+  $.set(asset_total_ref_mut, $.copy(asset_total_ref_mut).sub($.copy(amount)));
+  $.set(asset_available_ref_mut, $.copy(asset_available_ref_mut).sub($.copy(amount)));
+  $.set(asset_ceiling_ref_mut, $.copy(asset_ceiling_ref_mut).sub($.copy(amount)));
+  if (asset_is_coin) {
+    collateral_map_ref_mut = $c.borrow_global_mut<Collateral>(
+      new SimpleStructTag(Collateral, [$p[0]]),
+      $.copy(user)
+    ).map;
+    collateral_ref_mut = Open_table.borrow_mut_(collateral_map_ref_mut, $.copy(market_account_id), $c, [
+      AtomicTypeTag.U128,
+      new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
+    ]);
+    return Stdlib.Option.some_(Stdlib.Coin.extract_(collateral_ref_mut, $.copy(amount), $c, [$p[0]]), $c, [
+      new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
+    ]);
+  } else {
+    if (!$.copy(generic_asset_transfer_custodian_id).eq($.copy(generic_asset_transfer_custodian_id_ref))) {
+      throw $.abortCode($.copy(E_UNAUTHORIZED_CUSTODIAN));
+    }
+    return Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]);
+  }
+}
+
+export function withdraw_asset_as_option_internal_(
+  user: HexString,
+  market_account_id: U128,
+  amount: U64,
+  generic_asset_transfer_custodian_id: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <AssetType>*/
+): Stdlib.Option.Option {
+  return withdraw_asset_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(amount),
+    Stdlib.Coin.is_coin_initialized_($c, [$p[0]]),
+    $.copy(generic_asset_transfer_custodian_id),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function withdraw_assets_as_option_internal_(
+  user: HexString,
+  market_account_id: U128,
+  base_amount: U64,
+  quote_amount: U64,
+  generic_asset_transfer_custodian_id: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
+): [Stdlib.Option.Option, Stdlib.Option.Option] {
+  return [
+    withdraw_asset_(
+      $.copy(user),
+      $.copy(market_account_id),
+      $.copy(base_amount),
+      Stdlib.Coin.is_coin_initialized_($c, [$p[0]]),
+      $.copy(generic_asset_transfer_custodian_id),
+      $c,
+      [$p[0]]
+    ),
+    withdraw_asset_(
+      $.copy(user),
+      $.copy(market_account_id),
+      $.copy(quote_amount),
+      Stdlib.Coin.is_coin_initialized_($c, [$p[1]]),
+      $.copy(generic_asset_transfer_custodian_id),
+      $c,
+      [$p[1]]
+    )
+  ];
+}
+
+export function withdraw_coins_(
+  user: HexString,
+  market_id: U64,
+  general_custodian_id: U64,
   amount: U64,
   $c: AptosDataCache,
   $p: TypeTag[] /* <CoinType>*/
 ): Stdlib.Coin.Coin {
-  let coins_available_ref_mut, coins_total_ref_mut, collateral, collateral_map, market_accounts_map;
-  if (!exists_market_account_($.copy(market_account_info), $.copy(user), $c)) {
-    throw $.abortCode($.copy(E_NO_MARKET_ACCOUNT));
+  let market_account_id, option_coins;
+  if (!Stdlib.Coin.is_coin_initialized_($c, [$p[0]])) {
+    throw $.abortCode($.copy(E_NOT_COIN_ASSET));
   }
-  market_accounts_map = $c.borrow_global_mut<MarketAccounts>(new SimpleStructTag(MarketAccounts), $.copy(user)).map;
-  [coins_total_ref_mut, coins_available_ref_mut] = borrow_coin_counts_mut_(
-    market_accounts_map,
-    $.copy(market_account_info),
+  market_account_id = get_market_account_id_($.copy(market_id), $.copy(general_custodian_id), $c);
+  option_coins = withdraw_asset_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(amount),
+    true,
+    $.copy(COIN_ASSET_TRANSFER),
     $c,
     [$p[0]]
   );
-  if (!$.copy(amount).le($.copy(coins_available_ref_mut))) {
-    throw $.abortCode($.copy(E_NOT_ENOUGH_COLLATERAL));
-  }
-  $.set(coins_total_ref_mut, $.copy(coins_total_ref_mut).sub($.copy(amount)));
-  $.set(coins_available_ref_mut, $.copy(coins_available_ref_mut).sub($.copy(amount)));
-  collateral_map = $c.borrow_global_mut<Collateral>(new SimpleStructTag(Collateral, [$p[0]]), $.copy(user)).map;
-  collateral = Open_table.borrow_mut_(collateral_map, $.copy(market_account_info), $c, [
-    new SimpleStructTag(MarketAccountInfo),
-    new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])
-  ]);
-  return Stdlib.Coin.extract_(collateral, $.copy(amount), $c, [$p[0]]);
+  return Stdlib.Option.destroy_some_(option_coins, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]);
 }
 
-export function withdraw_collateral_coinstore_(
+export function withdraw_coins_as_option_internal_(
   user: HexString,
-  custodian_id: U64,
-  base: boolean,
+  market_account_id: U128,
   amount: U64,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
+  $p: TypeTag[] /* <CoinType>*/
+): Stdlib.Option.Option {
+  return withdraw_asset_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(amount),
+    true,
+    $.copy(COIN_ASSET_TRANSFER),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function withdraw_coins_custodian_(
+  user: HexString,
+  market_id: U64,
+  amount: U64,
+  general_custodian_capability_ref: Registry.CustodianCapability,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <CoinType>*/
+): Stdlib.Coin.Coin {
+  return withdraw_coins_(
+    $.copy(user),
+    $.copy(market_id),
+    Registry.custodian_id_(general_custodian_capability_ref, $c),
+    $.copy(amount),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function withdraw_coins_user_(
+  user: HexString,
+  market_id: U64,
+  amount: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <CoinType>*/
+): Stdlib.Coin.Coin {
+  return withdraw_coins_(
+    Stdlib.Signer.address_of_(user, $c),
+    $.copy(market_id),
+    $.copy(NO_CUSTODIAN),
+    $.copy(amount),
+    $c,
+    [$p[0]]
+  );
+}
+
+export function withdraw_generic_asset_(
+  user: HexString,
+  market_id: U64,
+  general_custodian_id: U64,
+  amount: U64,
+  generic_asset_transfer_custodian_capability_ref: Registry.CustodianCapability,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <AssetType>*/
 ): void {
-  let market_account_info;
-  if (!$.copy(custodian_id).eq($.copy(NO_CUSTODIAN))) {
-    throw $.abortCode($.copy(E_CUSTODIAN_OVERRIDE));
+  let empty_option, generic_asset_transfer_custodian_id, market_account_id;
+  if (!!Stdlib.Coin.is_coin_initialized_($c, [$p[0]])) {
+    throw $.abortCode($.copy(E_NOT_GENERIC_ASSET));
   }
-  market_account_info = market_account_info_($.copy(custodian_id), $c, [$p[0], $p[1], $p[2]]);
-  if (base) {
-    Stdlib.Coin.deposit_(
-      Stdlib.Signer.address_of_(user, $c),
-      withdraw_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [
-        $p[0]
-      ]),
-      $c,
-      [$p[0]]
-    );
-  } else {
-    Stdlib.Coin.deposit_(
-      Stdlib.Signer.address_of_(user, $c),
-      withdraw_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [
-        $p[1]
-      ]),
-      $c,
-      [$p[1]]
-    );
-  }
+  generic_asset_transfer_custodian_id = Registry.custodian_id_(generic_asset_transfer_custodian_capability_ref, $c);
+  market_account_id = get_market_account_id_($.copy(market_id), $.copy(general_custodian_id), $c);
+  empty_option = withdraw_asset_(
+    $.copy(user),
+    $.copy(market_account_id),
+    $.copy(amount),
+    false,
+    $.copy(generic_asset_transfer_custodian_id),
+    $c,
+    [$p[0]]
+  );
+  Stdlib.Option.destroy_none_(empty_option, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]);
   return;
 }
 
-export function buildPayload_withdraw_collateral_coinstore(
-  custodian_id: U64,
-  base: boolean,
+export function withdraw_to_coinstore_(
+  user: HexString,
+  market_id: U64,
   amount: U64,
-  $p: TypeTag[] /* <B, Q, E>*/,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <CoinType>*/
+): void {
+  let coins;
+  coins = withdraw_coins_user_(user, $.copy(market_id), $.copy(amount), $c, [$p[0]]);
+  Stdlib.Coin.deposit_(Stdlib.Signer.address_of_(user, $c), coins, $c, [$p[0]]);
+  return;
+}
+
+export function buildPayload_withdraw_to_coinstore(
+  market_id: U64,
+  amount: U64,
+  $p: TypeTag[] /* <CoinType>*/,
   isJSON = false
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
     'user',
-    'withdraw_collateral_coinstore',
+    'withdraw_to_coinstore',
     typeParamStrings,
-    [custodian_id, base, amount],
+    [market_id, amount],
     isJSON
   );
 }
 
-export function withdraw_collateral_custodian_(
-  user: HexString,
-  market_account_info: MarketAccountInfo,
-  amount: U64,
-  custodian_capability_ref: Registry.CustodianCapability,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): Stdlib.Coin.Coin {
-  if (!Registry.custodian_id_(custodian_capability_ref, $c).eq($.copy(market_account_info.custodian_id))) {
-    throw $.abortCode($.copy(E_UNAUTHORIZED_CUSTODIAN));
-  }
-  return withdraw_collateral_($.copy(user), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]);
-}
-
-export function withdraw_collateral_internal_(
-  user: HexString,
-  market_account_info: MarketAccountInfo,
-  amount: U64,
-  _econia_capability: Capability.EconiaCapability,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): Stdlib.Coin.Coin {
-  return withdraw_collateral_($.copy(user), $.copy(market_account_info), $.copy(amount), $c, [$p[0]]);
-}
-
-export function withdraw_collateral_user_(
-  user: HexString,
-  market_account_info: MarketAccountInfo,
-  amount: U64,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): Stdlib.Coin.Coin {
-  if (!$.copy(market_account_info.custodian_id).eq($.copy(NO_CUSTODIAN))) {
-    throw $.abortCode($.copy(E_CUSTODIAN_OVERRIDE));
-  }
-  return withdraw_collateral_(Stdlib.Signer.address_of_(user, $c), $.copy(market_account_info), $.copy(amount), $c, [
-    $p[0]
-  ]);
-}
-
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::user::Collateral',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::user::Collateral',
     Collateral.CollateralParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::user::MarketAccount',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::user::MarketAccount',
     MarketAccount.MarketAccountParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::user::MarketAccountInfo',
-    MarketAccountInfo.MarketAccountInfoParser
-  );
-  repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::user::MarketAccounts',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::user::MarketAccounts',
     MarketAccounts.MarketAccountsParser
   );
 }
@@ -996,9 +1373,6 @@ export class App {
   get MarketAccount() {
     return MarketAccount;
   }
-  get MarketAccountInfo() {
-    return MarketAccountInfo;
-  }
   get MarketAccounts() {
     return MarketAccounts;
   }
@@ -1009,63 +1383,63 @@ export class App {
     }
     return val;
   }
-  payload_deposit_collateral_coinstore(
-    custodian_id: U64,
-    base: boolean,
+  payload_deposit_from_coinstore(
+    market_id: U64,
+    general_custodian_id: U64,
     amount: U64,
-    $p: TypeTag[] /* <B, Q, E>*/,
+    $p: TypeTag[] /* <CoinType>*/,
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p, isJSON);
+    return buildPayload_deposit_from_coinstore(market_id, general_custodian_id, amount, $p, isJSON);
   }
-  async deposit_collateral_coinstore(
+  async deposit_from_coinstore(
     _account: AptosAccount,
-    custodian_id: U64,
-    base: boolean,
+    market_id: U64,
+    general_custodian_id: U64,
     amount: U64,
-    $p: TypeTag[] /* <B, Q, E>*/,
+    $p: TypeTag[] /* <CoinType>*/,
     _maxGas = 1000,
     _isJSON = false
   ) {
-    const payload = buildPayload_deposit_collateral_coinstore(custodian_id, base, amount, $p, _isJSON);
+    const payload = buildPayload_deposit_from_coinstore(market_id, general_custodian_id, amount, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_register_market_account(
-    custodian_id: U64,
-    $p: TypeTag[] /* <B, Q, E>*/,
+    market_id: U64,
+    general_custodian_id: U64,
+    $p: TypeTag[] /* <BaseType, QuoteType>*/,
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_register_market_account(custodian_id, $p, isJSON);
+    return buildPayload_register_market_account(market_id, general_custodian_id, $p, isJSON);
   }
   async register_market_account(
     _account: AptosAccount,
-    custodian_id: U64,
-    $p: TypeTag[] /* <B, Q, E>*/,
+    market_id: U64,
+    general_custodian_id: U64,
+    $p: TypeTag[] /* <BaseType, QuoteType>*/,
     _maxGas = 1000,
     _isJSON = false
   ) {
-    const payload = buildPayload_register_market_account(custodian_id, $p, _isJSON);
+    const payload = buildPayload_register_market_account(market_id, general_custodian_id, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
-  payload_withdraw_collateral_coinstore(
-    custodian_id: U64,
-    base: boolean,
+  payload_withdraw_to_coinstore(
+    market_id: U64,
     amount: U64,
-    $p: TypeTag[] /* <B, Q, E>*/,
+    $p: TypeTag[] /* <CoinType>*/,
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p, isJSON);
+    return buildPayload_withdraw_to_coinstore(market_id, amount, $p, isJSON);
   }
-  async withdraw_collateral_coinstore(
+  async withdraw_to_coinstore(
     _account: AptosAccount,
-    custodian_id: U64,
-    base: boolean,
+    market_id: U64,
     amount: U64,
-    $p: TypeTag[] /* <B, Q, E>*/,
+    $p: TypeTag[] /* <CoinType>*/,
     _maxGas = 1000,
     _isJSON = false
   ) {
-    const payload = buildPayload_withdraw_collateral_coinstore(custodian_id, base, amount, $p, _isJSON);
+    const payload = buildPayload_withdraw_to_coinstore(market_id, amount, $p, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

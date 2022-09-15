@@ -145,7 +145,7 @@ export function calc_swap_output(
   input_price: bigInt.BigInteger,
   output_price: bigInt.BigInteger,
   fee_bips: bigInt.BigInteger,
-  rebate_bips: bigInt.BigInteger,
+  rebate_bips: bigInt.BigInteger
 ): bigInt.BigInteger {
   const fair_input_value = input_amount.multiply(input_price);
   const input_reserve_value = input_reserve.multiply(input_price);

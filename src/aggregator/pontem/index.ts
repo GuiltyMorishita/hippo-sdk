@@ -1,4 +1,4 @@
-import { parseMoveStructTag, SimulationKeys, StructTag, TypeTag, u8 } from '@manahippo/move-to-ts';
+import { parseMoveStructTag, SimulationKeys, StructTag, TypeTag, u64 } from '@manahippo/move-to-ts';
 import { HexString, Types } from 'aptos';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
 import { CoinListClient } from '../../coinList';
@@ -24,7 +24,7 @@ export class PontemTradingPool extends TradingPool {
     return DexType.Pontem;
   }
   get poolType() {
-    return u8(0);
+    return u64(0);
   } // ignored
   get isRoutable() {
     return true;

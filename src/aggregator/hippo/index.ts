@@ -1,4 +1,4 @@
-import { AptosParserRepo, StructTag, u8 } from '@manahippo/move-to-ts';
+import { AptosParserRepo, StructTag, u64 } from '@manahippo/move-to-ts';
 import { Types } from 'aptos';
 import { App } from '../../generated';
 import { TokenPairMetadata } from '../../generated/hippo_swap/cp_swap';
@@ -31,11 +31,11 @@ export class HippoTradingPool extends TradingPool {
   }
   get poolType() {
     if (this.pool instanceof HippoConstantProductPool) {
-      return u8(HippoPoolTypes.ConstantProduct);
+      return u64(HippoPoolTypes.ConstantProduct);
     } else if (this.pool instanceof HippoStableCurvePool) {
-      return u8(HippoPoolTypes.StableCurve);
+      return u64(HippoPoolTypes.StableCurve);
     } else if (this.pool instanceof HippoPieceSwapPool) {
-      return u8(HippoPoolTypes.ThreePiece);
+      return u64(HippoPoolTypes.ThreePiece);
     } else {
       throw new Error('Unreachable');
     }

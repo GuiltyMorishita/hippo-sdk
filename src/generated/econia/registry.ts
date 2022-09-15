@@ -6,42 +6,24 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
-import * as Capability from './capability';
-import * as Open_table from './open_table';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
 export const moduleName = 'registry';
 
+export const E_INVALID_BASE_ASSET: U64 = u64('10');
+export const E_INVALID_CUSTODIAN: U64 = u64('5');
+export const E_INVALID_MARKET_ID: U64 = u64('9');
+export const E_INVALID_QUOTE_ASSET: U64 = u64('11');
+export const E_LOT_SIZE_0: U64 = u64('3');
 export const E_MARKET_EXISTS: U64 = u64('7');
-export const E_MARKET_NOT_REGISTERED: U64 = u64('8');
-export const E_NOT_COIN_BASE: U64 = u64('4');
-export const E_NOT_COIN_QUOTE: U64 = u64('5');
 export const E_NOT_ECONIA: U64 = u64('0');
-export const E_NOT_EXPONENT_TYPE: U64 = u64('3');
-export const E_NOT_IN_MARKET_PAIR: U64 = u64('9');
+export const E_NOT_IN_MARKET_PAIR: U64 = u64('8');
 export const E_NO_REGISTRY: U64 = u64('2');
 export const E_REGISTRY_EXISTS: U64 = u64('1');
-export const E_SAME_COIN_TYPE: U64 = u64('6');
-export const F0: U64 = u64('1');
-export const F1: U64 = u64('10');
-export const F10: U64 = u64('10000000000');
-export const F11: U64 = u64('100000000000');
-export const F12: U64 = u64('1000000000000');
-export const F13: U64 = u64('10000000000000');
-export const F14: U64 = u64('100000000000000');
-export const F15: U64 = u64('1000000000000000');
-export const F16: U64 = u64('10000000000000000');
-export const F17: U64 = u64('100000000000000000');
-export const F18: U64 = u64('1000000000000000000');
-export const F19: U64 = u64('10000000000000000000');
-export const F2: U64 = u64('100');
-export const F3: U64 = u64('1000');
-export const F4: U64 = u64('10000');
-export const F5: U64 = u64('100000');
-export const F6: U64 = u64('1000000');
-export const F7: U64 = u64('10000000');
-export const F8: U64 = u64('100000000');
-export const F9: U64 = u64('1000000000');
+export const E_SAME_COIN: U64 = u64('6');
+export const E_TICK_SIZE_0: U64 = u64('4');
+export const NO_CUSTODIAN: U64 = u64('0');
+export const PURE_COIN_PAIR: U64 = u64('0');
 
 export class CustodianCapability {
   static moduleAddress = moduleAddress;
@@ -70,460 +52,23 @@ export class CustodianCapability {
   }
 }
 
-export class E0 {
+export class GenericAsset {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = 'E0';
+  static structName: string = 'GenericAsset';
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [];
 
   constructor(proto: any, public typeTag: TypeTag) {}
 
-  static E0Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E0 {
-    const proto = $.parseStructProto(data, typeTag, repo, E0);
-    return new E0(proto, typeTag);
+  static GenericAssetParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): GenericAsset {
+    const proto = $.parseStructProto(data, typeTag, repo, GenericAsset);
+    return new GenericAsset(proto, typeTag);
   }
 
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E0', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E1 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E1';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E1Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E1 {
-    const proto = $.parseStructProto(data, typeTag, repo, E1);
-    return new E1(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E1', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E10 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E10';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E10Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E10 {
-    const proto = $.parseStructProto(data, typeTag, repo, E10);
-    return new E10(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E10', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E11 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E11';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E11Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E11 {
-    const proto = $.parseStructProto(data, typeTag, repo, E11);
-    return new E11(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E11', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E12 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E12';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E12Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E12 {
-    const proto = $.parseStructProto(data, typeTag, repo, E12);
-    return new E12(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E12', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E13 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E13';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E13Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E13 {
-    const proto = $.parseStructProto(data, typeTag, repo, E13);
-    return new E13(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E13', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E14 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E14';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E14Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E14 {
-    const proto = $.parseStructProto(data, typeTag, repo, E14);
-    return new E14(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E14', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E15 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E15';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E15Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E15 {
-    const proto = $.parseStructProto(data, typeTag, repo, E15);
-    return new E15(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E15', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E16 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E16';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E16Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E16 {
-    const proto = $.parseStructProto(data, typeTag, repo, E16);
-    return new E16(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E16', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E17 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E17';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E17Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E17 {
-    const proto = $.parseStructProto(data, typeTag, repo, E17);
-    return new E17(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E17', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E18 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E18';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E18Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E18 {
-    const proto = $.parseStructProto(data, typeTag, repo, E18);
-    return new E18(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E18', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E19 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E19';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E19Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E19 {
-    const proto = $.parseStructProto(data, typeTag, repo, E19);
-    return new E19(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E19', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E2 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E2';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E2Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E2 {
-    const proto = $.parseStructProto(data, typeTag, repo, E2);
-    return new E2(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E2', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E3 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E3';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E3Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E3 {
-    const proto = $.parseStructProto(data, typeTag, repo, E3);
-    return new E3(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E3', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E4 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E4';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E4Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E4 {
-    const proto = $.parseStructProto(data, typeTag, repo, E4);
-    return new E4(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E4', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E5 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E5';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E5Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E5 {
-    const proto = $.parseStructProto(data, typeTag, repo, E5);
-    return new E5(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E5', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E6 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E6';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E6Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E6 {
-    const proto = $.parseStructProto(data, typeTag, repo, E6);
-    return new E6(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E6', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E7 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E7';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E7Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E7 {
-    const proto = $.parseStructProto(data, typeTag, repo, E7);
-    return new E7(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E7', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E8 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E8';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E8Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E8 {
-    const proto = $.parseStructProto(data, typeTag, repo, E8);
-    return new E8(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E8', []);
-  }
-  async loadFullState(app: $.AppType) {
-    this.__app = app;
-  }
-}
-
-export class E9 {
-  static moduleAddress = moduleAddress;
-  static moduleName = moduleName;
-  __app: $.AppType | null = null;
-  static structName: string = 'E9';
-  static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [];
-
-  constructor(proto: any, public typeTag: TypeTag) {}
-
-  static E9Parser(data: any, typeTag: TypeTag, repo: AptosParserRepo): E9 {
-    const proto = $.parseStructProto(data, typeTag, repo, E9);
-    return new E9(proto, typeTag);
-  }
-
-  static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'E9', []);
+    return new StructTag(moduleAddress, moduleName, 'GenericAsset', []);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
@@ -537,19 +82,24 @@ export class MarketInfo {
   static structName: string = 'MarketInfo';
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
-    { name: 'base_coin_type', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
-    { name: 'quote_coin_type', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
-    { name: 'scale_exponent_type', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) }
+    { name: 'host', typeTag: AtomicTypeTag.Address },
+    {
+      name: 'trading_pair_info',
+      typeTag: new StructTag(
+        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+        'registry',
+        'TradingPairInfo',
+        []
+      )
+    }
   ];
 
-  base_coin_type: Stdlib.Type_info.TypeInfo;
-  quote_coin_type: Stdlib.Type_info.TypeInfo;
-  scale_exponent_type: Stdlib.Type_info.TypeInfo;
+  host: HexString;
+  trading_pair_info: TradingPairInfo;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.base_coin_type = proto['base_coin_type'] as Stdlib.Type_info.TypeInfo;
-    this.quote_coin_type = proto['quote_coin_type'] as Stdlib.Type_info.TypeInfo;
-    this.scale_exponent_type = proto['scale_exponent_type'] as Stdlib.Type_info.TypeInfo;
+    this.host = proto['host'] as HexString;
+    this.trading_pair_info = proto['trading_pair_info'] as TradingPairInfo;
   }
 
   static MarketInfoParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): MarketInfo {
@@ -561,9 +111,7 @@ export class MarketInfo {
     return new StructTag(moduleAddress, moduleName, 'MarketInfo', []);
   }
   async loadFullState(app: $.AppType) {
-    await this.base_coin_type.loadFullState(app);
-    await this.quote_coin_type.loadFullState(app);
-    await this.scale_exponent_type.loadFullState(app);
+    await this.trading_pair_info.loadFullState(app);
     this.__app = app;
   }
 }
@@ -576,41 +124,38 @@ export class Registry {
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
     {
-      name: 'scales',
-      typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-        'open_table',
-        'OpenTable',
-        [new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []), AtomicTypeTag.U64]
-      )
+      name: 'hosts',
+      typeTag: new StructTag(new HexString('0x1'), 'table', 'Table', [
+        new StructTag(
+          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          'registry',
+          'TradingPairInfo',
+          []
+        ),
+        AtomicTypeTag.Address
+      ])
     },
     {
       name: 'markets',
-      typeTag: new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-        'open_table',
-        'OpenTable',
-        [
-          new StructTag(
-            new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-            'registry',
-            'MarketInfo',
-            []
-          ),
-          AtomicTypeTag.Address
-        ]
+      typeTag: new VectorTag(
+        new StructTag(
+          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          'registry',
+          'MarketInfo',
+          []
+        )
       )
     },
     { name: 'n_custodians', typeTag: AtomicTypeTag.U64 }
   ];
 
-  scales: Open_table.OpenTable;
-  markets: Open_table.OpenTable;
+  hosts: Stdlib.Table.Table;
+  markets: MarketInfo[];
   n_custodians: U64;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.scales = proto['scales'] as Open_table.OpenTable;
-    this.markets = proto['markets'] as Open_table.OpenTable;
+    this.hosts = proto['hosts'] as Stdlib.Table.Table;
+    this.markets = proto['markets'] as MarketInfo[];
     this.n_custodians = proto['n_custodians'] as U64;
   }
 
@@ -632,54 +177,98 @@ export class Registry {
     return new StructTag(moduleAddress, moduleName, 'Registry', []);
   }
   async loadFullState(app: $.AppType) {
-    await this.scales.loadFullState(app);
-    await this.markets.loadFullState(app);
+    await this.hosts.loadFullState(app);
     this.__app = app;
   }
 }
-export function coin_is_base_coin_(
-  market_info: MarketInfo,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): boolean {
-  let coin_type_info;
-  coin_type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
-  if ($.deep_eq($.copy(coin_type_info), $.copy(market_info.base_coin_type))) {
-    return true;
-  } else {
-  }
-  if ($.deep_eq($.copy(coin_type_info), $.copy(market_info.quote_coin_type))) {
-    return false;
-  } else {
-  }
-  throw $.abortCode($.copy(E_NOT_IN_MARKET_PAIR));
-}
 
-export function coin_is_in_market_pair_(
-  market_info: MarketInfo,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinType>*/
-): boolean {
-  let temp$1, coin_type_info;
-  coin_type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
-  if ($.deep_eq($.copy(coin_type_info), $.copy(market_info.base_coin_type))) {
-    temp$1 = true;
-  } else {
-    temp$1 = $.deep_eq($.copy(coin_type_info), $.copy(market_info.quote_coin_type));
-  }
-  return temp$1;
-}
+export class TradingPairInfo {
+  static moduleAddress = moduleAddress;
+  static moduleName = moduleName;
+  __app: $.AppType | null = null;
+  static structName: string = 'TradingPairInfo';
+  static typeParameters: TypeParamDeclType[] = [];
+  static fields: FieldDeclType[] = [
+    { name: 'base_type_info', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
+    { name: 'quote_type_info', typeTag: new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []) },
+    { name: 'lot_size', typeTag: AtomicTypeTag.U64 },
+    { name: 'tick_size', typeTag: AtomicTypeTag.U64 },
+    { name: 'generic_asset_transfer_custodian_id', typeTag: AtomicTypeTag.U64 },
+    { name: 'agnostic_disambiguator', typeTag: AtomicTypeTag.U64 }
+  ];
 
+  base_type_info: Stdlib.Type_info.TypeInfo;
+  quote_type_info: Stdlib.Type_info.TypeInfo;
+  lot_size: U64;
+  tick_size: U64;
+  generic_asset_transfer_custodian_id: U64;
+  agnostic_disambiguator: U64;
+
+  constructor(proto: any, public typeTag: TypeTag) {
+    this.base_type_info = proto['base_type_info'] as Stdlib.Type_info.TypeInfo;
+    this.quote_type_info = proto['quote_type_info'] as Stdlib.Type_info.TypeInfo;
+    this.lot_size = proto['lot_size'] as U64;
+    this.tick_size = proto['tick_size'] as U64;
+    this.generic_asset_transfer_custodian_id = proto['generic_asset_transfer_custodian_id'] as U64;
+    this.agnostic_disambiguator = proto['agnostic_disambiguator'] as U64;
+  }
+
+  static TradingPairInfoParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): TradingPairInfo {
+    const proto = $.parseStructProto(data, typeTag, repo, TradingPairInfo);
+    return new TradingPairInfo(proto, typeTag);
+  }
+
+  static getTag(): StructTag {
+    return new StructTag(moduleAddress, moduleName, 'TradingPairInfo', []);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.base_type_info.loadFullState(app);
+    await this.quote_type_info.loadFullState(app);
+    this.__app = app;
+  }
+}
 export function custodian_id_(custodian_capability_ref: CustodianCapability, $c: AptosDataCache): U64 {
   return $.copy(custodian_capability_ref.custodian_id);
 }
 
+export function get_verified_market_custodian_id_(
+  market_id: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
+): U64 {
+  let registry_ref, trading_pair_info_ref;
+  if (
+    !$c.exists(
+      new SimpleStructTag(Registry),
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+    )
+  ) {
+    throw $.abortCode($.copy(E_NO_REGISTRY));
+  }
+  registry_ref = $c.borrow_global<Registry>(
+    new SimpleStructTag(Registry),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+  );
+  if (!$.copy(market_id).lt(Stdlib.Vector.length_(registry_ref.markets, $c, [new SimpleStructTag(MarketInfo)]))) {
+    throw $.abortCode($.copy(E_INVALID_MARKET_ID));
+  }
+  trading_pair_info_ref = Stdlib.Vector.borrow_(registry_ref.markets, $.copy(market_id), $c, [
+    new SimpleStructTag(MarketInfo)
+  ]).trading_pair_info;
+  if (!$.deep_eq($.copy(trading_pair_info_ref.base_type_info), Stdlib.Type_info.type_of_($c, [$p[0]]))) {
+    throw $.abortCode($.copy(E_INVALID_BASE_ASSET));
+  }
+  if (!$.deep_eq($.copy(trading_pair_info_ref.quote_type_info), Stdlib.Type_info.type_of_($c, [$p[1]]))) {
+    throw $.abortCode($.copy(E_INVALID_QUOTE_ASSET));
+  }
+  return $.copy(trading_pair_info_ref.generic_asset_transfer_custodian_id);
+}
+
 export function init_registry_(account: HexString, $c: AptosDataCache): void {
-  let scales;
   if (
     !(
       Stdlib.Signer.address_of_(account, $c).hex() ===
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a').hex()
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
@@ -687,7 +276,7 @@ export function init_registry_(account: HexString, $c: AptosDataCache): void {
   if (
     !!$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
     )
   ) {
     throw $.abortCode($.copy(E_REGISTRY_EXISTS));
@@ -697,157 +286,100 @@ export function init_registry_(account: HexString, $c: AptosDataCache): void {
     account,
     new Registry(
       {
-        scales: Open_table.empty_($c, [
-          new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-          AtomicTypeTag.U64
-        ]),
-        markets: Open_table.empty_($c, [new SimpleStructTag(MarketInfo), AtomicTypeTag.Address]),
+        hosts: Stdlib.Table.new___($c, [new SimpleStructTag(TradingPairInfo), AtomicTypeTag.Address]),
+        markets: Stdlib.Vector.empty_($c, [new SimpleStructTag(MarketInfo)]),
         n_custodians: u64('0')
       },
       new SimpleStructTag(Registry)
     )
   );
-  scales = $c.borrow_global_mut<Registry>(
-    new SimpleStructTag(Registry),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
-  ).scales;
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E0)]), $.copy(F0), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E1)]), $.copy(F1), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E2)]), $.copy(F2), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E3)]), $.copy(F3), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E4)]), $.copy(F4), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E5)]), $.copy(F5), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E6)]), $.copy(F6), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E7)]), $.copy(F7), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E8)]), $.copy(F8), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E9)]), $.copy(F9), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E10)]), $.copy(F10), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E11)]), $.copy(F11), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E12)]), $.copy(F12), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E13)]), $.copy(F13), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E14)]), $.copy(F14), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E15)]), $.copy(F15), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E16)]), $.copy(F16), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E17)]), $.copy(F17), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E18)]), $.copy(F18), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
-  Open_table.add_(scales, Stdlib.Type_info.type_of_($c, [new SimpleStructTag(E19)]), $.copy(F19), $c, [
-    new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-    AtomicTypeTag.U64
-  ]);
   return;
 }
 
-export function is_registered_(market_info: MarketInfo, $c: AptosDataCache): boolean {
-  let registry;
+export function buildPayload_init_registry(
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    'registry',
+    'init_registry',
+    typeParamStrings,
+    [],
+    isJSON
+  );
+}
+
+export function is_base_asset_(market_info: MarketInfo, $c: AptosDataCache, $p: TypeTag[] /* <T>*/): boolean {
+  let type_info;
+  type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
+  if ($.deep_eq($.copy(type_info), $.copy(market_info.trading_pair_info.base_type_info))) {
+    return true;
+  } else {
+  }
+  if ($.deep_eq($.copy(type_info), $.copy(market_info.trading_pair_info.quote_type_info))) {
+    return false;
+  } else {
+  }
+  throw $.abortCode($.copy(E_NOT_IN_MARKET_PAIR));
+}
+
+export function is_base_or_quote_(market_info: MarketInfo, $c: AptosDataCache, $p: TypeTag[] /* <T>*/): boolean {
+  let temp$1, type_info;
+  type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
+  if ($.deep_eq($.copy(type_info), $.copy(market_info.trading_pair_info.base_type_info))) {
+    temp$1 = true;
+  } else {
+    temp$1 = $.deep_eq($.copy(type_info), $.copy(market_info.trading_pair_info.quote_type_info));
+  }
+  return temp$1;
+}
+
+export function is_registered_custodian_id_(custodian_id: U64, $c: AptosDataCache): boolean {
+  let temp$1;
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
     )
   ) {
     return false;
   } else {
   }
-  registry = $c.borrow_global_mut<Registry>(
+  if ($.copy(custodian_id).le(n_custodians_($c))) {
+    temp$1 = $.copy(custodian_id).neq($.copy(NO_CUSTODIAN));
+  } else {
+    temp$1 = false;
+  }
+  return temp$1;
+}
+
+export function is_registered_trading_pair_(trading_pair_info: TradingPairInfo, $c: AptosDataCache): boolean {
+  let registry_ref;
+  if (
+    !$c.exists(
+      new SimpleStructTag(Registry),
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+    )
+  ) {
+    return false;
+  } else {
+  }
+  registry_ref = $c.borrow_global<Registry>(
     new SimpleStructTag(Registry),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
   );
-  return Open_table.contains_(registry.markets, $.copy(market_info), $c, [
-    new SimpleStructTag(MarketInfo),
+  return Stdlib.Table.contains_(registry_ref.hosts, $.copy(trading_pair_info), $c, [
+    new SimpleStructTag(TradingPairInfo),
     AtomicTypeTag.Address
   ]);
-}
-
-export function is_registered_types_($c: AptosDataCache, $p: TypeTag[] /* <B, Q, E>*/): boolean {
-  return is_registered_(market_info_($c, [$p[0], $p[1], $p[2]]), $c);
-}
-
-export function is_valid_custodian_id_(custodian_id: U64, $c: AptosDataCache): boolean {
-  if (
-    !$c.exists(
-      new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
-    )
-  ) {
-    return false;
-  } else {
-  }
-  return $.copy(custodian_id).le(n_custodians_($c));
-}
-
-export function market_info_($c: AptosDataCache, $p: TypeTag[] /* <B, Q, E>*/): MarketInfo {
-  return new MarketInfo(
-    {
-      base_coin_type: Stdlib.Type_info.type_of_($c, [$p[0]]),
-      quote_coin_type: Stdlib.Type_info.type_of_($c, [$p[1]]),
-      scale_exponent_type: Stdlib.Type_info.type_of_($c, [$p[2]])
-    },
-    new SimpleStructTag(MarketInfo)
-  );
 }
 
 export function n_custodians_($c: AptosDataCache): U64 {
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
@@ -855,165 +387,159 @@ export function n_custodians_($c: AptosDataCache): U64 {
   return $.copy(
     $c.borrow_global<Registry>(
       new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
     ).n_custodians
   );
 }
 
-export function register_custodian_capability_($c: AptosDataCache): CustodianCapability {
-  let custodian_id, registry;
+export function n_markets_($c: AptosDataCache): U64 {
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
-  registry = $c.borrow_global_mut<Registry>(
-    new SimpleStructTag(Registry),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+  return Stdlib.Vector.length_(
+    $c.borrow_global<Registry>(
+      new SimpleStructTag(Registry),
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+    ).markets,
+    $c,
+    [new SimpleStructTag(MarketInfo)]
   );
-  custodian_id = $.copy(registry.n_custodians).add(u64('1'));
-  registry.n_custodians = $.copy(custodian_id);
+}
+
+export function register_custodian_capability_($c: AptosDataCache): CustodianCapability {
+  let custodian_id, registry_ref_mut;
+  if (
+    !$c.exists(
+      new SimpleStructTag(Registry),
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+    )
+  ) {
+    throw $.abortCode($.copy(E_NO_REGISTRY));
+  }
+  registry_ref_mut = $c.borrow_global_mut<Registry>(
+    new SimpleStructTag(Registry),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+  );
+  custodian_id = $.copy(registry_ref_mut.n_custodians).add(u64('1'));
+  registry_ref_mut.n_custodians = $.copy(custodian_id);
   return new CustodianCapability({ custodian_id: $.copy(custodian_id) }, new SimpleStructTag(CustodianCapability));
 }
 
 export function register_market_internal_(
   host: HexString,
-  _econia_capability: Capability.EconiaCapability,
+  lot_size: U64,
+  tick_size: U64,
+  generic_asset_transfer_custodian_id: U64,
   $c: AptosDataCache,
-  $p: TypeTag[] /* <B, Q, E>*/
-): void {
-  let base_coin_type, market_info, quote_coin_type, registry, scale_exponent_type;
+  $p: TypeTag[] /* <BaseType, QuoteType>*/
+): U64 {
+  let temp$1,
+    agnostic_disambiguator,
+    base_is_coin,
+    base_type_info,
+    market_id,
+    pure_coin,
+    quote_is_coin,
+    quote_type_info,
+    registry_ref_mut,
+    trading_pair_info;
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
-  if (!Stdlib.Coin.is_coin_initialized_($c, [$p[0]])) {
-    throw $.abortCode($.copy(E_NOT_COIN_BASE));
+  if (!$.copy(lot_size).gt(u64('0'))) {
+    throw $.abortCode($.copy(E_LOT_SIZE_0));
   }
-  if (!Stdlib.Coin.is_coin_initialized_($c, [$p[1]])) {
-    throw $.abortCode($.copy(E_NOT_COIN_QUOTE));
+  if (!$.copy(tick_size).gt(u64('0'))) {
+    throw $.abortCode($.copy(E_TICK_SIZE_0));
   }
-  base_coin_type = Stdlib.Type_info.type_of_($c, [$p[0]]);
-  quote_coin_type = Stdlib.Type_info.type_of_($c, [$p[1]]);
-  if (!!$.deep_eq($.copy(base_coin_type), $.copy(quote_coin_type))) {
-    throw $.abortCode($.copy(E_SAME_COIN_TYPE));
+  base_type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
+  quote_type_info = Stdlib.Type_info.type_of_($c, [$p[1]]);
+  base_is_coin = Stdlib.Coin.is_coin_initialized_($c, [$p[0]]);
+  quote_is_coin = Stdlib.Coin.is_coin_initialized_($c, [$p[1]]);
+  pure_coin = base_is_coin && quote_is_coin;
+  market_id = n_markets_($c);
+  if (pure_coin) {
+    temp$1 = $.copy(PURE_COIN_PAIR);
+  } else {
+    temp$1 = $.copy(market_id);
   }
-  scale_exponent_type = Stdlib.Type_info.type_of_($c, [$p[2]]);
-  registry = $c.borrow_global_mut<Registry>(
-    new SimpleStructTag(Registry),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
-  );
-  if (
-    !Open_table.contains_(registry.scales, $.copy(scale_exponent_type), $c, [
-      new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-      AtomicTypeTag.U64
-    ])
-  ) {
-    throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
-  }
-  market_info = new MarketInfo(
+  agnostic_disambiguator = temp$1;
+  trading_pair_info = new TradingPairInfo(
     {
-      base_coin_type: $.copy(base_coin_type),
-      quote_coin_type: $.copy(quote_coin_type),
-      scale_exponent_type: $.copy(scale_exponent_type)
+      base_type_info: $.copy(base_type_info),
+      quote_type_info: $.copy(quote_type_info),
+      lot_size: $.copy(lot_size),
+      tick_size: $.copy(tick_size),
+      generic_asset_transfer_custodian_id: $.copy(generic_asset_transfer_custodian_id),
+      agnostic_disambiguator: $.copy(agnostic_disambiguator)
     },
-    new SimpleStructTag(MarketInfo)
+    new SimpleStructTag(TradingPairInfo)
   );
-  if (
-    !!Open_table.contains_(registry.markets, $.copy(market_info), $c, [
-      new SimpleStructTag(MarketInfo),
-      AtomicTypeTag.Address
-    ])
-  ) {
-    throw $.abortCode($.copy(E_MARKET_EXISTS));
+  if (pure_coin) {
+    if (!!$.deep_eq($.copy(base_type_info), $.copy(quote_type_info))) {
+      throw $.abortCode($.copy(E_SAME_COIN));
+    }
+    if (!!is_registered_trading_pair_($.copy(trading_pair_info), $c)) {
+      throw $.abortCode($.copy(E_MARKET_EXISTS));
+    }
+    if (!$.copy(generic_asset_transfer_custodian_id).eq($.copy(PURE_COIN_PAIR))) {
+      throw $.abortCode($.copy(E_INVALID_CUSTODIAN));
+    }
+  } else {
+    if (!is_registered_custodian_id_($.copy(generic_asset_transfer_custodian_id), $c)) {
+      throw $.abortCode($.copy(E_INVALID_CUSTODIAN));
+    }
   }
-  Open_table.add_(registry.markets, $.copy(market_info), $.copy(host), $c, [
-    new SimpleStructTag(MarketInfo),
+  registry_ref_mut = $c.borrow_global_mut<Registry>(
+    new SimpleStructTag(Registry),
+    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+  );
+  Stdlib.Table.add_(registry_ref_mut.hosts, $.copy(trading_pair_info), $.copy(host), $c, [
+    new SimpleStructTag(TradingPairInfo),
     AtomicTypeTag.Address
   ]);
-  return;
-}
-
-export function scale_factor_($c: AptosDataCache, $p: TypeTag[] /* <E>*/): U64 {
-  return scale_factor_from_type_info_(Stdlib.Type_info.type_of_($c, [$p[0]]), $c);
-}
-
-export function scale_factor_from_market_info_(market_info: MarketInfo, $c: AptosDataCache): U64 {
-  return scale_factor_from_type_info_($.copy(market_info.scale_exponent_type), $c);
-}
-
-export function scale_factor_from_type_info_(
-  scale_exponent_type_info: Stdlib.Type_info.TypeInfo,
-  $c: AptosDataCache
-): U64 {
-  let scales;
-  if (
-    !$c.exists(
-      new SimpleStructTag(Registry),
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
-    )
-  ) {
-    throw $.abortCode($.copy(E_NO_REGISTRY));
-  }
-  scales = $c.borrow_global<Registry>(
-    new SimpleStructTag(Registry),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
-  ).scales;
-  if (
-    !Open_table.contains_(scales, $.copy(scale_exponent_type_info), $c, [
-      new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-      AtomicTypeTag.U64
-    ])
-  ) {
-    throw $.abortCode($.copy(E_NOT_EXPONENT_TYPE));
-  }
-  return $.copy(
-    Open_table.borrow_(scales, $.copy(scale_exponent_type_info), $c, [
-      new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
-      AtomicTypeTag.U64
-    ])
+  Stdlib.Vector.push_back_(
+    registry_ref_mut.markets,
+    new MarketInfo(
+      { host: $.copy(host), trading_pair_info: $.copy(trading_pair_info) },
+      new SimpleStructTag(MarketInfo)
+    ),
+    $c,
+    [new SimpleStructTag(MarketInfo)]
   );
+  return $.copy(market_id);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::CustodianCapability',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::registry::CustodianCapability',
     CustodianCapability.CustodianCapabilityParser
   );
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E0', E0.E0Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E1', E1.E1Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E10', E10.E10Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E11', E11.E11Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E12', E12.E12Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E13', E13.E13Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E14', E14.E14Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E15', E15.E15Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E16', E16.E16Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E17', E17.E17Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E18', E18.E18Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E19', E19.E19Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E2', E2.E2Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E3', E3.E3Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E4', E4.E4Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E5', E5.E5Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E6', E6.E6Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E7', E7.E7Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E8', E8.E8Parser);
-  repo.addParser('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::E9', E9.E9Parser);
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::MarketInfo',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::registry::GenericAsset',
+    GenericAsset.GenericAssetParser
+  );
+  repo.addParser(
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::registry::MarketInfo',
     MarketInfo.MarketInfoParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::registry::Registry',
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::registry::Registry',
     Registry.RegistryParser
+  );
+  repo.addParser(
+    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::registry::TradingPairInfo',
+    TradingPairInfo.TradingPairInfoParser
   );
 }
 export class App {
@@ -1031,65 +557,8 @@ export class App {
   get CustodianCapability() {
     return CustodianCapability;
   }
-  get E0() {
-    return E0;
-  }
-  get E1() {
-    return E1;
-  }
-  get E10() {
-    return E10;
-  }
-  get E11() {
-    return E11;
-  }
-  get E12() {
-    return E12;
-  }
-  get E13() {
-    return E13;
-  }
-  get E14() {
-    return E14;
-  }
-  get E15() {
-    return E15;
-  }
-  get E16() {
-    return E16;
-  }
-  get E17() {
-    return E17;
-  }
-  get E18() {
-    return E18;
-  }
-  get E19() {
-    return E19;
-  }
-  get E2() {
-    return E2;
-  }
-  get E3() {
-    return E3;
-  }
-  get E4() {
-    return E4;
-  }
-  get E5() {
-    return E5;
-  }
-  get E6() {
-    return E6;
-  }
-  get E7() {
-    return E7;
-  }
-  get E8() {
-    return E8;
-  }
-  get E9() {
-    return E9;
+  get GenericAsset() {
+    return GenericAsset;
   }
   get MarketInfo() {
     return MarketInfo;
@@ -1103,5 +572,17 @@ export class App {
       await val.loadFullState(this);
     }
     return val;
+  }
+  get TradingPairInfo() {
+    return TradingPairInfo;
+  }
+  payload_init_registry(
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_init_registry(isJSON);
+  }
+  async init_registry(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_init_registry(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

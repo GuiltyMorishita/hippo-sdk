@@ -1,9 +1,17 @@
 import { HexString, Types } from 'aptos';
 import { App } from '../../generated';
-import { AptosLocalCache, AptosParserRepo, SimulationKeys, TypeTag, u64, U64, u8 } from '@manahippo/move-to-ts';
+import {
+  AptosParserRepo,
+  AtomicTypeTag,
+  getTypeTagFullname,
+  moveValueToOpenApiObject,
+  SimulationKeys,
+  u64,
+  U64
+} from '@manahippo/move-to-ts';
 
 import { EconiaClient } from './econia_client';
-import { get_orders_sdk_, OrderBook } from '../../generated/econia/market';
+import { OrderBook, OrderBooks } from '../../generated/econia/market';
 import { MarketInfo } from '../../generated/econia/registry';
 import { CoinListClient } from '../../coinList';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
@@ -11,9 +19,11 @@ import { Registry } from '../../generated/econia';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
 import { CONFIGS } from '../../config';
 
+export * from './econia_client';
+
 export enum EconiaPoolType {
   // eslint-disable-next-line no-unused-vars
-  V1 = 1
+  V3 = 3
 }
 
 export class EconiaTradingPoolV1 extends TradingPool {
@@ -23,7 +33,8 @@ export class EconiaTradingPoolV1 extends TradingPool {
     public orderBook: OrderBook | null,
     public mi: MarketInfo,
     public owner: HexString,
-    public repo: AptosParserRepo
+    public repo: AptosParserRepo,
+    public marketId: U64
   ) {
     super();
   }
@@ -31,7 +42,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
     return DexType.Econia;
   }
   get poolType() {
-    return u8(EconiaPoolType.V1);
+    return this.marketId;
   }
   get isRoutable() {
     return true;
@@ -54,14 +65,13 @@ export class EconiaTradingPoolV1 extends TradingPool {
     return !!this.orderBook;
   }
   async reloadState(app: App): Promise<void> {
-    this.orderBook = await OrderBook.load(this.repo, app.client, this.owner, this.getMiTags());
-  }
-  getMiTags(): TypeTag[] {
-    return [
-      this.mi.base_coin_type.toTypeTag(),
-      this.mi.quote_coin_type.toTypeTag(),
-      this.mi.scale_exponent_type.toTypeTag()
-    ];
+    const orderBooks = await OrderBooks.load(this.repo, app.client, this.owner, []);
+    const rawOrderBook = await app.client.getTableItem(orderBooks.map.base_table.handle.toString(), {
+      key_type: getTypeTagFullname(AtomicTypeTag.U64),
+      value_type: OrderBook.getTag().getFullname(),
+      key: moveValueToOpenApiObject(this.marketId, AtomicTypeTag.U64)
+    });
+    this.orderBook = OrderBook.OrderBookParser(rawOrderBook, OrderBook.getTag(), this.repo);
   }
   getUiPrice(rawPrice: U64) {
     if (!this.orderBook) {
@@ -69,20 +79,23 @@ export class EconiaTradingPoolV1 extends TradingPool {
     }
     const xFactor = Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
     const yFactor = Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
-    const scaleFactor = this.orderBook.scale_factor.toJsNumber();
+    // const scaleFactor = this.orderBook.scale_factor.toJsNumber();
+
+    const lotSize = this.orderBook.lot_size.toJsNumber();
+    const tickSize = this.orderBook.tick_size.toJsNumber();
+
     // yToX price
-    return rawPrice.toJsNumber() / yFactor / (scaleFactor / xFactor);
+    return rawPrice.toJsNumber() * (xFactor / yFactor) * (tickSize / lotSize);
   }
   getPrice(): PriceType {
     if (!this.orderBook) {
       throw new Error('Econia Orderbook not loaded. cannot compute price');
     }
     // use top-of-book price
-    const cache = new AptosLocalCache();
     let xToY = 0;
     let yToX = 0;
-    const asks = get_orders_sdk_(this.orderBook, true, cache, this.getMiTags());
-    const bids = get_orders_sdk_(this.orderBook, false, cache, this.getMiTags());
+    const orderVectors = this.orderBook.orders_vectors();
+    const [asks, bids] = orderVectors;
     if (asks.length > 0) {
       // y to x is buying, hits asks
       yToX = this.getUiPrice(asks[0].price);
@@ -100,9 +113,7 @@ export class EconiaTradingPoolV1 extends TradingPool {
     if (!this.orderBook) {
       throw new Error('Econia Orderbook not loaded. cannot compute quote');
     }
-    const cache = new AptosLocalCache();
-    const asks = get_orders_sdk_(this.orderBook, true, cache, this.getMiTags());
-    const bids = get_orders_sdk_(this.orderBook, false, cache, this.getMiTags());
+    const [asks, bids] = this.orderBook.orders_vectors();
     if (isXtoY) {
       // selling
       let soldBaseSize = u64(0);
@@ -112,12 +123,14 @@ export class EconiaTradingPoolV1 extends TradingPool {
         if (remainingBaseSize.eq(u64(0))) {
           break;
         }
-        const bidBaseSize = bid.base_parcels.mul(this.orderBook.scale_factor);
+        const bidBaseSize = bid.size.mul(this.orderBook.lot_size);
         const fillBaseSize = remainingBaseSize.gt(bidBaseSize) ? bidBaseSize : remainingBaseSize;
         if (fillBaseSize.gt(u64(0))) {
           soldBaseSize = soldBaseSize.add(fillBaseSize);
           remainingBaseSize = remainingBaseSize.sub(fillBaseSize);
-          gotQuoteSize = gotQuoteSize.add(fillBaseSize.div(this.orderBook.scale_factor).mul(bid.price));
+          gotQuoteSize = gotQuoteSize.add(
+            fillBaseSize.div(this.orderBook.lot_size).mul(bid.price).mul(this.orderBook.tick_size)
+          );
         }
       }
       // has partial unfilled
@@ -139,28 +152,26 @@ export class EconiaTradingPoolV1 extends TradingPool {
         if (remainingQuoteSize.eq(u64(0))) {
           break;
         }
-        const askQuoteSize = ask.base_parcels.mul(ask.price);
+        const askQuoteSize = ask.size.mul(ask.price).mul(this.orderBook.tick_size);
         const fillQuoteSize = remainingQuoteSize.gt(askQuoteSize) ? askQuoteSize : remainingQuoteSize;
         if (fillQuoteSize.gt(u64(0))) {
           soldQuoteSize = soldQuoteSize.add(fillQuoteSize);
           remainingQuoteSize = remainingQuoteSize.sub(fillQuoteSize);
-          gotBaseSize = gotBaseSize.add(fillQuoteSize.div(ask.price).mul(this.orderBook.scale_factor));
+          gotBaseSize = gotBaseSize.add(
+            fillQuoteSize.div(this.orderBook.tick_size).div(ask.price).mul(this.orderBook.lot_size)
+          );
         }
       }
       const actualInputUiAmt = soldQuoteSize.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
       const outputUiAmt = gotBaseSize.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
       return {
-        inputSymbol: this.xCoinInfo.symbol.str(),
-        outputSymbol: this.yCoinInfo.symbol.str(),
+        inputSymbol: this.yCoinInfo.symbol.str(),
+        outputSymbol: this.xCoinInfo.symbol.str(),
         inputUiAmt: actualInputUiAmt,
         outputUiAmt,
         avgPrice: outputUiAmt / actualInputUiAmt
       };
     }
-  }
-
-  getTagE(): TypeTag {
-    return this.mi.scale_exponent_type.toTypeTag();
   }
 
   // build payload directly if not routable
@@ -179,16 +190,20 @@ export class EconiaPoolProvider extends TradingPoolProvider {
     const markets = await econiaClient.getMarkets();
     const pools: TradingPool[] = [];
     const promises: Promise<void>[] = [];
-    markets.forEach(([mi, owner]) => {
-      if (this.registry.hasTokenType(mi.base_coin_type) && this.registry.hasTokenType(mi.quote_coin_type)) {
+    markets.forEach((mi, marketId) => {
+      if (
+        this.registry.hasTokenType(mi.trading_pair_info.base_type_info) &&
+        this.registry.hasTokenType(mi.trading_pair_info.quote_type_info)
+      ) {
         pools.push(
           new EconiaTradingPoolV1(
-            this.registry.getCoinInfoByType(mi.base_coin_type),
-            this.registry.getCoinInfoByType(mi.quote_coin_type),
+            this.registry.getCoinInfoByType(mi.trading_pair_info.base_type_info),
+            this.registry.getCoinInfoByType(mi.trading_pair_info.quote_type_info),
             null,
             mi,
-            owner,
-            this.app.parserRepo
+            mi.host,
+            this.app.parserRepo,
+            new U64(marketId)
           )
         );
       }

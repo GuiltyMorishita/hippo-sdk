@@ -77,8 +77,7 @@ export async function getCoinStoresForAddress(client: AptosClient, address: HexS
       }
       const store = repo.parse(resource.data, typeTag) as unknown as AptosFramework.Coin.CoinStore;
       stores.push(store);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
   return stores;
 }
