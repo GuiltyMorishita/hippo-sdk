@@ -32,9 +32,7 @@ export async function loadHippoDexResources(app: App, netConf: NetworkConfigurat
       } else if (parsed instanceof PieceSwapPoolInfo) {
         piecePoolInfos.push(parsed);
       }
-    } catch (e) {
-      console.log(`Could not parse resource of type: ${resource.type}`);
-    }
+    } catch (e) {}
   }
   if (!coinList) {
     throw new Error(`Failed to load CoinList from contract account: ${netConf.hippoDexAddress.hex()}`);
@@ -51,9 +49,7 @@ export async function loadCoinListResources(app: App, netConf: NetworkConfigurat
       if (parsed instanceof Coin_list.CoinRegistry) {
         coinRegister = parsed;
       }
-    } catch (e) {
-      console.log(`Could not parse resource of type: ${resource.type}`);
-    }
+    } catch (e) {}
   }
   if (!coinRegister) {
     throw new Error(`Failed to load CoinRegistry from contract account: ${netConf.coinListAddress.hex()}`);

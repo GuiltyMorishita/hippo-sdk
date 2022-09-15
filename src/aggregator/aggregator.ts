@@ -7,6 +7,7 @@ import { PontemPoolProvider } from './pontem';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
 import { SimulationKeys } from '@manahippo/move-to-ts';
+import { AptosClient } from 'aptos';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -21,7 +22,8 @@ export class TradeAggregator {
     this.xToAnyPools = new Map();
   }
 
-  static async create(app: App, fetcher: SimulationKeys, netConfig = CONFIGS.devnet) {
+  static async create(aptosClient: AptosClient, fetcher: SimulationKeys, netConfig = CONFIGS.devnet) {
+    const app = new App(aptosClient);
     const registryClient = await CoinListClient.load(app, fetcher);
     const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
     const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);
