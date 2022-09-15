@@ -14,8 +14,56 @@
 - `src/wallet`: Hippo wallet client SDK
 
 
+# Aggregator Usage
+
+These snippets are taken from `src/tools/index.ts` and demonstrate how you can use the `TradeAggregator` class to
+
+1. query coin info
+2. query quotes for a particular pair
+3. perform swap
+
+```typescript
+// compute a list of quotes (ordered by output), for fromSymbol -> toSymbol
+const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
+  const { client } = readConfig(program);
+  const agg = await TradeAggregator.create(client);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
+  const inputAmt = parseFloat(inputUiAmt);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
+  for (const quote of quotes) {
+    console.log('###########');
+    quote.route.debugPrint();
+    console.log(`Quote input: ${quote.quote.inputUiAmt}`);
+    console.log(`Quote output: ${quote.quote.outputUiAmt}`);
+  }
+};
+
+// send a transaction to swap "inputUiAmt" of "fromSymbol" to "toSymbol"
+const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
+  const { client, account } = readConfig(program);
+  const agg = await TradeAggregator.create(client);
+  const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
+  const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);
+  const inputAmt = parseFloat(inputUiAmt);
+  const quotes = await agg.getQuotes(inputAmt, xCoinInfo, yCoinInfo);
+  if (quotes.length === 0) {
+    console.log('No route available');
+    return;
+  }
+  const payload = quotes[0].route.makePayload(inputAmt, 0);
+  await sendPayloadTx(client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
+};
+```
+
+You can find more sample code that uses `TradeAggregator` in `src/tools/index.ts`.
 # cli tool
 We already deployed the contracts to Aptos devnet (for now, might be wiped out by the time you read this).
+
+To build the cli utility, run:
+```bash
+yarn build-cli
+```
 
 ## Aggregator CLI
 List commands
