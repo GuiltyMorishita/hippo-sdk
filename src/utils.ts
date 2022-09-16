@@ -12,6 +12,7 @@ import { AptosClient, HexString } from "aptos";
 import * as AptosStdlib from "./generated/stdlib";
 import * as AptosFramework from "./generated/stdlib";
 import { Coin_list } from "./generated/coin_list";
+import { coin_list } from "./generated";
 import * as Aptos_std from "./generated/stdlib";
 import { Nothing } from "./generated/coin_list/coin_list";
 import * as Std from "./generated/stdlib";
@@ -109,7 +110,7 @@ export function parseCoinInfoListFromCoinList(
     []
   );
   let coinInfo, coinInfoList, prev, tail, tailKey;
-  tail = Aptos_std.Iterable_table.tail_key_(coinList.coin_types, cache, [
+  tail = coin_list.Iterable_table.tail_key_(coinList.coin_types, cache, [
     structTag,
     new SimpleStructTag(Nothing),
   ]);
@@ -117,14 +118,14 @@ export function parseCoinInfoListFromCoinList(
   while (Std.Option.is_some_(tail, cache, [structTag])) {
     {
       tailKey = $.copy(Std.Option.borrow_(tail, cache, [structTag]));
-      coinInfo = Aptos_std.Iterable_table.borrow_(
+      coinInfo = coin_list.Iterable_table.borrow_(
         registry.type_to_coin_info,
         $.copy(tailKey),
         cache,
         [structTag, new SimpleStructTag(CoinInfo)]
       );
       coinInfoList.push(coinInfo);
-      [, prev] = Aptos_std.Iterable_table.borrow_iter_(
+      [, prev] = coin_list.Iterable_table.borrow_iter_(
         coinList.coin_types,
         $.copy(tailKey),
         cache,

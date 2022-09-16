@@ -76,7 +76,7 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   ),
   // econia
   new HexString(
-    "0x389397a906ddab111bc8f8bfece404424d9da38f64e45f262e444281a2d71618"
+    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
   )
 );
 
