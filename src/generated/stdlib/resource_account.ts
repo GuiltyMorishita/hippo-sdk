@@ -1,95 +1,135 @@
-import * as $ from '@manahippo/move-to-ts';
-import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
-import { U8, U64, U128 } from '@manahippo/move-to-ts';
-import { u8, u64, u128 } from '@manahippo/move-to-ts';
-import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
-import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
-import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
-import * as Account from './account';
-import * as Code from './code';
-import * as Coin from './coin';
-import * as Error from './error';
-import * as Signer from './signer';
-import * as Simple_map from './simple_map';
-import * as Vector from './vector';
-export const packageName = 'AptosFramework';
-export const moduleAddress = new HexString('0x1');
-export const moduleName = 'resource_account';
+import * as $ from "@manahippo/move-to-ts";
+import {
+  AptosDataCache,
+  AptosParserRepo,
+  DummyCache,
+  AptosLocalCache,
+} from "@manahippo/move-to-ts";
+import { U8, U64, U128 } from "@manahippo/move-to-ts";
+import { u8, u64, u128 } from "@manahippo/move-to-ts";
+import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
+import {
+  AtomicTypeTag,
+  StructTag,
+  TypeTag,
+  VectorTag,
+  SimpleStructTag,
+} from "@manahippo/move-to-ts";
+import {
+  HexString,
+  AptosClient,
+  AptosAccount,
+  TxnBuilderTypes,
+  Types,
+} from "aptos";
+import * as Account from "./account";
+import * as Code from "./code";
+import * as Coin from "./coin";
+import * as Error from "./error";
+import * as Signer from "./signer";
+import * as Simple_map from "./simple_map";
+import * as Vector from "./vector";
+export const packageName = "AptosFramework";
+export const moduleAddress = new HexString("0x1");
+export const moduleName = "resource_account";
 
-export const ECONTAINER_NOT_PUBLISHED: U64 = u64('1');
+export const ECONTAINER_NOT_PUBLISHED: U64 = u64("1");
 export const ZERO_AUTH_KEY: U8[] = [
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0'),
-  u8('0')
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
+  u8("0"),
 ];
 
 export class Container {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = 'Container';
+  static structName: string = "Container";
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
     {
-      name: 'store',
-      typeTag: new StructTag(new HexString('0x1'), 'simple_map', 'SimpleMap', [
+      name: "store",
+      typeTag: new StructTag(new HexString("0x1"), "simple_map", "SimpleMap", [
         AtomicTypeTag.Address,
-        new StructTag(new HexString('0x1'), 'account', 'SignerCapability', [])
-      ])
-    }
+        new StructTag(new HexString("0x1"), "account", "SignerCapability", []),
+      ]),
+    },
   ];
 
   store: Simple_map.SimpleMap;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.store = proto['store'] as Simple_map.SimpleMap;
+    this.store = proto["store"] as Simple_map.SimpleMap;
   }
 
-  static ContainerParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): Container {
+  static ContainerParser(
+    data: any,
+    typeTag: TypeTag,
+    repo: AptosParserRepo
+  ): Container {
     const proto = $.parseStructProto(data, typeTag, repo, Container);
     return new Container(proto, typeTag);
   }
 
-  static async load(repo: AptosParserRepo, client: AptosClient, address: HexString, typeParams: TypeTag[]) {
-    const result = await repo.loadResource(client, address, Container, typeParams);
+  static async load(
+    repo: AptosParserRepo,
+    client: AptosClient,
+    address: HexString,
+    typeParams: TypeTag[]
+  ) {
+    const result = await repo.loadResource(
+      client,
+      address,
+      Container,
+      typeParams
+    );
     return result as unknown as Container;
   }
-  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
-    const result = await app.repo.loadResource(app.client, address, Container, typeParams);
+  static async loadByApp(
+    app: $.AppType,
+    address: HexString,
+    typeParams: TypeTag[]
+  ) {
+    const result = await app.repo.loadResource(
+      app.client,
+      address,
+      Container,
+      typeParams
+    );
     await result.loadFullState(app);
     return result as unknown as Container;
   }
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'Container', []);
+    return new StructTag(moduleAddress, moduleName, "Container", []);
   }
   async loadFullState(app: $.AppType) {
     await this.store.loadFullState(app);
@@ -103,7 +143,11 @@ export function create_resource_account_(
   $c: AptosDataCache
 ): void {
   let resource, resource_signer_cap;
-  [resource, resource_signer_cap] = Account.create_resource_account_(origin, $.copy(seed), $c);
+  [resource, resource_signer_cap] = Account.create_resource_account_(
+    origin,
+    $.copy(seed),
+    $c
+  );
   rotate_account_authentication_key_and_store_capability_(
     origin,
     resource,
@@ -118,12 +162,14 @@ export function buildPayload_create_resource_account(
   seed: U8[],
   optional_auth_key: U8[],
   isJSON = false
-): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+):
+  | TxnBuilderTypes.TransactionPayloadEntryFunction
+  | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0x1'),
-    'resource_account',
-    'create_resource_account',
+    new HexString("0x1"),
+    "resource_account",
+    "create_resource_account",
     typeParamStrings,
     [seed, optional_auth_key],
     isJSON
@@ -137,11 +183,21 @@ export function create_resource_account_and_fund_(
   $c: AptosDataCache
 ): void {
   let resource, resource_signer_cap;
-  [resource, resource_signer_cap] = Account.create_resource_account_(origin, $.copy(seed), $c);
-  Coin.register_(resource, $c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])]);
-  Coin.transfer_(origin, Signer.address_of_(resource, $c), $.copy(fund_amount), $c, [
-    new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])
+  [resource, resource_signer_cap] = Account.create_resource_account_(
+    origin,
+    $.copy(seed),
+    $c
+  );
+  Coin.register_(resource, $c, [
+    new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", []),
   ]);
+  Coin.transfer_(
+    origin,
+    Signer.address_of_(resource, $c),
+    $.copy(fund_amount),
+    $c,
+    [new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", [])]
+  );
   rotate_account_authentication_key_and_store_capability_(
     origin,
     resource,
@@ -157,12 +213,14 @@ export function buildPayload_create_resource_account_and_fund(
   optional_auth_key: U8[],
   fund_amount: U64,
   isJSON = false
-): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+):
+  | TxnBuilderTypes.TransactionPayloadEntryFunction
+  | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0x1'),
-    'resource_account',
-    'create_resource_account_and_fund',
+    new HexString("0x1"),
+    "resource_account",
+    "create_resource_account_and_fund",
     typeParamStrings,
     [seed, optional_auth_key, fund_amount],
     isJSON
@@ -176,8 +234,17 @@ export function create_resource_account_and_publish_package_(
   $c: AptosDataCache
 ): void {
   let resource, resource_signer_cap;
-  [resource, resource_signer_cap] = Account.create_resource_account_(origin, $.copy(seed), $c);
-  Code.publish_package_txn_(resource, $.copy(metadata_serialized), $.copy(code), $c);
+  [resource, resource_signer_cap] = Account.create_resource_account_(
+    origin,
+    $.copy(seed),
+    $c
+  );
+  Code.publish_package_txn_(
+    resource,
+    $.copy(metadata_serialized),
+    $.copy(code),
+    $c
+  );
   rotate_account_authentication_key_and_store_capability_(
     origin,
     resource,
@@ -193,12 +260,14 @@ export function buildPayload_create_resource_account_and_publish_package(
   metadata_serialized: U8[],
   code: U8[][],
   isJSON = false
-): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+):
+  | TxnBuilderTypes.TransactionPayloadEntryFunction
+  | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0x1'),
-    'resource_account',
-    'create_resource_account_and_publish_package',
+    new HexString("0x1"),
+    "resource_account",
+    "create_resource_account_and_publish_package",
     typeParamStrings,
     [seed, metadata_serialized, code],
     isJSON
@@ -221,29 +290,44 @@ export function retrieve_resource_account_cap_(
     throw $.abortCode(Error.not_found_($.copy(ECONTAINER_NOT_PUBLISHED), $c));
   }
   resource_addr = Signer.address_of_(resource, $c);
-  container = $c.borrow_global_mut<Container>(new SimpleStructTag(Container), $.copy(source_addr));
-  [_resource_addr, signer_cap] = Simple_map.remove_(container.store, resource_addr, $c, [
-    AtomicTypeTag.Address,
-    new StructTag(new HexString('0x1'), 'account', 'SignerCapability', [])
-  ]);
+  container = $c.borrow_global_mut<Container>(
+    new SimpleStructTag(Container),
+    $.copy(source_addr)
+  );
+  [_resource_addr, signer_cap] = Simple_map.remove_(
+    container.store,
+    resource_addr,
+    $c,
+    [
+      AtomicTypeTag.Address,
+      new StructTag(new HexString("0x1"), "account", "SignerCapability", []),
+    ]
+  );
   [resource_signer_cap, empty_container] = [
     signer_cap,
     Simple_map.length_(container.store, $c, [
       AtomicTypeTag.Address,
-      new StructTag(new HexString('0x1'), 'account', 'SignerCapability', [])
-    ]).eq(u64('0'))
+      new StructTag(new HexString("0x1"), "account", "SignerCapability", []),
+    ]).eq(u64("0")),
   ];
   if (empty_container) {
-    container__1 = $c.move_from<Container>(new SimpleStructTag(Container), $.copy(source_addr));
+    container__1 = $c.move_from<Container>(
+      new SimpleStructTag(Container),
+      $.copy(source_addr)
+    );
     let { store: store } = container__1;
     Simple_map.destroy_empty_(store, $c, [
       AtomicTypeTag.Address,
-      new StructTag(new HexString('0x1'), 'account', 'SignerCapability', [])
+      new StructTag(new HexString("0x1"), "account", "SignerCapability", []),
     ]);
   } else {
   }
   resource__2 = Account.create_signer_with_capability_(resource_signer_cap, $c);
-  Account.rotate_authentication_key_internal_(resource__2, $.copy(ZERO_AUTH_KEY), $c);
+  Account.rotate_authentication_key_internal_(
+    resource__2,
+    $.copy(ZERO_AUTH_KEY),
+    $c
+  );
   return resource_signer_cap;
 }
 
@@ -264,20 +348,34 @@ export function rotate_account_authentication_key_and_store_capability_(
         {
           store: Simple_map.create_($c, [
             AtomicTypeTag.Address,
-            new StructTag(new HexString('0x1'), 'account', 'SignerCapability', [])
-          ])
+            new StructTag(
+              new HexString("0x1"),
+              "account",
+              "SignerCapability",
+              []
+            ),
+          ]),
         },
         new SimpleStructTag(Container)
       )
     );
   } else {
   }
-  container = $c.borrow_global_mut<Container>(new SimpleStructTag(Container), $.copy(origin_addr));
+  container = $c.borrow_global_mut<Container>(
+    new SimpleStructTag(Container),
+    $.copy(origin_addr)
+  );
   resource_addr = Signer.address_of_(resource, $c);
-  Simple_map.add_(container.store, $.copy(resource_addr), resource_signer_cap, $c, [
-    AtomicTypeTag.Address,
-    new StructTag(new HexString('0x1'), 'account', 'SignerCapability', [])
-  ]);
+  Simple_map.add_(
+    container.store,
+    $.copy(resource_addr),
+    resource_signer_cap,
+    $c,
+    [
+      AtomicTypeTag.Address,
+      new StructTag(new HexString("0x1"), "account", "SignerCapability", []),
+    ]
+  );
   if (Vector.is_empty_(optional_auth_key, $c, [AtomicTypeTag.U8])) {
     temp$1 = Account.get_authentication_key_($.copy(origin_addr), $c);
   } else {
@@ -289,10 +387,14 @@ export function rotate_account_authentication_key_and_store_capability_(
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser('0x1::resource_account::Container', Container.ContainerParser);
+  repo.addParser("0x1::resource_account::Container", Container.ContainerParser);
 }
 export class App {
-  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+    public cache: AptosLocalCache
+  ) {}
   get moduleAddress() {
     {
       return moduleAddress;
@@ -307,7 +409,12 @@ export class App {
     return Container;
   }
   async loadContainer(owner: HexString, loadFull = true) {
-    const val = await Container.load(this.repo, this.client, owner, [] as TypeTag[]);
+    const val = await Container.load(
+      this.repo,
+      this.client,
+      owner,
+      [] as TypeTag[]
+    );
     if (loadFull) {
       await val.loadFullState(this);
     }
@@ -317,8 +424,14 @@ export class App {
     seed: U8[],
     optional_auth_key: U8[],
     isJSON = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_create_resource_account(seed, optional_auth_key, isJSON);
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_create_resource_account(
+      seed,
+      optional_auth_key,
+      isJSON
+    );
   }
   async create_resource_account(
     _account: AptosAccount,
@@ -327,7 +440,11 @@ export class App {
     _maxGas = 1000,
     _isJSON = false
   ) {
-    const payload = buildPayload_create_resource_account(seed, optional_auth_key, _isJSON);
+    const payload = buildPayload_create_resource_account(
+      seed,
+      optional_auth_key,
+      _isJSON
+    );
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_create_resource_account_and_fund(
@@ -335,8 +452,15 @@ export class App {
     optional_auth_key: U8[],
     fund_amount: U64,
     isJSON = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_create_resource_account_and_fund(seed, optional_auth_key, fund_amount, isJSON);
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_create_resource_account_and_fund(
+      seed,
+      optional_auth_key,
+      fund_amount,
+      isJSON
+    );
   }
   async create_resource_account_and_fund(
     _account: AptosAccount,
@@ -346,7 +470,12 @@ export class App {
     _maxGas = 1000,
     _isJSON = false
   ) {
-    const payload = buildPayload_create_resource_account_and_fund(seed, optional_auth_key, fund_amount, _isJSON);
+    const payload = buildPayload_create_resource_account_and_fund(
+      seed,
+      optional_auth_key,
+      fund_amount,
+      _isJSON
+    );
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_create_resource_account_and_publish_package(
@@ -354,8 +483,15 @@ export class App {
     metadata_serialized: U8[],
     code: U8[][],
     isJSON = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_create_resource_account_and_publish_package(seed, metadata_serialized, code, isJSON);
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_create_resource_account_and_publish_package(
+      seed,
+      metadata_serialized,
+      code,
+      isJSON
+    );
   }
   async create_resource_account_and_publish_package(
     _account: AptosAccount,
@@ -365,7 +501,12 @@ export class App {
     _maxGas = 1000,
     _isJSON = false
   ) {
-    const payload = buildPayload_create_resource_account_and_publish_package(seed, metadata_serialized, code, _isJSON);
+    const payload = buildPayload_create_resource_account_and_publish_package(
+      seed,
+      metadata_serialized,
+      code,
+      _isJSON
+    );
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

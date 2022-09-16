@@ -22,10 +22,11 @@ import {
   TxnBuilderTypes,
   Types,
 } from "aptos";
-import * as Option from "./option";
-import * as Table_with_length from "./table_with_length";
-export const packageName = "AptosStdlib";
-export const moduleAddress = new HexString("0x1");
+import * as Stdlib from "../stdlib";
+export const packageName = "CoinList";
+export const moduleAddress = new HexString(
+  "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
+);
 export const moduleName = "iterable_table";
 
 export class IterableTable {
@@ -47,7 +48,9 @@ export class IterableTable {
         [
           new $.TypeParamIdx(0),
           new StructTag(
-            new HexString("0x1"),
+            new HexString(
+              "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
+            ),
             "iterable_table",
             "IterableValue",
             [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -69,14 +72,14 @@ export class IterableTable {
     },
   ];
 
-  inner: Table_with_length.TableWithLength;
-  head: Option.Option;
-  tail: Option.Option;
+  inner: Stdlib.Table_with_length.TableWithLength;
+  head: Stdlib.Option.Option;
+  tail: Stdlib.Option.Option;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.inner = proto["inner"] as Table_with_length.TableWithLength;
-    this.head = proto["head"] as Option.Option;
-    this.tail = proto["tail"] as Option.Option;
+    this.inner = proto["inner"] as Stdlib.Table_with_length.TableWithLength;
+    this.head = proto["head"] as Stdlib.Option.Option;
+    this.tail = proto["tail"] as Stdlib.Option.Option;
   }
 
   static IterableTableParser(
@@ -91,14 +94,10 @@ export class IterableTable {
   static makeTag($p: TypeTag[]): StructTag {
     return new StructTag(moduleAddress, moduleName, "IterableTable", $p);
   }
-
-  toTypedIterTable<K = any, V = any>() {
-    return TypedIterableTable.fromIterableTable<K, V>(this);
-  }
-
   async loadFullState(app: $.AppType) {
-    const typedIterTable = this.toTypedIterTable();
-    await typedIterTable.fetchAll(app.client, app.repo, app.cache);
+    await this.inner.loadFullState(app);
+    await this.head.loadFullState(app);
+    await this.tail.loadFullState(app);
     this.__app = app;
   }
 }
@@ -129,13 +128,13 @@ export class IterableValue {
   ];
 
   val: any;
-  prev: Option.Option;
-  next: Option.Option;
+  prev: Stdlib.Option.Option;
+  next: Stdlib.Option.Option;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.val = proto["val"] as any;
-    this.prev = proto["prev"] as Option.Option;
-    this.next = proto["next"] as Option.Option;
+    this.prev = proto["prev"] as Stdlib.Option.Option;
+    this.next = proto["next"] as Stdlib.Option.Option;
   }
 
   static IterableValueParser(
@@ -168,23 +167,27 @@ export function add_(
 ): void {
   let k, wrapped_value;
   wrapped_value = new IterableValue(
-    { val: val, prev: $.copy(table.tail), next: Option.none_($c, [$p[0]]) },
+    {
+      val: val,
+      prev: $.copy(table.tail),
+      next: Stdlib.Option.none_($c, [$p[0]]),
+    },
     new SimpleStructTag(IterableValue, [$p[0], $p[1]])
   );
-  Table_with_length.add_(table.inner, $.copy(key), wrapped_value, $c, [
+  Stdlib.Table_with_length.add_(table.inner, $.copy(key), wrapped_value, $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
-  if (Option.is_some_(table.tail, $c, [$p[0]])) {
-    k = Option.borrow_(table.tail, $c, [$p[0]]);
-    Table_with_length.borrow_mut_(table.inner, $.copy(k), $c, [
+  if (Stdlib.Option.is_some_(table.tail, $c, [$p[0]])) {
+    k = Stdlib.Option.borrow_(table.tail, $c, [$p[0]]);
+    Stdlib.Table_with_length.borrow_mut_(table.inner, $.copy(k), $c, [
       $p[0],
       new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
-    ]).next = Option.some_($.copy(key), $c, [$p[0]]);
+    ]).next = Stdlib.Option.some_($.copy(key), $c, [$p[0]]);
   } else {
-    table.head = Option.some_($.copy(key), $c, [$p[0]]);
+    table.head = Stdlib.Option.some_($.copy(key), $c, [$p[0]]);
   }
-  table.tail = Option.some_($.copy(key), $c, [$p[0]]);
+  table.tail = Stdlib.Option.some_($.copy(key), $c, [$p[0]]);
   return;
 }
 
@@ -196,15 +199,15 @@ export function append_(
 ): void {
   let key, next, val;
   key = head_key_(v2, $c, [$p[0], $p[1]]);
-  while (Option.is_some_(key, $c, [$p[0]])) {
+  while (Stdlib.Option.is_some_(key, $c, [$p[0]])) {
     {
       [val, , next] = remove_iter_(
         v2,
-        $.copy(Option.borrow_(key, $c, [$p[0]])),
+        $.copy(Stdlib.Option.borrow_(key, $c, [$p[0]])),
         $c,
         [$p[0], $p[1]]
       );
-      add_(v1, $.copy(Option.borrow_(key, $c, [$p[0]])), val, $c, [
+      add_(v1, $.copy(Stdlib.Option.borrow_(key, $c, [$p[0]])), val, $c, [
         $p[0],
         $p[1],
       ]);
@@ -220,7 +223,7 @@ export function borrow_(
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
 ): any {
-  return Table_with_length.borrow_(table.inner, $.copy(key), $c, [
+  return Stdlib.Table_with_length.borrow_(table.inner, $.copy(key), $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]).val;
@@ -231,9 +234,9 @@ export function borrow_iter_(
   key: any,
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
-): [any, Option.Option, Option.Option] {
+): [any, Stdlib.Option.Option, Stdlib.Option.Option] {
   let v;
-  v = Table_with_length.borrow_(table.inner, $.copy(key), $c, [
+  v = Stdlib.Table_with_length.borrow_(table.inner, $.copy(key), $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
@@ -245,9 +248,9 @@ export function borrow_iter_mut_(
   key: any,
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
-): [any, Option.Option, Option.Option] {
+): [any, Stdlib.Option.Option, Stdlib.Option.Option] {
   let v;
-  v = Table_with_length.borrow_mut_(table.inner, $.copy(key), $c, [
+  v = Stdlib.Table_with_length.borrow_mut_(table.inner, $.copy(key), $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
@@ -260,7 +263,7 @@ export function borrow_mut_(
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
 ): any {
-  return Table_with_length.borrow_mut_(table.inner, $.copy(key), $c, [
+  return Stdlib.Table_with_length.borrow_mut_(table.inner, $.copy(key), $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]).val;
@@ -288,7 +291,7 @@ export function contains_(
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
 ): boolean {
-  return Table_with_length.contains_(table.inner, $.copy(key), $c, [
+  return Stdlib.Table_with_length.contains_(table.inner, $.copy(key), $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
@@ -302,14 +305,14 @@ export function destroy_empty_(
   if (!empty_(table, $c, [$p[0], $p[1]])) {
     throw $.abortCode(u64("0"));
   }
-  if (!Option.is_none_(table.head, $c, [$p[0]])) {
+  if (!Stdlib.Option.is_none_(table.head, $c, [$p[0]])) {
     throw $.abortCode(u64("0"));
   }
-  if (!Option.is_none_(table.tail, $c, [$p[0]])) {
+  if (!Stdlib.Option.is_none_(table.tail, $c, [$p[0]])) {
     throw $.abortCode(u64("0"));
   }
   let { inner: inner } = table;
-  Table_with_length.destroy_empty_(inner, $c, [
+  Stdlib.Table_with_length.destroy_empty_(inner, $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
@@ -321,7 +324,7 @@ export function empty_(
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
 ): boolean {
-  return Table_with_length.empty_(table.inner, $c, [
+  return Stdlib.Table_with_length.empty_(table.inner, $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
@@ -331,7 +334,7 @@ export function head_key_(
   table: IterableTable,
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
-): Option.Option {
+): Stdlib.Option.Option {
   return $.copy(table.head);
 }
 
@@ -340,7 +343,7 @@ export function length_(
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
 ): U64 {
-  return Table_with_length.length_(table.inner, $c, [
+  return Stdlib.Table_with_length.length_(table.inner, $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
@@ -352,12 +355,12 @@ export function new___(
 ): IterableTable {
   return new IterableTable(
     {
-      inner: Table_with_length.new___($c, [
+      inner: Stdlib.Table_with_length.new___($c, [
         $p[0],
         new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
       ]),
-      head: Option.none_($c, [$p[0]]),
-      tail: Option.none_($c, [$p[0]]),
+      head: Stdlib.Option.none_($c, [$p[0]]),
+      tail: Stdlib.Option.none_($c, [$p[0]]),
     },
     new SimpleStructTag(IterableTable, [$p[0], $p[1]])
   );
@@ -379,31 +382,31 @@ export function remove_iter_(
   key: any,
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
-): [any, Option.Option, Option.Option] {
+): [any, Stdlib.Option.Option, Stdlib.Option.Option] {
   let key__1, key__2, val;
-  val = Table_with_length.remove_(table.inner, $.copy(key), $c, [
+  val = Stdlib.Table_with_length.remove_(table.inner, $.copy(key), $c, [
     $p[0],
     new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
   ]);
-  if (Option.contains_(table.tail, key, $c, [$p[0]])) {
+  if (Stdlib.Option.contains_(table.tail, key, $c, [$p[0]])) {
     table.tail = $.copy(val.prev);
   } else {
   }
-  if (Option.contains_(table.head, key, $c, [$p[0]])) {
+  if (Stdlib.Option.contains_(table.head, key, $c, [$p[0]])) {
     table.head = $.copy(val.next);
   } else {
   }
-  if (Option.is_some_(val.prev, $c, [$p[0]])) {
-    key__1 = Option.borrow_(val.prev, $c, [$p[0]]);
-    Table_with_length.borrow_mut_(table.inner, $.copy(key__1), $c, [
+  if (Stdlib.Option.is_some_(val.prev, $c, [$p[0]])) {
+    key__1 = Stdlib.Option.borrow_(val.prev, $c, [$p[0]]);
+    Stdlib.Table_with_length.borrow_mut_(table.inner, $.copy(key__1), $c, [
       $p[0],
       new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
     ]).next = $.copy(val.next);
   } else {
   }
-  if (Option.is_some_(val.next, $c, [$p[0]])) {
-    key__2 = Option.borrow_(val.next, $c, [$p[0]]);
-    Table_with_length.borrow_mut_(table.inner, $.copy(key__2), $c, [
+  if (Stdlib.Option.is_some_(val.next, $c, [$p[0]])) {
+    key__2 = Stdlib.Option.borrow_(val.next, $c, [$p[0]]);
+    Stdlib.Table_with_length.borrow_mut_(table.inner, $.copy(key__2), $c, [
       $p[0],
       new SimpleStructTag(IterableValue, [$p[0], $p[1]]),
     ]).prev = $.copy(val.prev);
@@ -417,17 +420,17 @@ export function tail_key_(
   table: IterableTable,
   $c: AptosDataCache,
   $p: TypeTag[] /* <K, V>*/
-): Option.Option {
+): Stdlib.Option.Option {
   return $.copy(table.tail);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    "0x1::iterable_table::IterableTable",
+    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::iterable_table::IterableTable",
     IterableTable.IterableTableParser
   );
   repo.addParser(
-    "0x1::iterable_table::IterableValue",
+    "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::iterable_table::IterableValue",
     IterableValue.IterableValueParser
   );
 }
@@ -452,80 +455,5 @@ export class App {
   }
   get IterableValue() {
     return IterableValue;
-  }
-}
-
-export class TypedIterableTable<K = any, V = any> {
-  static fromIterableTable<K = any, V = any>(
-    table: IterableTable
-  ): TypedIterableTable<K, V> {
-    const tag = table.typeTag;
-    if (!(tag instanceof StructTag)) {
-      throw new Error();
-    }
-    if (tag.getParamlessName() !== "0x1::iterable_table::IterableTable") {
-      throw new Error();
-    }
-    if (tag.typeParams.length !== 2) {
-      throw new Error();
-    }
-    const [keyTag, valueTag] = tag.typeParams;
-    return new TypedIterableTable<K, V>(table, keyTag, valueTag);
-  }
-
-  iterValueTag: StructTag;
-  constructor(
-    public table: IterableTable,
-    public keyTag: TypeTag,
-    public valueTag: TypeTag
-  ) {
-    this.iterValueTag = new StructTag(
-      moduleAddress,
-      moduleName,
-      "IterableValue",
-      [keyTag, valueTag]
-    );
-  }
-
-  async loadEntryRaw(client: AptosClient, key: K): Promise<any> {
-    return await client.getTableItem(this.table.inner.inner.handle.toString(), {
-      key_type: $.getTypeTagFullname(this.keyTag),
-      value_type: $.getTypeTagFullname(this.iterValueTag),
-      key: $.moveValueToOpenApiObject(key, this.keyTag),
-    });
-  }
-
-  async loadEntry(
-    client: AptosClient,
-    repo: AptosParserRepo,
-    key: K
-  ): Promise<IterableValue> {
-    const rawVal = await this.loadEntryRaw(client, key);
-    return repo.parse(rawVal, this.iterValueTag) as IterableValue;
-  }
-
-  async fetchAll(
-    client: AptosClient,
-    repo: AptosParserRepo,
-    cache: AptosLocalCache | null = null
-  ): Promise<[K, V][]> {
-    const result: [K, V][] = [];
-    const dummyCache = new $.DummyCache();
-    let next = this.table.head;
-    while (next && (await Option.is_some_(next, dummyCache, [this.keyTag]))) {
-      const key = (await Option.borrow_(next, dummyCache, [this.keyTag])) as K;
-      const iterVal = await this.loadEntry(client, repo, key);
-      const value = iterVal.val as V;
-      result.push([key, value]);
-      next = iterVal.next;
-      if (cache) {
-        const $p = [this.keyTag, this.valueTag];
-        Table_with_length.add_(this.table.inner, $.copy(key), iterVal, cache, [
-          $p[0],
-          iterVal.typeTag,
-        ]);
-      }
-    }
-    return result;
   }
 }

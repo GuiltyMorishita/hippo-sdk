@@ -1,40 +1,63 @@
-import * as $ from '@manahippo/move-to-ts';
-import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
-import { U8, U64, U128 } from '@manahippo/move-to-ts';
-import { u8, u64, u128 } from '@manahippo/move-to-ts';
-import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
-import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
-import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
-import * as Option from './option';
-import * as Vector from './vector';
-export const packageName = 'MoveStdlib';
-export const moduleAddress = new HexString('0x1');
-export const moduleName = 'string';
+import * as $ from "@manahippo/move-to-ts";
+import {
+  AptosDataCache,
+  AptosParserRepo,
+  DummyCache,
+  AptosLocalCache,
+} from "@manahippo/move-to-ts";
+import { U8, U64, U128 } from "@manahippo/move-to-ts";
+import { u8, u64, u128 } from "@manahippo/move-to-ts";
+import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
+import {
+  AtomicTypeTag,
+  StructTag,
+  TypeTag,
+  VectorTag,
+  SimpleStructTag,
+} from "@manahippo/move-to-ts";
+import {
+  HexString,
+  AptosClient,
+  AptosAccount,
+  TxnBuilderTypes,
+  Types,
+} from "aptos";
+import * as Option from "./option";
+import * as Vector from "./vector";
+export const packageName = "MoveStdlib";
+export const moduleAddress = new HexString("0x1");
+export const moduleName = "string";
 
-export const EINVALID_INDEX: U64 = u64('2');
-export const EINVALID_UTF8: U64 = u64('1');
+export const EINVALID_INDEX: U64 = u64("2");
+export const EINVALID_UTF8: U64 = u64("1");
 
 export class String {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = 'String';
+  static structName: string = "String";
   static typeParameters: TypeParamDeclType[] = [];
-  static fields: FieldDeclType[] = [{ name: 'bytes', typeTag: new VectorTag(AtomicTypeTag.U8) }];
+  static fields: FieldDeclType[] = [
+    { name: "bytes", typeTag: new VectorTag(AtomicTypeTag.U8) },
+  ];
 
   bytes: U8[];
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.bytes = proto['bytes'] as U8[];
+    this.bytes = proto["bytes"] as U8[];
   }
 
-  static StringParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): String {
+  static StringParser(
+    data: any,
+    typeTag: TypeTag,
+    repo: AptosParserRepo
+  ): String {
     const proto = $.parseStructProto(data, typeTag, repo, String);
     return new String(proto, typeTag);
   }
 
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'String', []);
+    return new StructTag(moduleAddress, moduleName, "String", []);
   }
   str(): string {
     return $.u8str(this.bytes);
@@ -59,8 +82,23 @@ export function index_of_(s: String, r: String, $c: AptosDataCache): U64 {
   return internal_index_of_(s.bytes, r.bytes, $c);
 }
 
-export function insert_(s: String, at: U64, o: String, $c: AptosDataCache): void {
-  let temp$1, temp$2, temp$3, temp$4, temp$5, temp$6, temp$7, bytes, end, front, l;
+export function insert_(
+  s: String,
+  at: U64,
+  o: String,
+  $c: AptosDataCache
+): void {
+  let temp$1,
+    temp$2,
+    temp$3,
+    temp$4,
+    temp$5,
+    temp$6,
+    temp$7,
+    bytes,
+    end,
+    front,
+    l;
   bytes = s.bytes;
   if ($.copy(at).le(Vector.length_(bytes, $c, [AtomicTypeTag.U8]))) {
     temp$1 = internal_is_char_boundary_(bytes, $.copy(at), $c);
@@ -71,7 +109,7 @@ export function insert_(s: String, at: U64, o: String, $c: AptosDataCache): void
     throw $.abortCode($.copy(EINVALID_INDEX));
   }
   l = length_(s, $c);
-  [temp$2, temp$3, temp$4] = [s, u64('0'), $.copy(at)];
+  [temp$2, temp$3, temp$4] = [s, u64("0"), $.copy(at)];
   front = sub_string_(temp$2, temp$3, temp$4, $c);
   [temp$5, temp$6, temp$7] = [s, $.copy(at), $.copy(l)];
   end = sub_string_(temp$5, temp$6, temp$7, $c);
@@ -87,10 +125,19 @@ export function internal_check_utf8_(v: U8[], $c: AptosDataCache): boolean {
 export function internal_index_of_(v: U8[], r: U8[], $c: AptosDataCache): U64 {
   return $.std_string_internal_index_of(v, r, $c);
 }
-export function internal_is_char_boundary_(v: U8[], i: U64, $c: AptosDataCache): boolean {
+export function internal_is_char_boundary_(
+  v: U8[],
+  i: U64,
+  $c: AptosDataCache
+): boolean {
   return $.std_string_internal_is_char_boundary(v, i, $c);
 }
-export function internal_sub_string_(v: U8[], i: U64, j: U64, $c: AptosDataCache): U8[] {
+export function internal_sub_string_(
+  v: U8[],
+  i: U64,
+  j: U64,
+  $c: AptosDataCache
+): U8[] {
   return $.std_string_internal_sub_string(v, i, j, $c);
 }
 export function is_empty_(s: String, $c: AptosDataCache): boolean {
@@ -101,7 +148,12 @@ export function length_(s: String, $c: AptosDataCache): U64 {
   return Vector.length_(s.bytes, $c, [AtomicTypeTag.U8]);
 }
 
-export function sub_string_(s: String, i: U64, j: U64, $c: AptosDataCache): String {
+export function sub_string_(
+  s: String,
+  i: U64,
+  j: U64,
+  $c: AptosDataCache
+): String {
   let temp$1, temp$2, temp$3, bytes, l;
   bytes = s.bytes;
   l = Vector.length_(bytes, $c, [AtomicTypeTag.U8]);
@@ -123,15 +175,20 @@ export function sub_string_(s: String, i: U64, j: U64, $c: AptosDataCache): Stri
   if (!temp$3) {
     throw $.abortCode($.copy(EINVALID_INDEX));
   }
-  return new String({ bytes: internal_sub_string_(bytes, $.copy(i), $.copy(j), $c) }, new SimpleStructTag(String));
+  return new String(
+    { bytes: internal_sub_string_(bytes, $.copy(i), $.copy(j), $c) },
+    new SimpleStructTag(String)
+  );
 }
 
 export function try_utf8_(bytes: U8[], $c: AptosDataCache): Option.Option {
   let temp$1;
   if (internal_check_utf8_(bytes, $c)) {
-    temp$1 = Option.some_(new String({ bytes: $.copy(bytes) }, new SimpleStructTag(String)), $c, [
-      new SimpleStructTag(String)
-    ]);
+    temp$1 = Option.some_(
+      new String({ bytes: $.copy(bytes) }, new SimpleStructTag(String)),
+      $c,
+      [new SimpleStructTag(String)]
+    );
   } else {
     temp$1 = Option.none_($c, [new SimpleStructTag(String)]);
   }
@@ -146,10 +203,14 @@ export function utf8_(bytes: U8[], $c: AptosDataCache): String {
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser('0x1::string::String', String.StringParser);
+  repo.addParser("0x1::string::String", String.StringParser);
 }
 export class App {
-  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+    public cache: AptosLocalCache
+  ) {}
   get moduleAddress() {
     {
       return moduleAddress;

@@ -1,48 +1,68 @@
-import * as $ from '@manahippo/move-to-ts';
-import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
-import { U8, U64, U128 } from '@manahippo/move-to-ts';
-import { u8, u64, u128 } from '@manahippo/move-to-ts';
-import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
-import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
-import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
-import * as Account from './account';
-import * as Aggregator_factory from './aggregator_factory';
-import * as Aptos_coin from './aptos_coin';
-import * as Aptos_governance from './aptos_governance';
-import * as Block from './block';
-import * as Chain_id from './chain_id';
-import * as Chain_status from './chain_status';
-import * as Coin from './coin';
-import * as Consensus_config from './consensus_config';
-import * as Gas_schedule from './gas_schedule';
-import * as Reconfiguration from './reconfiguration';
-import * as Stake from './stake';
-import * as Staking_config from './staking_config';
-import * as State_storage from './state_storage';
-import * as Timestamp from './timestamp';
-import * as Transaction_fee from './transaction_fee';
-import * as Transaction_validation from './transaction_validation';
-import * as Vector from './vector';
-import * as Version from './version';
-export const packageName = 'AptosFramework';
-export const moduleAddress = new HexString('0x1');
-export const moduleName = 'genesis';
+import * as $ from "@manahippo/move-to-ts";
+import {
+  AptosDataCache,
+  AptosParserRepo,
+  DummyCache,
+  AptosLocalCache,
+} from "@manahippo/move-to-ts";
+import { U8, U64, U128 } from "@manahippo/move-to-ts";
+import { u8, u64, u128 } from "@manahippo/move-to-ts";
+import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
+import {
+  AtomicTypeTag,
+  StructTag,
+  TypeTag,
+  VectorTag,
+  SimpleStructTag,
+} from "@manahippo/move-to-ts";
+import {
+  HexString,
+  AptosClient,
+  AptosAccount,
+  TxnBuilderTypes,
+  Types,
+} from "aptos";
+import * as Account from "./account";
+import * as Aggregator_factory from "./aggregator_factory";
+import * as Aptos_coin from "./aptos_coin";
+import * as Aptos_governance from "./aptos_governance";
+import * as Block from "./block";
+import * as Chain_id from "./chain_id";
+import * as Chain_status from "./chain_status";
+import * as Coin from "./coin";
+import * as Consensus_config from "./consensus_config";
+import * as Gas_schedule from "./gas_schedule";
+import * as Reconfiguration from "./reconfiguration";
+import * as Stake from "./stake";
+import * as Staking_config from "./staking_config";
+import * as State_storage from "./state_storage";
+import * as Timestamp from "./timestamp";
+import * as Transaction_fee from "./transaction_fee";
+import * as Transaction_validation from "./transaction_validation";
+import * as Vector from "./vector";
+import * as Version from "./version";
+export const packageName = "AptosFramework";
+export const moduleAddress = new HexString("0x1");
+export const moduleName = "genesis";
 
 export class ValidatorConfiguration {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = 'ValidatorConfiguration';
+  static structName: string = "ValidatorConfiguration";
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
-    { name: 'owner_address', typeTag: AtomicTypeTag.Address },
-    { name: 'operator_address', typeTag: AtomicTypeTag.Address },
-    { name: 'voter_address', typeTag: AtomicTypeTag.Address },
-    { name: 'stake_amount', typeTag: AtomicTypeTag.U64 },
-    { name: 'consensus_pubkey', typeTag: new VectorTag(AtomicTypeTag.U8) },
-    { name: 'proof_of_possession', typeTag: new VectorTag(AtomicTypeTag.U8) },
-    { name: 'network_addresses', typeTag: new VectorTag(AtomicTypeTag.U8) },
-    { name: 'full_node_network_addresses', typeTag: new VectorTag(AtomicTypeTag.U8) }
+    { name: "owner_address", typeTag: AtomicTypeTag.Address },
+    { name: "operator_address", typeTag: AtomicTypeTag.Address },
+    { name: "voter_address", typeTag: AtomicTypeTag.Address },
+    { name: "stake_amount", typeTag: AtomicTypeTag.U64 },
+    { name: "consensus_pubkey", typeTag: new VectorTag(AtomicTypeTag.U8) },
+    { name: "proof_of_possession", typeTag: new VectorTag(AtomicTypeTag.U8) },
+    { name: "network_addresses", typeTag: new VectorTag(AtomicTypeTag.U8) },
+    {
+      name: "full_node_network_addresses",
+      typeTag: new VectorTag(AtomicTypeTag.U8),
+    },
   ];
 
   owner_address: HexString;
@@ -55,23 +75,39 @@ export class ValidatorConfiguration {
   full_node_network_addresses: U8[];
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.owner_address = proto['owner_address'] as HexString;
-    this.operator_address = proto['operator_address'] as HexString;
-    this.voter_address = proto['voter_address'] as HexString;
-    this.stake_amount = proto['stake_amount'] as U64;
-    this.consensus_pubkey = proto['consensus_pubkey'] as U8[];
-    this.proof_of_possession = proto['proof_of_possession'] as U8[];
-    this.network_addresses = proto['network_addresses'] as U8[];
-    this.full_node_network_addresses = proto['full_node_network_addresses'] as U8[];
+    this.owner_address = proto["owner_address"] as HexString;
+    this.operator_address = proto["operator_address"] as HexString;
+    this.voter_address = proto["voter_address"] as HexString;
+    this.stake_amount = proto["stake_amount"] as U64;
+    this.consensus_pubkey = proto["consensus_pubkey"] as U8[];
+    this.proof_of_possession = proto["proof_of_possession"] as U8[];
+    this.network_addresses = proto["network_addresses"] as U8[];
+    this.full_node_network_addresses = proto[
+      "full_node_network_addresses"
+    ] as U8[];
   }
 
-  static ValidatorConfigurationParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): ValidatorConfiguration {
-    const proto = $.parseStructProto(data, typeTag, repo, ValidatorConfiguration);
+  static ValidatorConfigurationParser(
+    data: any,
+    typeTag: TypeTag,
+    repo: AptosParserRepo
+  ): ValidatorConfiguration {
+    const proto = $.parseStructProto(
+      data,
+      typeTag,
+      repo,
+      ValidatorConfiguration
+    );
     return new ValidatorConfiguration(proto, typeTag);
   }
 
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, 'ValidatorConfiguration', []);
+    return new StructTag(
+      moduleAddress,
+      moduleName,
+      "ValidatorConfiguration",
+      []
+    );
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
@@ -83,21 +119,36 @@ export function create_initialize_validators_(
   $c: AptosDataCache
 ): void {
   let temp$1, temp$2, temp$3, i, num_validators, operator, owner, validator;
-  i = u64('0');
-  num_validators = Vector.length_(validators, $c, [new SimpleStructTag(ValidatorConfiguration)]);
+  i = u64("0");
+  num_validators = Vector.length_(validators, $c, [
+    new SimpleStructTag(ValidatorConfiguration),
+  ]);
   while ($.copy(i).lt($.copy(num_validators))) {
     {
-      validator = Vector.borrow_(validators, $.copy(i), $c, [new SimpleStructTag(ValidatorConfiguration)]);
+      validator = Vector.borrow_(validators, $.copy(i), $c, [
+        new SimpleStructTag(ValidatorConfiguration),
+      ]);
       temp$1 = Account.create_account_($.copy(validator.owner_address), $c);
       owner = temp$1;
       operator = owner;
-      if ($.copy(validator.operator_address).hex() !== $.copy(validator.owner_address).hex()) {
-        temp$2 = Account.create_account_($.copy(validator.operator_address), $c);
+      if (
+        $.copy(validator.operator_address).hex() !==
+        $.copy(validator.owner_address).hex()
+      ) {
+        temp$2 = Account.create_account_(
+          $.copy(validator.operator_address),
+          $c
+        );
         operator = temp$2;
       } else {
       }
-      if ($.copy(validator.voter_address).hex() !== $.copy(validator.owner_address).hex()) {
-        temp$3 = $.copy(validator.voter_address).hex() !== $.copy(validator.operator_address).hex();
+      if (
+        $.copy(validator.voter_address).hex() !==
+        $.copy(validator.owner_address).hex()
+      ) {
+        temp$3 =
+          $.copy(validator.voter_address).hex() !==
+          $.copy(validator.operator_address).hex();
       } else {
         temp$3 = false;
       }
@@ -105,8 +156,15 @@ export function create_initialize_validators_(
         Account.create_account_($.copy(validator.voter_address), $c);
       } else {
       }
-      Coin.register_(owner, $c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])]);
-      Aptos_coin.mint_(aptos_framework, $.copy(validator.owner_address), $.copy(validator.stake_amount), $c);
+      Coin.register_(owner, $c, [
+        new StructTag(new HexString("0x1"), "aptos_coin", "AptosCoin", []),
+      ]);
+      Aptos_coin.mint_(
+        aptos_framework,
+        $.copy(validator.owner_address),
+        $.copy(validator.stake_amount),
+        $c
+      );
       Stake.initialize_stake_owner_(
         owner,
         $.copy(validator.stake_amount),
@@ -128,8 +186,12 @@ export function create_initialize_validators_(
         $.copy(validator.full_node_network_addresses),
         $c
       );
-      Stake.join_validator_set_internal_(operator, $.copy(validator.owner_address), $c);
-      i = $.copy(i).add(u64('1'));
+      Stake.join_validator_set_internal_(
+        operator,
+        $.copy(validator.owner_address),
+        $c
+      );
+      i = $.copy(i).add(u64("1"));
     }
   }
   Aptos_coin.destroy_mint_cap_(aptos_framework, $c);
@@ -159,101 +221,127 @@ export function initialize_(
     framework_reserved_addresses,
     framework_signer_cap,
     i;
-  [aptos_framework_account, aptos_framework_signer_cap] = Account.create_framework_reserved_account_(
-    new HexString('0x1'),
-    $c
-  );
+  [aptos_framework_account, aptos_framework_signer_cap] =
+    Account.create_framework_reserved_account_(new HexString("0x1"), $c);
   Account.initialize_(aptos_framework_account, $c);
   Transaction_validation.initialize_(
     aptos_framework_account,
     [
-      u8('115'),
-      u8('99'),
-      u8('114'),
-      u8('105'),
-      u8('112'),
-      u8('116'),
-      u8('95'),
-      u8('112'),
-      u8('114'),
-      u8('111'),
-      u8('108'),
-      u8('111'),
-      u8('103'),
-      u8('117'),
-      u8('101')
+      u8("115"),
+      u8("99"),
+      u8("114"),
+      u8("105"),
+      u8("112"),
+      u8("116"),
+      u8("95"),
+      u8("112"),
+      u8("114"),
+      u8("111"),
+      u8("108"),
+      u8("111"),
+      u8("103"),
+      u8("117"),
+      u8("101"),
     ],
     [
-      u8('109'),
-      u8('111'),
-      u8('100'),
-      u8('117'),
-      u8('108'),
-      u8('101'),
-      u8('95'),
-      u8('112'),
-      u8('114'),
-      u8('111'),
-      u8('108'),
-      u8('111'),
-      u8('103'),
-      u8('117'),
-      u8('101')
+      u8("109"),
+      u8("111"),
+      u8("100"),
+      u8("117"),
+      u8("108"),
+      u8("101"),
+      u8("95"),
+      u8("112"),
+      u8("114"),
+      u8("111"),
+      u8("108"),
+      u8("111"),
+      u8("103"),
+      u8("117"),
+      u8("101"),
     ],
     [
-      u8('109'),
-      u8('117'),
-      u8('108'),
-      u8('116'),
-      u8('105'),
-      u8('95'),
-      u8('97'),
-      u8('103'),
-      u8('101'),
-      u8('110'),
-      u8('116'),
-      u8('95'),
-      u8('115'),
-      u8('99'),
-      u8('114'),
-      u8('105'),
-      u8('112'),
-      u8('116'),
-      u8('95'),
-      u8('112'),
-      u8('114'),
-      u8('111'),
-      u8('108'),
-      u8('111'),
-      u8('103'),
-      u8('117'),
-      u8('101')
+      u8("109"),
+      u8("117"),
+      u8("108"),
+      u8("116"),
+      u8("105"),
+      u8("95"),
+      u8("97"),
+      u8("103"),
+      u8("101"),
+      u8("110"),
+      u8("116"),
+      u8("95"),
+      u8("115"),
+      u8("99"),
+      u8("114"),
+      u8("105"),
+      u8("112"),
+      u8("116"),
+      u8("95"),
+      u8("112"),
+      u8("114"),
+      u8("111"),
+      u8("108"),
+      u8("111"),
+      u8("103"),
+      u8("117"),
+      u8("101"),
     ],
-    [u8('101'), u8('112'), u8('105'), u8('108'), u8('111'), u8('103'), u8('117'), u8('101')],
+    [
+      u8("101"),
+      u8("112"),
+      u8("105"),
+      u8("108"),
+      u8("111"),
+      u8("103"),
+      u8("117"),
+      u8("101"),
+    ],
     $c
   );
-  Aptos_governance.store_signer_cap_(aptos_framework_account, new HexString('0x1'), aptos_framework_signer_cap, $c);
+  Aptos_governance.store_signer_cap_(
+    aptos_framework_account,
+    new HexString("0x1"),
+    aptos_framework_signer_cap,
+    $c
+  );
   framework_reserved_addresses = [
-    new HexString('0x2'),
-    new HexString('0x3'),
-    new HexString('0x4'),
-    new HexString('0x5'),
-    new HexString('0x6'),
-    new HexString('0x7'),
-    new HexString('0x8'),
-    new HexString('0x9'),
-    new HexString('0xa')
+    new HexString("0x2"),
+    new HexString("0x3"),
+    new HexString("0x4"),
+    new HexString("0x5"),
+    new HexString("0x6"),
+    new HexString("0x7"),
+    new HexString("0x8"),
+    new HexString("0x9"),
+    new HexString("0xa"),
   ];
-  i = u64('0');
-  while (!Vector.is_empty_(framework_reserved_addresses, $c, [AtomicTypeTag.Address])) {
+  i = u64("0");
+  while (
+    !Vector.is_empty_(framework_reserved_addresses, $c, [AtomicTypeTag.Address])
+  ) {
     {
-      address = Vector.pop_back_(framework_reserved_addresses, $c, [AtomicTypeTag.Address]);
-      [aptos_account, framework_signer_cap] = Account.create_framework_reserved_account_($.copy(address), $c);
-      Aptos_governance.store_signer_cap_(aptos_account, $.copy(address), framework_signer_cap, $c);
-      i = $.copy(i).add(u64('1'));
+      address = Vector.pop_back_(framework_reserved_addresses, $c, [
+        AtomicTypeTag.Address,
+      ]);
+      [aptos_account, framework_signer_cap] =
+        Account.create_framework_reserved_account_($.copy(address), $c);
+      Aptos_governance.store_signer_cap_(
+        aptos_account,
+        $.copy(address),
+        framework_signer_cap,
+        $c
+      );
+      i = $.copy(i).add(u64("1"));
     }
   }
-  Consensus_config.initialize_(aptos_framework_account, $.copy(consensus_config), $c);
+  Consensus_config.initialize_(
+    aptos_framework_account,
+    $.copy(consensus_config),
+    $c
+  );
   Version.initialize_(aptos_framework_account, $.copy(initial_version), $c);
   Stake.initialize_(aptos_framework_account, $c);
   Staking_config.initialize_(
@@ -268,22 +356,36 @@ export function initialize_(
     $c
   );
   Gas_schedule.initialize_(aptos_framework_account, $.copy(gas_schedule), $c);
-  Aggregator_factory.initialize_aggregator_factory_(aptos_framework_account, $c);
+  Aggregator_factory.initialize_aggregator_factory_(
+    aptos_framework_account,
+    $c
+  );
   Coin.initialize_supply_config_(aptos_framework_account, $c);
   Chain_id.initialize_(aptos_framework_account, $.copy(chain_id), $c);
   Reconfiguration.initialize_(aptos_framework_account, $c);
-  Block.initialize_(aptos_framework_account, $.copy(epoch_interval_microsecs), $c);
+  Block.initialize_(
+    aptos_framework_account,
+    $.copy(epoch_interval_microsecs),
+    $c
+  );
   State_storage.initialize_(aptos_framework_account, $c);
   Timestamp.set_time_has_started_(aptos_framework_account, $c);
   return;
 }
 
-export function initialize_aptos_coin_(aptos_framework: HexString, $c: AptosDataCache): Coin.MintCapability {
+export function initialize_aptos_coin_(
+  aptos_framework: HexString,
+  $c: AptosDataCache
+): void {
   let burn_cap, mint_cap;
   [burn_cap, mint_cap] = Aptos_coin.initialize_(aptos_framework, $c);
   Stake.store_aptos_coin_mint_cap_(aptos_framework, $.copy(mint_cap), $c);
-  Transaction_fee.store_aptos_coin_burn_cap_(aptos_framework, $.copy(burn_cap), $c);
-  return $.copy(mint_cap);
+  Transaction_fee.store_aptos_coin_burn_cap_(
+    aptos_framework,
+    $.copy(burn_cap),
+    $c
+  );
+  return;
 }
 
 export function initialize_core_resources_and_aptos_coin_(
@@ -291,24 +393,97 @@ export function initialize_core_resources_and_aptos_coin_(
   core_resources_auth_key: U8[],
   $c: AptosDataCache
 ): void {
-  let core_resources, mint_cap;
-  core_resources = Account.create_account_(new HexString('0xa550c18'), $c);
-  Account.rotate_authentication_key_internal_(core_resources, $.copy(core_resources_auth_key), $c);
-  mint_cap = initialize_aptos_coin_(aptos_framework, $c);
-  Aptos_coin.configure_accounts_for_test_(aptos_framework, core_resources, $.copy(mint_cap), $c);
+  let burn_cap, core_resources, mint_cap;
+  [burn_cap, mint_cap] = Aptos_coin.initialize_(aptos_framework, $c);
+  Stake.store_aptos_coin_mint_cap_(aptos_framework, $.copy(mint_cap), $c);
+  Transaction_fee.store_aptos_coin_burn_cap_(
+    aptos_framework,
+    $.copy(burn_cap),
+    $c
+  );
+  core_resources = Account.create_account_(new HexString("0xa550c18"), $c);
+  Account.rotate_authentication_key_internal_(
+    core_resources,
+    $.copy(core_resources_auth_key),
+    $c
+  );
+  Aptos_coin.configure_accounts_for_test_(
+    aptos_framework,
+    core_resources,
+    $.copy(mint_cap),
+    $c
+  );
   return;
 }
 
-export function set_genesis_end_(aptos_framework: HexString, $c: AptosDataCache): void {
+export function initialize_for_verification_(
+  gas_schedule: U8[],
+  chain_id: U8,
+  initial_version: U64,
+  consensus_config: U8[],
+  epoch_interval_microsecs: U64,
+  minimum_stake: U64,
+  maximum_stake: U64,
+  recurring_lockup_duration_secs: U64,
+  allow_validator_set_change: boolean,
+  rewards_rate: U64,
+  rewards_rate_denominator: U64,
+  voting_power_increase_limit: U64,
+  aptos_framework: HexString,
+  validators: ValidatorConfiguration[],
+  min_voting_threshold: U128,
+  required_proposer_stake: U64,
+  voting_duration_secs: U64,
+  $c: AptosDataCache
+): void {
+  initialize_(
+    $.copy(gas_schedule),
+    $.copy(chain_id),
+    $.copy(initial_version),
+    $.copy(consensus_config),
+    $.copy(epoch_interval_microsecs),
+    $.copy(minimum_stake),
+    $.copy(maximum_stake),
+    $.copy(recurring_lockup_duration_secs),
+    allow_validator_set_change,
+    $.copy(rewards_rate),
+    $.copy(rewards_rate_denominator),
+    $.copy(voting_power_increase_limit),
+    $c
+  );
+  initialize_aptos_coin_(aptos_framework, $c);
+  Aptos_governance.initialize_for_verification_(
+    aptos_framework,
+    $.copy(min_voting_threshold),
+    $.copy(required_proposer_stake),
+    $.copy(voting_duration_secs),
+    $c
+  );
+  create_initialize_validators_(aptos_framework, $.copy(validators), $c);
+  set_genesis_end_(aptos_framework, $c);
+  return;
+}
+
+export function set_genesis_end_(
+  aptos_framework: HexString,
+  $c: AptosDataCache
+): void {
   Chain_status.set_genesis_end_(aptos_framework, $c);
   return;
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser('0x1::genesis::ValidatorConfiguration', ValidatorConfiguration.ValidatorConfigurationParser);
+  repo.addParser(
+    "0x1::genesis::ValidatorConfiguration",
+    ValidatorConfiguration.ValidatorConfigurationParser
+  );
 }
 export class App {
-  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+    public cache: AptosLocalCache
+  ) {}
   get moduleAddress() {
     {
       return moduleAddress;
