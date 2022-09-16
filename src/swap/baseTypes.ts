@@ -1,9 +1,9 @@
-import { getTypeTagFullname, StructTag, u64, u8 } from '@manahippo/move-to-ts';
-import bigInt from 'big-integer';
-import { Router } from '../generated/hippo_swap';
-import { typeInfoToTypeTag } from '../utils';
-import { CoinInfo } from '../generated/coin_list/coin_list';
-import { TxnBuilderTypes } from 'aptos';
+import { getTypeTagFullname, StructTag, u64, u8 } from "@manahippo/move-to-ts";
+import bigInt from "big-integer";
+import { Router } from "../generated/hippo_swap";
+import { typeInfoToTypeTag } from "../utils";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { TxnBuilderTypes } from "aptos";
 
 export type UITokenAmount = number;
 
@@ -29,23 +29,26 @@ export enum PoolType {
   // eslint-disable-next-line no-unused-vars
   STABLE_CURVE = 2,
   // eslint-disable-next-line no-unused-vars
-  THREE_PIECE = 3
+  THREE_PIECE = 3,
 }
 
 export function poolTypeToName(poolType: PoolType) {
   if (poolType === PoolType.CONSTANT_PRODUCT) {
-    return 'ConstantProduct';
+    return "ConstantProduct";
   } else if (poolType === PoolType.STABLE_CURVE) {
-    return 'StableCurve';
+    return "StableCurve";
   } else if (poolType === PoolType.THREE_PIECE) {
-    return 'ThreePiece';
+    return "ThreePiece";
   } else {
     throw new Error();
   }
 }
 
 export abstract class TradeRoute {
-  protected constructor(public xCoinInfo: CoinInfo, public yCoinInfo: CoinInfo) {}
+  protected constructor(
+    public xCoinInfo: CoinInfo,
+    public yCoinInfo: CoinInfo
+  ) {}
 
   xTag(): StructTag {
     return typeInfoToTypeTag(this.xCoinInfo.token_type) as StructTag;
@@ -67,7 +70,11 @@ export abstract class TradeRoute {
 }
 
 export abstract class HippoPool extends TradeRoute {
-  protected constructor(xCoinInfo: CoinInfo, yCoinInfo: CoinInfo, public lpCoinInfo: CoinInfo) {
+  protected constructor(
+    xCoinInfo: CoinInfo,
+    yCoinInfo: CoinInfo,
+    public lpCoinInfo: CoinInfo
+  ) {
     super(xCoinInfo, yCoinInfo);
   }
 
@@ -86,7 +93,9 @@ export abstract class HippoPool extends TradeRoute {
   }
 
   xyFullname(): string {
-    const [xFullname, yFullname] = [this.xTag(), this.yTag()].map(getTypeTagFullname);
+    const [xFullname, yFullname] = [this.xTag(), this.yTag()].map(
+      getTypeTagFullname
+    );
     return `${xFullname}<->${yFullname}`;
   }
 
@@ -101,7 +110,10 @@ export abstract class HippoPool extends TradeRoute {
     return this.getCurrentPriceDirectional(true);
   }
 
-  abstract getQuoteDirectional(uiAmount: UITokenAmount, isXtoY: boolean): QuoteType;
+  abstract getQuoteDirectional(
+    uiAmount: UITokenAmount,
+    isXtoY: boolean
+  ): QuoteType;
 
   getQuote(uiAmount: UITokenAmount): QuoteType {
     return this.getQuoteDirectional(uiAmount, true);
@@ -170,7 +182,10 @@ export class SteppedRoute extends TradeRoute {
 
   getQuote(uiAmount: UITokenAmount): QuoteType {
     if (this.steps.length === 1) {
-      return this.steps[0].pool.getQuoteDirectional(uiAmount, this.steps[0].isXtoY);
+      return this.steps[0].pool.getQuoteDirectional(
+        uiAmount,
+        this.steps[0].isXtoY
+      );
     } else {
       let prevOutputUiAmt = uiAmount;
       let avgPrice = 1;
@@ -178,7 +193,10 @@ export class SteppedRoute extends TradeRoute {
       let finalPrice = 1;
       const quotes = [];
       for (const step of this.steps) {
-        const quote = step.pool.getQuoteDirectional(prevOutputUiAmt, step.isXtoY);
+        const quote = step.pool.getQuoteDirectional(
+          prevOutputUiAmt,
+          step.isXtoY
+        );
         quotes.push(quote);
         prevOutputUiAmt = quote.outputUiAmt;
         avgPrice *= quote.avgPrice;
@@ -193,7 +211,7 @@ export class SteppedRoute extends TradeRoute {
         finalPrice,
         inputUiAmt: uiAmount,
         outputUiAmt: prevOutputUiAmt,
-        priceImpact: (finalPrice - initialPrice) / initialPrice
+        priceImpact: (finalPrice - initialPrice) / initialPrice,
       };
     }
   }
@@ -204,13 +222,25 @@ export class SteppedRoute extends TradeRoute {
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     // TxnBuilderTypes.TxnBuilderTypes.TransactionPayloadEntryFunction
     if (this.steps.length === 1) {
-      return this.steps[0].pool.makeSwapPayloadDirectional(amountIn, minAmountOut, this.steps[0].isXtoY);
+      return this.steps[0].pool.makeSwapPayloadDirectional(
+        amountIn,
+        minAmountOut,
+        this.steps[0].isXtoY
+      );
     } else if (this.steps.length === 2) {
       const fromTokenInfo = this.steps[0].lhsTokenInfo();
       const middleTokenInfo = this.steps[0].rhsTokenInfo();
       const toTokenInfo = this.steps[1].rhsTokenInfo();
-      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
-      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+      const fromRawAmount = bigInt(
+        (amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(
+          0
+        )
+      );
+      const toRawAmount = bigInt(
+        (
+          minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())
+        ).toFixed(0)
+      );
       return Promise.resolve(
         Router.buildPayload_two_step_route_script(
           u8(this.steps[0].pool.getPoolType()),
@@ -222,7 +252,7 @@ export class SteppedRoute extends TradeRoute {
           [
             typeInfoToTypeTag(fromTokenInfo.token_type),
             typeInfoToTypeTag(middleTokenInfo.token_type),
-            typeInfoToTypeTag(toTokenInfo.token_type)
+            typeInfoToTypeTag(toTokenInfo.token_type),
           ]
         ) as TxnBuilderTypes.TransactionPayloadEntryFunction
       );
@@ -231,8 +261,16 @@ export class SteppedRoute extends TradeRoute {
       const middle1TokenInfo = this.steps[0].rhsTokenInfo();
       const middle2TokenInfo = this.steps[1].rhsTokenInfo();
       const toTokenInfo = this.steps[2].rhsTokenInfo();
-      const fromRawAmount = bigInt((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
-      const toRawAmount = bigInt((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+      const fromRawAmount = bigInt(
+        (amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(
+          0
+        )
+      );
+      const toRawAmount = bigInt(
+        (
+          minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())
+        ).toFixed(0)
+      );
       return Promise.resolve(
         Router.buildPayload_three_step_route_script(
           u8(this.steps[0].pool.getPoolType()),
@@ -247,7 +285,7 @@ export class SteppedRoute extends TradeRoute {
             typeInfoToTypeTag(fromTokenInfo.token_type),
             typeInfoToTypeTag(middle1TokenInfo.token_type),
             typeInfoToTypeTag(middle2TokenInfo.token_type),
-            typeInfoToTypeTag(toTokenInfo.token_type)
+            typeInfoToTypeTag(toTokenInfo.token_type),
           ]
         ) as TxnBuilderTypes.TransactionPayloadEntryFunction
       );
@@ -279,6 +317,6 @@ export class SteppedRoute extends TradeRoute {
   }
 
   summarize(): string {
-    return this.getSymbolPath().join(' -> ');
+    return this.getSymbolPath().join(" -> ");
   }
 }

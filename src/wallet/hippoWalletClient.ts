@@ -1,11 +1,16 @@
-import { getTypeTagFullname, SimulationKeys, StructTag, u64 } from '@manahippo/move-to-ts';
-import { HexString, TxnBuilderTypes, Types } from 'aptos';
-import { NetworkConfiguration } from '../config';
+import {
+  getTypeTagFullname,
+  SimulationKeys,
+  StructTag,
+  u64,
+} from "@manahippo/move-to-ts";
+import { HexString, TxnBuilderTypes, Types } from "aptos";
+import { NetworkConfiguration } from "../config";
 
-import * as AptosFramework from '../generated/stdlib';
-import * as CoinList from '../generated/coin_list';
-import { getCoinStoresForAddress, typeInfoToTypeTag } from '../utils';
-import { App } from '../generated';
+import * as AptosFramework from "../generated/stdlib";
+import * as CoinList from "../generated/coin_list";
+import { getCoinStoresForAddress, typeInfoToTypeTag } from "../utils";
+import { App } from "../generated";
 
 export class HippoWalletClient {
   public symbolToCoinStore: Record<string, AptosFramework.Coin.CoinStore>;
@@ -48,7 +53,8 @@ export class HippoWalletClient {
         throw new Error();
       }
       if (
-        typeTag.address.hex() === this.app.coin_list.devnet_coins.moduleAddress.hex() &&
+        typeTag.address.hex() ===
+          this.app.coin_list.devnet_coins.moduleAddress.hex() &&
         typeTag.module === this.app.coin_list.devnet_coins.moduleName
       ) {
         this.devnetCoinSymbols.push(tokenInfo.symbol.str());
@@ -74,7 +80,11 @@ export class HippoWalletClient {
   }
 
   async refreshStores() {
-    this.coinStores = await getCoinStoresForAddress(this.app.client, this.walletAddress, this.app.parserRepo);
+    this.coinStores = await getCoinStoresForAddress(
+      this.app.client,
+      this.walletAddress,
+      this.app.parserRepo
+    );
     await this.buildCache();
   }
 
@@ -84,8 +94,18 @@ export class HippoWalletClient {
     walletAddress: HexString,
     fetcher: SimulationKeys
   ) {
-    const stores = await getCoinStoresForAddress(app.client, walletAddress, app.parserRepo);
-    const client = new HippoWalletClient(netConf, app, walletAddress, stores, fetcher);
+    const stores = await getCoinStoresForAddress(
+      app.client,
+      walletAddress,
+      app.parserRepo
+    );
+    const client = new HippoWalletClient(
+      netConf,
+      app,
+      walletAddress,
+      stores,
+      fetcher
+    );
     await client.buildCache();
     return client;
   }
@@ -94,17 +114,27 @@ export class HippoWalletClient {
     uiAmount: number,
     symbol: string,
     isJSONPayload = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
     if (!this.devnetCoinSymbols.includes(symbol)) {
-      throw new Error(`${symbol} is not a MockCoin and we are unable to mint it.`);
+      throw new Error(
+        `${symbol} is not a MockCoin and we are unable to mint it.`
+      );
     }
     const tokenInfo = this.symbolToTokenInfo[symbol];
     if (!tokenInfo) {
       throw new Error(`Cannot find TokenInfo for ${symbol}`);
     }
-    const rawAmount = u64(Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber())));
+    const rawAmount = u64(
+      Math.floor(uiAmount * Math.pow(10, tokenInfo.decimals.toJsNumber()))
+    );
     const tokenTypeTag = typeInfoToTypeTag(tokenInfo.token_type);
-    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(rawAmount, [tokenTypeTag], isJSONPayload);
+    return this.app.coin_list.devnet_coins.payload_mint_to_wallet(
+      rawAmount,
+      [tokenTypeTag],
+      isJSONPayload
+    );
   }
 
   debugPrint() {
@@ -112,7 +142,10 @@ export class HippoWalletClient {
       const store = this.symbolToCoinStore[symbol];
       const tokenInfo = this.symbolToTokenInfo[symbol];
       console.log(
-        `${tokenInfo.symbol.str()}: ${store.coin.value.toJsNumber() / Math.pow(10, tokenInfo.decimals.toJsNumber())}`
+        `${tokenInfo.symbol.str()}: ${
+          store.coin.value.toJsNumber() /
+          Math.pow(10, tokenInfo.decimals.toJsNumber())
+        }`
       );
     }
   }

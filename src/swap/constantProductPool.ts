@@ -1,8 +1,14 @@
-import { u64 } from '@manahippo/move-to-ts';
-import { Cp_scripts, Cp_swap } from '../generated/hippo_swap';
-import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
-import { CoinInfo } from '../generated/coin_list/coin_list';
-import { TxnBuilderTypes } from 'aptos';
+import { u64 } from "@manahippo/move-to-ts";
+import { Cp_scripts, Cp_swap } from "../generated/hippo_swap";
+import {
+  HippoPool,
+  PoolType,
+  PriceType,
+  QuoteType,
+  UITokenAmount,
+} from "./baseTypes";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { TxnBuilderTypes } from "aptos";
 
 export class HippoConstantProductPool extends HippoPool {
   constructor(
@@ -14,10 +20,16 @@ export class HippoConstantProductPool extends HippoPool {
     super(xCoinInfo, yCoinInfo, lpCoinInfo);
   }
   xUiBalance() {
-    return this.cpPoolMeta.balance_x.value.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+    return (
+      this.cpPoolMeta.balance_x.value.toJsNumber() /
+      Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
   }
   yUiBalance() {
-    return this.cpPoolMeta.balance_y.value.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+    return (
+      this.cpPoolMeta.balance_y.value.toJsNumber() /
+      Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
   }
   getId(): string {
     return `HippoConstantProductPool<${this.xyFullname()}>`;
@@ -30,7 +42,7 @@ export class HippoConstantProductPool extends HippoPool {
     const yUiBalance = isXtoY ? this.yUiBalance() : this.xUiBalance();
     return {
       xToY: xUiBalance / yUiBalance / this.getAfterFeeFactor(),
-      yToX: yUiBalance / xUiBalance / this.getAfterFeeFactor()
+      yToX: yUiBalance / xUiBalance / this.getAfterFeeFactor(),
     };
   }
   getQuoteDirectional(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
@@ -42,9 +54,13 @@ export class HippoConstantProductPool extends HippoPool {
     if (isXtoY) {
       inputSymbol = this.xCoinInfo.symbol.str();
       outputSymbol = this.yCoinInfo.symbol.str();
-      const inputAmt = inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
-      const outputAmt = this.cpPoolMeta.quote_x_to_y_after_fees(u64(Math.floor(inputAmt))).toJsNumber();
-      outputUiAmt = outputAmt / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+      const inputAmt =
+        inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+      const outputAmt = this.cpPoolMeta
+        .quote_x_to_y_after_fees(u64(Math.floor(inputAmt)))
+        .toJsNumber();
+      outputUiAmt =
+        outputAmt / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
 
       // compute output in Y
       const newXUiBalance = xUiBalance + inputUiAmt;
@@ -54,9 +70,13 @@ export class HippoConstantProductPool extends HippoPool {
     } else {
       inputSymbol = this.yCoinInfo.symbol.str();
       outputSymbol = this.xCoinInfo.symbol.str();
-      const inputAmt = inputUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
-      const outputAmt = this.cpPoolMeta.quote_y_to_x_after_fees(u64(Math.floor(inputAmt))).toJsNumber();
-      outputUiAmt = outputAmt / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+      const inputAmt =
+        inputUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+      const outputAmt = this.cpPoolMeta
+        .quote_y_to_x_after_fees(u64(Math.floor(inputAmt)))
+        .toJsNumber();
+      outputUiAmt =
+        outputAmt / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
       // compute output in X
       const newYUiBalance = yUiBalance + inputUiAmt;
       const newXUiBalance = k / newYUiBalance;
@@ -74,7 +94,7 @@ export class HippoConstantProductPool extends HippoPool {
       initialPrice,
       avgPrice,
       finalPrice,
-      priceImpact
+      priceImpact,
     };
   }
   estimateWithdrawalOutput(
@@ -84,7 +104,7 @@ export class HippoConstantProductPool extends HippoPool {
     const fraction = lpUiAmount / lpSupplyUiAmt;
     return {
       xUiAmt: this.xUiBalance() * fraction,
-      yUiAmt: this.yUiBalance() * fraction
+      yUiAmt: this.yUiBalance() * fraction,
     };
   }
   estimateNeededYFromXDeposit(xUiAmt: UITokenAmount): UITokenAmount {
@@ -107,8 +127,14 @@ export class HippoConstantProductPool extends HippoPool {
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const toTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
-    const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
-    const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const fromRawAmount = u64(
+      (amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const toRawAmount = u64(
+      (minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(
+        0
+      )
+    );
     if (isXtoY) {
       return Cp_scripts.buildPayload_swap_script(
         fromRawAmount,
@@ -132,8 +158,12 @@ export class HippoConstantProductPool extends HippoPool {
     xUiAmt: UITokenAmount,
     yUiAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
-    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const xRawAmt = u64(
+      (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const yRawAmt = u64(
+      (yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
     return Cp_scripts.buildPayload_add_liquidity_script(
       xRawAmt,
       yRawAmt,
@@ -146,9 +176,15 @@ export class HippoConstantProductPool extends HippoPool {
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(liquidityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
-    const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
-    const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+    const liquidityRawAmt = u64(
+      liquidityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
+    );
+    const lhsMinRawAmt = u64(
+      lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
+    const rhsMinRawAmt = u64(
+      rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
     return Cp_scripts.buildPayload_remove_liquidity_script(
       liquidityRawAmt,
       lhsMinRawAmt,

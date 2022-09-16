@@ -1,8 +1,8 @@
-import { Type_info } from '../generated/stdlib';
-import { Router } from '../generated/hippo_swap';
-import { CoinInfo } from '../generated/coin_list/coin_list';
-import { App } from '../generated';
-import { SimulationKeys } from '@manahippo/move-to-ts';
+import { Type_info } from "../generated/stdlib";
+import { Router } from "../generated/hippo_swap";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { App } from "../generated";
+import { SimulationKeys } from "@manahippo/move-to-ts";
 
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;
@@ -37,7 +37,11 @@ export class CoinListClient {
   }
 
   private async buildCache() {
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(this.fetcher, Router.moduleAddress, []);
+    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
+      this.fetcher,
+      Router.moduleAddress,
+      []
+    );
     this.coinList = fullList.coin_info_list;
     for (const tokenInfo of fullList.coin_info_list) {
       const fullname = tokenInfo.token_type.typeFullname();

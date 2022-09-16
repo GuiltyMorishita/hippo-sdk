@@ -1,8 +1,17 @@
-import { u64 } from '@manahippo/move-to-ts';
-import { Stable_curve_scripts, Stable_curve_swap } from '../generated/hippo_swap';
-import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
-import { CoinInfo } from '../generated/coin_list/coin_list';
-import { TxnBuilderTypes } from 'aptos';
+import { u64 } from "@manahippo/move-to-ts";
+import {
+  Stable_curve_scripts,
+  Stable_curve_swap,
+} from "../generated/hippo_swap";
+import {
+  HippoPool,
+  PoolType,
+  PriceType,
+  QuoteType,
+  UITokenAmount,
+} from "./baseTypes";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { TxnBuilderTypes } from "aptos";
 
 export class HippoStableCurvePool extends HippoPool {
   static FEE_DENOMINATOR = 10 ** 6;
@@ -15,10 +24,16 @@ export class HippoStableCurvePool extends HippoPool {
     super(xCoinInfo, yCoinInfo, lpCoinInfo);
   }
   xUiBalance() {
-    return this.stablePoolInfo.reserve_x.value.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+    return (
+      this.stablePoolInfo.reserve_x.value.toJsNumber() /
+      Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
   }
   yUiBalance() {
-    return this.stablePoolInfo.reserve_y.value.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+    return (
+      this.stablePoolInfo.reserve_y.value.toJsNumber() /
+      Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
   }
   getId(): string {
     return `HippoStableCurvePool<${this.xyFullname()}>`;
@@ -33,9 +48,17 @@ export class HippoStableCurvePool extends HippoPool {
   ): number {
     if (timestamp < future_A_time) {
       if (future_A < initial_A) {
-        return initial_A - ((initial_A - future_A) * (timestamp - initial_A_time)) / (future_A_time - initial_A_time);
+        return (
+          initial_A -
+          ((initial_A - future_A) * (timestamp - initial_A_time)) /
+            (future_A_time - initial_A_time)
+        );
       } else {
-        return initial_A + ((future_A - initial_A) * (timestamp - initial_A_time)) / (future_A_time - initial_A_time);
+        return (
+          initial_A +
+          ((future_A - initial_A) * (timestamp - initial_A_time)) /
+            (future_A_time - initial_A_time)
+        );
       }
     } else {
       return future_A;
@@ -53,7 +76,9 @@ export class HippoStableCurvePool extends HippoPool {
   }
 
   private recurD(d: number, x: number, y: number, amp: number): number {
-    const d1 = (8 * amp * x * y * (x + y) + 2 * d * d * d) / (3 * d * d + 4 * x * y * (2 * amp - 1));
+    const d1 =
+      (8 * amp * x * y * (x + y) + 2 * d * d * d) /
+      (3 * d * d + 4 * x * y * (2 * amp - 1));
     const minuend = d - d1;
     if (minuend <= 0.00000001) {
       return d1;
@@ -119,7 +144,9 @@ export class HippoStableCurvePool extends HippoPool {
       lhs = inputUiAmt + this.xUiBalance();
       rhs = this.getY(lhs, amp, d);
       difference = this.yUiBalance() - rhs;
-      amtFee = (difference * this.stablePoolInfo.fee.toJsNumber()) / HippoStableCurvePool.FEE_DENOMINATOR;
+      amtFee =
+        (difference * this.stablePoolInfo.fee.toJsNumber()) /
+        HippoStableCurvePool.FEE_DENOMINATOR;
       finalPrice = this.getPrice(lhs, rhs, d, amp);
     } else {
       inputSymbol = this.xCoinInfo.symbol.str();
@@ -127,7 +154,9 @@ export class HippoStableCurvePool extends HippoPool {
       lhs = inputUiAmt + this.yUiBalance();
       rhs = this.getY(lhs, amp, d);
       difference = this.xUiBalance() - rhs;
-      amtFee = (difference * this.stablePoolInfo.fee.toJsNumber()) / HippoStableCurvePool.FEE_DENOMINATOR;
+      amtFee =
+        (difference * this.stablePoolInfo.fee.toJsNumber()) /
+        HippoStableCurvePool.FEE_DENOMINATOR;
       finalPrice = this.getPrice(lhs, rhs, d, amp);
     }
     const outputUiAmt = difference - amtFee;
@@ -140,7 +169,7 @@ export class HippoStableCurvePool extends HippoPool {
       initialPrice,
       avgPrice: inputUiAmt / difference,
       finalPrice: finalPrice,
-      priceImpact: Math.abs(finalPrice - initialPrice)
+      priceImpact: Math.abs(finalPrice - initialPrice),
     };
   }
 
@@ -151,7 +180,7 @@ export class HippoStableCurvePool extends HippoPool {
     const fraction = lpUiAmount / lpSupplyUiAmt;
     return {
       xUiAmt: this.xUiBalance() * fraction,
-      yUiAmt: this.yUiBalance() * fraction
+      yUiAmt: this.yUiBalance() * fraction,
     };
   }
   estimateNeededYFromXDeposit(xUiAmt: UITokenAmount): UITokenAmount {
@@ -174,8 +203,14 @@ export class HippoStableCurvePool extends HippoPool {
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const toTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
-    const fromRawAmount = u64((amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0));
-    const toRawAmount = u64((minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(0));
+    const fromRawAmount = u64(
+      (amountIn * Math.pow(10, fromTokenInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const toRawAmount = u64(
+      (minAmountOut * Math.pow(10, toTokenInfo.decimals.toJsNumber())).toFixed(
+        0
+      )
+    );
     if (isXtoY) {
       return Stable_curve_scripts.buildPayload_swap_script(
         fromRawAmount,
@@ -199,8 +234,12 @@ export class HippoStableCurvePool extends HippoPool {
     xUiAmt: UITokenAmount,
     yUiAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
-    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const xRawAmt = u64(
+      (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const yRawAmt = u64(
+      (yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
     return Stable_curve_scripts.buildPayload_add_liquidity(
       xRawAmt,
       yRawAmt,
@@ -213,9 +252,15 @@ export class HippoStableCurvePool extends HippoPool {
     lhsMinAmt: UITokenAmount,
     rhsMinAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
-    const lhsMinRawAmt = u64(lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
-    const rhsMinRawAmt = u64(rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+    const liquidityRawAmt = u64(
+      liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
+    );
+    const lhsMinRawAmt = u64(
+      lhsMinAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
+    const rhsMinRawAmt = u64(
+      rhsMinAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
     return Stable_curve_scripts.buildPayload_remove_liquidity(
       liquidityRawAmt,
       lhsMinRawAmt,

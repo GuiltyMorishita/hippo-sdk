@@ -1,19 +1,19 @@
-import { AptosAccount, AptosClient, HexString } from 'aptos';
-import { Command } from 'commander';
-import * as fs from 'fs';
-import * as yaml from 'yaml';
-import { CONFIGS } from '../config';
-import { App } from '../generated';
-import { AptosDataCache, strToU8 } from '@manahippo/move-to-ts';
-import * as Std from '../generated/stdlib';
+import { AptosAccount, AptosClient, HexString } from "aptos";
+import { Command } from "commander";
+import * as fs from "fs";
+import * as yaml from "yaml";
+import { CONFIGS } from "../config";
+import { App } from "../generated";
+import { AptosDataCache, strToU8 } from "@manahippo/move-to-ts";
+import * as Std from "../generated/stdlib";
 
 export const readConfig = (program: Command) => {
   const { config, profile } = program.opts();
-  const ymlContent = fs.readFileSync(config, { encoding: 'utf-8' });
+  const ymlContent = fs.readFileSync(config, { encoding: "utf-8" });
   const result = yaml.parse(ymlContent);
   //console.log(result);
   if (!result.profiles) {
-    throw new Error('Expect a profiles to be present in yaml config');
+    throw new Error("Expect a profiles to be present in yaml config");
   }
   if (!result.profiles[profile]) {
     throw new Error(`Expect a ${profile} profile to be present in yaml config`);
@@ -27,7 +27,7 @@ export const readConfig = (program: Command) => {
     throw new Error(`Expect private_key to be present in ${profile} profile`);
   }
   const privateKey = new HexString(privateKeyStr);
-  const isDevnet = (url as string).includes('devnet');
+  const isDevnet = (url as string).includes("devnet");
   const netConf = isDevnet ? CONFIGS.devnet : CONFIGS.localhost;
   const hippoDexAddress = netConf.hippoDexAddress;
   const client = new AptosClient(result.profiles[profile].rest_url);

@@ -1,9 +1,16 @@
-import { AtomicTypeTag, SimulationKeys, TypeTag, u64, u8, U8 } from '@manahippo/move-to-ts';
-import { TxnBuilderTypes, Types } from 'aptos';
-import { CoinInfo } from '../generated/coin_list/coin_list';
-import { Aggregator } from '../generated/hippo_aggregator';
-import { App } from '../generated';
-import { CONFIGS } from '../config';
+import {
+  AtomicTypeTag,
+  SimulationKeys,
+  TypeTag,
+  u64,
+  u8,
+  U8,
+} from "@manahippo/move-to-ts";
+import { TxnBuilderTypes, Types } from "aptos";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { Aggregator } from "../generated/hippo_aggregator";
+import { App } from "../generated";
+import { CONFIGS } from "../config";
 
 export type UITokenAmount = number;
 export type UITokenAmountRatio = number;
@@ -30,12 +37,12 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   Econia = 2,
   // eslint-disable-next-line no-unused-vars
-  Pontem = 3
+  Pontem = 3,
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
-  [DexType.Hippo]: 'Hippo',
-  [DexType.Econia]: 'Econia',
-  [DexType.Pontem]: 'Pontem'
+  [DexType.Hippo]: "Hippo",
+  [DexType.Econia]: "Econia",
+  [DexType.Pontem]: "Pontem",
 };
 export type PoolType = U8;
 
@@ -60,7 +67,10 @@ export abstract class TradingPool {
   abstract getPrice(): PriceType;
   abstract getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType;
   // build payload directly if not routable
-  abstract makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload;
+  abstract makePayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount
+  ): Types.EntryFunctionPayload;
   getTagE(): TypeTag {
     return AtomicTypeTag.U8;
   }
@@ -68,7 +78,10 @@ export abstract class TradingPool {
 
 // a single trade step involving a Pool and a direction (X-to-Y or Y-to-X)
 export class TradeStep {
-  constructor(public readonly pool: TradingPool, public readonly isXtoY: boolean) {}
+  constructor(
+    public readonly pool: TradingPool,
+    public readonly isXtoY: boolean
+  ) {}
   get xCoinInfo() {
     return this.isXtoY ? this.pool.xCoinInfo : this.pool.yCoinInfo;
   }
@@ -89,7 +102,7 @@ export class TradeStep {
     } else {
       return {
         xToY: price.yToX,
-        yToX: price.xToY
+        yToX: price.xToY,
       };
     }
   }
@@ -106,7 +119,7 @@ export class TradeRoute {
   constructor(public readonly steps: TradeStep[]) {
     // at least 1 step
     if (steps.length < 1) {
-      throw new Error('A TradeRoute requires at least one TradeStep');
+      throw new Error("A TradeRoute requires at least one TradeStep");
     }
     this.tokens = [];
     // steps have matching ends
@@ -117,7 +130,9 @@ export class TradeRoute {
       const yFullname = step.yCoinInfo.token_type.typeFullname();
       // make sure LHS matches tokFullname
       if (xFullname !== tokFullname) {
-        throw new Error(`Mismatching tokens in route. Expected ${tokFullname} but received ${xFullname}`);
+        throw new Error(
+          `Mismatching tokens in route. Expected ${tokFullname} but received ${xFullname}`
+        );
       }
       tokFullname = yFullname;
       this.tokens.push(step.yCoinInfo);
@@ -159,13 +174,15 @@ export class TradeRoute {
       outputSymbol: this.yCoinInfo.symbol.str(),
       inputUiAmt,
       outputUiAmt,
-      avgPrice: outputUiAmt / inputUiAmt
+      avgPrice: outputUiAmt / inputUiAmt,
     };
   }
 
   hasRoundTrip() {
     // whether something like A -> B -> A or A -> B -> C -> B happens
-    const fullnameSet = new Set(this.tokens.map((ti) => ti.token_type.typeFullname()));
+    const fullnameSet = new Set(
+      this.tokens.map((ti) => ti.token_type.typeFullname())
+    );
     return fullnameSet.size < this.tokens.length;
   }
 
@@ -173,9 +190,15 @@ export class TradeRoute {
     inputUiAmt: UITokenAmount,
     minOutAmt: UITokenAmount,
     isJSONPayload = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
-    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+  ):
+    | TxnBuilderTypes.TransactionPayloadEntryFunction
+    | Types.TransactionPayload_EntryFunctionPayload {
+    const inputSize = Math.floor(
+      inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
+    const minOutputSize = Math.floor(
+      minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
     if (this.steps.length === 1) {
       const step0 = this.steps[0];
       return Aggregator.buildPayload_one_step_route(
@@ -184,7 +207,11 @@ export class TradeRoute {
         step0.isXtoY,
         u64(inputSize),
         u64(minOutputSize),
-        [this.xCoinInfo.token_type.toTypeTag(), this.yCoinInfo.token_type.toTypeTag(), step0.getTagE()], // X, Y, E
+        [
+          this.xCoinInfo.token_type.toTypeTag(),
+          this.yCoinInfo.token_type.toTypeTag(),
+          step0.getTagE(),
+        ], // X, Y, E
         isJSONPayload
       );
     } else if (this.steps.length === 2) {
@@ -204,7 +231,7 @@ export class TradeRoute {
           this.tokens[1].token_type.toTypeTag(),
           this.tokens[2].token_type.toTypeTag(),
           step0.getTagE(),
-          step1.getTagE()
+          step1.getTagE(),
         ], // X, Y, Z, E1, E2
         isJSONPayload
       );
@@ -231,18 +258,22 @@ export class TradeRoute {
           this.tokens[3].token_type.toTypeTag(),
           step0.getTagE(),
           step1.getTagE(),
-          step2.getTagE()
+          step2.getTagE(),
         ], // X, Y, Z, M, E1, E2, E3
         isJSONPayload
       );
     } else {
-      throw new Error('Unreachable');
+      throw new Error("Unreachable");
     }
   }
 
   debugPrint() {
     const lastSymbol = this.steps[this.steps.length - 1].yCoinInfo.symbol.str();
-    console.log(`Route: ${this.steps.map((step) => step.xCoinInfo.symbol.str()).join(' -> ')} -> ${lastSymbol}`);
+    console.log(
+      `Route: ${this.steps
+        .map((step) => step.xCoinInfo.symbol.str())
+        .join(" -> ")} -> ${lastSymbol}`
+    );
     this.steps.forEach((step, i) => {
       console.log(
         `Step ${i}: ${step.xCoinInfo.symbol.str()} -> ${step.yCoinInfo.symbol.str()} (via ${
@@ -260,7 +291,11 @@ export interface RouteAndQuote {
 
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
-  constructor(public app: App, public fetcher: SimulationKeys, public netConfig = CONFIGS.devnet) {}
+  constructor(
+    public app: App,
+    public fetcher: SimulationKeys,
+    public netConfig = CONFIGS.devnet
+  ) {}
   abstract loadPoolList(): Promise<TradingPool[]>;
 
   async reloadAllPoolState() {

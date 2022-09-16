@@ -1,12 +1,25 @@
-import { parseMoveStructTag, SimulationKeys, StructTag, TypeTag, u8 } from '@manahippo/move-to-ts';
-import { HexString, Types } from 'aptos';
-import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
-import { CoinListClient } from '../../coinList';
-import { typeTagToTypeInfo } from '../../utils';
-import { App, hippo_swap } from '../../generated';
-import bigInt from 'big-integer';
-import { CoinInfo } from '../../generated/coin_list/coin_list';
-import { CONFIGS } from '../../config';
+import {
+  parseMoveStructTag,
+  SimulationKeys,
+  StructTag,
+  TypeTag,
+  u8,
+} from "@manahippo/move-to-ts";
+import { HexString, Types } from "aptos";
+import {
+  DexType,
+  PriceType,
+  QuoteType,
+  TradingPool,
+  TradingPoolProvider,
+  UITokenAmount,
+} from "../types";
+import { CoinListClient } from "../../coinList";
+import { typeTagToTypeInfo } from "../../utils";
+import { App, hippo_swap } from "../../generated";
+import bigInt from "big-integer";
+import { CoinInfo } from "../../generated/coin_list/coin_list";
+import { CONFIGS } from "../../config";
 
 export class PontemTradingPool extends TradingPool {
   pontemPool: object | null;
@@ -48,30 +61,42 @@ export class PontemTradingPool extends TradingPool {
   }
   getPrice(): PriceType {
     if (!this.pontemPool) {
-      throw new Error('Pontem pool not loaded. cannot compute price');
+      throw new Error("Pontem pool not loaded. cannot compute price");
     }
-    throw new Error('Not Implemented');
+    throw new Error("Not Implemented");
   }
   getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
     if (!this.pontemPool) {
-      throw new Error('Pontem pool not loaded. cannot compute quote');
+      throw new Error("Pontem pool not loaded. cannot compute quote");
     }
     const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
-    const coinXReserve = (this.pontemPool as any).data.coin_x_reserve.value as string;
-    const coinYReserve = (this.pontemPool as any).data.coin_y_reserve.value as string;
-    const coinInAmt = bigInt(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
+    const coinXReserve = (this.pontemPool as any).data.coin_x_reserve
+      .value as string;
+    const coinYReserve = (this.pontemPool as any).data.coin_y_reserve
+      .value as string;
+    const coinInAmt = bigInt(
+      Math.floor(
+        inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())
+      )
+    );
     const reserveInAmt = bigInt(isXtoY ? coinXReserve : coinYReserve);
     const reserveOutAmt = bigInt(isXtoY ? coinYReserve : coinXReserve);
-    const coinOutAmt = getCoinOutWithFees(coinInAmt, reserveInAmt, reserveOutAmt);
-    const outputUiAmt = coinOutAmt.toJSNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber());
+    const coinOutAmt = getCoinOutWithFees(
+      coinInAmt,
+      reserveInAmt,
+      reserveOutAmt
+    );
+    const outputUiAmt =
+      coinOutAmt.toJSNumber() /
+      Math.pow(10, outputTokenInfo.decimals.toJsNumber());
 
     return {
       inputSymbol: inputTokenInfo.symbol.str(),
       outputSymbol: outputTokenInfo.symbol.str(),
       inputUiAmt,
       outputUiAmt,
-      avgPrice: outputUiAmt / inputUiAmt
+      avgPrice: outputUiAmt / inputUiAmt,
     };
   }
 
@@ -80,13 +105,21 @@ export class PontemTradingPool extends TradingPool {
   }
 
   // build payload directly if not routable
-  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
-    throw new Error('Not Implemented');
+  makePayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount
+  ): Types.EntryFunctionPayload {
+    throw new Error("Not Implemented");
   }
 }
 
 export class PontemPoolProvider extends TradingPoolProvider {
-  constructor(app: App, fetcher: SimulationKeys, netConfig = CONFIGS.devnet, public registry: CoinListClient) {
+  constructor(
+    app: App,
+    fetcher: SimulationKeys,
+    netConfig = CONFIGS.devnet,
+    public registry: CoinListClient
+  ) {
     super(app, fetcher, netConfig);
   }
   async loadPoolList(): Promise<TradingPool[]> {
@@ -94,17 +127,27 @@ export class PontemPoolProvider extends TradingPoolProvider {
     const ownerAddress = hippo_swap.Cp_swap.moduleAddress;
     const resources = await this.app.client.getAccountResources(ownerAddress);
     for (const resource of resources) {
-      if (resource.type.indexOf('liquidity_pool::LiquidityPool') >= 0) {
+      if (resource.type.indexOf("liquidity_pool::LiquidityPool") >= 0) {
         const tag = parseMoveStructTag(resource.type);
         const xTag = tag.typeParams[0] as StructTag;
         const yTag = tag.typeParams[1] as StructTag;
         const lpTag = tag.typeParams[2] as StructTag;
-        const xCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
-        const yCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
+        const xCoinInfo = this.registry.getCoinInfoByType(
+          typeTagToTypeInfo(xTag)
+        );
+        const yCoinInfo = this.registry.getCoinInfoByType(
+          typeTagToTypeInfo(yTag)
+        );
         if (!xCoinInfo || !yCoinInfo) {
           continue;
         }
-        const pool = new PontemTradingPool(ownerAddress, xCoinInfo, yCoinInfo, lpTag, tag);
+        const pool = new PontemTradingPool(
+          ownerAddress,
+          xCoinInfo,
+          yCoinInfo,
+          lpTag,
+          tag
+        );
         poolList.push(pool);
       }
     }
@@ -121,7 +164,9 @@ export function getCoinOutWithFees(
   const feeScale = bigInt(1000);
   const feeMultiplier = feeScale.subtract(feePct);
   const coinInAfterFees = coinInVal.multiply(feeMultiplier);
-  const newReservesInSize = reserveInSize.multiply(feeScale).add(coinInAfterFees);
+  const newReservesInSize = reserveInSize
+    .multiply(feeScale)
+    .add(coinInAfterFees);
 
   return coinInAfterFees.multiply(reserveOutSize).divide(newReservesInSize);
 }

@@ -1,28 +1,49 @@
-import { u64 } from '@manahippo/move-to-ts';
-import { Piece_swap_script } from '../generated/hippo_swap';
-import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
-import { HippoPool, PoolType, PriceType, QuoteType, UITokenAmount } from './baseTypes';
-import { CoinInfo } from '../generated/coin_list/coin_list';
-import { TxnBuilderTypes } from 'aptos';
+import { u64 } from "@manahippo/move-to-ts";
+import { Piece_swap_script } from "../generated/hippo_swap";
+import { PieceSwapPoolInfo } from "../generated/hippo_swap/piece_swap";
+import {
+  HippoPool,
+  PoolType,
+  PriceType,
+  QuoteType,
+  UITokenAmount,
+} from "./baseTypes";
+import { CoinInfo } from "../generated/coin_list/coin_list";
+import { TxnBuilderTypes } from "aptos";
 
 export class HippoPieceSwapPool extends HippoPool {
-  constructor(xCoinInfo: CoinInfo, yCoinInfo: CoinInfo, lpCoinInfo: CoinInfo, public poolInfo: PieceSwapPoolInfo) {
+  constructor(
+    xCoinInfo: CoinInfo,
+    yCoinInfo: CoinInfo,
+    lpCoinInfo: CoinInfo,
+    public poolInfo: PieceSwapPoolInfo
+  ) {
     super(xCoinInfo, yCoinInfo, lpCoinInfo);
   }
 
   xUiBalance() {
-    return this.poolInfo.reserve_x.value.toJsNumber() / Math.pow(10, this.xCoinInfo.decimals.toJsNumber());
+    return (
+      this.poolInfo.reserve_x.value.toJsNumber() /
+      Math.pow(10, this.xCoinInfo.decimals.toJsNumber())
+    );
   }
 
   yUiBalance() {
-    return this.poolInfo.reserve_y.value.toJsNumber() / Math.pow(10, this.yCoinInfo.decimals.toJsNumber());
+    return (
+      this.poolInfo.reserve_y.value.toJsNumber() /
+      Math.pow(10, this.yCoinInfo.decimals.toJsNumber())
+    );
   }
 
   getId(): string {
     return `HippoPieceSwapPool<${this.xyFullname()}>`;
   }
 
-  getCurrentPriceDirectional(isXtoY: boolean, xShift = 0, yShift = 0): PriceType {
+  getCurrentPriceDirectional(
+    isXtoY: boolean,
+    xShift = 0,
+    yShift = 0
+  ): PriceType {
     const delta_x = 0.001;
     const delta_y = get_swap_x_to_y_out(
       this.xUiBalance() + xShift,
@@ -35,16 +56,17 @@ export class HippoPieceSwapPool extends HippoPool {
       this.poolInfo.m.toJsNumber(),
       this.poolInfo.n.toJsNumber()
     );
-    const feeDiscountFactor = 1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000;
+    const feeDiscountFactor =
+      1 - this.poolInfo.swap_fee_per_million.toJsNumber() / 1000000;
     if (isXtoY) {
       return {
         xToY: (delta_x / delta_y) * feeDiscountFactor,
-        yToX: (delta_y / delta_x) * feeDiscountFactor
+        yToX: (delta_y / delta_x) * feeDiscountFactor,
       };
     } else {
       return {
         yToX: (delta_x / delta_y) * feeDiscountFactor,
-        xToY: (delta_y / delta_x) * feeDiscountFactor
+        xToY: (delta_y / delta_x) * feeDiscountFactor,
       };
     }
   }
@@ -53,11 +75,15 @@ export class HippoPieceSwapPool extends HippoPool {
     const inputCoinInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const outputCoinInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
     const initialPrice = this.getCurrentPriceDirectional(isXtoY);
-    const amountIn = u64(Math.floor(inputUiAmt * Math.pow(10, inputCoinInfo.decimals.toJsNumber())));
+    const amountIn = u64(
+      Math.floor(inputUiAmt * Math.pow(10, inputCoinInfo.decimals.toJsNumber()))
+    );
     const amountOut = isXtoY
       ? this.poolInfo.quote_x_to_y_after_fees(amountIn)
       : this.poolInfo.quote_y_to_x_after_fees(amountIn);
-    const outputUiAmt = amountOut.toJsNumber() / Math.pow(10, outputCoinInfo.decimals.toJsNumber());
+    const outputUiAmt =
+      amountOut.toJsNumber() /
+      Math.pow(10, outputCoinInfo.decimals.toJsNumber());
     const finalPrice = this.getCurrentPriceDirectional(
       isXtoY,
       isXtoY ? inputUiAmt : -outputUiAmt,
@@ -71,7 +97,7 @@ export class HippoPieceSwapPool extends HippoPool {
       initialPrice: initialPrice.yToX,
       avgPrice: outputUiAmt / inputUiAmt,
       finalPrice: finalPrice.yToX,
-      priceImpact: (finalPrice.yToX - initialPrice.yToX) / initialPrice.yToX
+      priceImpact: (finalPrice.yToX - initialPrice.yToX) / initialPrice.yToX,
     };
   }
 
@@ -82,7 +108,7 @@ export class HippoPieceSwapPool extends HippoPool {
     const fraction = lpUiAmount / lpSupplyUiAmt;
     return {
       xUiAmt: this.xUiBalance() * fraction,
-      yUiAmt: this.yUiBalance() * fraction
+      yUiAmt: this.yUiBalance() * fraction,
     };
   }
   estimateNeededYFromXDeposit(xUiAmt: UITokenAmount): UITokenAmount {
@@ -105,8 +131,12 @@ export class HippoPieceSwapPool extends HippoPool {
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
     const fromCoinInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const toCoinInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
-    const fromRawAmount = u64((amountIn * Math.pow(10, fromCoinInfo.decimals.toJsNumber())).toFixed(0));
-    const toRawAmount = u64((minAmountOut * Math.pow(10, toCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const fromRawAmount = u64(
+      (amountIn * Math.pow(10, fromCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const toRawAmount = u64(
+      (minAmountOut * Math.pow(10, toCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
     if (isXtoY) {
       return Piece_swap_script.buildPayload_swap_script(
         fromRawAmount,
@@ -130,8 +160,12 @@ export class HippoPieceSwapPool extends HippoPool {
     xUiAmt: UITokenAmount,
     yUiAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const xRawAmt = u64((xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0));
-    const yRawAmt = u64((yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0));
+    const xRawAmt = u64(
+      (xUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
+    const yRawAmt = u64(
+      (yUiAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber())).toFixed(0)
+    );
     return Piece_swap_script.buildPayload_add_liquidity_script(
       xRawAmt,
       yRawAmt,
@@ -144,7 +178,9 @@ export class HippoPieceSwapPool extends HippoPool {
     _lhsMinAmt: UITokenAmount,
     _rhsMinAmt: UITokenAmount
   ): Promise<TxnBuilderTypes.TransactionPayloadEntryFunction> {
-    const liquidityRawAmt = u64(liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber()));
+    const liquidityRawAmt = u64(
+      liqiudityAmt * Math.pow(10, this.lpCoinInfo.decimals.toJsNumber())
+    );
     return Piece_swap_script.buildPayload_remove_liquidity_script(
       liquidityRawAmt,
       this.lpTag().typeParams
@@ -178,10 +214,15 @@ enum PieceStage {
   // eslint-disable-next-line no-unused-vars
   MIDDLE,
   // eslint-disable-next-line no-unused-vars
-  RIGHT
+  RIGHT,
 }
 
-function getStage(current_x: number, current_y: number, xa: number, xb: number): PieceStage {
+function getStage(
+  current_x: number,
+  current_y: number,
+  xa: number,
+  xb: number
+): PieceStage {
   if (current_x / current_y < xa / xb) {
     return PieceStage.LEFT;
   } else if (current_x / current_y < xb / xa) {
@@ -235,7 +276,17 @@ function get_swap_x_to_y_out(
       // crossed into the middle stage
       const delta_yF_this_stage = current_yF - xb; // xb = ya
       const input_xF_next_stage = new_xF - xa;
-      const output_yF_next_stage = get_swap_x_to_y_out(xa, xb, input_xF_next_stage, k, k2, xa, xb, m, n);
+      const output_yF_next_stage = get_swap_x_to_y_out(
+        xa,
+        xb,
+        input_xF_next_stage,
+        k,
+        k2,
+        xa,
+        xb,
+        m,
+        n
+      );
       return (delta_yF_this_stage + output_yF_next_stage) / F;
     } else {
       const new_yF = k2 / new_xF + n;
@@ -255,7 +306,17 @@ function get_swap_x_to_y_out(
       // crossed into the bottom-right stage
       const delta_yF_this_stage = current_yF - xa; // xa = yb
       const input_xF_next_stage = new_xF - xb;
-      const output_yF_next_stage = get_swap_x_to_y_out(xb, xa, input_xF_next_stage, k, k2, xa, xb, m, n);
+      const output_yF_next_stage = get_swap_x_to_y_out(
+        xb,
+        xa,
+        input_xF_next_stage,
+        k,
+        k2,
+        xa,
+        xb,
+        m,
+        n
+      );
       return (delta_yF_this_stage + output_yF_next_stage) / F;
     } else {
       /*

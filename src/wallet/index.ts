@@ -1,1 +1,1 @@
-export * from './hippoWalletClient';
+export * from "./hippoWalletClient";
