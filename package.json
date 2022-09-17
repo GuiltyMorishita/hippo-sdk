@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/hippo-sdk",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Hippo SDK for Aptos",
   "sideEffects": false,
   "exports": {
