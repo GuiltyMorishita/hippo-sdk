@@ -1,245 +1,169 @@
-import * as $ from "@manahippo/move-to-ts";
-import {
-  AptosDataCache,
-  AptosParserRepo,
-  DummyCache,
-  AptosLocalCache,
-} from "@manahippo/move-to-ts";
-import { U8, U64, U128 } from "@manahippo/move-to-ts";
-import { u8, u64, u128 } from "@manahippo/move-to-ts";
-import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
-import {
-  AtomicTypeTag,
-  StructTag,
-  TypeTag,
-  VectorTag,
-  SimpleStructTag,
-} from "@manahippo/move-to-ts";
-import {
-  HexString,
-  AptosClient,
-  AptosAccount,
-  TxnBuilderTypes,
-  Types,
-} from "aptos";
-import * as Coin_list from "../coin_list";
-import * as Econia from "../econia";
-import * as Pontem from "../pontem";
-import * as Stdlib from "../stdlib";
-export const packageName = "HippoAggregator";
-export const moduleAddress = new HexString(
-  "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-);
-export const moduleName = "devnet";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Coin_list from '../coin_list';
+import * as Econia from '../econia';
+import * as Pontem from '../pontem';
+import * as Stdlib from '../stdlib';
+export const packageName = 'HippoAggregator';
+export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleName = 'devnet';
 
-export const BTC_AMOUNT: U64 = u64("100000000").mul(u64("1000"));
-export const USDC_AMOUNT: U64 = u64("100000000")
-  .mul(u64("1000"))
-  .mul(u64("10000"));
+export const BTC_AMOUNT: U64 = u64('100000000').mul(u64('1000'));
+export const USDC_AMOUNT: U64 = u64('100000000').mul(u64('1000')).mul(u64('10000'));
 
 export class PontemLP {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "PontemLP";
+  static structName: string = 'PontemLP';
   static typeParameters: TypeParamDeclType[] = [
-    { name: "X", isPhantom: true },
-    { name: "Y", isPhantom: true },
+    { name: 'X', isPhantom: true },
+    { name: 'Y', isPhantom: true }
   ];
   static fields: FieldDeclType[] = [];
 
   constructor(proto: any, public typeTag: TypeTag) {}
 
-  static PontemLPParser(
-    data: any,
-    typeTag: TypeTag,
-    repo: AptosParserRepo
-  ): PontemLP {
+  static PontemLPParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): PontemLP {
     const proto = $.parseStructProto(data, typeTag, repo, PontemLP);
     return new PontemLP(proto, typeTag);
   }
 
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "PontemLP", $p);
+    return new StructTag(moduleAddress, moduleName, 'PontemLP', $p);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
   }
 }
-export function mock_deploy_econia_(
-  admin: HexString,
-  $c: AptosDataCache
-): void {
+export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void {
   Econia.Market.register_market_(admin, $c, [
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetBTC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
       []
     ),
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetUSDC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
       []
     ),
     new StructTag(
-      new HexString(
-        "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-      ),
-      "registry",
-      "E0",
+      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+      'registry',
+      'E0',
       []
-    ),
+    )
   ]);
-  Econia.User.register_market_account_(admin, u64("0"), $c, [
+  Econia.User.register_market_account_(admin, u64('0'), $c, [
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetBTC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
       []
     ),
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetUSDC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
       []
     ),
     new StructTag(
-      new HexString(
-        "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-      ),
-      "registry",
-      "E0",
+      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+      'registry',
+      'E0',
       []
-    ),
+    )
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(BTC_AMOUNT), $c, [
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetBTC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
       []
-    ),
+    )
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetUSDC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
+      []
+    )
+  ]);
+  Econia.User.deposit_collateral_coinstore_(admin, u64('0'), true, $.copy(BTC_AMOUNT), $c, [
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
       []
     ),
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
+      []
+    ),
+    new StructTag(
+      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+      'registry',
+      'E0',
+      []
+    )
   ]);
-  Econia.User.deposit_collateral_coinstore_(
-    admin,
-    u64("0"),
-    true,
-    $.copy(BTC_AMOUNT),
-    $c,
-    [
-      new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetBTC",
-        []
-      ),
-      new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetUSDC",
-        []
-      ),
-      new StructTag(
-        new HexString(
-          "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-        ),
-        "registry",
-        "E0",
-        []
-      ),
-    ]
-  );
-  Econia.User.deposit_collateral_coinstore_(
-    admin,
-    u64("0"),
-    false,
-    $.copy(USDC_AMOUNT),
-    $c,
-    [
-      new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetBTC",
-        []
-      ),
-      new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetUSDC",
-        []
-      ),
-      new StructTag(
-        new HexString(
-          "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-        ),
-        "registry",
-        "E0",
-        []
-      ),
-    ]
-  );
+  Econia.User.deposit_collateral_coinstore_(admin, u64('0'), false, $.copy(USDC_AMOUNT), $c, [
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
+      []
+    ),
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
+      []
+    ),
+    new StructTag(
+      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+      'registry',
+      'E0',
+      []
+    )
+  ]);
   Econia.Market.place_limit_order_user_(
     admin,
     Stdlib.Signer.address_of_(admin, $c),
     true,
     $.copy(BTC_AMOUNT),
-    u64("10001"),
+    u64('10001'),
     $c,
     [
       new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetBTC",
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetUSDC",
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetUSDC',
         []
       ),
       new StructTag(
-        new HexString(
-          "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-        ),
-        "registry",
-        "E0",
+        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+        'registry',
+        'E0',
         []
-      ),
+      )
     ]
   );
   Econia.Market.place_limit_order_user_(
@@ -247,33 +171,27 @@ export function mock_deploy_econia_(
     Stdlib.Signer.address_of_(admin, $c),
     false,
     $.copy(BTC_AMOUNT),
-    u64("10000"),
+    u64('10000'),
     $c,
     [
       new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetBTC",
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetUSDC",
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetUSDC',
         []
       ),
       new StructTag(
-        new HexString(
-          "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-        ),
-        "registry",
-        "E0",
+        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+        'registry',
+        'E0',
         []
-      ),
+      )
     ]
   );
   return;
@@ -281,105 +199,82 @@ export function mock_deploy_econia_(
 
 export function buildPayload_mock_deploy_econia(
   isJSON = false
-):
-  | TxnBuilderTypes.TransactionPayloadEntryFunction
-  | Types.TransactionPayload_EntryFunctionPayload {
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString(
-      "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-    ),
-    "devnet",
-    "mock_deploy_econia",
+    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    'devnet',
+    'mock_deploy_econia',
     typeParamStrings,
     [],
     isJSON
   );
 }
 
-export function mock_deploy_pontem_(
-  admin: HexString,
-  $c: AptosDataCache
-): void {
+export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void {
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(BTC_AMOUNT), $c, [
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetBTC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
       []
-    ),
+    )
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString(
-        "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-      ),
-      "devnet_coins",
-      "DevnetUSDC",
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
       []
-    ),
+    )
   ]);
   return Pontem.Scripts.register_pool_and_add_liquidity_(
     admin,
-    u8("2"),
+    u8('2'),
     $.copy(BTC_AMOUNT),
-    u64("0"),
+    u64('0'),
     $.copy(USDC_AMOUNT),
-    u64("0"),
+    u64('0'),
     $c,
     [
       new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetBTC",
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString(
-          "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-        ),
-        "devnet_coins",
-        "DevnetUSDC",
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetUSDC',
         []
       ),
       new SimpleStructTag(PontemLP, [
         new StructTag(
-          new HexString(
-            "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-          ),
-          "devnet_coins",
-          "DevnetBTC",
+          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+          'devnet_coins',
+          'DevnetBTC',
           []
         ),
         new StructTag(
-          new HexString(
-            "0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68"
-          ),
-          "devnet_coins",
-          "DevnetUSDC",
+          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+          'devnet_coins',
+          'DevnetUSDC',
           []
-        ),
-      ]),
+        )
+      ])
     ]
   );
 }
 
 export function buildPayload_mock_deploy_pontem(
   isJSON = false
-):
-  | TxnBuilderTypes.TransactionPayloadEntryFunction
-  | Types.TransactionPayload_EntryFunctionPayload {
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString(
-      "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-    ),
-    "devnet",
-    "mock_deploy_pontem",
+    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    'devnet',
+    'mock_deploy_pontem',
     typeParamStrings,
     [],
     isJSON
@@ -388,16 +283,12 @@ export function buildPayload_mock_deploy_pontem(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnet::PontemLP",
+    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::devnet::PontemLP',
     PontemLP.PontemLPParser
   );
 }
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache
-  ) {}
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
   get moduleAddress() {
     {
       return moduleAddress;
@@ -413,31 +304,19 @@ export class App {
   }
   payload_mock_deploy_econia(
     isJSON = false
-  ):
-    | TxnBuilderTypes.TransactionPayloadEntryFunction
-    | Types.TransactionPayload_EntryFunctionPayload {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_econia(isJSON);
   }
-  async mock_deploy_econia(
-    _account: AptosAccount,
-    _maxGas = 1000,
-    _isJSON = false
-  ) {
+  async mock_deploy_econia(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
     const payload = buildPayload_mock_deploy_econia(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mock_deploy_pontem(
     isJSON = false
-  ):
-    | TxnBuilderTypes.TransactionPayloadEntryFunction
-    | Types.TransactionPayload_EntryFunctionPayload {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_pontem(isJSON);
   }
-  async mock_deploy_pontem(
-    _account: AptosAccount,
-    _maxGas = 1000,
-    _isJSON = false
-  ) {
+  async mock_deploy_pontem(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
     const payload = buildPayload_mock_deploy_pontem(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }

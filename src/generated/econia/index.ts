@@ -1,24 +1,24 @@
-import { AptosClient } from "aptos";
-import { AptosParserRepo, AptosLocalCache } from "@manahippo/move-to-ts";
-import * as Capability from "./capability";
-import * as Coins from "./coins";
-import * as Critbit from "./critbit";
-import * as Init from "./init";
-import * as Market from "./market";
-import * as Open_table from "./open_table";
-import * as Order_id from "./order_id";
-import * as Registry from "./registry";
-import * as User from "./user";
+import { AptosClient } from 'aptos';
+import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
+import * as Capability from './capability';
+import * as Coins from './coins';
+import * as Critbit from './critbit';
+import * as Init from './init';
+import * as Market from './market';
+import * as Open_table from './open_table';
+import * as Order_id from './order_id';
+import * as Registry from './registry';
+import * as User from './user';
 
-export * as Capability from "./capability";
-export * as Coins from "./coins";
-export * as Critbit from "./critbit";
-export * as Init from "./init";
-export * as Market from "./market";
-export * as Open_table from "./open_table";
-export * as Order_id from "./order_id";
-export * as Registry from "./registry";
-export * as User from "./user";
+export * as Capability from './capability';
+export * as Coins from './coins';
+export * as Critbit from './critbit';
+export * as Init from './init';
+export * as Market from './market';
+export * as Open_table from './open_table';
+export * as Order_id from './order_id';
+export * as Registry from './registry';
+export * as User from './user';
 
 export function loadParsers(repo: AptosParserRepo) {
   Capability.loadParsers(repo);
@@ -55,11 +55,7 @@ export class App {
   order_id: Order_id.App;
   registry: Registry.App;
   user: User.App;
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache
-  ) {
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
     this.capability = new Capability.App(client, repo, cache);
     this.coins = new Coins.App(client, repo, cache);
     this.critbit = new Critbit.App(client, repo, cache);

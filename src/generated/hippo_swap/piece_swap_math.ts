@@ -1,40 +1,21 @@
-import * as $ from "@manahippo/move-to-ts";
-import {
-  AptosDataCache,
-  AptosParserRepo,
-  DummyCache,
-  AptosLocalCache,
-} from "@manahippo/move-to-ts";
-import { U8, U64, U128 } from "@manahippo/move-to-ts";
-import { u8, u64, u128 } from "@manahippo/move-to-ts";
-import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
-import {
-  AtomicTypeTag,
-  StructTag,
-  TypeTag,
-  VectorTag,
-  SimpleStructTag,
-} from "@manahippo/move-to-ts";
-import {
-  HexString,
-  AptosClient,
-  AptosAccount,
-  TxnBuilderTypes,
-  Types,
-} from "aptos";
-import * as Math from "./math";
-export const packageName = "hippo-swap";
-export const moduleAddress = new HexString(
-  "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-);
-export const moduleName = "piece_swap_math";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Math from './math';
+export const packageName = 'hippo-swap';
+export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleName = 'piece_swap_math';
 
-export const BILLION: U128 = u128("1000000000");
+export const BILLION: U128 = u128('1000000000');
 export const ENABLE_PLOT: boolean = false;
-export const E_X_Y_NOT_EQUAL: U64 = u64("0");
-export const FRACTION_MULT: U128 = u128("1000000000");
-export const NUM_STEPS: U128 = u128("40");
-export const PRECISION_FACTOR: U128 = u128("1000000");
+export const E_X_Y_NOT_EQUAL: U64 = u64('0');
+export const FRACTION_MULT: U128 = u128('1000000000');
+export const NUM_STEPS: U128 = u128('40');
+export const PRECISION_FACTOR: U128 = u128('1000000');
 
 export function compare_fraction_(
   first_numerator: U128,
@@ -57,33 +38,17 @@ export function compute_initialization_constants_(
   $c: AptosDataCache
 ): [U128, U128, U128, U128, U128] {
   let k2, m, n, xa, xb;
-  m = Math.sqrt_(
-    div_w_($.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $c),
-    $c
-  );
-  xa = Math.sqrt_(
-    div_w_($.copy(k), $.copy(w2_numerator), $.copy(w2_denominator), $c),
-    $c
-  ).sub($.copy(m));
+  m = Math.sqrt_(div_w_($.copy(k), $.copy(w1_numerator), $.copy(w1_denominator), $c), $c);
+  xa = Math.sqrt_(div_w_($.copy(k), $.copy(w2_numerator), $.copy(w2_denominator), $c), $c).sub($.copy(m));
   xb = $.copy(k)
     .div($.copy(xa).add($.copy(m)))
     .sub($.copy(m));
-  k2 = mul_w_(
-    $.copy(xa).mul($.copy(xa)),
-    $.copy(w2_numerator),
-    $.copy(w2_denominator),
-    $c
-  );
+  k2 = mul_w_($.copy(xa).mul($.copy(xa)), $.copy(w2_numerator), $.copy(w2_denominator), $c);
   n = $.copy(xb).sub($.copy(k2).div($.copy(xa)));
   return [$.copy(xa), $.copy(xb), $.copy(m), $.copy(n), $.copy(k2)];
 }
 
-export function div_w_(
-  multiplier: U128,
-  numerator: U128,
-  denominator: U128,
-  $c: AptosDataCache
-): U128 {
+export function div_w_(multiplier: U128, numerator: U128, denominator: U128, $c: AptosDataCache): U128 {
   return $.copy(multiplier).mul($.copy(denominator)).div($.copy(numerator));
 }
 
@@ -95,27 +60,20 @@ export function get_add_liquidity_actual_amount_(
   add_amt_y: U128,
   $c: AptosDataCache
 ): [U128, U128, U128] {
-  let temp$1,
-    temp$2,
-    add_x_to_y,
-    current_x_to_y,
-    optimal_amt_x,
-    optimal_amt_y,
-    optimal_lp,
-    optimal_lp__3;
-  if ($.copy(add_amt_x).eq(u128("0"))) {
+  let temp$1, temp$2, add_x_to_y, current_x_to_y, optimal_amt_x, optimal_amt_y, optimal_lp, optimal_lp__3;
+  if ($.copy(add_amt_x).eq(u128('0'))) {
     temp$1 = true;
   } else {
-    temp$1 = $.copy(add_amt_y).eq(u128("0"));
+    temp$1 = $.copy(add_amt_y).eq(u128('0'));
   }
   if (temp$1) {
-    return [u128("0"), u128("0"), u128("0")];
+    return [u128('0'), u128('0'), u128('0')];
   } else {
   }
-  if ($.copy(current_x).eq(u128("0"))) {
+  if ($.copy(current_x).eq(u128('0'))) {
     temp$2 = true;
   } else {
-    temp$2 = $.copy(current_y).eq(u128("0"));
+    temp$2 = $.copy(current_y).eq(u128('0'));
   }
   if (temp$2) {
     if (!$.copy(add_amt_x).eq($.copy(add_amt_y))) {
@@ -124,27 +82,15 @@ export function get_add_liquidity_actual_amount_(
     return [$.copy(add_amt_x), $.copy(add_amt_y), $.copy(add_amt_x)];
   } else {
   }
-  current_x_to_y = $.copy(current_x)
-    .mul($.copy(FRACTION_MULT))
-    .div($.copy(current_y));
-  add_x_to_y = $.copy(add_amt_x)
-    .mul($.copy(FRACTION_MULT))
-    .div($.copy(add_amt_y));
+  current_x_to_y = $.copy(current_x).mul($.copy(FRACTION_MULT)).div($.copy(current_y));
+  add_x_to_y = $.copy(add_amt_x).mul($.copy(FRACTION_MULT)).div($.copy(add_amt_y));
   if ($.copy(current_x_to_y).gt($.copy(add_x_to_y))) {
-    optimal_amt_y = $.copy(current_y)
-      .mul($.copy(add_amt_x))
-      .div($.copy(current_x));
-    optimal_lp = $.copy(current_lp)
-      .mul($.copy(add_amt_x))
-      .div($.copy(current_x));
+    optimal_amt_y = $.copy(current_y).mul($.copy(add_amt_x)).div($.copy(current_x));
+    optimal_lp = $.copy(current_lp).mul($.copy(add_amt_x)).div($.copy(current_x));
     return [$.copy(add_amt_x), $.copy(optimal_amt_y), $.copy(optimal_lp)];
   } else {
-    optimal_amt_x = $.copy(current_x)
-      .mul($.copy(add_amt_y))
-      .div($.copy(current_y));
-    optimal_lp__3 = $.copy(current_lp)
-      .mul($.copy(add_amt_y))
-      .div($.copy(current_y));
+    optimal_amt_x = $.copy(current_x).mul($.copy(add_amt_y)).div($.copy(current_y));
+    optimal_lp__3 = $.copy(current_lp).mul($.copy(add_amt_y)).div($.copy(current_y));
     return [$.copy(optimal_amt_x), $.copy(add_amt_y), $.copy(optimal_lp__3)];
   }
 }
@@ -157,18 +103,18 @@ export function get_remove_liquidity_amounts_(
   $c: AptosDataCache
 ): [U128, U128] {
   let temp$1;
-  if ($.copy(remove_lp_amt).eq(u128("0"))) {
+  if ($.copy(remove_lp_amt).eq(u128('0'))) {
     temp$1 = true;
   } else {
-    temp$1 = $.copy(current_lp_amt).eq(u128("0"));
+    temp$1 = $.copy(current_lp_amt).eq(u128('0'));
   }
   if (temp$1) {
-    return [u128("0"), u128("0")];
+    return [u128('0'), u128('0')];
   } else {
   }
   return [
     $.copy(current_x).mul($.copy(remove_lp_amt)).div($.copy(current_lp_amt)),
-    $.copy(current_y).mul($.copy(remove_lp_amt)).div($.copy(current_lp_amt)),
+    $.copy(current_y).mul($.copy(remove_lp_amt)).div($.copy(current_lp_amt))
   ];
 }
 
@@ -186,24 +132,22 @@ export function get_swap_x_to_y_out_(
 ): U128 {
   let temp$1, denominator, max_x_y, numerator, preprocessed_input_x;
   max_x_y = Math.max_($.copy(current_x), $.copy(current_y), $c);
-  numerator = u128("1");
-  denominator = u128("1");
+  numerator = u128('1');
+  denominator = u128('1');
   while ($.copy(max_x_y).gt($.copy(BILLION))) {
     {
-      max_x_y = $.copy(max_x_y).div(u128("10"));
-      denominator = $.copy(denominator).mul(u128("10"));
+      max_x_y = $.copy(max_x_y).div(u128('10'));
+      denominator = $.copy(denominator).mul(u128('10'));
     }
   }
-  while ($.copy(max_x_y).lt($.copy(BILLION).div(u128("10")))) {
+  while ($.copy(max_x_y).lt($.copy(BILLION).div(u128('10')))) {
     {
-      max_x_y = $.copy(max_x_y).mul(u128("10"));
-      numerator = $.copy(numerator).mul(u128("10"));
+      max_x_y = $.copy(max_x_y).mul(u128('10'));
+      numerator = $.copy(numerator).mul(u128('10'));
     }
   }
-  preprocessed_input_x = $.copy(input_x)
-    .mul($.copy(numerator))
-    .div($.copy(denominator));
-  if ($.copy(preprocessed_input_x).lt(u128("10000"))) {
+  preprocessed_input_x = $.copy(input_x).mul($.copy(numerator)).div($.copy(denominator));
+  if ($.copy(preprocessed_input_x).lt(u128('10000'))) {
     temp$1 = get_swap_x_to_y_out_preprocessed_inner_(
       $.copy(current_x).mul($.copy(numerator)).div($.copy(denominator)),
       $.copy(current_y).mul($.copy(numerator)).div($.copy(denominator)),
@@ -225,8 +169,8 @@ export function get_swap_x_to_y_out_(
       $.copy(current_x).mul($.copy(numerator)).div($.copy(denominator)),
       $.copy(current_y).mul($.copy(numerator)).div($.copy(denominator)),
       $.copy(preprocessed_input_x),
-      u128("1"),
-      u128("1"),
+      u128('1'),
+      u128('1'),
       $.copy(k),
       $.copy(k2),
       $.copy(xa),
@@ -257,8 +201,8 @@ export function get_swap_x_to_y_out_preprocessed_(
     $.copy(current_x),
     $.copy(current_y),
     $.copy(input_x),
-    u128("1"),
-    u128("1"),
+    u128('1'),
+    u128('1'),
     $.copy(k),
     $.copy(k2),
     $.copy(xa),
@@ -344,31 +288,16 @@ export function get_swap_x_to_y_out_preprocessed_inner_(
   p_n = $.copy(n).mul($.copy(PRECISION_FACTOR));
   p_k = $.copy(k).mul($.copy(PRECISION_FACTOR)).mul($.copy(PRECISION_FACTOR));
   p_k2 = $.copy(k2).mul($.copy(PRECISION_FACTOR)).mul($.copy(PRECISION_FACTOR));
-  if (
-    compare_fraction_(
+  if (compare_fraction_($.copy(current_x), $.copy(current_y), $.copy(xa), $.copy(xb), $c)) {
+    [f_numerator, f_denominator, dydx_numerator, dydx_denominator] = solve_F_upper_left_(
       $.copy(current_x),
       $.copy(current_y),
-      $.copy(xa),
-      $.copy(xb),
+      $.copy(n),
+      $.copy(k2),
       $c
-    )
-  ) {
-    [f_numerator, f_denominator, dydx_numerator, dydx_denominator] =
-      solve_F_upper_left_(
-        $.copy(current_x),
-        $.copy(current_y),
-        $.copy(n),
-        $.copy(k2),
-        $c
-      );
-    p_current_xF = $.copy(current_x)
-      .mul($.copy(f_numerator))
-      .mul($.copy(PRECISION_FACTOR))
-      .div($.copy(f_denominator));
-    p_current_yF = $.copy(current_y)
-      .mul($.copy(f_numerator))
-      .mul($.copy(PRECISION_FACTOR))
-      .div($.copy(f_denominator));
+    );
+    p_current_xF = $.copy(current_x).mul($.copy(f_numerator)).mul($.copy(PRECISION_FACTOR)).div($.copy(f_denominator));
+    p_current_yF = $.copy(current_y).mul($.copy(f_numerator)).mul($.copy(PRECISION_FACTOR)).div($.copy(f_denominator));
     p_input_xF = $.copy(input_x)
       .mul($.copy(f_numerator))
       .mul($.copy(PRECISION_FACTOR))
@@ -387,9 +316,7 @@ export function get_swap_x_to_y_out_preprocessed_inner_(
         $c
       );
       p_delta_yF_this_stage = $.copy(p_current_yF).sub($.copy(p_xb));
-      input_xF_next_stage = $.copy(p_new_xF)
-        .sub($.copy(p_xa))
-        .div($.copy(PRECISION_FACTOR));
+      input_xF_next_stage = $.copy(p_new_xF).sub($.copy(p_xa)).div($.copy(PRECISION_FACTOR));
       p_output_yF_next_stage = get_swap_x_to_y_out_preprocessed_(
         $.copy(xa),
         $.copy(xb),
@@ -412,31 +339,16 @@ export function get_swap_x_to_y_out_preprocessed_inner_(
       if ($.copy(p_current_yF).gt($.copy(p_new_yF))) {
         temp$1 = $.copy(p_current_yF).sub($.copy(p_new_yF));
       } else {
-        temp$1 = u128("0");
+        temp$1 = u128('0');
       }
       p_delta_yF = temp$1;
-      p_output_y__2 = $.copy(p_delta_yF)
-        .mul($.copy(f_denominator))
-        .div($.copy(f_numerator));
+      p_output_y__2 = $.copy(p_delta_yF).mul($.copy(f_denominator)).div($.copy(f_numerator));
       temp$3 = $.copy(p_output_y__2);
     }
     temp$32 = temp$3;
   } else {
-    if (
-      compare_fraction_(
-        $.copy(current_x),
-        $.copy(current_y),
-        $.copy(xb),
-        $.copy(xa),
-        $c
-      )
-    ) {
-      [
-        f_numerator__4,
-        f_denominator__5,
-        dydx_numerator__6,
-        dydx_denominator__7,
-      ] = solve_F_middle_(
+    if (compare_fraction_($.copy(current_x), $.copy(current_y), $.copy(xb), $.copy(xa), $c)) {
+      [f_numerator__4, f_denominator__5, dydx_numerator__6, dydx_denominator__7] = solve_F_middle_(
         $.copy(current_x),
         $.copy(current_y),
         $.copy(m),
@@ -469,9 +381,7 @@ export function get_swap_x_to_y_out_preprocessed_inner_(
           $c
         );
         p_delta_yF_this_stage__13 = $.copy(p_current_yF__9).sub($.copy(p_xa));
-        input_xF_next_stage__14 = $.copy(p_new_xF__11)
-          .sub($.copy(p_xb))
-          .div($.copy(PRECISION_FACTOR));
+        input_xF_next_stage__14 = $.copy(p_new_xF__11).sub($.copy(p_xb)).div($.copy(PRECISION_FACTOR));
         p_output_yF_next_stage__15 = get_swap_x_to_y_out_preprocessed_(
           $.copy(xb),
           $.copy(xa),
@@ -488,31 +398,24 @@ export function get_swap_x_to_y_out_preprocessed_inner_(
           .add($.copy(p_output_yF_next_stage__15))
           .mul($.copy(f_denominator__5))
           .div($.copy(f_numerator__4));
-        temp$20 = Math.min_(
-          $.copy(p_output_y__16),
-          $.copy(p_output_y_max__12),
-          $c
-        );
+        temp$20 = Math.min_($.copy(p_output_y__16), $.copy(p_output_y_max__12), $c);
       } else {
         p_new_yF__17 = $.copy(p_k)
           .div($.copy(p_new_xF__11).add($.copy(p_m)))
           .sub($.copy(p_m));
         p_delta_yF__18 = $.copy(p_current_yF__9).sub($.copy(p_new_yF__17));
-        p_output_y__19 = $.copy(p_delta_yF__18)
-          .mul($.copy(f_denominator__5))
-          .div($.copy(f_numerator__4));
+        p_output_y__19 = $.copy(p_delta_yF__18).mul($.copy(f_denominator__5)).div($.copy(f_numerator__4));
         temp$20 = $.copy(p_output_y__19);
       }
       temp$31 = temp$20;
     } else {
-      [f_numerator__21, f_denominator__22, _dydx_numerator, _dydx_denominator] =
-        solve_F_bottom_right_(
-          $.copy(current_x),
-          $.copy(current_y),
-          $.copy(n),
-          $.copy(k2),
-          $c
-        );
+      [f_numerator__21, f_denominator__22, _dydx_numerator, _dydx_denominator] = solve_F_bottom_right_(
+        $.copy(current_x),
+        $.copy(current_y),
+        $.copy(n),
+        $.copy(k2),
+        $c
+      );
       p_current_xF__23 = $.copy(current_x)
         .mul($.copy(f_numerator__21))
         .mul($.copy(PRECISION_FACTOR))
@@ -532,12 +435,10 @@ export function get_swap_x_to_y_out_preprocessed_inner_(
       if ($.copy(p_current_yF__24).gt($.copy(p_new_yF__27))) {
         temp$28 = $.copy(p_current_yF__24).sub($.copy(p_new_yF__27));
       } else {
-        temp$28 = u128("0");
+        temp$28 = u128('0');
       }
       p_delta_yF__29 = temp$28;
-      p_output_y__30 = $.copy(p_delta_yF__29)
-        .mul($.copy(f_denominator__22))
-        .div($.copy(f_numerator__21));
+      p_output_y__30 = $.copy(p_delta_yF__29).mul($.copy(f_denominator__22)).div($.copy(f_numerator__21));
       temp$31 = $.copy(p_output_y__30);
     }
     temp$32 = temp$31;
@@ -571,12 +472,7 @@ export function get_swap_y_to_x_out_(
   );
 }
 
-export function mul_w_(
-  multiplier: U128,
-  numerator: U128,
-  denominator: U128,
-  $c: AptosDataCache
-): U128 {
+export function mul_w_(multiplier: U128, numerator: U128, denominator: U128, $c: AptosDataCache): U128 {
   return $.copy(multiplier).mul($.copy(numerator)).div($.copy(denominator));
 }
 
@@ -590,13 +486,7 @@ export function solve_F_bottom_right_(
   return solve_F_upper_left_($.copy(y), $.copy(x), $.copy(n), $.copy(k2), $c);
 }
 
-export function solve_F_middle_(
-  x: U128,
-  y: U128,
-  m: U128,
-  k: U128,
-  $c: AptosDataCache
-): [U128, U128, U128, U128] {
+export function solve_F_middle_(x: U128, y: U128, m: U128, k: U128, $c: AptosDataCache): [U128, U128, U128, U128] {
   let b, denominator, numerator, xF, x_plus_y, xf_plus_m, xy;
   xy = $.copy(x).mul($.copy(y));
   x_plus_y = $.copy(x).add($.copy(y));
@@ -605,30 +495,19 @@ export function solve_F_middle_(
     $.copy(b)
       .mul($.copy(b))
       .add(
-        u128("4")
+        u128('4')
           .mul($.copy(xy))
           .mul($.copy(k).sub($.copy(m).mul($.copy(m))))
       ),
     $c
   ).sub($.copy(b));
-  denominator = u128("2").mul($.copy(xy));
+  denominator = u128('2').mul($.copy(xy));
   xF = mul_w_($.copy(x), $.copy(numerator), $.copy(denominator), $c);
   xf_plus_m = $.copy(xF).add($.copy(m));
-  return [
-    $.copy(numerator),
-    $.copy(denominator),
-    $.copy(k),
-    $.copy(xf_plus_m).mul($.copy(xf_plus_m)),
-  ];
+  return [$.copy(numerator), $.copy(denominator), $.copy(k), $.copy(xf_plus_m).mul($.copy(xf_plus_m))];
 }
 
-export function solve_F_upper_left_(
-  x: U128,
-  y: U128,
-  n: U128,
-  k2: U128,
-  $c: AptosDataCache
-): [U128, U128, U128, U128] {
+export function solve_F_upper_left_(x: U128, y: U128, n: U128, k2: U128, $c: AptosDataCache): [U128, U128, U128, U128] {
   let denominator, numerator, xF, xn, xy;
   xn = $.copy(x).mul($.copy(n));
   xy = $.copy(x).mul($.copy(y));
@@ -636,27 +515,18 @@ export function solve_F_upper_left_(
     Math.sqrt_(
       $.copy(xn)
         .mul($.copy(xn))
-        .add(u128("4").mul($.copy(xy)).mul($.copy(k2))),
+        .add(u128('4').mul($.copy(xy)).mul($.copy(k2))),
       $c
     )
   );
-  denominator = u128("2").mul($.copy(xy));
+  denominator = u128('2').mul($.copy(xy));
   xF = mul_w_($.copy(x), $.copy(numerator), $.copy(denominator), $c);
-  return [
-    $.copy(numerator),
-    $.copy(denominator),
-    $.copy(k2),
-    $.copy(xF).mul($.copy(xF)),
-  ];
+  return [$.copy(numerator), $.copy(denominator), $.copy(k2), $.copy(xF).mul($.copy(xF))];
 }
 
 export function loadParsers(repo: AptosParserRepo) {}
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache
-  ) {}
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
   get moduleAddress() {
     {
       return moduleAddress;

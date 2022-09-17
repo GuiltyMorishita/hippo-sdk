@@ -1,44 +1,27 @@
-import * as $ from "@manahippo/move-to-ts";
-import {
-  AptosDataCache,
-  AptosParserRepo,
-  DummyCache,
-  AptosLocalCache,
-} from "@manahippo/move-to-ts";
-import { U8, U64, U128 } from "@manahippo/move-to-ts";
-import { u8, u64, u128 } from "@manahippo/move-to-ts";
-import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
-import {
-  AtomicTypeTag,
-  StructTag,
-  TypeTag,
-  VectorTag,
-  SimpleStructTag,
-} from "@manahippo/move-to-ts";
-import {
-  HexString,
-  AptosClient,
-  AptosAccount,
-  TxnBuilderTypes,
-  Types,
-} from "aptos";
-export const packageName = "MoveStdlib";
-export const moduleAddress = new HexString("0x1");
-export const moduleName = "error";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+export const packageName = 'MoveStdlib';
+export const moduleAddress = new HexString('0x1');
+export const moduleName = 'error';
 
-export const ABORTED: U64 = u64("7");
-export const ALREADY_EXISTS: U64 = u64("8");
-export const CANCELLED: U64 = u64("10");
-export const INTERNAL: U64 = u64("11");
-export const INVALID_ARGUMENT: U64 = u64("1");
-export const INVALID_STATE: U64 = u64("3");
-export const NOT_FOUND: U64 = u64("6");
-export const NOT_IMPLEMENTED: U64 = u64("12");
-export const OUT_OF_RANGE: U64 = u64("2");
-export const PERMISSION_DENIED: U64 = u64("5");
-export const RESOURCE_EXHAUSTED: U64 = u64("9");
-export const UNAUTHENTICATED: U64 = u64("4");
-export const UNAVAILABLE: U64 = u64("13");
+export const ABORTED: U64 = u64('7');
+export const ALREADY_EXISTS: U64 = u64('8');
+export const CANCELLED: U64 = u64('10');
+export const INTERNAL: U64 = u64('11');
+export const INVALID_ARGUMENT: U64 = u64('1');
+export const INVALID_STATE: U64 = u64('3');
+export const NOT_FOUND: U64 = u64('6');
+export const NOT_IMPLEMENTED: U64 = u64('12');
+export const OUT_OF_RANGE: U64 = u64('2');
+export const PERMISSION_DENIED: U64 = u64('5');
+export const RESOURCE_EXHAUSTED: U64 = u64('9');
+export const UNAUTHENTICATED: U64 = u64('4');
+export const UNAVAILABLE: U64 = u64('13');
 
 export function aborted_(r: U64, $c: AptosDataCache): U64 {
   return canonical_($.copy(ABORTED), $.copy(r), $c);
@@ -48,12 +31,8 @@ export function already_exists_(r: U64, $c: AptosDataCache): U64 {
   return canonical_($.copy(ALREADY_EXISTS), $.copy(r), $c);
 }
 
-export function canonical_(
-  category: U64,
-  reason: U64,
-  $c: AptosDataCache
-): U64 {
-  return $.copy(category).shl(u8("16")).add($.copy(reason));
+export function canonical_(category: U64, reason: U64, $c: AptosDataCache): U64 {
+  return $.copy(category).shl(u8('16')).add($.copy(reason));
 }
 
 export function internal_(r: U64, $c: AptosDataCache): U64 {
@@ -98,11 +77,7 @@ export function unavailable_(r: U64, $c: AptosDataCache): U64 {
 
 export function loadParsers(repo: AptosParserRepo) {}
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache
-  ) {}
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
   get moduleAddress() {
     {
       return moduleAddress;

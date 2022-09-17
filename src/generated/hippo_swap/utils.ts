@@ -1,64 +1,41 @@
-import * as $ from "@manahippo/move-to-ts";
-import {
-  AptosDataCache,
-  AptosParserRepo,
-  DummyCache,
-  AptosLocalCache,
-} from "@manahippo/move-to-ts";
-import { U8, U64, U128 } from "@manahippo/move-to-ts";
-import { u8, u64, u128 } from "@manahippo/move-to-ts";
-import { TypeParamDeclType, FieldDeclType } from "@manahippo/move-to-ts";
-import {
-  AtomicTypeTag,
-  StructTag,
-  TypeTag,
-  VectorTag,
-  SimpleStructTag,
-} from "@manahippo/move-to-ts";
-import {
-  HexString,
-  AptosClient,
-  AptosAccount,
-  TxnBuilderTypes,
-  Types,
-} from "aptos";
-import * as Stdlib from "../stdlib";
-export const packageName = "hippo-swap";
-export const moduleAddress = new HexString(
-  "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-);
-export const moduleName = "utils";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Stdlib from '../stdlib';
+export const packageName = 'hippo-swap';
+export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleName = 'utils';
 
 export class PoolInfo {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "PoolInfo";
+  static structName: string = 'PoolInfo';
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
-    { name: "pool_type", typeTag: AtomicTypeTag.U8 },
-    { name: "pool_idx", typeTag: AtomicTypeTag.U8 },
+    { name: 'pool_type', typeTag: AtomicTypeTag.U8 },
+    { name: 'pool_idx', typeTag: AtomicTypeTag.U8 }
   ];
 
   pool_type: U8;
   pool_idx: U8;
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.pool_type = proto["pool_type"] as U8;
-    this.pool_idx = proto["pool_idx"] as U8;
+    this.pool_type = proto['pool_type'] as U8;
+    this.pool_idx = proto['pool_idx'] as U8;
   }
 
-  static PoolInfoParser(
-    data: any,
-    typeTag: TypeTag,
-    repo: AptosParserRepo
-  ): PoolInfo {
+  static PoolInfoParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): PoolInfo {
     const proto = $.parseStructProto(data, typeTag, repo, PoolInfo);
     return new PoolInfo(proto, typeTag);
   }
 
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, "PoolInfo", []);
+    return new StructTag(moduleAddress, moduleName, 'PoolInfo', []);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
@@ -69,69 +46,44 @@ export class PoolList {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "PoolList";
+  static structName: string = 'PoolList';
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
     {
-      name: "list",
+      name: 'list',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString(
-            "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-          ),
-          "utils",
-          "PoolInfo",
+          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          'utils',
+          'PoolInfo',
           []
         )
-      ),
-    },
+      )
+    }
   ];
 
   list: PoolInfo[];
 
   constructor(proto: any, public typeTag: TypeTag) {
-    this.list = proto["list"] as PoolInfo[];
+    this.list = proto['list'] as PoolInfo[];
   }
 
-  static PoolListParser(
-    data: any,
-    typeTag: TypeTag,
-    repo: AptosParserRepo
-  ): PoolList {
+  static PoolListParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): PoolList {
     const proto = $.parseStructProto(data, typeTag, repo, PoolList);
     return new PoolList(proto, typeTag);
   }
 
-  static async load(
-    repo: AptosParserRepo,
-    client: AptosClient,
-    address: HexString,
-    typeParams: TypeTag[]
-  ) {
-    const result = await repo.loadResource(
-      client,
-      address,
-      PoolList,
-      typeParams
-    );
+  static async load(repo: AptosParserRepo, client: AptosClient, address: HexString, typeParams: TypeTag[]) {
+    const result = await repo.loadResource(client, address, PoolList, typeParams);
     return result as unknown as PoolList;
   }
-  static async loadByApp(
-    app: $.AppType,
-    address: HexString,
-    typeParams: TypeTag[]
-  ) {
-    const result = await app.repo.loadResource(
-      app.client,
-      address,
-      PoolList,
-      typeParams
-    );
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, PoolList, typeParams);
     await result.loadFullState(app);
     return result as unknown as PoolList;
   }
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, "PoolList", []);
+    return new StructTag(moduleAddress, moduleName, 'PoolList', []);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
@@ -142,10 +94,7 @@ export function compute_pool_list_($c: AptosDataCache): PoolList {
   list = Stdlib.Vector.empty_($c, [new SimpleStructTag(PoolInfo)]);
   Stdlib.Vector.push_back_(
     list,
-    new PoolInfo(
-      { pool_type: u8("0"), pool_idx: u8("0") },
-      new SimpleStructTag(PoolInfo)
-    ),
+    new PoolInfo({ pool_type: u8('0'), pool_idx: u8('0') }, new SimpleStructTag(PoolInfo)),
     $c,
     [new SimpleStructTag(PoolInfo)]
   );
@@ -153,37 +102,21 @@ export function compute_pool_list_($c: AptosDataCache): PoolList {
 }
 
 export function get_pool_list_(user: HexString, $c: AptosDataCache): void {
-  if (
-    $c.exists(
-      new SimpleStructTag(PoolList),
-      Stdlib.Signer.address_of_(user, $c)
-    )
-  ) {
-    $c.move_from<PoolList>(
-      new SimpleStructTag(PoolList),
-      Stdlib.Signer.address_of_(user, $c)
-    );
+  if ($c.exists(new SimpleStructTag(PoolList), Stdlib.Signer.address_of_(user, $c))) {
+    $c.move_from<PoolList>(new SimpleStructTag(PoolList), Stdlib.Signer.address_of_(user, $c));
   } else {
   }
-  return $c.move_to(
-    new SimpleStructTag(PoolList),
-    user,
-    compute_pool_list_($c)
-  );
+  return $c.move_to(new SimpleStructTag(PoolList), user, compute_pool_list_($c));
 }
 
 export function buildPayload_get_pool_list(
   isJSON = false
-):
-  | TxnBuilderTypes.TransactionPayloadEntryFunction
-  | Types.TransactionPayload_EntryFunctionPayload {
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString(
-      "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a"
-    ),
-    "utils",
-    "get_pool_list",
+    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    'utils',
+    'get_pool_list',
     typeParamStrings,
     [],
     isJSON
@@ -209,20 +142,16 @@ function make_query_get_pool_list(app: App) {
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolInfo",
+    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolInfo',
     PoolInfo.PoolInfoParser
   );
   repo.addParser(
-    "0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolList",
+    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolList',
     PoolList.PoolListParser
   );
 }
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache
-  ) {}
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
   get moduleAddress() {
     {
       return moduleAddress;
@@ -240,12 +169,7 @@ export class App {
     return PoolList;
   }
   async loadPoolList(owner: HexString, loadFull = true) {
-    const val = await PoolList.load(
-      this.repo,
-      this.client,
-      owner,
-      [] as TypeTag[]
-    );
+    const val = await PoolList.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
     }
@@ -253,9 +177,7 @@ export class App {
   }
   payload_get_pool_list(
     isJSON = false
-  ):
-    | TxnBuilderTypes.TransactionPayloadEntryFunction
-    | Types.TransactionPayload_EntryFunctionPayload {
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_get_pool_list(isJSON);
   }
   async get_pool_list(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
