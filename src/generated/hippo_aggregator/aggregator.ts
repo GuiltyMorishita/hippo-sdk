@@ -5,6 +5,7 @@ import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Basiq from '../basiq';
 import * as Econia from '../econia';
 import * as Hippo_swap from '../hippo_swap';
 import * as Pontem from '../pontem';
@@ -13,6 +14,7 @@ export const packageName = 'HippoAggregator';
 export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
 export const moduleName = 'aggregator';
 
+export const DEX_BASIQ: U8 = u8('4');
 export const DEX_ECONIA: U8 = u8('2');
 export const DEX_HIPPO: U8 = u8('1');
 export const DEX_PONTEM: U8 = u8('3');
@@ -219,11 +221,13 @@ export function get_intermediate_output_(
     temp$3,
     temp$30,
     temp$31,
+    temp$32,
     temp$33,
+    temp$35,
     temp$4,
     temp$9,
     coin_in_value,
-    coin_in_value__34,
+    coin_in_value__36,
     x_out,
     x_out__2,
     x_out_opt,
@@ -232,7 +236,7 @@ export function get_intermediate_output_(
     y_out__11,
     y_out__12,
     y_out__21,
-    y_out__32,
+    y_out__34,
     y_out__5,
     y_out__7,
     zero,
@@ -304,7 +308,7 @@ export function get_intermediate_output_(
       }
       [temp$19, temp$20] = [temp$17, temp$18];
     }
-    [temp$30, temp$31] = [temp$19, temp$20];
+    [temp$32, temp$33] = [temp$19, temp$20];
   } else {
     if ($.copy(dex_type).eq($.copy(DEX_ECONIA))) {
       if ($.copy(pool_type).eq($.copy(ECONIA_V1))) {
@@ -344,10 +348,10 @@ export function get_intermediate_output_(
       } else {
         throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
       }
-      [temp$28, temp$29] = [temp$24, temp$25];
+      [temp$30, temp$31] = [temp$24, temp$25];
     } else {
       if ($.copy(dex_type).eq($.copy(DEX_PONTEM))) {
-        [temp$26, temp$27] = [
+        [temp$28, temp$29] = [
           Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           Pontem.Router.swap_exact_coin_for_coin_(
             new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
@@ -358,15 +362,23 @@ export function get_intermediate_output_(
           )
         ];
       } else {
-        throw $.abortCode($.copy(E_UNKNOWN_DEX));
+        if ($.copy(dex_type).eq($.copy(DEX_BASIQ))) {
+          [temp$26, temp$27] = [
+            Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+            Basiq.Dex.swap_(x_in, $c, [$p[0], $p[1]])
+          ];
+        } else {
+          throw $.abortCode($.copy(E_UNKNOWN_DEX));
+        }
+        [temp$28, temp$29] = [temp$26, temp$27];
       }
-      [temp$28, temp$29] = [temp$26, temp$27];
+      [temp$30, temp$31] = [temp$28, temp$29];
     }
-    [temp$30, temp$31] = [temp$28, temp$29];
+    [temp$32, temp$33] = [temp$30, temp$31];
   }
-  [x_out_opt, y_out__32] = [temp$30, temp$31];
+  [x_out_opt, y_out__34] = [temp$32, temp$33];
   if (Stdlib.Option.is_some_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])) {
-    temp$33 = $.copy(coin_in_value).sub(
+    temp$35 = $.copy(coin_in_value).sub(
       Stdlib.Coin.value_(
         Stdlib.Option.borrow_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
         $c,
@@ -374,18 +386,18 @@ export function get_intermediate_output_(
       )
     );
   } else {
-    temp$33 = $.copy(coin_in_value);
+    temp$35 = $.copy(coin_in_value);
   }
-  coin_in_value__34 = temp$33;
+  coin_in_value__36 = temp$35;
   emit_swap_step_event_(
     $.copy(dex_type),
     $.copy(pool_type),
-    $.copy(coin_in_value__34),
-    Stdlib.Coin.value_(y_out__32, $c, [$p[1]]),
+    $.copy(coin_in_value__36),
+    Stdlib.Coin.value_(y_out__34, $c, [$p[1]]),
     $c,
     [$p[0], $p[1]]
   );
-  return [x_out_opt, y_out__32];
+  return [x_out_opt, y_out__34];
 }
 
 export function initialize_(admin: HexString, $c: AptosDataCache): void {
@@ -423,7 +435,6 @@ export function buildPayload_initialize(
     isJSON
   );
 }
-
 export function one_step_direct_(
   dex_type: U8,
   pool_type: U8,

@@ -11,6 +11,7 @@ export class NetworkConfiguration {
     public hippoAggregatorAddress: HexString,
     public pontemAddress: HexString,
     public econiaAddress: HexString,
+    public basiqAddress: HexString,
     public isMainnet = false
   ) {}
 
@@ -36,7 +37,9 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // pontem
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
   // econia
-  new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+  new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+  // basiq
+  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab')
 );
 
 export const DEVNET_CONFIG = new NetworkConfiguration(
@@ -53,7 +56,9 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   // pontem
   new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
   // econia
-  new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+  new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+  // basiq
+  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab')
 );
 
 export const CONFIGS = {

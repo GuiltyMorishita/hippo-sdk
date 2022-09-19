@@ -5,6 +5,7 @@ import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Basiq from '../basiq';
 import * as Coin_list from '../coin_list';
 import * as Econia from '../econia';
 import * as Pontem from '../pontem';
@@ -41,6 +42,83 @@ export class PontemLP {
     this.__app = app;
   }
 }
+export function mock_deploy_basiq_(admin: HexString, $c: AptosDataCache): void {
+  Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(BTC_AMOUNT), $c, [
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
+      []
+    )
+  ]);
+  Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(USDC_AMOUNT), $c, [
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
+      []
+    )
+  ]);
+  Basiq.Dex.admin_create_pool_(
+    admin,
+    $.copy(USDC_AMOUNT).div($.copy(BTC_AMOUNT)).mul(u64('1000000')),
+    u64('1').mul(u64('1000000')),
+    Stdlib.String.utf8_(
+      [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67'), u8('32'), u8('76'), u8('80')],
+      $c
+    ),
+    Stdlib.String.utf8_(
+      [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67'), u8('45'), u8('76'), u8('80')],
+      $c
+    ),
+    true,
+    $c,
+    [
+      new StructTag(
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetBTC',
+        []
+      ),
+      new StructTag(
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        'devnet_coins',
+        'DevnetUSDC',
+        []
+      )
+    ]
+  );
+  Basiq.Dex.add_liquidity_entry_(admin, $.copy(BTC_AMOUNT), $.copy(USDC_AMOUNT), $c, [
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetBTC',
+      []
+    ),
+    new StructTag(
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      'devnet_coins',
+      'DevnetUSDC',
+      []
+    )
+  ]);
+  return;
+}
+
+export function buildPayload_mock_deploy_basiq(
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    'devnet',
+    'mock_deploy_basiq',
+    typeParamStrings,
+    [],
+    isJSON
+  );
+}
+
 export function mock_deploy_econia_(admin: HexString, $c: AptosDataCache): void {
   Econia.Market.register_market_(admin, $c, [
     new StructTag(
@@ -301,6 +379,15 @@ export class App {
   }
   get PontemLP() {
     return PontemLP;
+  }
+  payload_mock_deploy_basiq(
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_mock_deploy_basiq(isJSON);
+  }
+  async mock_deploy_basiq(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_mock_deploy_basiq(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_mock_deploy_econia(
     isJSON = false

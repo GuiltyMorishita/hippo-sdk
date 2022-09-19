@@ -30,12 +30,15 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   Econia = 2,
   // eslint-disable-next-line no-unused-vars
-  Pontem = 3
+  Pontem = 3,
+  // eslint-disable-next-line no-unused-vars
+  Basiq = 4
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo]: 'Hippo',
   [DexType.Econia]: 'Econia',
-  [DexType.Pontem]: 'Pontem'
+  [DexType.Pontem]: 'Pontem',
+  [DexType.Basiq]: 'Basiq'
 };
 export type PoolType = U8;
 

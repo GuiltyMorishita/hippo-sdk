@@ -8,6 +8,7 @@ import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
 import { SimulationKeys } from '@manahippo/move-to-ts';
 import { AptosClient } from 'aptos';
+import { BasiqPoolProvider } from './basiq';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -32,10 +33,12 @@ export class TradeAggregator {
     const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
     const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);
     const pontemProvider = new PontemPoolProvider(app, fetcher, netConfig, registryClient);
+    const basiqProvider = new BasiqPoolProvider(app, fetcher, netConfig, registryClient);
     const aggregator = new TradeAggregator(registryClient, app, fetcher, [
       hippoProvider,
       econiaProvider,
-      pontemProvider
+      pontemProvider,
+      basiqProvider
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;
