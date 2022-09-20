@@ -193,7 +193,9 @@ export class EconiaPoolProvider extends TradingPoolProvider {
     markets.forEach((mi, marketId) => {
       if (
         this.registry.hasTokenType(mi.trading_pair_info.base_type_info) &&
-        this.registry.hasTokenType(mi.trading_pair_info.quote_type_info)
+        this.registry.hasTokenType(mi.trading_pair_info.quote_type_info) &&
+        // host is devnet contract
+        mi.host.hex() === this.netConfig.hippoAggregatorAddress.hex()
       ) {
         pools.push(
           new EconiaTradingPoolV1(

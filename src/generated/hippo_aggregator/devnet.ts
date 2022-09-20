@@ -11,7 +11,7 @@ import * as Econia from '../econia';
 import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
+export const moduleAddress = new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe');
 export const moduleName = 'devnet';
 
 export const BTC_AMOUNT: U64 = u64('100000000').mul(u64('1000'));
@@ -110,7 +110,7 @@ export function buildPayload_mock_deploy_basiq(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
     'devnet',
     'mock_deploy_basiq',
     typeParamStrings,
@@ -122,7 +122,7 @@ export function buildPayload_mock_deploy_basiq(
 export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosDataCache): void {
   let lot_size, tick_size;
   lot_size = u64('1000');
-  tick_size = u64('1');
+  tick_size = u64('1000');
   Econia.Market.register_market_pure_coin_(admin, $.copy(lot_size), $.copy(tick_size), $c, [
     new StructTag(
       new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
@@ -244,7 +244,7 @@ export function buildPayload_mock_deploy_econia(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
     'devnet',
     'mock_deploy_econia',
     typeParamStrings,
@@ -314,7 +314,7 @@ export function buildPayload_mock_deploy_pontem(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
     'devnet',
     'mock_deploy_pontem',
     typeParamStrings,
@@ -325,7 +325,7 @@ export function buildPayload_mock_deploy_pontem(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::devnet::PontemLP',
+    '0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe::devnet::PontemLP',
     PontemLP.PontemLPParser
   );
 }

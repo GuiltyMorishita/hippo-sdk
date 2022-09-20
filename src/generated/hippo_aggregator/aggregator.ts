@@ -11,7 +11,7 @@ import * as Hippo_swap from '../hippo_swap';
 import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
+export const moduleAddress = new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe');
 export const moduleName = 'aggregator';
 
 export const DEX_BASIQ: U8 = u8('4');
@@ -38,7 +38,7 @@ export class EventStore {
       name: 'swap_step_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
           'aggregator',
           'SwapStepEvent',
           []
@@ -171,7 +171,7 @@ export function emit_swap_step_event_(
   let event_store;
   event_store = $c.borrow_global_mut<EventStore>(
     new SimpleStructTag(EventStore),
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33')
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe')
   );
   Stdlib.Event.emit_event_(
     event_store.swap_step_events,
@@ -316,7 +316,7 @@ export function get_intermediate_output_(
       market_id = $.copy(pool_type);
       if (is_x_to_y) {
         Econia.Market.swap_coins_(
-          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
           $.copy(market_id),
           false,
           u64('0'),
@@ -331,7 +331,7 @@ export function get_intermediate_output_(
         );
       } else {
         Econia.Market.swap_coins_(
-          new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+          new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
           $.copy(market_id),
           true,
           u64('0'),
@@ -363,7 +363,7 @@ export function get_intermediate_output_(
         [temp$26, temp$27] = [
           Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           Pontem.Router.swap_exact_coin_for_coin_(
-            new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+            new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
             x_in,
             u64('0'),
             $c,
@@ -415,7 +415,7 @@ export function init_module_(admin: HexString, $c: AptosDataCache): void {
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33').hex()
+      new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
@@ -431,6 +431,19 @@ export function init_module_(admin: HexString, $c: AptosDataCache): void {
   return;
 }
 
+export function buildPayload_init_module(
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    'aggregator',
+    'init_module',
+    typeParamStrings,
+    [],
+    isJSON
+  );
+}
 export function one_step_direct_(
   dex_type: U8,
   pool_type: U64,
@@ -481,7 +494,7 @@ export function buildPayload_one_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
     'aggregator',
     'one_step_route',
     typeParamStrings,
@@ -591,7 +604,7 @@ export function buildPayload_three_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
     'aggregator',
     'three_step_route',
     typeParamStrings,
@@ -692,7 +705,7 @@ export function buildPayload_two_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
     'aggregator',
     'two_step_route',
     typeParamStrings,
@@ -712,11 +725,11 @@ export function buildPayload_two_step_route(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::aggregator::EventStore',
+    '0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe::aggregator::EventStore',
     EventStore.EventStoreParser
   );
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::aggregator::SwapStepEvent',
+    '0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe::aggregator::SwapStepEvent',
     SwapStepEvent.SwapStepEventParser
   );
 }
@@ -744,6 +757,15 @@ export class App {
   }
   get SwapStepEvent() {
     return SwapStepEvent;
+  }
+  payload_init_module(
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_init_module(isJSON);
+  }
+  async init_module(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_init_module(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_one_step_route(
     first_dex_type: U8,
