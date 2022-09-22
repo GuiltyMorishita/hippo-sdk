@@ -10,7 +10,13 @@ export const moduleAddress = new HexString('0x1');
 export const moduleName = 'math64';
 
 export function average_(a: U64, b: U64, $c: AptosDataCache): U64 {
-  return $.copy(a).add($.copy(b)).div(u64('2'));
+  let temp$1;
+  if ($.copy(a).lt($.copy(b))) {
+    temp$1 = $.copy(a).add($.copy(b).sub($.copy(a)).div(u64('2')));
+  } else {
+    temp$1 = $.copy(b).add($.copy(a).sub($.copy(b)).div(u64('2')));
+  }
+  return temp$1;
 }
 
 export function max_(a: U64, b: U64, $c: AptosDataCache): U64 {
@@ -34,26 +40,24 @@ export function min_(a: U64, b: U64, $c: AptosDataCache): U64 {
 }
 
 export function pow_(n: U64, e: U64, $c: AptosDataCache): U64 {
-  let temp$1, temp$2, temp$3, p;
+  let temp$1, p;
   if ($.copy(e).eq(u64('0'))) {
-    temp$3 = u64('1');
+    temp$1 = u64('1');
   } else {
-    if ($.copy(e).eq(u64('1'))) {
-      temp$2 = $.copy(n);
-    } else {
-      p = pow_($.copy(n), $.copy(e).div(u64('2')), $c);
-      p = $.copy(p).mul($.copy(p));
-      if ($.copy(e).mod(u64('2')).eq(u64('1'))) {
-        p = $.copy(p).mul($.copy(n));
-        temp$1 = $.copy(p);
-      } else {
-        temp$1 = $.copy(p);
+    p = u64('1');
+    while ($.copy(e).gt(u64('1'))) {
+      {
+        if ($.copy(e).mod(u64('2')).eq(u64('1'))) {
+          p = $.copy(p).mul($.copy(n));
+        } else {
+        }
+        e = $.copy(e).div(u64('2'));
+        n = $.copy(n).mul($.copy(n));
       }
-      temp$2 = temp$1;
     }
-    temp$3 = temp$2;
+    temp$1 = $.copy(p).mul($.copy(n));
   }
-  return temp$3;
+  return temp$1;
 }
 
 export function loadParsers(repo: AptosParserRepo) {}

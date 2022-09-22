@@ -11,8 +11,6 @@ export const packageName = 'AptosFramework';
 export const moduleAddress = new HexString('0x1');
 export const moduleName = 'state_storage';
 
-export const EEPOCH_ZERO: U64 = u64('2');
-export const EGAS_PARAMETER: U64 = u64('1');
 export const ESTATE_STORAGE_USAGE: U64 = u64('0');
 
 export class GasParameter {
@@ -127,6 +125,15 @@ export class Usage {
     this.__app = app;
   }
 }
+export function current_items_and_bytes_($c: AptosDataCache): [U64, U64] {
+  let usage;
+  if (!$c.exists(new SimpleStructTag(StateStorageUsage), new HexString('0x1'))) {
+    throw $.abortCode(Error.not_found_($.copy(ESTATE_STORAGE_USAGE), $c));
+  }
+  usage = $c.borrow_global<StateStorageUsage>(new SimpleStructTag(StateStorageUsage), new HexString('0x1'));
+  return [$.copy(usage.usage.items), $.copy(usage.usage.bytes)];
+}
+
 export function get_state_storage_usage_only_at_epoch_beginning_($c: AptosDataCache): Usage {
   return $.aptos_framework_state_storage_get_state_storage_usage_only_at_epoch_beginning($c);
 }
@@ -134,9 +141,6 @@ export function initialize_(aptos_framework: HexString, $c: AptosDataCache): voi
   System_addresses.assert_aptos_framework_(aptos_framework, $c);
   if (!!$c.exists(new SimpleStructTag(StateStorageUsage), new HexString('0x1'))) {
     throw $.abortCode(Error.already_exists_($.copy(ESTATE_STORAGE_USAGE), $c));
-  }
-  if (!!$c.exists(new SimpleStructTag(GasParameter), new HexString('0x1'))) {
-    throw $.abortCode(Error.already_exists_($.copy(EGAS_PARAMETER), $c));
   }
   $c.move_to(
     new SimpleStructTag(StateStorageUsage),
@@ -146,19 +150,14 @@ export function initialize_(aptos_framework: HexString, $c: AptosDataCache): voi
       new SimpleStructTag(StateStorageUsage)
     )
   );
-  $c.move_to(
-    new SimpleStructTag(GasParameter),
-    aptos_framework,
-    new GasParameter(
-      { usage: new Usage({ items: u64('0'), bytes: u64('0') }, new SimpleStructTag(Usage)) },
-      new SimpleStructTag(GasParameter)
-    )
-  );
   return;
 }
 
 export function on_new_block_(epoch: U64, $c: AptosDataCache): void {
   let usage;
+  if (!$c.exists(new SimpleStructTag(StateStorageUsage), new HexString('0x1'))) {
+    throw $.abortCode(Error.not_found_($.copy(ESTATE_STORAGE_USAGE), $c));
+  }
   usage = $c.borrow_global_mut<StateStorageUsage>(new SimpleStructTag(StateStorageUsage), new HexString('0x1'));
   if ($.copy(epoch).neq($.copy(usage.epoch))) {
     usage.epoch = $.copy(epoch);
@@ -169,11 +168,7 @@ export function on_new_block_(epoch: U64, $c: AptosDataCache): void {
 }
 
 export function on_reconfig_($c: AptosDataCache): void {
-  let gas_parameter, usage;
-  gas_parameter = $c.borrow_global_mut<GasParameter>(new SimpleStructTag(GasParameter), new HexString('0x1'));
-  usage = $c.borrow_global<StateStorageUsage>(new SimpleStructTag(StateStorageUsage), new HexString('0x1'));
-  gas_parameter.usage = $.copy(usage.usage);
-  return;
+  throw $.abortCode(u64('0'));
 }
 
 export function loadParsers(repo: AptosParserRepo) {

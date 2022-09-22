@@ -12,7 +12,7 @@ import * as Order_id from './order_id';
 import * as Registry from './registry';
 import * as User from './user';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
+export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
 export const moduleName = 'market';
 
 export const ASK: boolean = true;
@@ -100,12 +100,12 @@ export class OrderBook {
     {
       name: 'asks',
       typeTag: new StructTag(
-        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
         'critbit',
         'CritBitTree',
         [
           new StructTag(
-            new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+            new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
             'market',
             'Order',
             []
@@ -116,12 +116,12 @@ export class OrderBook {
     {
       name: 'bids',
       typeTag: new StructTag(
-        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
         'critbit',
         'CritBitTree',
         [
           new StructTag(
-            new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+            new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
             'market',
             'Order',
             []
@@ -203,13 +203,13 @@ export class OrderBooks {
     {
       name: 'map',
       typeTag: new StructTag(
-        new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
         'open_table',
         'OpenTable',
         [
           AtomicTypeTag.U64,
           new StructTag(
-            new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+            new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
             'market',
             'OrderBook',
             []
@@ -390,7 +390,7 @@ export function buildPayload_cancel_all_limit_orders_user(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
     'market',
     'cancel_all_limit_orders_user',
     typeParamStrings,
@@ -544,7 +544,7 @@ export function buildPayload_cancel_limit_order_user(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
     'market',
     'cancel_limit_order_user',
     typeParamStrings,
@@ -1624,7 +1624,7 @@ export function buildPayload_place_limit_order_user(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
     'market',
     'place_limit_order_user',
     typeParamStrings,
@@ -1760,7 +1760,7 @@ export function buildPayload_place_market_order_user(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
     'market',
     'place_market_order_user',
     typeParamStrings,
@@ -1883,7 +1883,7 @@ export function buildPayload_register_market_pure_coin(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
     'market',
     'register_market_pure_coin',
     typeParamStrings,
@@ -2169,7 +2169,7 @@ export function buildPayload_swap_between_coinstores(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
     'market',
     'swap_between_coinstores',
     typeParamStrings,
@@ -2465,23 +2465,23 @@ export function verify_order_book_exists_(host: HexString, market_id: U64, $c: A
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::market::Order',
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::market::Order',
     Order.OrderParser
   );
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::market::OrderBook',
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::market::OrderBook',
     OrderBook.OrderBookParser
   );
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::market::OrderBooks',
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::market::OrderBooks',
     OrderBooks.OrderBooksParser
   );
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::market::PriceLevel',
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::market::PriceLevel',
     PriceLevel.PriceLevelParser
   );
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::market::SimpleOrder',
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::market::SimpleOrder',
     SimpleOrder.SimpleOrderParser
   );
 }

@@ -19,6 +19,7 @@ export const moduleName = 'code';
 
 export const EDEP_ARBITRARY_NOT_SAME_ADDRESS: U64 = u64('7');
 export const EDEP_WEAKER_POLICY: U64 = u64('6');
+export const EINCOMPATIBLE_POLICY_DISABLED: U64 = u64('8');
 export const EMODULE_MISSING: U64 = u64('4');
 export const EMODULE_NAME_CLASH: U64 = u64('1');
 export const EPACKAGE_DEP_MISSING: U64 = u64('5');
@@ -518,7 +519,11 @@ export function is_policy_exempted_address_(addr: HexString, $c: AptosDataCache)
 }
 
 export function publish_package_(owner: HexString, pack: PackageMetadata, code: U8[][], $c: AptosDataCache): void {
-  let temp$1, temp$2, addr, allowed_deps, i, index, len, module_names, old, packages, policy, upgrade_number;
+  let temp$1, temp$2, temp$3, addr, allowed_deps, i, index, len, module_names, old, packages, policy, upgrade_number;
+  temp$1 = upgrade_policy_arbitrary_($c);
+  if (!$.copy(pack.upgrade_policy.policy).gt($.copy(temp$1.policy))) {
+    throw $.abortCode(Error.invalid_argument_($.copy(EINCOMPATIBLE_POLICY_DISABLED), $c));
+  }
   addr = Signer.address_of_(owner, $c);
   if (!$c.exists(new SimpleStructTag(PackageRegistry), $.copy(addr))) {
     $c.move_to(
@@ -540,8 +545,8 @@ export function publish_package_(owner: HexString, pack: PackageMetadata, code: 
   upgrade_number = u64('0');
   while ($.copy(i).lt($.copy(len))) {
     {
-      [temp$1, temp$2] = [packages, $.copy(i)];
-      old = Vector.borrow_(temp$1, temp$2, $c, [new SimpleStructTag(PackageMetadata)]);
+      [temp$2, temp$3] = [packages, $.copy(i)];
+      old = Vector.borrow_(temp$2, temp$3, $c, [new SimpleStructTag(PackageMetadata)]);
       if ($.deep_eq($.copy(old.name), $.copy(pack.name))) {
         upgrade_number = $.copy(old.upgrade_number).add(u64('1'));
         check_upgradability_(old, pack, module_names, $c);
