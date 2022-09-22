@@ -7,9 +7,30 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Account from './account';
 import * as Coin from './coin';
+import * as Error from './error';
 export const packageName = 'AptosFramework';
 export const moduleAddress = new HexString('0x1');
 export const moduleName = 'aptos_account';
+
+export const EACCOUNT_NOT_FOUND: U64 = u64('1');
+export const EACCOUNT_NOT_REGISTERED_FOR_APT: U64 = u64('2');
+
+export function assert_account_exists_(addr: HexString, $c: AptosDataCache): void {
+  if (!Account.exists_at_($.copy(addr), $c)) {
+    throw $.abortCode(Error.not_found_($.copy(EACCOUNT_NOT_FOUND), $c));
+  }
+  return;
+}
+
+export function assert_account_is_registered_for_apt_(addr: HexString, $c: AptosDataCache): void {
+  assert_account_exists_($.copy(addr), $c);
+  if (
+    !Coin.is_account_registered_($.copy(addr), $c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])])
+  ) {
+    throw $.abortCode(Error.not_found_($.copy(EACCOUNT_NOT_REGISTERED_FOR_APT), $c));
+  }
+  return;
+}
 
 export function create_account_(auth_key: HexString, $c: AptosDataCache): void {
   let signer;

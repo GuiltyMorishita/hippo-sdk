@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33');
+export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
 export const moduleName = 'open_table';
 
 export class OpenTable {
@@ -75,7 +75,7 @@ export function empty_($c: AptosDataCache, $p: TypeTag[] /* <K, V>*/): OpenTable
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33::open_table::OpenTable',
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::open_table::OpenTable',
     OpenTable.OpenTableParser
   );
 }

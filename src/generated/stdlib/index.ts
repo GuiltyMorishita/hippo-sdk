@@ -47,7 +47,9 @@ import * as Signer from './signer';
 import * as Simple_map from './simple_map';
 import * as Stake from './stake';
 import * as Staking_config from './staking_config';
+import * as Staking_contract from './staking_contract';
 import * as State_storage from './state_storage';
+import * as Storage_gas from './storage_gas';
 import * as String from './string';
 import * as System_addresses from './system_addresses';
 import * as Table from './table';
@@ -60,6 +62,7 @@ import * as Type_info from './type_info';
 import * as Util from './util';
 import * as Vector from './vector';
 import * as Version from './version';
+import * as Vesting from './vesting';
 import * as Voting from './voting';
 
 export * as Account from './account';
@@ -109,7 +112,9 @@ export * as Signer from './signer';
 export * as Simple_map from './simple_map';
 export * as Stake from './stake';
 export * as Staking_config from './staking_config';
+export * as Staking_contract from './staking_contract';
 export * as State_storage from './state_storage';
+export * as Storage_gas from './storage_gas';
 export * as String from './string';
 export * as System_addresses from './system_addresses';
 export * as Table from './table';
@@ -122,6 +127,7 @@ export * as Type_info from './type_info';
 export * as Util from './util';
 export * as Vector from './vector';
 export * as Version from './version';
+export * as Vesting from './vesting';
 export * as Voting from './voting';
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -172,7 +178,9 @@ export function loadParsers(repo: AptosParserRepo) {
   Simple_map.loadParsers(repo);
   Stake.loadParsers(repo);
   Staking_config.loadParsers(repo);
+  Staking_contract.loadParsers(repo);
   State_storage.loadParsers(repo);
+  Storage_gas.loadParsers(repo);
   String.loadParsers(repo);
   System_addresses.loadParsers(repo);
   Table.loadParsers(repo);
@@ -185,6 +193,7 @@ export function loadParsers(repo: AptosParserRepo) {
   Util.loadParsers(repo);
   Vector.loadParsers(repo);
   Version.loadParsers(repo);
+  Vesting.loadParsers(repo);
   Voting.loadParsers(repo);
 }
 
@@ -249,7 +258,9 @@ export class App {
   simple_map: Simple_map.App;
   stake: Stake.App;
   staking_config: Staking_config.App;
+  staking_contract: Staking_contract.App;
   state_storage: State_storage.App;
+  storage_gas: Storage_gas.App;
   string: String.App;
   system_addresses: System_addresses.App;
   table: Table.App;
@@ -262,6 +273,7 @@ export class App {
   util: Util.App;
   vector: Vector.App;
   version: Version.App;
+  vesting: Vesting.App;
   voting: Voting.App;
   constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
     this.account = new Account.App(client, repo, cache);
@@ -311,7 +323,9 @@ export class App {
     this.simple_map = new Simple_map.App(client, repo, cache);
     this.stake = new Stake.App(client, repo, cache);
     this.staking_config = new Staking_config.App(client, repo, cache);
+    this.staking_contract = new Staking_contract.App(client, repo, cache);
     this.state_storage = new State_storage.App(client, repo, cache);
+    this.storage_gas = new Storage_gas.App(client, repo, cache);
     this.string = new String.App(client, repo, cache);
     this.system_addresses = new System_addresses.App(client, repo, cache);
     this.table = new Table.App(client, repo, cache);
@@ -324,6 +338,7 @@ export class App {
     this.util = new Util.App(client, repo, cache);
     this.vector = new Vector.App(client, repo, cache);
     this.version = new Version.App(client, repo, cache);
+    this.vesting = new Vesting.App(client, repo, cache);
     this.voting = new Voting.App(client, repo, cache);
   }
 }

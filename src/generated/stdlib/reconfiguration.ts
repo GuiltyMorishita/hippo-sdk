@@ -11,7 +11,7 @@ import * as Error from './error';
 import * as Event from './event';
 import * as Signer from './signer';
 import * as Stake from './stake';
-import * as State_storage from './state_storage';
+import * as Storage_gas from './storage_gas';
 import * as System_addresses from './system_addresses';
 import * as Timestamp from './timestamp';
 export const packageName = 'AptosFramework';
@@ -234,7 +234,7 @@ export function reconfigure_($c: AptosDataCache): void {
   } else {
   }
   Stake.on_new_epoch_($c);
-  State_storage.on_reconfig_($c);
+  Storage_gas.on_reconfig_($c);
   if (!$.copy(current_time).gt($.copy(config_ref.last_reconfiguration_time))) {
     throw $.abortCode(Error.invalid_state_($.copy(EINVALID_BLOCK_TIME), $c));
   }

@@ -28,14 +28,12 @@ export const EACCOUNT_DOES_NOT_EXIST: U64 = u64('2');
 export const ECANNOT_RESERVED_ADDRESS: U64 = u64('5');
 export const ED25519_SCHEME: U8 = u8('0');
 export const EINVALID_ACCEPT_ROTATION_CAPABILITY: U64 = u64('10');
-export const EINVALID_ACCEPT_SIGNER_CAPABILITY: U64 = u64('15');
-export const EINVALID_CAPABILITY_TYPE: U64 = u64('14');
 export const EINVALID_ORIGINATING_ADDRESS: U64 = u64('13');
 export const EINVALID_PROOF_OF_KNOWLEDGE: U64 = u64('8');
-export const EINVALID_REVOKE_SIGNER_CAPABILITY: U64 = u64('16');
 export const EINVALID_SCHEME: U64 = u64('12');
 export const EMALFORMED_AUTHENTICATION_KEY: U64 = u64('4');
 export const ENO_CAPABILITY: U64 = u64('9');
+export const ENO_SUCH_SIGNER_CAPABILITY: U64 = u64('14');
 export const ENO_VALID_FRAMEWORK_RESERVED_ADDRESS: U64 = u64('11');
 export const EOUT_OF_GAS: U64 = u64('6');
 export const ESEQUENCE_NUMBER_TOO_BIG: U64 = u64('3');
@@ -491,7 +489,7 @@ export function create_authorized_signer_(
   account_resource = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(offerer_address));
   addr = Signer.address_of_(account, $c);
   if (!Option.contains_(account_resource.signer_capability_offer.for__, addr, $c, [AtomicTypeTag.Address])) {
-    throw $.abortCode(Error.not_found_($.copy(EINVALID_ACCEPT_SIGNER_CAPABILITY), $c));
+    throw $.abortCode(Error.not_found_($.copy(ENO_SUCH_SIGNER_CAPABILITY), $c));
   }
   return create_signer_($.copy(offerer_address), $c);
 }
@@ -756,7 +754,7 @@ export function revoke_signer_capability_(
       AtomicTypeTag.Address
     ])
   ) {
-    throw $.abortCode(Error.not_found_($.copy(EINVALID_REVOKE_SIGNER_CAPABILITY), $c));
+    throw $.abortCode(Error.not_found_($.copy(ENO_SUCH_SIGNER_CAPABILITY), $c));
   }
   Option.extract_(account_resource.signer_capability_offer.for__, $c, [AtomicTypeTag.Address]);
   return;
