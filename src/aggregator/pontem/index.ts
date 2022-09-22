@@ -3,7 +3,7 @@ import { HexString, Types } from 'aptos';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
 import { CoinListClient } from '../../coinList';
 import { typeTagToTypeInfo } from '../../utils';
-import { App, hippo_swap } from '../../generated';
+import { App, hippo_aggregator } from '../../generated';
 import bigInt from 'big-integer';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
 import { CONFIGS } from '../../config';
@@ -91,7 +91,7 @@ export class PontemPoolProvider extends TradingPoolProvider {
   }
   async loadPoolList(): Promise<TradingPool[]> {
     const poolList: TradingPool[] = [];
-    const ownerAddress = hippo_swap.Cp_swap.moduleAddress;
+    const ownerAddress = hippo_aggregator.Aggregator.moduleAddress;
     const resources = await this.app.client.getAccountResources(ownerAddress);
     for (const resource of resources) {
       if (resource.type.indexOf('liquidity_pool::LiquidityPool') >= 0) {
