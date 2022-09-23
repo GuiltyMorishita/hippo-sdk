@@ -13,7 +13,7 @@ import { BasiqPoolProvider } from './basiq';
 export class TradeAggregator {
   public allPools: TradingPool[];
   public xToAnyPools: Map<TokenTypeFullname, TradingPool[]>;
-  constructor(
+  private constructor(
     public registryClient: CoinListClient,
     public app: App,
     public fetcher: SimulationKeys,
