@@ -36,7 +36,7 @@ export class HippoWalletClient {
     this.devnetCoinSymbols = [];
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
       this.fetcher,
-      this.netConf.hippoDexAddress,
+      this.netConf.coinListAddress,
       []
     );
     for (const tokenInfo of fullList.coin_info_list) {
