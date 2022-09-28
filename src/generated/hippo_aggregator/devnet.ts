@@ -45,7 +45,7 @@ export class PontemLP {
 export function mock_deploy_basiq_(admin: HexString, $c: AptosDataCache): void {
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(BTC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
@@ -53,7 +53,7 @@ export function mock_deploy_basiq_(admin: HexString, $c: AptosDataCache): void {
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -72,13 +72,13 @@ export function mock_deploy_basiq_(admin: HexString, $c: AptosDataCache): void {
     $c,
     [
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetUSDC',
         []
@@ -87,13 +87,13 @@ export function mock_deploy_basiq_(admin: HexString, $c: AptosDataCache): void {
   );
   Basiq.Dex.add_liquidity_entry_(admin, $.copy(BTC_AMOUNT), $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
     ),
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -122,13 +122,13 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
   tick_size = u64('1000');
   Econia.Market.register_market_pure_coin_(admin, $.copy(lot_size), $.copy(tick_size), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
     ),
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -136,13 +136,13 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
   ]);
   Econia.User.register_market_account_(admin, $.copy(market_id), u64('0'), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
     ),
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -150,7 +150,7 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(BTC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
@@ -158,7 +158,7 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -166,7 +166,7 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
   ]);
   Econia.User.deposit_from_coinstore_(admin, $.copy(market_id), u64('0'), $.copy(BTC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
@@ -174,7 +174,7 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
   ]);
   Econia.User.deposit_from_coinstore_(admin, $.copy(market_id), u64('0'), $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -193,13 +193,13 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
     $c,
     [
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetUSDC',
         []
@@ -219,13 +219,13 @@ export function mock_deploy_econia_(admin: HexString, market_id: U64, $c: AptosD
     $c,
     [
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetUSDC',
         []
@@ -253,7 +253,7 @@ export function buildPayload_mock_deploy_econia(
 export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void {
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(BTC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetBTC',
       []
@@ -261,7 +261,7 @@ export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void 
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(USDC_AMOUNT), $c, [
     new StructTag(
-      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -277,26 +277,26 @@ export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetUSDC',
         []
       ),
       new SimpleStructTag(PontemLP, [
         new StructTag(
-          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+          new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
           'devnet_coins',
           'DevnetBTC',
           []
         ),
         new StructTag(
-          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+          new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
           'devnet_coins',
           'DevnetUSDC',
           []

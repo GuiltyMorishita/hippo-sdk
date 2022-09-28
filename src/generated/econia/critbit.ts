@@ -1,47 +1,64 @@
-import * as $ from "@manahippo/move-to-ts";
-import {AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache} from "@manahippo/move-to-ts";
-import {U8, U64, U128} from "@manahippo/move-to-ts";
-import {u8, u64, u128} from "@manahippo/move-to-ts";
-import {TypeParamDeclType, FieldDeclType} from "@manahippo/move-to-ts";
-import {AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag} from "@manahippo/move-to-ts";
-import {HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types} from "aptos";
-import * as Stdlib from "../stdlib";
-export const packageName = "Econia";
-export const moduleAddress = new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd");
-export const moduleName = "critbit";
+import * as $ from '@manahippo/move-to-ts';
+import { AptosDataCache, AptosParserRepo, DummyCache, AptosLocalCache } from '@manahippo/move-to-ts';
+import { U8, U64, U128 } from '@manahippo/move-to-ts';
+import { u8, u64, u128 } from '@manahippo/move-to-ts';
+import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Stdlib from '../stdlib';
+export const packageName = 'Econia';
+export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
+export const moduleName = 'critbit';
 
-export const E_BIT_NOT_0_OR_1 : U64 = u64("0");
-export const E_BORROW_EMPTY : U64 = u64("3");
-export const E_DESTROY_NOT_EMPTY : U64 = u64("1");
-export const E_HAS_KEY : U64 = u64("2");
-export const E_INSERT_FULL : U64 = u64("5");
-export const E_LOOKUP_EMPTY : U64 = u64("7");
-export const E_NOT_HAS_KEY : U64 = u64("4");
-export const E_POP_EMPTY : U64 = u64("6");
-export const HI_128 : U128 = u128("340282366920938463463374607431768211455");
-export const HI_64 : U64 = u64("18446744073709551615");
-export const INNER : U64 = u64("0");
-export const LEFT : boolean = true;
-export const MSB_u128 : U8 = u8("127");
-export const NODE_TYPE : U8 = u8("63");
-export const OUTER : U64 = u64("1");
-export const RIGHT : boolean = false;
-export const ROOT : U64 = u64("18446744073709551615");
+export const E_BIT_NOT_0_OR_1: U64 = u64('0');
+export const E_BORROW_EMPTY: U64 = u64('3');
+export const E_DESTROY_NOT_EMPTY: U64 = u64('1');
+export const E_HAS_KEY: U64 = u64('2');
+export const E_INSERT_FULL: U64 = u64('5');
+export const E_LOOKUP_EMPTY: U64 = u64('7');
+export const E_NOT_HAS_KEY: U64 = u64('4');
+export const E_POP_EMPTY: U64 = u64('6');
+export const HI_128: U128 = u128('340282366920938463463374607431768211455');
+export const HI_64: U64 = u64('18446744073709551615');
+export const INNER: U64 = u64('0');
+export const LEFT: boolean = true;
+export const MSB_u128: U8 = u8('127');
+export const NODE_TYPE: U8 = u8('63');
+export const OUTER: U64 = u64('1');
+export const RIGHT: boolean = false;
+export const ROOT: U64 = u64('18446744073709551615');
 
-
-export class CritBitTree 
-{
+export class CritBitTree {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "CritBitTree";
-  static typeParameters: TypeParamDeclType[] = [
-    { name: "V", isPhantom: false }
-  ];
+  static structName: string = 'CritBitTree';
+  static typeParameters: TypeParamDeclType[] = [{ name: 'V', isPhantom: false }];
   static fields: FieldDeclType[] = [
-  { name: "root", typeTag: AtomicTypeTag.U64 },
-  { name: "inner_nodes", typeTag: new VectorTag(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "critbit", "InnerNode", [])) },
-  { name: "outer_nodes", typeTag: new VectorTag(new StructTag(new HexString("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd"), "critbit", "OuterNode", [new $.TypeParamIdx(0)])) }];
+    { name: 'root', typeTag: AtomicTypeTag.U64 },
+    {
+      name: 'inner_nodes',
+      typeTag: new VectorTag(
+        new StructTag(
+          new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+          'critbit',
+          'InnerNode',
+          []
+        )
+      )
+    },
+    {
+      name: 'outer_nodes',
+      typeTag: new VectorTag(
+        new StructTag(
+          new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+          'critbit',
+          'OuterNode',
+          [new $.TypeParamIdx(0)]
+        )
+      )
+    }
+  ];
 
   root: U64;
   inner_nodes: InnerNode[];
@@ -53,34 +70,31 @@ export class CritBitTree
     this.outer_nodes = proto['outer_nodes'] as OuterNode[];
   }
 
-  static CritBitTreeParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : CritBitTree {
+  static CritBitTreeParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): CritBitTree {
     const proto = $.parseStructProto(data, typeTag, repo, CritBitTree);
     return new CritBitTree(proto, typeTag);
   }
 
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "CritBitTree", $p);
+    return new StructTag(moduleAddress, moduleName, 'CritBitTree', $p);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
   }
-
 }
 
-export class InnerNode 
-{
+export class InnerNode {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "InnerNode";
-  static typeParameters: TypeParamDeclType[] = [
-
-  ];
+  static structName: string = 'InnerNode';
+  static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
-  { name: "critical_bit", typeTag: AtomicTypeTag.U8 },
-  { name: "parent_index", typeTag: AtomicTypeTag.U64 },
-  { name: "left_child_index", typeTag: AtomicTypeTag.U64 },
-  { name: "right_child_index", typeTag: AtomicTypeTag.U64 }];
+    { name: 'critical_bit', typeTag: AtomicTypeTag.U8 },
+    { name: 'parent_index', typeTag: AtomicTypeTag.U64 },
+    { name: 'left_child_index', typeTag: AtomicTypeTag.U64 },
+    { name: 'right_child_index', typeTag: AtomicTypeTag.U64 }
+  ];
 
   critical_bit: U8;
   parent_index: U64;
@@ -94,33 +108,30 @@ export class InnerNode
     this.right_child_index = proto['right_child_index'] as U64;
   }
 
-  static InnerNodeParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : InnerNode {
+  static InnerNodeParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): InnerNode {
     const proto = $.parseStructProto(data, typeTag, repo, InnerNode);
     return new InnerNode(proto, typeTag);
   }
 
   static getTag(): StructTag {
-    return new StructTag(moduleAddress, moduleName, "InnerNode", []);
+    return new StructTag(moduleAddress, moduleName, 'InnerNode', []);
   }
   async loadFullState(app: $.AppType) {
     this.__app = app;
   }
-
 }
 
-export class OuterNode 
-{
+export class OuterNode {
   static moduleAddress = moduleAddress;
   static moduleName = moduleName;
   __app: $.AppType | null = null;
-  static structName: string = "OuterNode";
-  static typeParameters: TypeParamDeclType[] = [
-    { name: "V", isPhantom: false }
-  ];
+  static structName: string = 'OuterNode';
+  static typeParameters: TypeParamDeclType[] = [{ name: 'V', isPhantom: false }];
   static fields: FieldDeclType[] = [
-  { name: "key", typeTag: AtomicTypeTag.U128 },
-  { name: "value", typeTag: new $.TypeParamIdx(0) },
-  { name: "parent_index", typeTag: AtomicTypeTag.U64 }];
+    { name: 'key', typeTag: AtomicTypeTag.U128 },
+    { name: 'value', typeTag: new $.TypeParamIdx(0) },
+    { name: 'parent_index', typeTag: AtomicTypeTag.U64 }
+  ];
 
   key: U128;
   value: any;
@@ -132,155 +143,135 @@ export class OuterNode
     this.parent_index = proto['parent_index'] as U64;
   }
 
-  static OuterNodeParser(data:any, typeTag: TypeTag, repo: AptosParserRepo) : OuterNode {
+  static OuterNodeParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): OuterNode {
     const proto = $.parseStructProto(data, typeTag, repo, OuterNode);
     return new OuterNode(proto, typeTag);
   }
 
   static makeTag($p: TypeTag[]): StructTag {
-    return new StructTag(moduleAddress, moduleName, "OuterNode", $p);
+    return new StructTag(moduleAddress, moduleName, 'OuterNode', $p);
   }
   async loadFullState(app: $.AppType) {
-    if (this.value.typeTag instanceof StructTag) {await this.value.loadFullState(app);}
+    if (this.value.typeTag instanceof StructTag) {
+      await this.value.loadFullState(app);
+    }
     this.__app = app;
   }
-
 }
-export function borrow_ (
-  tree: CritBitTree,
-  key: U128,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): any {
+export function borrow_(tree: CritBitTree, key: U128, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): any {
   let closest_outer_node_ref;
   if (!!is_empty_(tree, $c, [$p[0]])) {
     throw $.abortCode($.copy(E_BORROW_EMPTY));
   }
   closest_outer_node_ref = borrow_closest_outer_node_(tree, $.copy(key), $c, [$p[0]]);
-  if (!($.copy(closest_outer_node_ref.key)).eq(($.copy(key)))) {
+  if (!$.copy(closest_outer_node_ref.key).eq($.copy(key))) {
     throw $.abortCode($.copy(E_NOT_HAS_KEY));
   }
   return closest_outer_node_ref.value;
 }
 
-export function borrow_closest_outer_node_ (
+export function borrow_closest_outer_node_(
   tree: CritBitTree,
   key: U128,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): OuterNode {
   let temp$1, child_index, node;
   if (is_outer_node_($.copy(tree.root), $c)) {
-    return Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(tree.root), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  }
-  else{
+    return Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(tree.root), $c), $c, [
+      new SimpleStructTag(OuterNode, [$p[0]])
+    ]);
+  } else {
   }
   node = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(tree.root), $c, [new SimpleStructTag(InnerNode)]);
   while (true) {
     if (is_set_($.copy(key), $.copy(node.critical_bit), $c)) {
       temp$1 = $.copy(node.right_child_index);
-    }
-    else{
+    } else {
       temp$1 = $.copy(node.left_child_index);
     }
     child_index = temp$1;
     if (is_outer_node_($.copy(child_index), $c)) {
-      return Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(child_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-    }
-    else{
+      return Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(child_index), $c), $c, [
+        new SimpleStructTag(OuterNode, [$p[0]])
+      ]);
+    } else {
     }
     node = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)]);
   }
 }
 
-export function borrow_closest_outer_node_mut_ (
+export function borrow_closest_outer_node_mut_(
   tree: CritBitTree,
   key: U128,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): OuterNode {
   let temp$1, child_index, node;
   if (is_outer_node_($.copy(tree.root), $c)) {
-    return Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(tree.root), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  }
-  else{
+    return Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(tree.root), $c), $c, [
+      new SimpleStructTag(OuterNode, [$p[0]])
+    ]);
+  } else {
   }
   node = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(tree.root), $c, [new SimpleStructTag(InnerNode)]);
   while (true) {
     if (is_set_($.copy(key), $.copy(node.critical_bit), $c)) {
       temp$1 = $.copy(node.right_child_index);
-    }
-    else{
+    } else {
       temp$1 = $.copy(node.left_child_index);
     }
     child_index = temp$1;
     if (is_outer_node_($.copy(child_index), $c)) {
-      return Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(child_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-    }
-    else{
+      return Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(child_index), $c), $c, [
+        new SimpleStructTag(OuterNode, [$p[0]])
+      ]);
+    } else {
     }
     node = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)]);
   }
 }
 
-export function borrow_mut_ (
-  tree: CritBitTree,
-  key: U128,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): any {
+export function borrow_mut_(tree: CritBitTree, key: U128, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): any {
   let closest_outer_node_ref_mut;
   if (!!is_empty_(tree, $c, [$p[0]])) {
     throw $.abortCode($.copy(E_BORROW_EMPTY));
   }
   closest_outer_node_ref_mut = borrow_closest_outer_node_mut_(tree, $.copy(key), $c, [$p[0]]);
-  if (!($.copy(closest_outer_node_ref_mut.key)).eq(($.copy(key)))) {
+  if (!$.copy(closest_outer_node_ref_mut.key).eq($.copy(key))) {
     throw $.abortCode($.copy(E_NOT_HAS_KEY));
   }
   return closest_outer_node_ref_mut.value;
 }
 
-export function check_length_ (
-  length: U64,
-  $c: AptosDataCache,
-): void {
-  if (!($.copy(length)).lt(($.copy(HI_64)).xor(($.copy(OUTER)).shl($.copy(NODE_TYPE))))) {
+export function check_length_(length: U64, $c: AptosDataCache): void {
+  if (!$.copy(length).lt($.copy(HI_64).xor($.copy(OUTER).shl($.copy(NODE_TYPE))))) {
     throw $.abortCode($.copy(E_INSERT_FULL));
   }
   return;
 }
 
-export function crit_bit_ (
-  s1: U128,
-  s2: U128,
-  $c: AptosDataCache,
-): U8 {
+export function crit_bit_(s1: U128, s2: U128, $c: AptosDataCache): U8 {
   let l, m, s, u, x;
-  x = ($.copy(s1)).xor($.copy(s2));
-  l = u8("0");
+  x = $.copy(s1).xor($.copy(s2));
+  l = u8('0');
   u = $.copy(MSB_u128);
   while (true) {
-    m = (($.copy(l)).add($.copy(u))).div(u8("2"));
-    s = ($.copy(x)).shr($.copy(m));
-    if (($.copy(s)).eq((u128("1")))) {
+    m = $.copy(l).add($.copy(u)).div(u8('2'));
+    s = $.copy(x).shr($.copy(m));
+    if ($.copy(s).eq(u128('1'))) {
       return $.copy(m);
+    } else {
     }
-    else{
-    }
-    if (($.copy(s)).gt(u128("1"))) {
-      l = ($.copy(m)).add(u8("1"));
-    }
-    else{
-      u = ($.copy(m)).sub(u8("1"));
+    if ($.copy(s).gt(u128('1'))) {
+      l = $.copy(m).add(u8('1'));
+    } else {
+      u = $.copy(m).sub(u8('1'));
     }
   }
 }
 
-export function destroy_empty_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): void {
+export function destroy_empty_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): void {
   if (!is_empty_(tree, $c, [$p[0]])) {
     throw $.abortCode($.copy(E_DESTROY_NOT_EMPTY));
   }
@@ -290,52 +281,42 @@ export function destroy_empty_ (
   return;
 }
 
-export function empty_ (
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): CritBitTree {
-  return new CritBitTree({ root: u64("0"), inner_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(InnerNode)]), outer_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(OuterNode, [$p[0]])]) }, new SimpleStructTag(CritBitTree, [$p[0]]));
+export function empty_($c: AptosDataCache, $p: TypeTag[] /* <V>*/): CritBitTree {
+  return new CritBitTree(
+    {
+      root: u64('0'),
+      inner_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(InnerNode)]),
+      outer_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(OuterNode, [$p[0]])])
+    },
+    new SimpleStructTag(CritBitTree, [$p[0]])
+  );
 }
 
-export function has_key_ (
-  tree: CritBitTree,
-  key: U128,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): boolean {
+export function has_key_(tree: CritBitTree, key: U128, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): boolean {
   if (is_empty_(tree, $c, [$p[0]])) {
     return false;
+  } else {
   }
-  else{
-  }
-  return ($.copy(borrow_closest_outer_node_(tree, $.copy(key), $c, [$p[0]]).key)).eq(($.copy(key)));
+  return $.copy(borrow_closest_outer_node_(tree, $.copy(key), $c, [$p[0]]).key).eq($.copy(key));
 }
 
-export function insert_ (
-  tree: CritBitTree,
-  key: U128,
-  value: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): void {
+export function insert_(tree: CritBitTree, key: U128, value: any, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): void {
   let length;
   length = length_(tree, $c, [$p[0]]);
   check_length_($.copy(length), $c);
-  if (($.copy(length)).eq((u64("0")))) {
+  if ($.copy(length).eq(u64('0'))) {
     insert_empty_(tree, $.copy(key), value, $c, [$p[0]]);
-  }
-  else{
-    if (($.copy(length)).eq((u64("1")))) {
+  } else {
+    if ($.copy(length).eq(u64('1'))) {
       insert_singleton_(tree, $.copy(key), value, $c, [$p[0]]);
-    }
-    else{
+    } else {
       insert_general_(tree, $.copy(key), value, $.copy(length), $c, [$p[0]]);
     }
   }
   return;
 }
 
-export function insert_above_ (
+export function insert_above_(
   tree: CritBitTree,
   key: U128,
   value: any,
@@ -344,27 +325,47 @@ export function insert_above_ (
   search_parent_index: U64,
   critical_bit: U8,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let node, node_index;
-  node_index = $.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(search_parent_index), $c, [new SimpleStructTag(InnerNode)]).parent_index);
+  node_index = $.copy(
+    Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(search_parent_index), $c, [new SimpleStructTag(InnerNode)])
+      .parent_index
+  );
   while (true) {
-    if (($.copy(node_index)).eq(($.copy(ROOT)))) {
-      return insert_above_root_(tree, $.copy(key), value, $.copy(n_outer_nodes), $.copy(n_inner_nodes), $.copy(critical_bit), $c, [$p[0]]);
-    }
-    else{
+    if ($.copy(node_index).eq($.copy(ROOT))) {
+      return insert_above_root_(
+        tree,
+        $.copy(key),
+        value,
+        $.copy(n_outer_nodes),
+        $.copy(n_inner_nodes),
+        $.copy(critical_bit),
+        $c,
+        [$p[0]]
+      );
+    } else {
       node = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(node_index), $c, [new SimpleStructTag(InnerNode)]);
-      if (($.copy(critical_bit)).lt($.copy(node.critical_bit))) {
-        return insert_below_walk_(tree, $.copy(key), value, $.copy(n_outer_nodes), $.copy(n_inner_nodes), $.copy(node_index), $.copy(critical_bit), $c, [$p[0]]);
-      }
-      else{
+      if ($.copy(critical_bit).lt($.copy(node.critical_bit))) {
+        return insert_below_walk_(
+          tree,
+          $.copy(key),
+          value,
+          $.copy(n_outer_nodes),
+          $.copy(n_inner_nodes),
+          $.copy(node_index),
+          $.copy(critical_bit),
+          $c,
+          [$p[0]]
+        );
+      } else {
         node_index = $.copy(node.parent_index);
       }
     }
   }
 }
 
-export function insert_above_root_ (
+export function insert_above_root_(
   tree: CritBitTree,
   key: U128,
   value: any,
@@ -372,17 +373,31 @@ export function insert_above_root_ (
   n_inner_nodes: U64,
   critical_bit: U8,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let old_root_index;
   old_root_index = $.copy(tree.root);
-  Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(old_root_index), $c, [new SimpleStructTag(InnerNode)]).parent_index = $.copy(n_inner_nodes);
+  Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(old_root_index), $c, [
+    new SimpleStructTag(InnerNode)
+  ]).parent_index = $.copy(n_inner_nodes);
   tree.root = $.copy(n_inner_nodes);
-  push_back_insert_nodes_(tree, $.copy(key), value, $.copy(n_inner_nodes), $.copy(critical_bit), $.copy(ROOT), is_set_($.copy(key), $.copy(critical_bit), $c), $.copy(old_root_index), outer_node_child_index_($.copy(n_outer_nodes), $c), $c, [$p[0]]);
+  push_back_insert_nodes_(
+    tree,
+    $.copy(key),
+    value,
+    $.copy(n_inner_nodes),
+    $.copy(critical_bit),
+    $.copy(ROOT),
+    is_set_($.copy(key), $.copy(critical_bit), $c),
+    $.copy(old_root_index),
+    outer_node_child_index_($.copy(n_outer_nodes), $c),
+    $c,
+    [$p[0]]
+  );
   return;
 }
 
-export function insert_below_ (
+export function insert_below_(
   tree: CritBitTree,
   key: U128,
   value: any,
@@ -394,22 +409,37 @@ export function insert_below_ (
   search_parent_index: U64,
   critical_bit: U8,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let search_parent;
-  search_parent = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(search_parent_index), $c, [new SimpleStructTag(InnerNode)]);
-  if ((search_child_side == $.copy(LEFT))) {
+  search_parent = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(search_parent_index), $c, [
+    new SimpleStructTag(InnerNode)
+  ]);
+  if (search_child_side == $.copy(LEFT)) {
     search_parent.left_child_index = $.copy(n_inner_nodes);
-  }
-  else{
+  } else {
     search_parent.right_child_index = $.copy(n_inner_nodes);
   }
-  Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(search_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).parent_index = $.copy(n_inner_nodes);
-  push_back_insert_nodes_(tree, $.copy(key), value, $.copy(n_inner_nodes), $.copy(critical_bit), $.copy(search_parent_index), ($.copy(key)).lt($.copy(search_key)), outer_node_child_index_($.copy(n_outer_nodes), $c), $.copy(search_index), $c, [$p[0]]);
+  Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(search_index), $c), $c, [
+    new SimpleStructTag(OuterNode, [$p[0]])
+  ]).parent_index = $.copy(n_inner_nodes);
+  push_back_insert_nodes_(
+    tree,
+    $.copy(key),
+    value,
+    $.copy(n_inner_nodes),
+    $.copy(critical_bit),
+    $.copy(search_parent_index),
+    $.copy(key).lt($.copy(search_key)),
+    outer_node_child_index_($.copy(n_outer_nodes), $c),
+    $.copy(search_index),
+    $c,
+    [$p[0]]
+  );
   return;
 }
 
-export function insert_below_walk_ (
+export function insert_below_walk_(
   tree: CritBitTree,
   key: U128,
   value: any,
@@ -418,300 +448,353 @@ export function insert_below_walk_ (
   review_node_index: U64,
   critical_bit: U8,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let temp$1, temp$2, review_node, walked_child_index, walked_child_side;
-  review_node = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(review_node_index), $c, [new SimpleStructTag(InnerNode)]);
+  review_node = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(review_node_index), $c, [
+    new SimpleStructTag(InnerNode)
+  ]);
   if (is_set_($.copy(key), $.copy(review_node.critical_bit), $c)) {
     [temp$1, temp$2] = [$.copy(RIGHT), $.copy(review_node.right_child_index)];
-  }
-  else{
+  } else {
     [temp$1, temp$2] = [$.copy(LEFT), $.copy(review_node.left_child_index)];
   }
   [walked_child_side, walked_child_index] = [temp$1, temp$2];
-  if ((walked_child_side == $.copy(LEFT))) {
+  if (walked_child_side == $.copy(LEFT)) {
     review_node.left_child_index = $.copy(n_inner_nodes);
-  }
-  else{
+  } else {
     review_node.right_child_index = $.copy(n_inner_nodes);
   }
-  Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(walked_child_index), $c, [new SimpleStructTag(InnerNode)]).parent_index = $.copy(n_inner_nodes);
-  push_back_insert_nodes_(tree, $.copy(key), value, $.copy(n_inner_nodes), $.copy(critical_bit), $.copy(review_node_index), is_set_($.copy(key), $.copy(critical_bit), $c), $.copy(walked_child_index), outer_node_child_index_($.copy(n_outer_nodes), $c), $c, [$p[0]]);
+  Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(walked_child_index), $c, [
+    new SimpleStructTag(InnerNode)
+  ]).parent_index = $.copy(n_inner_nodes);
+  push_back_insert_nodes_(
+    tree,
+    $.copy(key),
+    value,
+    $.copy(n_inner_nodes),
+    $.copy(critical_bit),
+    $.copy(review_node_index),
+    is_set_($.copy(key), $.copy(critical_bit), $c),
+    $.copy(walked_child_index),
+    outer_node_child_index_($.copy(n_outer_nodes), $c),
+    $c,
+    [$p[0]]
+  );
   return;
 }
 
-export function insert_empty_ (
+export function insert_empty_(
   tree: CritBitTree,
   key: U128,
   value: any,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
-  Stdlib.Vector.push_back_(tree.outer_nodes, new OuterNode({ key: $.copy(key), value: value, parent_index: $.copy(ROOT) }, new SimpleStructTag(OuterNode, [$p[0]])), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  tree.root = ($.copy(OUTER)).shl($.copy(NODE_TYPE));
+  Stdlib.Vector.push_back_(
+    tree.outer_nodes,
+    new OuterNode(
+      { key: $.copy(key), value: value, parent_index: $.copy(ROOT) },
+      new SimpleStructTag(OuterNode, [$p[0]])
+    ),
+    $c,
+    [new SimpleStructTag(OuterNode, [$p[0]])]
+  );
+  tree.root = $.copy(OUTER).shl($.copy(NODE_TYPE));
   return;
 }
 
-export function insert_general_ (
+export function insert_general_(
   tree: CritBitTree,
   key: U128,
   value: any,
   n_outer_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
-  let temp$1, temp$2, critical_bit, n_inner_nodes, search_child_side, search_index, search_key, search_parent_critical_bit, search_parent_index;
+  let temp$1,
+    temp$2,
+    critical_bit,
+    n_inner_nodes,
+    search_child_side,
+    search_index,
+    search_key,
+    search_parent_critical_bit,
+    search_parent_index;
   n_inner_nodes = Stdlib.Vector.length_(tree.inner_nodes, $c, [new SimpleStructTag(InnerNode)]);
   [temp$1, temp$2] = [tree, $.copy(key)];
-  [search_index, search_child_side, search_key, search_parent_index, search_parent_critical_bit] = search_outer_(temp$1, temp$2, $c, [$p[0]]);
-  if (!($.copy(search_key)).neq($.copy(key))) {
+  [search_index, search_child_side, search_key, search_parent_index, search_parent_critical_bit] = search_outer_(
+    temp$1,
+    temp$2,
+    $c,
+    [$p[0]]
+  );
+  if (!$.copy(search_key).neq($.copy(key))) {
     throw $.abortCode($.copy(E_HAS_KEY));
   }
   critical_bit = crit_bit_($.copy(search_key), $.copy(key), $c);
-  if (($.copy(critical_bit)).lt($.copy(search_parent_critical_bit))) {
-    insert_below_(tree, $.copy(key), value, $.copy(n_outer_nodes), $.copy(n_inner_nodes), $.copy(search_index), search_child_side, $.copy(search_key), $.copy(search_parent_index), $.copy(critical_bit), $c, [$p[0]]);
-  }
-  else{
-    insert_above_(tree, $.copy(key), value, $.copy(n_outer_nodes), $.copy(n_inner_nodes), $.copy(search_parent_index), $.copy(critical_bit), $c, [$p[0]]);
+  if ($.copy(critical_bit).lt($.copy(search_parent_critical_bit))) {
+    insert_below_(
+      tree,
+      $.copy(key),
+      value,
+      $.copy(n_outer_nodes),
+      $.copy(n_inner_nodes),
+      $.copy(search_index),
+      search_child_side,
+      $.copy(search_key),
+      $.copy(search_parent_index),
+      $.copy(critical_bit),
+      $c,
+      [$p[0]]
+    );
+  } else {
+    insert_above_(
+      tree,
+      $.copy(key),
+      value,
+      $.copy(n_outer_nodes),
+      $.copy(n_inner_nodes),
+      $.copy(search_parent_index),
+      $.copy(critical_bit),
+      $c,
+      [$p[0]]
+    );
   }
   return;
 }
 
-export function insert_singleton_ (
+export function insert_singleton_(
   tree: CritBitTree,
   key: U128,
   value: any,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let critical_bit, outer_node;
-  outer_node = Stdlib.Vector.borrow_(tree.outer_nodes, u64("0"), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  if (!($.copy(key)).neq($.copy(outer_node.key))) {
+  outer_node = Stdlib.Vector.borrow_(tree.outer_nodes, u64('0'), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
+  if (!$.copy(key).neq($.copy(outer_node.key))) {
     throw $.abortCode($.copy(E_HAS_KEY));
   }
   critical_bit = crit_bit_($.copy(outer_node.key), $.copy(key), $c);
-  push_back_insert_nodes_(tree, $.copy(key), value, u64("0"), $.copy(critical_bit), $.copy(ROOT), ($.copy(key)).gt($.copy(outer_node.key)), outer_node_child_index_(u64("0"), $c), outer_node_child_index_(u64("1"), $c), $c, [$p[0]]);
-  tree.root = u64("0");
-  Stdlib.Vector.borrow_mut_(tree.outer_nodes, u64("0"), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).parent_index = u64("0");
+  push_back_insert_nodes_(
+    tree,
+    $.copy(key),
+    value,
+    u64('0'),
+    $.copy(critical_bit),
+    $.copy(ROOT),
+    $.copy(key).gt($.copy(outer_node.key)),
+    outer_node_child_index_(u64('0'), $c),
+    outer_node_child_index_(u64('1'), $c),
+    $c,
+    [$p[0]]
+  );
+  tree.root = u64('0');
+  Stdlib.Vector.borrow_mut_(tree.outer_nodes, u64('0'), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).parent_index =
+    u64('0');
   return;
 }
 
-export function is_empty_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): boolean {
+export function is_empty_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): boolean {
   return Stdlib.Vector.is_empty_(tree.outer_nodes, $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
 }
 
-export function is_outer_node_ (
-  child_field_index: U64,
-  $c: AptosDataCache,
-): boolean {
-  return ((($.copy(child_field_index)).shr($.copy(NODE_TYPE))).and($.copy(OUTER))).eq(($.copy(OUTER)));
+export function is_outer_node_(child_field_index: U64, $c: AptosDataCache): boolean {
+  return $.copy(child_field_index).shr($.copy(NODE_TYPE)).and($.copy(OUTER)).eq($.copy(OUTER));
 }
 
-export function is_set_ (
-  key: U128,
-  bit_number: U8,
-  $c: AptosDataCache,
-): boolean {
-  return ((($.copy(key)).shr($.copy(bit_number))).and(u128("1"))).eq((u128("1")));
+export function is_set_(key: U128, bit_number: U8, $c: AptosDataCache): boolean {
+  return $.copy(key).shr($.copy(bit_number)).and(u128('1')).eq(u128('1'));
 }
 
-export function length_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): U64 {
+export function length_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): U64 {
   return Stdlib.Vector.length_(tree.outer_nodes, $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
 }
 
-export function max_key_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): U128 {
+export function max_key_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): U128 {
   if (!!is_empty_(tree, $c, [$p[0]])) {
     throw $.abortCode($.copy(E_LOOKUP_EMPTY));
   }
-  return $.copy(Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_(max_node_child_index_(tree, $c, [$p[0]]), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).key);
+  return $.copy(
+    Stdlib.Vector.borrow_(
+      tree.outer_nodes,
+      outer_node_vector_index_(max_node_child_index_(tree, $c, [$p[0]]), $c),
+      $c,
+      [new SimpleStructTag(OuterNode, [$p[0]])]
+    ).key
+  );
 }
 
-export function max_node_child_index_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): U64 {
+export function max_node_child_index_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): U64 {
   let child_field_index;
   child_field_index = $.copy(tree.root);
   while (true) {
     if (is_outer_node_($.copy(child_field_index), $c)) {
       return $.copy(child_field_index);
+    } else {
     }
-    else{
-    }
-    child_field_index = $.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_field_index), $c, [new SimpleStructTag(InnerNode)]).right_child_index);
+    child_field_index = $.copy(
+      Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_field_index), $c, [new SimpleStructTag(InnerNode)])
+        .right_child_index
+    );
   }
 }
 
-export function min_key_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): U128 {
+export function min_key_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): U128 {
   if (!!is_empty_(tree, $c, [$p[0]])) {
     throw $.abortCode($.copy(E_LOOKUP_EMPTY));
   }
-  return $.copy(Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_(min_node_child_index_(tree, $c, [$p[0]]), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).key);
+  return $.copy(
+    Stdlib.Vector.borrow_(
+      tree.outer_nodes,
+      outer_node_vector_index_(min_node_child_index_(tree, $c, [$p[0]]), $c),
+      $c,
+      [new SimpleStructTag(OuterNode, [$p[0]])]
+    ).key
+  );
 }
 
-export function min_node_child_index_ (
-  tree: CritBitTree,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): U64 {
+export function min_node_child_index_(tree: CritBitTree, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): U64 {
   let child_field_index;
   child_field_index = $.copy(tree.root);
   while (true) {
     if (is_outer_node_($.copy(child_field_index), $c)) {
       return $.copy(child_field_index);
+    } else {
     }
-    else{
-    }
-    child_field_index = $.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_field_index), $c, [new SimpleStructTag(InnerNode)]).left_child_index);
+    child_field_index = $.copy(
+      Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_field_index), $c, [new SimpleStructTag(InnerNode)])
+        .left_child_index
+    );
   }
 }
 
-export function outer_node_child_index_ (
-  vector_index: U64,
-  $c: AptosDataCache,
-): U64 {
-  return ($.copy(vector_index)).or(($.copy(OUTER)).shl($.copy(NODE_TYPE)));
+export function outer_node_child_index_(vector_index: U64, $c: AptosDataCache): U64 {
+  return $.copy(vector_index).or($.copy(OUTER).shl($.copy(NODE_TYPE)));
 }
 
-export function outer_node_vector_index_ (
-  child_field_index: U64,
-  $c: AptosDataCache,
-): U64 {
-  return (($.copy(child_field_index)).and($.copy(HI_64))).xor(($.copy(OUTER)).shl($.copy(NODE_TYPE)));
+export function outer_node_vector_index_(child_field_index: U64, $c: AptosDataCache): U64 {
+  return $.copy(child_field_index)
+    .and($.copy(HI_64))
+    .xor($.copy(OUTER).shl($.copy(NODE_TYPE)));
 }
 
-export function pop_ (
-  tree: CritBitTree,
-  key: U128,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): any {
+export function pop_(tree: CritBitTree, key: U128, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): any {
   let temp$1, length;
   if (!!is_empty_(tree, $c, [$p[0]])) {
     throw $.abortCode($.copy(E_POP_EMPTY));
   }
   length = length_(tree, $c, [$p[0]]);
-  if (($.copy(length)).eq((u64("1")))) {
+  if ($.copy(length).eq(u64('1'))) {
     temp$1 = pop_singleton_(tree, $.copy(key), $c, [$p[0]]);
-  }
-  else{
+  } else {
     temp$1 = pop_general_(tree, $.copy(key), $.copy(length), $c, [$p[0]]);
   }
   return temp$1;
 }
 
-export function pop_destroy_nodes_ (
+export function pop_destroy_nodes_(
   tree: CritBitTree,
   inner_index: U64,
   outer_index: U64,
   n_outer_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): any {
   let n_inner_nodes;
   n_inner_nodes = Stdlib.Vector.length_(tree.inner_nodes, $c, [new SimpleStructTag(InnerNode)]);
   Stdlib.Vector.swap_remove_(tree.inner_nodes, $.copy(inner_index), $c, [new SimpleStructTag(InnerNode)]);
-  if (($.copy(inner_index)).lt(($.copy(n_inner_nodes)).sub(u64("1")))) {
+  if ($.copy(inner_index).lt($.copy(n_inner_nodes).sub(u64('1')))) {
     stitch_swap_remove_(tree, $.copy(inner_index), $.copy(n_inner_nodes), $c, [$p[0]]);
+  } else {
   }
-  else{
-  }
-  let { value: value } = Stdlib.Vector.swap_remove_(tree.outer_nodes, outer_node_vector_index_($.copy(outer_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  if ((outer_node_vector_index_($.copy(outer_index), $c)).lt(($.copy(n_outer_nodes)).sub(u64("1")))) {
+  let { value: value } = Stdlib.Vector.swap_remove_(
+    tree.outer_nodes,
+    outer_node_vector_index_($.copy(outer_index), $c),
+    $c,
+    [new SimpleStructTag(OuterNode, [$p[0]])]
+  );
+  if (outer_node_vector_index_($.copy(outer_index), $c).lt($.copy(n_outer_nodes).sub(u64('1')))) {
     stitch_swap_remove_(tree, $.copy(outer_index), $.copy(n_outer_nodes), $c, [$p[0]]);
-  }
-  else{
+  } else {
   }
   return value;
 }
 
-export function pop_general_ (
+export function pop_general_(
   tree: CritBitTree,
   key: U128,
   n_outer_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): any {
   let temp$1, temp$2, search_child_side, search_index, search_key, search_parent_index;
   [temp$1, temp$2] = [tree, $.copy(key)];
-  [search_index, search_child_side, search_key, search_parent_index, ] = search_outer_(temp$1, temp$2, $c, [$p[0]]);
-  if (!($.copy(search_key)).eq(($.copy(key)))) {
+  [search_index, search_child_side, search_key, search_parent_index] = search_outer_(temp$1, temp$2, $c, [$p[0]]);
+  if (!$.copy(search_key).eq($.copy(key))) {
     throw $.abortCode($.copy(E_NOT_HAS_KEY));
   }
   pop_update_relationships_(tree, search_child_side, $.copy(search_parent_index), $c, [$p[0]]);
-  return pop_destroy_nodes_(tree, $.copy(search_parent_index), $.copy(search_index), $.copy(n_outer_nodes), $c, [$p[0]]);
+  return pop_destroy_nodes_(tree, $.copy(search_parent_index), $.copy(search_index), $.copy(n_outer_nodes), $c, [
+    $p[0]
+  ]);
 }
 
-export function pop_singleton_ (
-  tree: CritBitTree,
-  key: U128,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): any {
-  if (!($.copy(Stdlib.Vector.borrow_(tree.outer_nodes, u64("0"), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).key)).eq(($.copy(key)))) {
+export function pop_singleton_(tree: CritBitTree, key: U128, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): any {
+  if (
+    !$.copy(Stdlib.Vector.borrow_(tree.outer_nodes, u64('0'), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).key).eq(
+      $.copy(key)
+    )
+  ) {
     throw $.abortCode($.copy(E_NOT_HAS_KEY));
   }
-  tree.root = u64("0");
+  tree.root = u64('0');
   let { value: value } = Stdlib.Vector.pop_back_(tree.outer_nodes, $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
   return value;
 }
 
-export function pop_update_relationships_ (
+export function pop_update_relationships_(
   tree: CritBitTree,
   child_side: boolean,
   parent_index: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let temp$1, grandparent, grandparent_index, parent, sibling_index;
   parent = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)]);
-  if ((child_side == $.copy(LEFT))) {
+  if (child_side == $.copy(LEFT)) {
     temp$1 = $.copy(parent.right_child_index);
-  }
-  else{
+  } else {
     temp$1 = $.copy(parent.left_child_index);
   }
   sibling_index = temp$1;
   grandparent_index = $.copy(parent.parent_index);
   if (is_outer_node_($.copy(sibling_index), $c)) {
-    Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(sibling_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).parent_index = $.copy(grandparent_index);
+    Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(sibling_index), $c), $c, [
+      new SimpleStructTag(OuterNode, [$p[0]])
+    ]).parent_index = $.copy(grandparent_index);
+  } else {
+    Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(sibling_index), $c, [
+      new SimpleStructTag(InnerNode)
+    ]).parent_index = $.copy(grandparent_index);
   }
-  else{
-    Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(sibling_index), $c, [new SimpleStructTag(InnerNode)]).parent_index = $.copy(grandparent_index);
-  }
-  if (($.copy(grandparent_index)).eq(($.copy(ROOT)))) {
+  if ($.copy(grandparent_index).eq($.copy(ROOT))) {
     tree.root = $.copy(sibling_index);
-  }
-  else{
-    grandparent = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(grandparent_index), $c, [new SimpleStructTag(InnerNode)]);
-    if (($.copy(grandparent.left_child_index)).eq(($.copy(parent_index)))) {
+  } else {
+    grandparent = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(grandparent_index), $c, [
+      new SimpleStructTag(InnerNode)
+    ]);
+    if ($.copy(grandparent.left_child_index).eq($.copy(parent_index))) {
       grandparent.left_child_index = $.copy(sibling_index);
-    }
-    else{
+    } else {
       grandparent.right_child_index = $.copy(sibling_index);
     }
   }
   return;
 }
 
-export function push_back_insert_nodes_ (
+export function push_back_insert_nodes_(
   tree: CritBitTree,
   key: U128,
   value: any,
@@ -722,184 +805,227 @@ export function push_back_insert_nodes_ (
   child_index_1: U64,
   child_index_2: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let temp$1, temp$2, left_child_index, right_child_index;
   if (child_polarity) {
     [temp$1, temp$2] = [$.copy(child_index_1), $.copy(child_index_2)];
-  }
-  else{
+  } else {
     [temp$1, temp$2] = [$.copy(child_index_2), $.copy(child_index_1)];
   }
   [left_child_index, right_child_index] = [temp$1, temp$2];
-  Stdlib.Vector.push_back_(tree.outer_nodes, new OuterNode({ key: $.copy(key), value: value, parent_index: $.copy(inner_index) }, new SimpleStructTag(OuterNode, [$p[0]])), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  Stdlib.Vector.push_back_(tree.inner_nodes, new InnerNode({ critical_bit: $.copy(critical_bit), parent_index: $.copy(parent_index), left_child_index: $.copy(left_child_index), right_child_index: $.copy(right_child_index) }, new SimpleStructTag(InnerNode)), $c, [new SimpleStructTag(InnerNode)]);
+  Stdlib.Vector.push_back_(
+    tree.outer_nodes,
+    new OuterNode(
+      { key: $.copy(key), value: value, parent_index: $.copy(inner_index) },
+      new SimpleStructTag(OuterNode, [$p[0]])
+    ),
+    $c,
+    [new SimpleStructTag(OuterNode, [$p[0]])]
+  );
+  Stdlib.Vector.push_back_(
+    tree.inner_nodes,
+    new InnerNode(
+      {
+        critical_bit: $.copy(critical_bit),
+        parent_index: $.copy(parent_index),
+        left_child_index: $.copy(left_child_index),
+        right_child_index: $.copy(right_child_index)
+      },
+      new SimpleStructTag(InnerNode)
+    ),
+    $c,
+    [new SimpleStructTag(InnerNode)]
+  );
   return;
 }
 
-export function search_outer_ (
+export function search_outer_(
   tree: CritBitTree,
   key: U128,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U64, boolean, U128, U64, U8] {
   let temp$1, temp$2, index, node, parent, side;
   parent = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(tree.root), $c, [new SimpleStructTag(InnerNode)]);
   while (true) {
     if (is_set_($.copy(key), $.copy(parent.critical_bit), $c)) {
       [temp$1, temp$2] = [$.copy(parent.right_child_index), $.copy(RIGHT)];
-    }
-    else{
+    } else {
       [temp$1, temp$2] = [$.copy(parent.left_child_index), $.copy(LEFT)];
     }
     [index, side] = [temp$1, temp$2];
     if (is_outer_node_($.copy(index), $c)) {
-      node = Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
+      node = Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(index), $c), $c, [
+        new SimpleStructTag(OuterNode, [$p[0]])
+      ]);
       return [$.copy(index), side, $.copy(node.key), $.copy(node.parent_index), $.copy(parent.critical_bit)];
-    }
-    else{
+    } else {
     }
     parent = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(index), $c, [new SimpleStructTag(InnerNode)]);
   }
 }
 
-export function singleton_ (
-  key: U128,
-  value: any,
-  $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
-): CritBitTree {
+export function singleton_(key: U128, value: any, $c: AptosDataCache, $p: TypeTag[] /* <V>*/): CritBitTree {
   let tree;
-  tree = new CritBitTree({ root: u64("0"), inner_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(InnerNode)]), outer_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(OuterNode, [$p[0]])]) }, new SimpleStructTag(CritBitTree, [$p[0]]));
+  tree = new CritBitTree(
+    {
+      root: u64('0'),
+      inner_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(InnerNode)]),
+      outer_nodes: Stdlib.Vector.empty_($c, [new SimpleStructTag(OuterNode, [$p[0]])])
+    },
+    new SimpleStructTag(CritBitTree, [$p[0]])
+  );
   insert_empty_(tree, $.copy(key), value, $c, [$p[0]]);
   return tree;
 }
 
-export function stitch_child_of_parent_ (
+export function stitch_child_of_parent_(
   tree: CritBitTree,
   new_index: U64,
   parent_index: U64,
   old_index: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let parent;
   parent = Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)]);
-  if (($.copy(parent.left_child_index)).eq(($.copy(old_index)))) {
+  if ($.copy(parent.left_child_index).eq($.copy(old_index))) {
     parent.left_child_index = $.copy(new_index);
-  }
-  else{
+  } else {
     parent.right_child_index = $.copy(new_index);
   }
   return;
 }
 
-export function stitch_parent_of_child_ (
+export function stitch_parent_of_child_(
   tree: CritBitTree,
   new_index: U64,
   child_index: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   if (is_outer_node_($.copy(child_index), $c)) {
-    Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(child_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).parent_index = $.copy(new_index);
-  }
-  else{
-    Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)]).parent_index = $.copy(new_index);
+    Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(child_index), $c), $c, [
+      new SimpleStructTag(OuterNode, [$p[0]])
+    ]).parent_index = $.copy(new_index);
+  } else {
+    Stdlib.Vector.borrow_mut_(tree.inner_nodes, $.copy(child_index), $c, [
+      new SimpleStructTag(InnerNode)
+    ]).parent_index = $.copy(new_index);
   }
   return;
 }
 
-export function stitch_swap_remove_ (
+export function stitch_swap_remove_(
   tree: CritBitTree,
   node_index: U64,
   n_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): void {
   let left_child_index, node, parent_index, parent_index__1, right_child_index;
   if (is_outer_node_($.copy(node_index), $c)) {
-    parent_index = $.copy(Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(node_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]).parent_index);
-    if (($.copy(parent_index)).eq(($.copy(ROOT)))) {
+    parent_index = $.copy(
+      Stdlib.Vector.borrow_(tree.outer_nodes, outer_node_vector_index_($.copy(node_index), $c), $c, [
+        new SimpleStructTag(OuterNode, [$p[0]])
+      ]).parent_index
+    );
+    if ($.copy(parent_index).eq($.copy(ROOT))) {
       tree.root = $.copy(node_index);
       return;
+    } else {
     }
-    else{
-    }
-    stitch_child_of_parent_(tree, $.copy(node_index), $.copy(parent_index), outer_node_child_index_(($.copy(n_nodes)).sub(u64("1")), $c), $c, [$p[0]]);
-  }
-  else{
+    stitch_child_of_parent_(
+      tree,
+      $.copy(node_index),
+      $.copy(parent_index),
+      outer_node_child_index_($.copy(n_nodes).sub(u64('1')), $c),
+      $c,
+      [$p[0]]
+    );
+  } else {
     node = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(node_index), $c, [new SimpleStructTag(InnerNode)]);
-    [parent_index__1, left_child_index, right_child_index] = [$.copy(node.parent_index), $.copy(node.left_child_index), $.copy(node.right_child_index)];
+    [parent_index__1, left_child_index, right_child_index] = [
+      $.copy(node.parent_index),
+      $.copy(node.left_child_index),
+      $.copy(node.right_child_index)
+    ];
     stitch_parent_of_child_(tree, $.copy(node_index), $.copy(left_child_index), $c, [$p[0]]);
     stitch_parent_of_child_(tree, $.copy(node_index), $.copy(right_child_index), $c, [$p[0]]);
-    if (($.copy(parent_index__1)).eq(($.copy(ROOT)))) {
+    if ($.copy(parent_index__1).eq($.copy(ROOT))) {
       tree.root = $.copy(node_index);
       return;
+    } else {
     }
-    else{
-    }
-    stitch_child_of_parent_(tree, $.copy(node_index), $.copy(parent_index__1), ($.copy(n_nodes)).sub(u64("1")), $c, [$p[0]]);
+    stitch_child_of_parent_(tree, $.copy(node_index), $.copy(parent_index__1), $.copy(n_nodes).sub(u64('1')), $c, [
+      $p[0]
+    ]);
   }
   return;
 }
 
-export function traverse_end_pop_ (
+export function traverse_end_pop_(
   tree: CritBitTree,
   parent_index: U64,
   child_index: U64,
   n_outer_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): any {
   let temp$1, node_child_side;
-  if (($.copy(n_outer_nodes)).eq((u64("1")))) {
-    tree.root = u64("0");
+  if ($.copy(n_outer_nodes).eq(u64('1'))) {
+    tree.root = u64('0');
     let { value: value } = Stdlib.Vector.pop_back_(tree.outer_nodes, $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
     temp$1 = value;
-  }
-  else{
-    node_child_side = ($.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)]).left_child_index)).eq(($.copy(child_index)));
+  } else {
+    node_child_side = $.copy(
+      Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)])
+        .left_child_index
+    ).eq($.copy(child_index));
     pop_update_relationships_(tree, node_child_side, $.copy(parent_index), $c, [$p[0]]);
     temp$1 = pop_destroy_nodes_(tree, $.copy(parent_index), $.copy(child_index), $.copy(n_outer_nodes), $c, [$p[0]]);
   }
   return temp$1;
 }
 
-export function traverse_init_mut_ (
+export function traverse_init_mut_(
   tree: CritBitTree,
   direction: boolean,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64] {
   let temp$1, child_field_index, node;
-  if ((direction == $.copy(LEFT))) {
+  if (direction == $.copy(LEFT)) {
     temp$1 = max_node_child_index_(tree, $c, [$p[0]]);
-  }
-  else{
+  } else {
     temp$1 = min_node_child_index_(tree, $c, [$p[0]]);
   }
   child_field_index = temp$1;
-  node = Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(child_field_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
+  node = Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(child_field_index), $c), $c, [
+    new SimpleStructTag(OuterNode, [$p[0]])
+  ]);
   return [$.copy(node.key), node.value, $.copy(node.parent_index), $.copy(child_field_index)];
 }
 
-export function traverse_mut_ (
+export function traverse_mut_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
   direction: boolean,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64] {
   let temp$1, temp$2, temp$3, temp$4, node, target_child_index;
   [temp$1, temp$2, temp$3, temp$4] = [tree, $.copy(key), $.copy(parent_index), direction];
   target_child_index = traverse_target_child_index_(temp$1, temp$2, temp$3, temp$4, $c, [$p[0]]);
-  node = Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(target_child_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
+  node = Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(target_child_index), $c), $c, [
+    new SimpleStructTag(OuterNode, [$p[0]])
+  ]);
   return [$.copy(node.key), node.value, $.copy(node.parent_index), $.copy(target_child_index)];
 }
 
-export function traverse_pop_mut_ (
+export function traverse_pop_mut_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
@@ -907,135 +1033,188 @@ export function traverse_pop_mut_ (
   n_outer_nodes: U64,
   direction: boolean,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64, any] {
   let temp$1, temp$2, temp$3, temp$4, start_child_side, start_value, target_child_index, target_node;
-  start_child_side = ($.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)]).left_child_index)).eq(($.copy(child_index)));
+  start_child_side = $.copy(
+    Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)]).left_child_index
+  ).eq($.copy(child_index));
   [temp$1, temp$2, temp$3, temp$4] = [tree, $.copy(key), $.copy(parent_index), direction];
   target_child_index = traverse_target_child_index_(temp$1, temp$2, temp$3, temp$4, $c, [$p[0]]);
   pop_update_relationships_(tree, start_child_side, $.copy(parent_index), $c, [$p[0]]);
   start_value = pop_destroy_nodes_(tree, $.copy(parent_index), $.copy(child_index), $.copy(n_outer_nodes), $c, [$p[0]]);
-  if ((outer_node_vector_index_($.copy(target_child_index), $c)).eq((($.copy(n_outer_nodes)).sub(u64("1"))))) {
+  if (outer_node_vector_index_($.copy(target_child_index), $c).eq($.copy(n_outer_nodes).sub(u64('1')))) {
     target_child_index = $.copy(child_index);
+  } else {
   }
-  else{
-  }
-  target_node = Stdlib.Vector.borrow_mut_(tree.outer_nodes, outer_node_vector_index_($.copy(target_child_index), $c), $c, [new SimpleStructTag(OuterNode, [$p[0]])]);
-  return [$.copy(target_node.key), target_node.value, $.copy(target_node.parent_index), $.copy(target_child_index), start_value];
+  target_node = Stdlib.Vector.borrow_mut_(
+    tree.outer_nodes,
+    outer_node_vector_index_($.copy(target_child_index), $c),
+    $c,
+    [new SimpleStructTag(OuterNode, [$p[0]])]
+  );
+  return [
+    $.copy(target_node.key),
+    target_node.value,
+    $.copy(target_node.parent_index),
+    $.copy(target_child_index),
+    start_value
+  ];
 }
 
-export function traverse_predecessor_init_mut_ (
+export function traverse_predecessor_init_mut_(
   tree: CritBitTree,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64] {
   return traverse_init_mut_(tree, $.copy(LEFT), $c, [$p[0]]);
 }
 
-export function traverse_predecessor_mut_ (
+export function traverse_predecessor_mut_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64] {
   return traverse_mut_(tree, $.copy(key), $.copy(parent_index), $.copy(LEFT), $c, [$p[0]]);
 }
 
-export function traverse_predecessor_pop_mut_ (
+export function traverse_predecessor_pop_mut_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
   child_index: U64,
   n_outer_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64, any] {
-  return traverse_pop_mut_(tree, $.copy(key), $.copy(parent_index), $.copy(child_index), $.copy(n_outer_nodes), $.copy(LEFT), $c, [$p[0]]);
+  return traverse_pop_mut_(
+    tree,
+    $.copy(key),
+    $.copy(parent_index),
+    $.copy(child_index),
+    $.copy(n_outer_nodes),
+    $.copy(LEFT),
+    $c,
+    [$p[0]]
+  );
 }
 
-export function traverse_successor_init_mut_ (
+export function traverse_successor_init_mut_(
   tree: CritBitTree,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64] {
   return traverse_init_mut_(tree, $.copy(RIGHT), $c, [$p[0]]);
 }
 
-export function traverse_successor_mut_ (
+export function traverse_successor_mut_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64] {
   return traverse_mut_(tree, $.copy(key), $.copy(parent_index), $.copy(RIGHT), $c, [$p[0]]);
 }
 
-export function traverse_successor_pop_mut_ (
+export function traverse_successor_pop_mut_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
   child_index: U64,
   n_outer_nodes: U64,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): [U128, any, U64, U64, any] {
-  return traverse_pop_mut_(tree, $.copy(key), $.copy(parent_index), $.copy(child_index), $.copy(n_outer_nodes), $.copy(RIGHT), $c, [$p[0]]);
+  return traverse_pop_mut_(
+    tree,
+    $.copy(key),
+    $.copy(parent_index),
+    $.copy(child_index),
+    $.copy(n_outer_nodes),
+    $.copy(RIGHT),
+    $c,
+    [$p[0]]
+  );
 }
 
-export function traverse_target_child_index_ (
+export function traverse_target_child_index_(
   tree: CritBitTree,
   key: U128,
   parent_index: U64,
   direction: boolean,
   $c: AptosDataCache,
-  $p: TypeTag[], /* <V>*/
+  $p: TypeTag[] /* <V>*/
 ): U64 {
   let temp$1, temp$2, child_index, parent;
   parent = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent_index), $c, [new SimpleStructTag(InnerNode)]);
-  while ((direction != is_set_($.copy(key), $.copy(parent.critical_bit), $c))) {
+  while (direction != is_set_($.copy(key), $.copy(parent.critical_bit), $c)) {
     {
-      parent = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent.parent_index), $c, [new SimpleStructTag(InnerNode)]);
+      parent = Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(parent.parent_index), $c, [
+        new SimpleStructTag(InnerNode)
+      ]);
     }
-
-  }if ((direction == $.copy(LEFT))) {
-    temp$1 = $.copy(parent.left_child_index);
   }
-  else{
+  if (direction == $.copy(LEFT)) {
+    temp$1 = $.copy(parent.left_child_index);
+  } else {
     temp$1 = $.copy(parent.right_child_index);
   }
   child_index = temp$1;
   while (!is_outer_node_($.copy(child_index), $c)) {
     {
-      if ((direction == $.copy(LEFT))) {
-        temp$2 = $.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)]).right_child_index);
-      }
-      else{
-        temp$2 = $.copy(Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)]).left_child_index);
+      if (direction == $.copy(LEFT)) {
+        temp$2 = $.copy(
+          Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)])
+            .right_child_index
+        );
+      } else {
+        temp$2 = $.copy(
+          Stdlib.Vector.borrow_(tree.inner_nodes, $.copy(child_index), $c, [new SimpleStructTag(InnerNode)])
+            .left_child_index
+        );
       }
       child_index = temp$2;
     }
-
-  }return $.copy(child_index);
+  }
+  return $.copy(child_index);
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::CritBitTree", CritBitTree.CritBitTreeParser);
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::InnerNode", InnerNode.InnerNodeParser);
-  repo.addParser("0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::OuterNode", OuterNode.OuterNodeParser);
+  repo.addParser(
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::CritBitTree',
+    CritBitTree.CritBitTreeParser
+  );
+  repo.addParser(
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::InnerNode',
+    InnerNode.InnerNodeParser
+  );
+  repo.addParser(
+    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::OuterNode',
+    OuterNode.OuterNodeParser
+  );
 }
 export class App {
-  constructor(
-    public client: AptosClient,
-    public repo: AptosParserRepo,
-    public cache: AptosLocalCache,
-  ) {
+  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
+  get moduleAddress() {
+    {
+      return moduleAddress;
+    }
   }
-  get moduleAddress() {{ return moduleAddress; }}
-  get moduleName() {{ return moduleName; }}
-  get CritBitTree() { return CritBitTree; }
-  get InnerNode() { return InnerNode; }
-  get OuterNode() { return OuterNode; }
+  get moduleName() {
+    {
+      return moduleName;
+    }
+  }
+  get CritBitTree() {
+    return CritBitTree;
+  }
+  get InnerNode() {
+    return InnerNode;
+  }
+  get OuterNode() {
+    return OuterNode;
+  }
 }
-

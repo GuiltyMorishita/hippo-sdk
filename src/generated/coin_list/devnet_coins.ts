@@ -8,7 +8,7 @@ import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'ap
 import * as Stdlib from '../stdlib';
 import * as Coin_list from './coin_list';
 export const packageName = 'CoinList';
-export const moduleAddress = new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68');
+export const moduleAddress = new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46');
 export const moduleName = 'devnet_coins';
 
 export class CoinCaps {
@@ -236,10 +236,6 @@ export function burn_(tokens: Stdlib.Coin.Coin, $c: AptosDataCache, $p: TypeTag[
 }
 
 export function deploy_(admin: HexString, $c: AptosDataCache): void {
-  if (!Coin_list.is_registry_initialized_($c)) {
-    Coin_list.initialize_(admin, $c);
-  } else {
-  }
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('66'), u8('105'), u8('116'), u8('99'), u8('111'), u8('105'), u8('110')], $c),
@@ -1004,7 +1000,7 @@ export function buildPayload_deploy(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+    new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
     'devnet_coins',
     'deploy',
     typeParamStrings,
@@ -1012,7 +1008,6 @@ export function buildPayload_deploy(
     isJSON
   );
 }
-
 export function deposit_(
   user: HexString,
   coin: Stdlib.Coin.Coin,
@@ -1100,7 +1095,7 @@ export function mint_(amount: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinTyp
   let caps;
   caps = $c.borrow_global<CoinCaps>(
     new SimpleStructTag(CoinCaps, [$p[0]]),
-    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
+    new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46')
   );
   return Stdlib.Coin.mint_($.copy(amount), caps.mint, $c, [$p[0]]);
 }
@@ -1123,7 +1118,7 @@ export function buildPayload_mint_to_wallet(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+    new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
     'devnet_coins',
     'mint_to_wallet',
     typeParamStrings,
@@ -1134,35 +1129,35 @@ export function buildPayload_mint_to_wallet(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::CoinCaps',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::CoinCaps',
     CoinCaps.CoinCapsParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetBNB',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetBNB',
     DevnetBNB.DevnetBNBParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetBTC',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetBTC',
     DevnetBTC.DevnetBTCParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetDAI',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetDAI',
     DevnetDAI.DevnetDAIParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetETH',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetETH',
     DevnetETH.DevnetETHParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetSOL',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetSOL',
     DevnetSOL.DevnetSOLParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetUSDC',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetUSDC',
     DevnetUSDC.DevnetUSDCParser
   );
   repo.addParser(
-    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::devnet_coins::DevnetUSDT',
+    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetUSDT',
     DevnetUSDT.DevnetUSDTParser
   );
 }

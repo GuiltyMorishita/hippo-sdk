@@ -26,10 +26,7 @@ export class TradeAggregator {
 
   static async create(aptosClient: AptosClient, netConfig = CONFIGS.devnet) {
     const app = new App(aptosClient);
-    const fetcher: SimulationKeys = {
-      pubkey: netConfig.hippoDexPubkey,
-      address: netConfig.hippoDexAddress
-    };
+    const fetcher: SimulationKeys = netConfig.simulationKeys;
     const registryClient = await CoinListClient.load(app, fetcher);
     const aggregator = new TradeAggregator(registryClient, app, fetcher, [
       new HippoPoolProvider(app, fetcher, netConfig, registryClient),

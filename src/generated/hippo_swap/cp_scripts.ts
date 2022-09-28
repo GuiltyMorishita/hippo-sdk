@@ -57,8 +57,8 @@ export function create_new_pool_(
   fee_on: boolean,
   lp_name: U8[],
   lp_symbol: U8[],
-  lp_logo_url: U8[],
-  lp_project_url: U8[],
+  _lp_logo_url: U8[],
+  _lp_project_url: U8[],
   $c: AptosDataCache,
   $p: TypeTag[] /* <X, Y>*/
 ): void {
@@ -133,40 +133,6 @@ export function create_new_pool_(
     $c,
     [$p[0], $p[1]]
   );
-  Coin_list.Coin_list.add_to_registry_by_signer_(
-    admin,
-    Stdlib.String.utf8_($.copy(lp_name), $c),
-    Stdlib.String.utf8_($.copy(lp_symbol), $c),
-    Stdlib.String.utf8_(Stdlib.Vector.empty_($c, [AtomicTypeTag.U8]), $c),
-    Stdlib.String.utf8_($.copy(lp_logo_url), $c),
-    Stdlib.String.utf8_($.copy(lp_project_url), $c),
-    false,
-    $c,
-    [
-      new StructTag(
-        new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-        'cp_swap',
-        'LPToken',
-        [$p[0], $p[1]]
-      )
-    ]
-  );
-  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[0]])) {
-    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[0]]);
-  } else {
-  }
-  if (!Coin_list.Coin_list.is_coin_in_list_($.copy(admin_addr), $c, [$p[1]])) {
-    Coin_list.Coin_list.add_to_list_(admin, $c, [$p[1]]);
-  } else {
-  }
-  Coin_list.Coin_list.add_to_list_(admin, $c, [
-    new StructTag(
-      new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-      'cp_swap',
-      'LPToken',
-      [$p[0], $p[1]]
-    )
-  ]);
   return;
 }
 
@@ -276,13 +242,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetUSDC',
         []
@@ -298,13 +264,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetBTC',
         []
       ),
       new StructTag(
-        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
         'devnet_coins',
         'DevnetUSDT',
         []

@@ -5,8 +5,9 @@ export class NetworkConfiguration {
     public name: string,
     public fullNodeUrl: string,
     public faucetUrl: string,
+    public simulationAddress: HexString,
+    public simulationPubkey: HexString,
     public hippoDexAddress: HexString,
-    public hippoDexPubkey: HexString,
     public coinListAddress: HexString,
     public hippoAggregatorAddress: HexString,
     public pontemAddress: HexString,
@@ -19,8 +20,8 @@ export class NetworkConfiguration {
 
   get simulationKeys() {
     return {
-      pubkey: this.hippoDexPubkey,
-      address: this.hippoDexAddress
+      pubkey: this.simulationPubkey,
+      address: this.simulationAddress
     };
   }
 }
@@ -29,13 +30,16 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   'localhost',
   'http://0.0.0.0:8080',
   'http://0.0.0.0:8000',
+  // simulationAddress coin list now
+  new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+  // simulationPubkey coin list now
+  new HexString('0xc5aad5bddffb7516c7a02a2fb14fa50cfaf7497281bc89f90024005f44f3e393'),
   // hippo dex
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-  new HexString('0x980a2b1bc2c60ae3e7b7cd1f22ee6fa078843a856b86b111c98f7dc744d2d2b4'),
   // coin list
   new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
-  new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+  new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
   // pontem
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
   // econia
@@ -52,13 +56,16 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   'devnet',
   'https://fullnode.devnet.aptoslabs.com/v1',
   'https://faucet.devnet.aptoslabs.com',
+  // simulationAddress coin list now
+  new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+  // simulationPubkey coin list now
+  new HexString('0xc5aad5bddffb7516c7a02a2fb14fa50cfaf7497281bc89f90024005f44f3e393'),
   // hippo dex
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
-  new HexString('0x980a2b1bc2c60ae3e7b7cd1f22ee6fa078843a856b86b111c98f7dc744d2d2b4'),
   // coin list
   new HexString('b5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
-  new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+  new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
   // pontem
   new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
   // econia
