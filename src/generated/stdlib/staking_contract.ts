@@ -1466,10 +1466,13 @@ export class App {
   get Store() {
     return Store;
   }
-  async loadStore(owner: HexString, loadFull = true) {
+  async loadStore(owner: HexString, loadFull = true, fillCache = true) {
     const val = await Store.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

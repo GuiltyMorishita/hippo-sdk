@@ -990,10 +990,13 @@ export class App {
   get ApprovedExecutionHashes() {
     return ApprovedExecutionHashes;
   }
-  async loadApprovedExecutionHashes(owner: HexString, loadFull = true) {
+  async loadApprovedExecutionHashes(owner: HexString, loadFull = true, fillCache = true) {
     const val = await ApprovedExecutionHashes.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -1003,30 +1006,39 @@ export class App {
   get GovernanceConfig() {
     return GovernanceConfig;
   }
-  async loadGovernanceConfig(owner: HexString, loadFull = true) {
+  async loadGovernanceConfig(owner: HexString, loadFull = true, fillCache = true) {
     const val = await GovernanceConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get GovernanceEvents() {
     return GovernanceEvents;
   }
-  async loadGovernanceEvents(owner: HexString, loadFull = true) {
+  async loadGovernanceEvents(owner: HexString, loadFull = true, fillCache = true) {
     const val = await GovernanceEvents.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get GovernanceResponsbility() {
     return GovernanceResponsbility;
   }
-  async loadGovernanceResponsbility(owner: HexString, loadFull = true) {
+  async loadGovernanceResponsbility(owner: HexString, loadFull = true, fillCache = true) {
     const val = await GovernanceResponsbility.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -1042,10 +1054,13 @@ export class App {
   get VotingRecords() {
     return VotingRecords;
   }
-  async loadVotingRecords(owner: HexString, loadFull = true) {
+  async loadVotingRecords(owner: HexString, loadFull = true, fillCache = true) {
     const val = await VotingRecords.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

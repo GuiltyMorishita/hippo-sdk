@@ -182,9 +182,6 @@ export class EconiaTradingPoolV1 extends TradingPool {
 }
 
 export class EconiaPoolProvider extends TradingPoolProvider {
-  constructor(app: App, fetcher: SimulationKeys, netConfig = CONFIGS.devnet, public registry: CoinListClient) {
-    super(app, fetcher, netConfig);
-  }
   async loadPoolList(): Promise<TradingPool[]> {
     const econiaClient = new EconiaClient(this.app.client, this.app.parserRepo, Registry.moduleAddress);
     const markets = await econiaClient.getMarkets();

@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
 import * as Lp from './lp';
 import * as Router from './router';
 import * as Scripts from './scripts';

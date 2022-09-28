@@ -157,10 +157,13 @@ export class App {
   get Features() {
     return Features;
   }
-  async loadFeatures(owner: HexString, loadFull = true) {
+  async loadFeatures(owner: HexString, loadFull = true, fillCache = true) {
     const val = await Features.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

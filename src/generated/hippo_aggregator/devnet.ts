@@ -11,7 +11,7 @@ import * as Econia from '../econia';
 import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe');
+export const moduleAddress = new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7');
 export const moduleName = 'devnet';
 
 export const BTC_AMOUNT: U64 = u64('100000000').mul(u64('1000'));
@@ -67,10 +67,7 @@ export function mock_deploy_basiq_(admin: HexString, $c: AptosDataCache): void {
       [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67'), u8('32'), u8('76'), u8('80')],
       $c
     ),
-    Stdlib.String.utf8_(
-      [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67'), u8('45'), u8('76'), u8('80')],
-      $c
-    ),
+    Stdlib.String.utf8_([u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67')], $c),
     true,
     $c,
     [
@@ -110,7 +107,7 @@ export function buildPayload_mock_deploy_basiq(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'devnet',
     'mock_deploy_basiq',
     typeParamStrings,
@@ -244,7 +241,7 @@ export function buildPayload_mock_deploy_econia(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'devnet',
     'mock_deploy_econia',
     typeParamStrings,
@@ -314,7 +311,7 @@ export function buildPayload_mock_deploy_pontem(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'devnet',
     'mock_deploy_pontem',
     typeParamStrings,
@@ -323,9 +320,36 @@ export function buildPayload_mock_deploy_pontem(
   );
 }
 
+export function registe_coins_(
+  hippo_swap: HexString,
+  coin_list: HexString,
+  deploy_coin_list: boolean,
+  $c: AptosDataCache
+): void {
+  let _coin_list, _deploy_coin_list, _hippo_swap;
+  _hippo_swap = hippo_swap;
+  _coin_list = coin_list;
+  _deploy_coin_list = deploy_coin_list;
+  return;
+}
+
+export function buildPayload_registe_coins(
+  deploy_coin_list: boolean,
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    'devnet',
+    'registe_coins',
+    typeParamStrings,
+    [deploy_coin_list],
+    isJSON
+  );
+}
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe::devnet::PontemLP',
+    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::devnet::PontemLP',
     PontemLP.PontemLPParser
   );
 }
@@ -370,6 +394,16 @@ export class App {
   }
   async mock_deploy_pontem(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
     const payload = buildPayload_mock_deploy_pontem(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_registe_coins(
+    deploy_coin_list: boolean,
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_registe_coins(deploy_coin_list, isJSON);
+  }
+  async registe_coins(_account: AptosAccount, deploy_coin_list: boolean, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_registe_coins(deploy_coin_list, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
 }

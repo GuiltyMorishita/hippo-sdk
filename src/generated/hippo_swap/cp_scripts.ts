@@ -269,7 +269,7 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   btc_amt = u64('1000000000');
   mock_create_pair_and_add_liquidity_(
     admin,
-    [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67'), u8('45'), u8('76'), u8('80')],
+    [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('67')],
     $.copy(btc_amt),
     $.copy(btc_amt).mul(u64('10000')),
     $.copy(btc_amt).mul(u64('100')).sub(u64('1000')),
@@ -291,7 +291,7 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   );
   mock_create_pair_and_add_liquidity_(
     admin,
-    [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('84'), u8('45'), u8('76'), u8('80')],
+    [u8('66'), u8('84'), u8('67'), u8('45'), u8('85'), u8('83'), u8('68'), u8('84')],
     $.copy(btc_amt),
     $.copy(btc_amt).mul(u64('10000')),
     $.copy(btc_amt).mul(u64('100')).sub(u64('1000')),

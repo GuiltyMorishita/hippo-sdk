@@ -346,10 +346,13 @@ export class App {
   get AptosCoin() {
     return AptosCoin;
   }
-  async loadAptosCoin(owner: HexString, loadFull = true) {
+  async loadAptosCoin(owner: HexString, loadFull = true, fillCache = true) {
     const val = await AptosCoin.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -359,20 +362,26 @@ export class App {
   get Delegations() {
     return Delegations;
   }
-  async loadDelegations(owner: HexString, loadFull = true) {
+  async loadDelegations(owner: HexString, loadFull = true, fillCache = true) {
     const val = await Delegations.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get MintCapStore() {
     return MintCapStore;
   }
-  async loadMintCapStore(owner: HexString, loadFull = true) {
+  async loadMintCapStore(owner: HexString, loadFull = true, fillCache = true) {
     const val = await MintCapStore.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

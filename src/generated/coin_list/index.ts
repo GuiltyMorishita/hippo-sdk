@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
 import * as Coin_list from './coin_list';
 import * as Devnet_coins from './devnet_coins';
 import * as Iterable_table from './iterable_table';

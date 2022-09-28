@@ -168,10 +168,13 @@ export class App {
   get PoolList() {
     return PoolList;
   }
-  async loadPoolList(owner: HexString, loadFull = true) {
+  async loadPoolList(owner: HexString, loadFull = true, fillCache = true) {
     const val = await PoolList.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

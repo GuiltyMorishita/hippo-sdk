@@ -104,9 +104,6 @@ export class BasiqTradingPool extends TradingPool {
 }
 
 export class BasiqPoolProvider extends TradingPoolProvider {
-  constructor(app: App, fetcher: SimulationKeys, netConfig = CONFIGS.devnet, public registry: CoinListClient) {
-    super(app, fetcher, netConfig);
-  }
   async loadPoolList(): Promise<TradingPool[]> {
     const poolList: TradingPool[] = [];
     const ownerAddress = this.netConfig.basiqAddress;

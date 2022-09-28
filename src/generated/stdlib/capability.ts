@@ -319,20 +319,26 @@ export class App {
   get CapDelegateState() {
     return CapDelegateState;
   }
-  async loadCapDelegateState(owner: HexString, $p: TypeTag[] /* <Feature> */, loadFull = true) {
+  async loadCapDelegateState(owner: HexString, $p: TypeTag[] /* <Feature> */, loadFull = true, fillCache = true) {
     const val = await CapDelegateState.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get CapState() {
     return CapState;
   }
-  async loadCapState(owner: HexString, $p: TypeTag[] /* <Feature> */, loadFull = true) {
+  async loadCapState(owner: HexString, $p: TypeTag[] /* <Feature> */, loadFull = true, fillCache = true) {
     const val = await CapState.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

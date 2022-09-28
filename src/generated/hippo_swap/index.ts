@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
 import * as Cp_scripts from './cp_scripts';
 import * as Cp_swap from './cp_swap';
 import * as Cp_swap_utils from './cp_swap_utils';

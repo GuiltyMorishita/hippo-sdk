@@ -748,7 +748,7 @@ const aggSimulateSwapWithRoute = async (
   minOutAmt: string,
   routeIdx: string
 ) => {
-  const { client, account } = readConfig(program);
+  const { client } = readConfig(program);
   const agg = await TradeAggregator.create(client);
   const xCoinInfo = agg.registryClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfo = agg.registryClient.getCoinInfoBySymbol(toSymbol);

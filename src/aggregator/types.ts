@@ -4,6 +4,7 @@ import { CoinInfo } from '../generated/coin_list/coin_list';
 import { Aggregator } from '../generated/hippo_aggregator';
 import { App } from '../generated';
 import { CONFIGS } from '../config';
+import { CoinListClient } from '../coinList';
 
 export type UITokenAmount = number;
 export type UITokenAmountRatio = number;
@@ -32,13 +33,19 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   Pontem = 3,
   // eslint-disable-next-line no-unused-vars
-  Basiq = 4
+  Basiq = 4,
+  // eslint-disable-next-line no-unused-vars
+  Ditto = 5,
+  // eslint-disable-next-line no-unused-vars
+  Tortuga = 6
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo]: 'Hippo',
   [DexType.Econia]: 'Econia',
   [DexType.Pontem]: 'Pontem',
-  [DexType.Basiq]: 'Basiq'
+  [DexType.Basiq]: 'Basiq',
+  [DexType.Ditto]: 'Ditto',
+  [DexType.Tortuga]: 'Tortuga'
 };
 export type PoolType = U64;
 
@@ -263,7 +270,12 @@ export interface RouteAndQuote {
 
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
-  constructor(public app: App, public fetcher: SimulationKeys, public netConfig = CONFIGS.devnet) {}
+  constructor(
+    public app: App,
+    public fetcher: SimulationKeys,
+    public netConfig = CONFIGS.devnet,
+    public registry: CoinListClient
+  ) {}
   abstract loadPoolList(): Promise<TradingPool[]>;
 
   async reloadAllPoolState() {

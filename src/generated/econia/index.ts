@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
 import * as Assets from './assets';
 import * as Critbit from './critbit';
 import * as Market from './market';

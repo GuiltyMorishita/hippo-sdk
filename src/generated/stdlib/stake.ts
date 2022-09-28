@@ -2463,20 +2463,26 @@ export class App {
   get AllowedValidators() {
     return AllowedValidators;
   }
-  async loadAllowedValidators(owner: HexString, loadFull = true) {
+  async loadAllowedValidators(owner: HexString, loadFull = true, fillCache = true) {
     const val = await AllowedValidators.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get AptosCoinCapabilities() {
     return AptosCoinCapabilities;
   }
-  async loadAptosCoinCapabilities(owner: HexString, loadFull = true) {
+  async loadAptosCoinCapabilities(owner: HexString, loadFull = true, fillCache = true) {
     const val = await AptosCoinCapabilities.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -2498,10 +2504,13 @@ export class App {
   get OwnerCapability() {
     return OwnerCapability;
   }
-  async loadOwnerCapability(owner: HexString, loadFull = true) {
+  async loadOwnerCapability(owner: HexString, loadFull = true, fillCache = true) {
     const val = await OwnerCapability.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -2520,10 +2529,13 @@ export class App {
   get StakePool() {
     return StakePool;
   }
-  async loadStakePool(owner: HexString, loadFull = true) {
+  async loadStakePool(owner: HexString, loadFull = true, fillCache = true) {
     const val = await StakePool.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -2536,10 +2548,13 @@ export class App {
   get ValidatorConfig() {
     return ValidatorConfig;
   }
-  async loadValidatorConfig(owner: HexString, loadFull = true) {
+  async loadValidatorConfig(owner: HexString, loadFull = true, fillCache = true) {
     const val = await ValidatorConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -2549,20 +2564,26 @@ export class App {
   get ValidatorPerformance() {
     return ValidatorPerformance;
   }
-  async loadValidatorPerformance(owner: HexString, loadFull = true) {
+  async loadValidatorPerformance(owner: HexString, loadFull = true, fillCache = true) {
     const val = await ValidatorPerformance.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get ValidatorSet() {
     return ValidatorSet;
   }
-  async loadValidatorSet(owner: HexString, loadFull = true) {
+  async loadValidatorSet(owner: HexString, loadFull = true, fillCache = true) {
     const val = await ValidatorSet.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

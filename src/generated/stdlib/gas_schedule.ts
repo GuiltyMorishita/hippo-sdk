@@ -199,20 +199,26 @@ export class App {
   get GasSchedule() {
     return GasSchedule;
   }
-  async loadGasSchedule(owner: HexString, loadFull = true) {
+  async loadGasSchedule(owner: HexString, loadFull = true, fillCache = true) {
     const val = await GasSchedule.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get GasScheduleV2() {
     return GasScheduleV2;
   }
-  async loadGasScheduleV2(owner: HexString, loadFull = true) {
+  async loadGasScheduleV2(owner: HexString, loadFull = true, fillCache = true) {
     const val = await GasScheduleV2.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

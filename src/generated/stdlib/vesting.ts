@@ -1903,10 +1903,13 @@ export class App {
   get AdminStore() {
     return AdminStore;
   }
-  async loadAdminStore(owner: HexString, loadFull = true) {
+  async loadAdminStore(owner: HexString, loadFull = true, fillCache = true) {
     const val = await AdminStore.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -1946,20 +1949,26 @@ export class App {
   get VestingAccountManagement() {
     return VestingAccountManagement;
   }
-  async loadVestingAccountManagement(owner: HexString, loadFull = true) {
+  async loadVestingAccountManagement(owner: HexString, loadFull = true, fillCache = true) {
     const val = await VestingAccountManagement.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get VestingContract() {
     return VestingContract;
   }
-  async loadVestingContract(owner: HexString, loadFull = true) {
+  async loadVestingContract(owner: HexString, loadFull = true, fillCache = true) {
     const val = await VestingContract.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

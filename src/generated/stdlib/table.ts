@@ -187,10 +187,13 @@ export class App {
   get Box() {
     return Box;
   }
-  async loadBox(owner: HexString, $p: TypeTag[] /* <V> */, loadFull = true) {
+  async loadBox(owner: HexString, $p: TypeTag[] /* <V> */, loadFull = true, fillCache = true) {
     const val = await Box.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

@@ -108,10 +108,13 @@ export class App {
   get CurrentTimeMicroseconds() {
     return CurrentTimeMicroseconds;
   }
-  async loadCurrentTimeMicroseconds(owner: HexString, loadFull = true) {
+  async loadCurrentTimeMicroseconds(owner: HexString, loadFull = true, fillCache = true) {
     const val = await CurrentTimeMicroseconds.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

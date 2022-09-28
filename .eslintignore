@@ -1,5 +1,5 @@
 node_modules/
-src/generated
+
 dist/
 jest.config.js
 tsconfig.js

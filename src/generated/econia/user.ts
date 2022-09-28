@@ -1363,10 +1363,13 @@ export class App {
   get Collateral() {
     return Collateral;
   }
-  async loadCollateral(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true) {
+  async loadCollateral(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true, fillCache = true) {
     const val = await Collateral.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -1376,10 +1379,13 @@ export class App {
   get MarketAccounts() {
     return MarketAccounts;
   }
-  async loadMarketAccounts(owner: HexString, loadFull = true) {
+  async loadMarketAccounts(owner: HexString, loadFull = true, fillCache = true) {
     const val = await MarketAccounts.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

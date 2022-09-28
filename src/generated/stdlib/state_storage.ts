@@ -191,20 +191,26 @@ export class App {
   get GasParameter() {
     return GasParameter;
   }
-  async loadGasParameter(owner: HexString, loadFull = true) {
+  async loadGasParameter(owner: HexString, loadFull = true, fillCache = true) {
     const val = await GasParameter.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get StateStorageUsage() {
     return StateStorageUsage;
   }
-  async loadStateStorageUsage(owner: HexString, loadFull = true) {
+  async loadStateStorageUsage(owner: HexString, loadFull = true, fillCache = true) {
     const val = await StateStorageUsage.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

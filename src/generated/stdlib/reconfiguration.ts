@@ -269,20 +269,26 @@ export class App {
   get Configuration() {
     return Configuration;
   }
-  async loadConfiguration(owner: HexString, loadFull = true) {
+  async loadConfiguration(owner: HexString, loadFull = true, fillCache = true) {
     const val = await Configuration.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get DisableReconfiguration() {
     return DisableReconfiguration;
   }
-  async loadDisableReconfiguration(owner: HexString, loadFull = true) {
+  async loadDisableReconfiguration(owner: HexString, loadFull = true, fillCache = true) {
     const val = await DisableReconfiguration.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

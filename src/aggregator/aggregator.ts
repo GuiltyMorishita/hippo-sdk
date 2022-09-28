@@ -9,6 +9,7 @@ import { CONFIGS } from '../config';
 import { SimulationKeys } from '@manahippo/move-to-ts';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
+import { DittoPoolProvider, TortugaPoolProvider } from './stake';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -30,15 +31,13 @@ export class TradeAggregator {
       address: netConfig.hippoDexAddress
     };
     const registryClient = await CoinListClient.load(app, fetcher);
-    const hippoProvider = new HippoPoolProvider(app, fetcher, netConfig);
-    const econiaProvider = new EconiaPoolProvider(app, fetcher, netConfig, registryClient);
-    const pontemProvider = new PontemPoolProvider(app, fetcher, netConfig, registryClient);
-    const basiqProvider = new BasiqPoolProvider(app, fetcher, netConfig, registryClient);
     const aggregator = new TradeAggregator(registryClient, app, fetcher, [
-      hippoProvider,
-      econiaProvider,
-      pontemProvider,
-      basiqProvider
+      new HippoPoolProvider(app, fetcher, netConfig, registryClient),
+      new EconiaPoolProvider(app, fetcher, netConfig, registryClient),
+      new PontemPoolProvider(app, fetcher, netConfig, registryClient),
+      new BasiqPoolProvider(app, fetcher, netConfig, registryClient),
+      new DittoPoolProvider(app, fetcher, netConfig, registryClient),
+      new TortugaPoolProvider(app, fetcher, netConfig, registryClient)
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;

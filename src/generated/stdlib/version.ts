@@ -149,20 +149,26 @@ export class App {
   get SetVersionCapability() {
     return SetVersionCapability;
   }
-  async loadSetVersionCapability(owner: HexString, loadFull = true) {
+  async loadSetVersionCapability(owner: HexString, loadFull = true, fillCache = true) {
     const val = await SetVersionCapability.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get Version() {
     return Version;
   }
-  async loadVersion(owner: HexString, loadFull = true) {
+  async loadVersion(owner: HexString, loadFull = true, fillCache = true) {
     const val = await Version.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

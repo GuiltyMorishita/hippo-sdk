@@ -985,10 +985,13 @@ export class App {
   get Account() {
     return Account;
   }
-  async loadAccount(owner: HexString, loadFull = true) {
+  async loadAccount(owner: HexString, loadFull = true, fillCache = true) {
     const val = await Account.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -1004,10 +1007,13 @@ export class App {
   get OriginatingAddress() {
     return OriginatingAddress;
   }
-  async loadOriginatingAddress(owner: HexString, loadFull = true) {
+  async loadOriginatingAddress(owner: HexString, loadFull = true, fillCache = true) {
     const val = await OriginatingAddress.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

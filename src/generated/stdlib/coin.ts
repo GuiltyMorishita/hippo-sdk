@@ -770,20 +770,26 @@ export class App {
   get CoinInfo() {
     return CoinInfo;
   }
-  async loadCoinInfo(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true) {
+  async loadCoinInfo(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true, fillCache = true) {
     const val = await CoinInfo.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get CoinStore() {
     return CoinStore;
   }
-  async loadCoinStore(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true) {
+  async loadCoinStore(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true, fillCache = true) {
     const val = await CoinStore.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
@@ -799,10 +805,13 @@ export class App {
   get SupplyConfig() {
     return SupplyConfig;
   }
-  async loadSupplyConfig(owner: HexString, loadFull = true) {
+  async loadSupplyConfig(owner: HexString, loadFull = true, fillCache = true) {
     const val = await SupplyConfig.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

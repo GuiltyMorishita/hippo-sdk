@@ -920,30 +920,39 @@ export class App {
   get CoinList() {
     return CoinList;
   }
-  async loadCoinList(owner: HexString, loadFull = true) {
+  async loadCoinList(owner: HexString, loadFull = true, fillCache = true) {
     const val = await CoinList.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get CoinRegistry() {
     return CoinRegistry;
   }
-  async loadCoinRegistry(owner: HexString, loadFull = true) {
+  async loadCoinRegistry(owner: HexString, loadFull = true, fillCache = true) {
     const val = await CoinRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get FullList() {
     return FullList;
   }
-  async loadFullList(owner: HexString, loadFull = true) {
+  async loadFullList(owner: HexString, loadFull = true, fillCache = true) {
     const val = await FullList.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

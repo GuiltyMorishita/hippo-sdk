@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache } from '@manahippo/move-to-ts';
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
 import * as Aggregator from './aggregator';
 import * as Devnet from './devnet';
 import * as Volume from './volume';

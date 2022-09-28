@@ -1015,30 +1015,39 @@ export class App {
   get LPToken() {
     return LPToken;
   }
-  async loadLPToken(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true) {
+  async loadLPToken(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true, fillCache = true) {
     const val = await LPToken.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get TokenPairMetadata() {
     return TokenPairMetadata;
   }
-  async loadTokenPairMetadata(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true) {
+  async loadTokenPairMetadata(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true, fillCache = true) {
     const val = await TokenPairMetadata.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get TokenPairReserve() {
     return TokenPairReserve;
   }
-  async loadTokenPairReserve(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true) {
+  async loadTokenPairReserve(owner: HexString, $p: TypeTag[] /* <X, Y> */, loadFull = true, fillCache = true) {
     const val = await TokenPairReserve.load(this.repo, this.client, owner, $p);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

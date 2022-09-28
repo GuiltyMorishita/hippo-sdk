@@ -681,10 +681,13 @@ export class App {
   get PackageRegistry() {
     return PackageRegistry;
   }
-  async loadPackageRegistry(owner: HexString, loadFull = true) {
+  async loadPackageRegistry(owner: HexString, loadFull = true, fillCache = true) {
     const val = await PackageRegistry.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }

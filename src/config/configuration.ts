@@ -12,7 +12,9 @@ export class NetworkConfiguration {
     public pontemAddress: HexString,
     public econiaAddress: HexString,
     public basiqAddress: HexString,
-    public isMainnet = false
+    public dittoAddress: HexString,
+    public tortugaAddress: HexString,
+    public isMainNet = false
   ) {}
 
   get simulationKeys() {
@@ -39,7 +41,11 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // econia
   new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
   // basiq
-  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab')
+  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab'),
+  // ditto
+  new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+  // tortuga
+  new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab')
 );
 
 export const DEVNET_CONFIG = new NetworkConfiguration(
@@ -58,7 +64,11 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   // econia
   new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
   // basiq
-  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab')
+  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab'),
+  // ditto
+  new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+  // tortuga
+  new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab')
 );
 
 export const CONFIGS = {

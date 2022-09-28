@@ -6,26 +6,73 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Basiq from '../basiq';
+import * as Ditto from '../ditto';
 import * as Econia from '../econia';
 import * as Hippo_swap from '../hippo_swap';
 import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
+import * as Tortuga from '../tortuga';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe');
+export const moduleAddress = new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7');
 export const moduleName = 'aggregator';
 
 export const DEX_BASIQ: U8 = u8('4');
+export const DEX_DITTO: U8 = u8('5');
 export const DEX_ECONIA: U8 = u8('2');
 export const DEX_HIPPO: U8 = u8('1');
 export const DEX_PONTEM: U8 = u8('3');
+export const DEX_TORTUGA: U8 = u8('6');
+export const E_COIN_STORE_NOT_EXITES: U64 = u64('8');
+export const E_INVALID_PAIR_OF_DITTO: U64 = u64('5');
+export const E_INVALID_PAIR_OF_TORTUGA: U64 = u64('6');
 export const E_NOT_ADMIN: U64 = u64('4');
 export const E_OUTPUT_LESS_THAN_MINIMUM: U64 = u64('2');
+export const E_TYPE_NOT_EQUAL: U64 = u64('7');
 export const E_UNKNOWN_DEX: U64 = u64('3');
 export const E_UNKNOWN_POOL_TYPE: U64 = u64('1');
 export const HIPPO_CONSTANT_PRODUCT: U64 = u64('1');
 export const HIPPO_PIECEWISE: U64 = u64('3');
 export const HIPPO_STABLE_CURVE: U64 = u64('2');
 export const HI_64: U64 = u64('18446744073709551615');
+
+export class CoinStore {
+  static moduleAddress = moduleAddress;
+  static moduleName = moduleName;
+  __app: $.AppType | null = null;
+  static structName: string = 'CoinStore';
+  static typeParameters: TypeParamDeclType[] = [{ name: 'CoinType', isPhantom: true }];
+  static fields: FieldDeclType[] = [
+    { name: 'balance', typeTag: new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(0)]) }
+  ];
+
+  balance: Stdlib.Coin.Coin;
+
+  constructor(proto: any, public typeTag: TypeTag) {
+    this.balance = proto['balance'] as Stdlib.Coin.Coin;
+  }
+
+  static CoinStoreParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): CoinStore {
+    const proto = $.parseStructProto(data, typeTag, repo, CoinStore);
+    return new CoinStore(proto, typeTag);
+  }
+
+  static async load(repo: AptosParserRepo, client: AptosClient, address: HexString, typeParams: TypeTag[]) {
+    const result = await repo.loadResource(client, address, CoinStore, typeParams);
+    return result as unknown as CoinStore;
+  }
+  static async loadByApp(app: $.AppType, address: HexString, typeParams: TypeTag[]) {
+    const result = await app.repo.loadResource(app.client, address, CoinStore, typeParams);
+    await result.loadFullState(app);
+    return result as unknown as CoinStore;
+  }
+  static makeTag($p: TypeTag[]): StructTag {
+    return new StructTag(moduleAddress, moduleName, 'CoinStore', $p);
+  }
+  async loadFullState(app: $.AppType) {
+    await this.balance.loadFullState(app);
+    this.__app = app;
+  }
+}
 
 export class EventStore {
   static moduleAddress = moduleAddress;
@@ -38,7 +85,7 @@ export class EventStore {
       name: 'swap_step_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
           'aggregator',
           'SwapStepEvent',
           []
@@ -124,6 +171,36 @@ export class SwapStepEvent {
     this.__app = app;
   }
 }
+export function change_coin_type_(
+  x_coin: Stdlib.Coin.Coin,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <X, Y>*/
+): Stdlib.Coin.Coin {
+  let amount, x_coin_store, y_coin_store;
+  if (!$.deep_eq(Stdlib.Type_info.type_of_($c, [$p[0]]), Stdlib.Type_info.type_of_($c, [$p[1]]))) {
+    throw $.abortCode($.copy(E_TYPE_NOT_EQUAL));
+  }
+  if (
+    !$c.exists(
+      new SimpleStructTag(CoinStore, [$p[0]]),
+      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+    )
+  ) {
+    throw $.abortCode(u64('0'));
+  }
+  amount = Stdlib.Coin.value_(x_coin, $c, [$p[0]]);
+  x_coin_store = $c.borrow_global_mut<CoinStore>(
+    new SimpleStructTag(CoinStore, [$p[0]]),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+  );
+  Stdlib.Coin.merge_(x_coin_store.balance, x_coin, $c, [$p[0]]);
+  y_coin_store = $c.borrow_global_mut<CoinStore>(
+    new SimpleStructTag(CoinStore, [$p[1]]),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+  );
+  return Stdlib.Coin.extract_(y_coin_store.balance, $.copy(amount), $c, [$p[1]]);
+}
+
 export function check_and_deposit_(
   sender: HexString,
   coin: Stdlib.Coin.Coin,
@@ -171,7 +248,7 @@ export function emit_swap_step_event_(
   let event_store;
   event_store = $c.borrow_global_mut<EventStore>(
     new SimpleStructTag(EventStore),
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe')
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
   );
   Stdlib.Event.emit_event_(
     event_store.swap_step_events,
@@ -221,11 +298,24 @@ export function get_intermediate_output_(
     temp$3,
     temp$30,
     temp$31,
+    temp$32,
     temp$33,
+    temp$34,
+    temp$35,
+    temp$36,
+    temp$37,
+    temp$38,
+    temp$39,
     temp$4,
+    temp$40,
+    temp$41,
+    temp$42,
+    temp$43,
+    temp$44,
+    temp$46,
     temp$9,
     coin_in_value,
-    coin_in_value__34,
+    coin_in_value__47,
     market_id,
     x_out,
     x_out__2,
@@ -236,7 +326,7 @@ export function get_intermediate_output_(
     y_out__11,
     y_out__12,
     y_out__21,
-    y_out__32,
+    y_out__45,
     y_out__5,
     y_out__7,
     zero,
@@ -308,7 +398,7 @@ export function get_intermediate_output_(
       }
       [temp$19, temp$20] = [temp$17, temp$18];
     }
-    [temp$30, temp$31] = [temp$19, temp$20];
+    [temp$43, temp$44] = [temp$19, temp$20];
   } else {
     if ($.copy(dex_type).eq($.copy(DEX_ECONIA))) {
       y_out__21 = Stdlib.Coin.zero_($c, [$p[1]]);
@@ -316,7 +406,7 @@ export function get_intermediate_output_(
       market_id = $.copy(pool_type);
       if (is_x_to_y) {
         Econia.Market.swap_coins_(
-          new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
           $.copy(market_id),
           false,
           u64('0'),
@@ -331,7 +421,7 @@ export function get_intermediate_output_(
         );
       } else {
         Econia.Market.swap_coins_(
-          new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
           $.copy(market_id),
           true,
           u64('0'),
@@ -357,13 +447,13 @@ export function get_intermediate_output_(
           y_out__21
         ];
       }
-      [temp$28, temp$29] = [temp$22, temp$23];
+      [temp$41, temp$42] = [temp$22, temp$23];
     } else {
       if ($.copy(dex_type).eq($.copy(DEX_PONTEM))) {
-        [temp$26, temp$27] = [
+        [temp$39, temp$40] = [
           Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           Pontem.Router.swap_exact_coin_for_coin_(
-            new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+            new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
             x_in,
             u64('0'),
             $c,
@@ -372,22 +462,167 @@ export function get_intermediate_output_(
         ];
       } else {
         if ($.copy(dex_type).eq($.copy(DEX_BASIQ))) {
-          [temp$24, temp$25] = [
+          [temp$37, temp$38] = [
             Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
             Basiq.Dex.swap_(x_in, $c, [$p[0], $p[1]])
           ];
         } else {
-          throw $.abortCode($.copy(E_UNKNOWN_DEX));
+          if ($.copy(dex_type).eq($.copy(DEX_DITTO))) {
+            if (
+              $.deep_eq(
+                Stdlib.Type_info.type_of_($c, [$p[0]]),
+                Stdlib.Type_info.type_of_($c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])])
+              )
+            ) {
+              temp$24 = $.deep_eq(
+                Stdlib.Type_info.type_of_($c, [$p[1]]),
+                Stdlib.Type_info.type_of_($c, [
+                  new StructTag(
+                    new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+                    'staked_coin',
+                    'StakedAptos',
+                    []
+                  )
+                ])
+              );
+            } else {
+              temp$24 = false;
+            }
+            if (temp$24) {
+              [temp$28, temp$29] = [
+                Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+                change_coin_type_(
+                  Ditto.Ditto_staking.exchange_aptos_(
+                    change_coin_type_(x_in, $c, [
+                      $p[0],
+                      new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])
+                    ]),
+                    $c
+                  ),
+                  $c,
+                  [
+                    new StructTag(
+                      new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+                      'staked_coin',
+                      'StakedAptos',
+                      []
+                    ),
+                    $p[1]
+                  ]
+                )
+              ];
+            } else {
+              if (
+                $.deep_eq(
+                  Stdlib.Type_info.type_of_($c, [$p[0]]),
+                  Stdlib.Type_info.type_of_($c, [
+                    new StructTag(
+                      new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+                      'staked_coin',
+                      'StakedAptos',
+                      []
+                    )
+                  ])
+                )
+              ) {
+                temp$25 = $.deep_eq(
+                  Stdlib.Type_info.type_of_($c, [$p[1]]),
+                  Stdlib.Type_info.type_of_($c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])])
+                );
+              } else {
+                temp$25 = false;
+              }
+              if (temp$25) {
+                [temp$26, temp$27] = [
+                  Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+                  change_coin_type_(
+                    Ditto.Ditto_staking.exchange_staptos_(
+                      change_coin_type_(x_in, $c, [
+                        $p[0],
+                        new StructTag(
+                          new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+                          'staked_coin',
+                          'StakedAptos',
+                          []
+                        )
+                      ]),
+                      $c
+                    ),
+                    $c,
+                    [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', []), $p[1]]
+                  )
+                ];
+              } else {
+                throw $.abortCode($.copy(E_INVALID_PAIR_OF_DITTO));
+              }
+              [temp$28, temp$29] = [temp$26, temp$27];
+            }
+            [temp$35, temp$36] = [temp$28, temp$29];
+          } else {
+            if ($.copy(dex_type).eq($.copy(DEX_TORTUGA))) {
+              if (
+                $.deep_eq(
+                  Stdlib.Type_info.type_of_($c, [$p[0]]),
+                  Stdlib.Type_info.type_of_($c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])])
+                )
+              ) {
+                temp$30 = $.deep_eq(
+                  Stdlib.Type_info.type_of_($c, [$p[1]]),
+                  Stdlib.Type_info.type_of_($c, [
+                    new StructTag(
+                      new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
+                      'staked_aptos_coin',
+                      'StakedAptosCoin',
+                      []
+                    )
+                  ])
+                );
+              } else {
+                temp$30 = false;
+              }
+              if (temp$30) {
+                [temp$31, temp$32] = [
+                  Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+                  change_coin_type_(
+                    Tortuga.Stake_router.stake_coins_(
+                      change_coin_type_(x_in, $c, [
+                        $p[0],
+                        new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])
+                      ]),
+                      $c
+                    ),
+                    $c,
+                    [
+                      new StructTag(
+                        new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
+                        'staked_aptos_coin',
+                        'StakedAptosCoin',
+                        []
+                      ),
+                      $p[1]
+                    ]
+                  )
+                ];
+              } else {
+                throw $.abortCode($.copy(E_INVALID_PAIR_OF_TORTUGA));
+              }
+              [temp$33, temp$34] = [temp$31, temp$32];
+            } else {
+              throw $.abortCode($.copy(E_UNKNOWN_DEX));
+            }
+            [temp$35, temp$36] = [temp$33, temp$34];
+          }
+          [temp$37, temp$38] = [temp$35, temp$36];
         }
-        [temp$26, temp$27] = [temp$24, temp$25];
+        [temp$39, temp$40] = [temp$37, temp$38];
       }
-      [temp$28, temp$29] = [temp$26, temp$27];
+      [temp$41, temp$42] = [temp$39, temp$40];
     }
-    [temp$30, temp$31] = [temp$28, temp$29];
+    [temp$43, temp$44] = [temp$41, temp$42];
   }
-  [x_out_opt, y_out__32] = [temp$30, temp$31];
+  [x_out_opt, y_out__45] = [temp$43, temp$44];
   if (Stdlib.Option.is_some_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])) {
-    temp$33 = $.copy(coin_in_value).sub(
+    temp$46 = $.copy(coin_in_value).sub(
       Stdlib.Coin.value_(
         Stdlib.Option.borrow_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
         $c,
@@ -395,18 +630,87 @@ export function get_intermediate_output_(
       )
     );
   } else {
-    temp$33 = $.copy(coin_in_value);
+    temp$46 = $.copy(coin_in_value);
   }
-  coin_in_value__34 = temp$33;
+  coin_in_value__47 = temp$46;
   emit_swap_step_event_(
     $.copy(dex_type),
     $.copy(pool_type),
-    $.copy(coin_in_value__34),
-    Stdlib.Coin.value_(y_out__32, $c, [$p[1]]),
+    $.copy(coin_in_value__47),
+    Stdlib.Coin.value_(y_out__45, $c, [$p[1]]),
     $c,
     [$p[0], $p[1]]
   );
-  return [x_out_opt, y_out__32];
+  return [x_out_opt, y_out__45];
+}
+
+export function init_coin_store_(admin: HexString, $c: AptosDataCache, $p: TypeTag[] /* <X>*/): void {
+  let admin_addr;
+  admin_addr = Stdlib.Signer.address_of_(admin, $c);
+  if (
+    !(
+      $.copy(admin_addr).hex() ===
+      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7').hex()
+    )
+  ) {
+    throw $.abortCode($.copy(E_NOT_ADMIN));
+  }
+  $c.move_to(
+    new SimpleStructTag(CoinStore, [$p[0]]),
+    admin,
+    new CoinStore({ balance: Stdlib.Coin.zero_($c, [$p[0]]) }, new SimpleStructTag(CoinStore, [$p[0]]))
+  );
+  return;
+}
+
+export function buildPayload_init_coin_store(
+  $p: TypeTag[] /* <X>*/,
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
+  return $.buildPayload(
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    'aggregator',
+    'init_coin_store',
+    typeParamStrings,
+    [],
+    isJSON
+  );
+}
+
+export function init_coin_store_all_(admin: HexString, $c: AptosDataCache): void {
+  init_coin_store_(admin, $c, [new StructTag(new HexString('0x1'), 'aptos_coin', 'AptosCoin', [])]);
+  init_coin_store_(admin, $c, [
+    new StructTag(
+      new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
+      'staked_coin',
+      'StakedAptos',
+      []
+    )
+  ]);
+  init_coin_store_(admin, $c, [
+    new StructTag(
+      new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
+      'staked_aptos_coin',
+      'StakedAptosCoin',
+      []
+    )
+  ]);
+  return;
+}
+
+export function buildPayload_init_coin_store_all(
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    'aggregator',
+    'init_coin_store_all',
+    typeParamStrings,
+    [],
+    isJSON
+  );
 }
 
 export function init_module_(admin: HexString, $c: AptosDataCache): void {
@@ -415,11 +719,12 @@ export function init_module_(admin: HexString, $c: AptosDataCache): void {
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe').hex()
+      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
   }
+  init_coin_store_all_(admin, $c);
   $c.move_to(
     new SimpleStructTag(EventStore),
     admin,
@@ -436,7 +741,7 @@ export function buildPayload_init_module(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'aggregator',
     'init_module',
     typeParamStrings,
@@ -494,7 +799,7 @@ export function buildPayload_one_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'aggregator',
     'one_step_route',
     typeParamStrings,
@@ -604,7 +909,7 @@ export function buildPayload_three_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'aggregator',
     'three_step_route',
     typeParamStrings,
@@ -705,7 +1010,7 @@ export function buildPayload_two_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
+    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
     'aggregator',
     'two_step_route',
     typeParamStrings,
@@ -725,11 +1030,15 @@ export function buildPayload_two_step_route(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe::aggregator::EventStore',
+    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::aggregator::CoinStore',
+    CoinStore.CoinStoreParser
+  );
+  repo.addParser(
+    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::aggregator::EventStore',
     EventStore.EventStoreParser
   );
   repo.addParser(
-    '0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe::aggregator::SwapStepEvent',
+    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::aggregator::SwapStepEvent',
     SwapStepEvent.SwapStepEventParser
   );
 }
@@ -745,18 +1054,53 @@ export class App {
       return moduleName;
     }
   }
+  get CoinStore() {
+    return CoinStore;
+  }
+  async loadCoinStore(owner: HexString, $p: TypeTag[] /* <CoinType> */, loadFull = true, fillCache = true) {
+    const val = await CoinStore.load(this.repo, this.client, owner, $p);
+    if (loadFull) {
+      await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
+    }
+    return val;
+  }
   get EventStore() {
     return EventStore;
   }
-  async loadEventStore(owner: HexString, loadFull = true) {
+  async loadEventStore(owner: HexString, loadFull = true, fillCache = true) {
     const val = await EventStore.load(this.repo, this.client, owner, [] as TypeTag[]);
     if (loadFull) {
       await val.loadFullState(this);
+    }
+    if (fillCache) {
+      this.cache.move_to(val.typeTag, owner, val);
     }
     return val;
   }
   get SwapStepEvent() {
     return SwapStepEvent;
+  }
+  payload_init_coin_store(
+    $p: TypeTag[] /* <X>*/,
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_init_coin_store($p, isJSON);
+  }
+  async init_coin_store(_account: AptosAccount, $p: TypeTag[] /* <X>*/, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_init_coin_store($p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_init_coin_store_all(
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_init_coin_store_all(isJSON);
+  }
+  async init_coin_store_all(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+    const payload = buildPayload_init_coin_store_all(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_init_module(
     isJSON = false
