@@ -31,7 +31,7 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
   new HexString('0x980a2b1bc2c60ae3e7b7cd1f22ee6fa078843a856b86b111c98f7dc744d2d2b4'),
   // coin list
-  new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+  new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
   new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
   // pontem
@@ -50,7 +50,7 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
   new HexString('0x980a2b1bc2c60ae3e7b7cd1f22ee6fa078843a856b86b111c98f7dc744d2d2b4'),
   // coin list
-  new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
+  new HexString('b5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
   new HexString('0xdad1c1d54fcff3bf0d83b4b0067d7cf0ebdca3ff17556f77115ada2db1ff23fe'),
   // pontem

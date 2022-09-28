@@ -15,7 +15,6 @@ import { App } from '../generated';
 
 export async function loadHippoDexResources(app: App, netConf: NetworkConfiguration) {
   const resources = await app.client.getAccountResources(netConf.hippoDexAddress);
-  let coinList: Coin_list.CoinList | null = null;
   const cpPoolInfos: Cp_swap.TokenPairMetadata[] = [];
   const stablePoolInfos: Stable_curve_swap.StableCurvePoolInfo[] = [];
   const piecePoolInfos: PieceSwapPoolInfo[] = [];
@@ -23,9 +22,7 @@ export async function loadHippoDexResources(app: App, netConf: NetworkConfigurat
     try {
       const typeTag = parseMoveStructTag(resource.type);
       const parsed = app.parserRepo.parse(resource.data, typeTag);
-      if (parsed instanceof Coin_list.CoinList) {
-        coinList = parsed;
-      } else if (parsed instanceof Cp_swap.TokenPairMetadata) {
+      if (parsed instanceof Cp_swap.TokenPairMetadata) {
         cpPoolInfos.push(parsed);
       } else if (parsed instanceof Stable_curve_swap.StableCurvePoolInfo) {
         stablePoolInfos.push(parsed);
@@ -34,10 +31,7 @@ export async function loadHippoDexResources(app: App, netConf: NetworkConfigurat
       }
     } catch (e) {}
   }
-  if (!coinList) {
-    throw new Error(`Failed to load CoinList from contract account: ${netConf.hippoDexAddress.hex()}`);
-  }
-  return { coinList, cpPoolInfos, stablePoolInfos, piecePoolInfos };
+  return { cpPoolInfos, stablePoolInfos, piecePoolInfos };
 }
 export async function loadCoinListResources(app: App, netConf: NetworkConfiguration) {
   let coinRegister: Coin_list.CoinRegistry | null = null;
@@ -59,8 +53,6 @@ export async function loadCoinListResources(app: App, netConf: NetworkConfigurat
 export async function loadResources(app: App, netConf: NetworkConfiguration) {
   const resources = await Promise.all([loadCoinListResources(app, netConf), loadHippoDexResources(app, netConf)]);
   return {
-    coinRegister: resources[0].coinRegister,
-    coinList: resources[1].coinList,
     cpPoolInfos: resources[1].cpPoolInfos,
     stablePoolInfos: resources[1].stablePoolInfos,
     piecePoolInfos: resources[1].piecePoolInfos
@@ -95,7 +87,7 @@ export class HippoSwapClient {
 
   static async createInOneCall(app: App, netConfig: NetworkConfiguration, fetcher: SimulationKeys) {
     const { cpPoolInfos, stablePoolInfos, piecePoolInfos } = await loadHippoDexResources(app, netConfig);
-    const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.hippoDexAddress, []);
+    const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.coinListAddress, []);
     return new HippoSwapClient(
       app,
       netConfig,
