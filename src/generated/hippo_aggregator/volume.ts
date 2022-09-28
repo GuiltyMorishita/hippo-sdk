@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7');
+export const moduleAddress = new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039');
 export const moduleName = 'volume';
 
 export const E_NOT_ADMIN: U64 = u64('1');
@@ -56,17 +56,14 @@ export class TotalVolume {
   static typeParameters: TypeParamDeclType[] = [];
   static fields: FieldDeclType[] = [
     { name: 'start_time', typeTag: AtomicTypeTag.U64 },
-    { name: 'end_time', typeTag: AtomicTypeTag.U64 },
     { name: 'amount', typeTag: AtomicTypeTag.U64 }
   ];
 
   start_time: U64;
-  end_time: U64;
   amount: U64;
 
   constructor(proto: any, public typeTag: TypeTag) {
     this.start_time = proto['start_time'] as U64;
-    this.end_time = proto['end_time'] as U64;
     this.amount = proto['amount'] as U64;
   }
 
@@ -129,6 +126,8 @@ export class Volume {
   static fields: FieldDeclType[] = [
     { name: 'poster', typeTag: AtomicTypeTag.Address },
     { name: 'total_volume', typeTag: AtomicTypeTag.U128 },
+    { name: 'last_24h_volume', typeTag: AtomicTypeTag.U64 },
+    { name: 'last_7d_volume', typeTag: AtomicTypeTag.U64 },
     { name: 'data_end_sequence_number', typeTag: AtomicTypeTag.U64 },
     { name: 'data_end_time', typeTag: AtomicTypeTag.U64 },
     { name: 'volume_decimals', typeTag: AtomicTypeTag.U64 },
@@ -136,7 +135,7 @@ export class Volume {
       name: 'total_volume_history_24h',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'volume',
           'TotalVolume',
           []
@@ -147,7 +146,7 @@ export class Volume {
       name: 'total_volume_history_7d',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'volume',
           'TotalVolume',
           []
@@ -158,7 +157,7 @@ export class Volume {
       name: 'top_trading_pairs_24h',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'volume',
           'TradingPair',
           []
@@ -169,7 +168,7 @@ export class Volume {
       name: 'top_trading_pairs_7d',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'volume',
           'TradingPair',
           []
@@ -180,7 +179,7 @@ export class Volume {
       name: 'top_pool_provider_24h',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'volume',
           'PoolProvider',
           []
@@ -191,7 +190,7 @@ export class Volume {
       name: 'top_pool_provider_7d',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'volume',
           'PoolProvider',
           []
@@ -202,6 +201,8 @@ export class Volume {
 
   poster: HexString;
   total_volume: U128;
+  last_24h_volume: U64;
+  last_7d_volume: U64;
   data_end_sequence_number: U64;
   data_end_time: U64;
   volume_decimals: U64;
@@ -215,6 +216,8 @@ export class Volume {
   constructor(proto: any, public typeTag: TypeTag) {
     this.poster = proto['poster'] as HexString;
     this.total_volume = proto['total_volume'] as U128;
+    this.last_24h_volume = proto['last_24h_volume'] as U64;
+    this.last_7d_volume = proto['last_7d_volume'] as U64;
     this.data_end_sequence_number = proto['data_end_sequence_number'] as U64;
     this.data_end_time = proto['data_end_time'] as U64;
     this.volume_decimals = proto['volume_decimals'] as U64;
@@ -250,7 +253,6 @@ export class Volume {
 export function add_volume_(
   total_volume_array: TotalVolume[],
   round_start_time: U64,
-  data_end_time: U64,
   amount: U64,
   $c: AptosDataCache
 ): void {
@@ -260,7 +262,7 @@ export function add_volume_(
     Stdlib.Vector.push_back_(
       total_volume_array,
       new TotalVolume(
-        { start_time: $.copy(round_start_time), end_time: $.copy(data_end_time), amount: $.copy(amount) },
+        { start_time: $.copy(round_start_time), amount: $.copy(amount) },
         new SimpleStructTag(TotalVolume)
       ),
       $c,
@@ -278,7 +280,7 @@ export function add_volume_(
     Stdlib.Vector.push_back_(
       total_volume_array,
       new TotalVolume(
-        { start_time: $.copy(round_start_time), end_time: $.copy(data_end_time), amount: $.copy(amount) },
+        { start_time: $.copy(round_start_time), amount: $.copy(amount) },
         new SimpleStructTag(TotalVolume)
       ),
       $c,
@@ -296,7 +298,7 @@ export function clean_(poster: HexString, $c: AptosDataCache): void {
   let volume;
   volume = $c.borrow_global_mut<Volume>(
     new SimpleStructTag(Volume),
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
   );
   if (!(Stdlib.Signer.address_of_(poster, $c).hex() === $.copy(volume.poster).hex())) {
     throw $.abortCode($.copy(E_NOT_POSTER));
@@ -318,7 +320,7 @@ export function buildPayload_clean(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
     'clean',
     typeParamStrings,
@@ -336,7 +338,7 @@ export function buildPayload_fetch_volume(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
     'fetch_volume',
     typeParamStrings,
@@ -366,7 +368,7 @@ export function get_volume_($c: AptosDataCache): Volume {
   return $.copy(
     $c.borrow_global<Volume>(
       new SimpleStructTag(Volume),
-      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+      new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
     )
   );
 }
@@ -376,7 +378,7 @@ export function buildPayload_get_volume(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
     'get_volume',
     typeParamStrings,
@@ -390,7 +392,7 @@ export function initialize_(admin: HexString, poster: HexString, $c: AptosDataCa
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7').hex()
+      new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
@@ -402,6 +404,8 @@ export function initialize_(admin: HexString, poster: HexString, $c: AptosDataCa
       {
         poster: $.copy(poster),
         total_volume: u128('0'),
+        last_24h_volume: u64('0'),
+        last_7d_volume: u64('0'),
         data_end_sequence_number: u64('0'),
         data_end_time: u64('0'),
         volume_decimals: u64('4'),
@@ -423,7 +427,7 @@ export function buildPayload_initialize(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
     'initialize',
     typeParamStrings,
@@ -499,6 +503,8 @@ export function parse_trading_pairs_vector_(
 export function post_(
   poster: HexString,
   amount: U64,
+  last_24_volume: U64,
+  last_7d_volume: U64,
   round_start_time_24h: U64,
   round_start_time_7d: U64,
   new_data_end_time: U64,
@@ -518,13 +524,10 @@ export function post_(
   let temp$1, volume;
   volume = $c.borrow_global_mut<Volume>(
     new SimpleStructTag(Volume),
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
   );
   if (!(Stdlib.Signer.address_of_(poster, $c).hex() === $.copy(volume.poster).hex())) {
     throw $.abortCode($.copy(E_NOT_POSTER));
-  }
-  if (!$.copy(new_data_end_time).neq($.copy(volume.data_end_time))) {
-    throw $.abortCode($.copy(E_REPEAT_POST));
   }
   if ($.copy(volume.data_end_sequence_number).eq(u64('0'))) {
     temp$1 = true;
@@ -576,23 +579,13 @@ export function post_(
   ) {
     throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
   }
+  volume.last_24h_volume = $.copy(last_24_volume);
+  volume.last_7d_volume = $.copy(last_7d_volume);
   volume.data_end_time = $.copy(new_data_end_time);
   volume.data_end_sequence_number = $.copy(new_data_end_seauence_number);
   volume.total_volume = $.copy(volume.total_volume).add(u128($.copy(amount)));
-  add_volume_(
-    volume.total_volume_history_24h,
-    $.copy(round_start_time_24h),
-    $.copy(new_data_end_time),
-    $.copy(amount),
-    $c
-  );
-  add_volume_(
-    volume.total_volume_history_7d,
-    $.copy(round_start_time_7d),
-    $.copy(new_data_end_time),
-    $.copy(amount),
-    $c
-  );
+  add_volume_(volume.total_volume_history_24h, $.copy(round_start_time_24h), $.copy(amount), $c);
+  add_volume_(volume.total_volume_history_7d, $.copy(round_start_time_7d), $.copy(amount), $c);
   volume.top_trading_pairs_24h = parse_trading_pairs_vector_(
     trading_pairs_24h_coin_x,
     trading_pairs_24h_coin_y,
@@ -612,6 +605,8 @@ export function post_(
 
 export function buildPayload_post(
   amount: U64,
+  last_24_volume: U64,
+  last_7d_volume: U64,
   round_start_time_24h: U64,
   round_start_time_7d: U64,
   new_data_end_time: U64,
@@ -630,12 +625,14 @@ export function buildPayload_post(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
     'post',
     typeParamStrings,
     [
       amount,
+      last_24_volume,
+      last_7d_volume,
       round_start_time_24h,
       round_start_time_7d,
       new_data_end_time,
@@ -660,7 +657,7 @@ export function set_poster_(admin: HexString, new_poster: HexString, $c: AptosDa
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7').hex()
+      new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
@@ -676,7 +673,7 @@ export function buildPayload_set_poster(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
     'set_poster',
     typeParamStrings,
@@ -687,19 +684,19 @@ export function buildPayload_set_poster(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::volume::PoolProvider',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::volume::PoolProvider',
     PoolProvider.PoolProviderParser
   );
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::volume::TotalVolume',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::volume::TotalVolume',
     TotalVolume.TotalVolumeParser
   );
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::volume::TradingPair',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::volume::TradingPair',
     TradingPair.TradingPairParser
   );
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::volume::Volume',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::volume::Volume',
     Volume.VolumeParser
   );
 }
@@ -779,6 +776,8 @@ export class App {
   }
   payload_post(
     amount: U64,
+    last_24_volume: U64,
+    last_7d_volume: U64,
     round_start_time_24h: U64,
     round_start_time_7d: U64,
     new_data_end_time: U64,
@@ -797,6 +796,8 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_post(
       amount,
+      last_24_volume,
+      last_7d_volume,
       round_start_time_24h,
       round_start_time_7d,
       new_data_end_time,
@@ -817,6 +818,8 @@ export class App {
   async post(
     _account: AptosAccount,
     amount: U64,
+    last_24_volume: U64,
+    last_7d_volume: U64,
     round_start_time_24h: U64,
     round_start_time_7d: U64,
     new_data_end_time: U64,
@@ -836,6 +839,8 @@ export class App {
   ) {
     const payload = buildPayload_post(
       amount,
+      last_24_volume,
+      last_7d_volume,
       round_start_time_24h,
       round_start_time_7d,
       new_data_end_time,

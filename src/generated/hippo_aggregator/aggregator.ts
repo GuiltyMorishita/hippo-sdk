@@ -13,7 +13,7 @@ import * as Pontem from '../pontem';
 import * as Stdlib from '../stdlib';
 import * as Tortuga from '../tortuga';
 export const packageName = 'HippoAggregator';
-export const moduleAddress = new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7');
+export const moduleAddress = new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039');
 export const moduleName = 'aggregator';
 
 export const DEX_BASIQ: U8 = u8('4');
@@ -85,7 +85,7 @@ export class EventStore {
       name: 'swap_step_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           'aggregator',
           'SwapStepEvent',
           []
@@ -183,7 +183,7 @@ export function change_coin_type_(
   if (
     !$c.exists(
       new SimpleStructTag(CoinStore, [$p[0]]),
-      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+      new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
     )
   ) {
     throw $.abortCode(u64('0'));
@@ -191,12 +191,12 @@ export function change_coin_type_(
   amount = Stdlib.Coin.value_(x_coin, $c, [$p[0]]);
   x_coin_store = $c.borrow_global_mut<CoinStore>(
     new SimpleStructTag(CoinStore, [$p[0]]),
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
   );
   Stdlib.Coin.merge_(x_coin_store.balance, x_coin, $c, [$p[0]]);
   y_coin_store = $c.borrow_global_mut<CoinStore>(
     new SimpleStructTag(CoinStore, [$p[1]]),
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
   );
   return Stdlib.Coin.extract_(y_coin_store.balance, $.copy(amount), $c, [$p[1]]);
 }
@@ -248,7 +248,7 @@ export function emit_swap_step_event_(
   let event_store;
   event_store = $c.borrow_global_mut<EventStore>(
     new SimpleStructTag(EventStore),
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7')
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
   );
   Stdlib.Event.emit_event_(
     event_store.swap_step_events,
@@ -406,7 +406,7 @@ export function get_intermediate_output_(
       market_id = $.copy(pool_type);
       if (is_x_to_y) {
         Econia.Market.swap_coins_(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           $.copy(market_id),
           false,
           u64('0'),
@@ -421,7 +421,7 @@ export function get_intermediate_output_(
         );
       } else {
         Econia.Market.swap_coins_(
-          new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
           $.copy(market_id),
           true,
           u64('0'),
@@ -453,7 +453,7 @@ export function get_intermediate_output_(
         [temp$39, temp$40] = [
           Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           Pontem.Router.swap_exact_coin_for_coin_(
-            new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+            new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
             x_in,
             u64('0'),
             $c,
@@ -650,7 +650,7 @@ export function init_coin_store_(admin: HexString, $c: AptosDataCache, $p: TypeT
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7').hex()
+      new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
@@ -669,7 +669,7 @@ export function buildPayload_init_coin_store(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'aggregator',
     'init_coin_store',
     typeParamStrings,
@@ -704,7 +704,7 @@ export function buildPayload_init_coin_store_all(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'aggregator',
     'init_coin_store_all',
     typeParamStrings,
@@ -719,7 +719,7 @@ export function init_module_(admin: HexString, $c: AptosDataCache): void {
   if (
     !(
       $.copy(admin_addr).hex() ===
-      new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7').hex()
+      new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ADMIN));
@@ -741,7 +741,7 @@ export function buildPayload_init_module(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'aggregator',
     'init_module',
     typeParamStrings,
@@ -799,7 +799,7 @@ export function buildPayload_one_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'aggregator',
     'one_step_route',
     typeParamStrings,
@@ -909,7 +909,7 @@ export function buildPayload_three_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'aggregator',
     'three_step_route',
     typeParamStrings,
@@ -1010,7 +1010,7 @@ export function buildPayload_two_step_route(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'aggregator',
     'two_step_route',
     typeParamStrings,
@@ -1030,15 +1030,15 @@ export function buildPayload_two_step_route(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::aggregator::CoinStore',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::aggregator::CoinStore',
     CoinStore.CoinStoreParser
   );
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::aggregator::EventStore',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::aggregator::EventStore',
     EventStore.EventStoreParser
   );
   repo.addParser(
-    '0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7::aggregator::SwapStepEvent',
+    '0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039::aggregator::SwapStepEvent',
     SwapStepEvent.SwapStepEventParser
   );
 }

@@ -39,7 +39,7 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // coin list
   new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
-  new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+  new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
   // pontem
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
   // econia
@@ -65,7 +65,7 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   // coin list
   new HexString('b5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
-  new HexString('0xdbd92bb499c3476815e3a3e83cc21d34f1970d86b190ea65bd19f5fb7a4ca9f7'),
+  new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
   // pontem
   new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
   // econia
