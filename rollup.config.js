@@ -1,22 +1,22 @@
-import typescript from "@rollup/plugin-typescript";
+import typescript from '@rollup/plugin-typescript';
 
 var rollup_config = [
   {
-    input: "src/index.ts",
+    input: 'src/index.ts',
     output: [
       {
-        file: "./dist/index.js",
-        format: "cjs",
-        sourcemap: true,
+        file: './dist/index.js',
+        format: 'cjs',
+        sourcemap: true
       },
       {
-        file: "./dist/index.mjs",
-        format: "es",
-        sourcemap: true,
-      },
+        file: './dist/index.mjs',
+        format: 'es',
+        sourcemap: true
+      }
     ],
-    external: ["aptos", "@manahippo/move-to-ts", "big-integer"],
-    plugins: [typescript()],
-  },
+    external: ['aptos', '@manahippo/move-to-ts', 'big-integer'],
+    plugins: [typescript()]
+  }
 ];
 export { rollup_config as default };
