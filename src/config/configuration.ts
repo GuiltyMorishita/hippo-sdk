@@ -63,7 +63,7 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   // hippo dex
   new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
   // coin list
-  new HexString('b5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+  new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // hippo aggregator
   new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
   // pontem
