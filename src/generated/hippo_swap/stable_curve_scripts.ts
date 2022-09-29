@@ -229,13 +229,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetUSDC',
         []
       ),
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetUSDT',
         []
@@ -253,13 +253,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetUSDC',
         []
       ),
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetSOL',
         []

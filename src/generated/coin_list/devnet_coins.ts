@@ -8,7 +8,7 @@ import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'ap
 import * as Stdlib from '../stdlib';
 import * as Coin_list from './coin_list';
 export const packageName = 'CoinList';
-export const moduleAddress = new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46');
+export const moduleAddress = new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01');
 export const moduleName = 'devnet_coins';
 
 export class CoinCaps {
@@ -239,7 +239,7 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('66'), u8('105'), u8('116'), u8('99'), u8('111'), u8('105'), u8('110')], $c),
-    Stdlib.String.utf8_([u8('66'), u8('84'), u8('67')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('66'), u8('84'), u8('67')], $c),
     Stdlib.String.utf8_([u8('98'), u8('105'), u8('116'), u8('99'), u8('111'), u8('105'), u8('110')], $c),
     Stdlib.String.utf8_(
       [
@@ -341,7 +341,7 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('66'), u8('78'), u8('66')], $c),
-    Stdlib.String.utf8_([u8('66'), u8('78'), u8('66')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('66'), u8('78'), u8('66')], $c),
     Stdlib.String.utf8_(
       [
         u8('98'),
@@ -465,7 +465,7 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('69'), u8('116'), u8('104'), u8('101'), u8('114'), u8('101'), u8('117'), u8('109')], $c),
-    Stdlib.String.utf8_([u8('69'), u8('84'), u8('72')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('69'), u8('84'), u8('72')], $c),
     Stdlib.String.utf8_([u8('101'), u8('116'), u8('104'), u8('101'), u8('114'), u8('101'), u8('117'), u8('109')], $c),
     Stdlib.String.utf8_(
       [
@@ -570,7 +570,7 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('83'), u8('111'), u8('108'), u8('97'), u8('110'), u8('97')], $c),
-    Stdlib.String.utf8_([u8('83'), u8('79'), u8('76')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('83'), u8('79'), u8('76')], $c),
     Stdlib.String.utf8_([u8('115'), u8('111'), u8('108'), u8('97'), u8('110'), u8('97')], $c),
     Stdlib.String.utf8_(
       [
@@ -674,7 +674,7 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('85'), u8('83'), u8('68'), u8('32'), u8('67'), u8('111'), u8('105'), u8('110')], $c),
-    Stdlib.String.utf8_([u8('85'), u8('83'), u8('68'), u8('67')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('85'), u8('83'), u8('68'), u8('67')], $c),
     Stdlib.String.utf8_([u8('117'), u8('115'), u8('100'), u8('45'), u8('99'), u8('111'), u8('105'), u8('110')], $c),
     Stdlib.String.utf8_(
       [
@@ -785,7 +785,7 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   init_coin_and_register_(
     admin,
     Stdlib.String.utf8_([u8('84'), u8('101'), u8('116'), u8('104'), u8('101'), u8('114')], $c),
-    Stdlib.String.utf8_([u8('85'), u8('83'), u8('68'), u8('84')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('85'), u8('83'), u8('68'), u8('84')], $c),
     Stdlib.String.utf8_([u8('116'), u8('101'), u8('116'), u8('104'), u8('101'), u8('114')], $c),
     Stdlib.String.utf8_(
       [
@@ -892,8 +892,8 @@ export function deploy_(admin: HexString, $c: AptosDataCache): void {
   );
   init_coin_and_register_(
     admin,
-    Stdlib.String.utf8_([u8('68'), u8('97'), u8('105')], $c),
     Stdlib.String.utf8_([u8('68'), u8('65'), u8('73')], $c),
+    Stdlib.String.utf8_([u8('100'), u8('101'), u8('118'), u8('68'), u8('65'), u8('73')], $c),
     Stdlib.String.utf8_([u8('100'), u8('97'), u8('105')], $c),
     Stdlib.String.utf8_(
       [
@@ -1000,7 +1000,7 @@ export function buildPayload_deploy(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
     'devnet_coins',
     'deploy',
     typeParamStrings,
@@ -1095,7 +1095,7 @@ export function mint_(amount: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinTyp
   let caps;
   caps = $c.borrow_global<CoinCaps>(
     new SimpleStructTag(CoinCaps, [$p[0]]),
-    new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46')
+    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
   );
   return Stdlib.Coin.mint_($.copy(amount), caps.mint, $c, [$p[0]]);
 }
@@ -1118,7 +1118,7 @@ export function buildPayload_mint_to_wallet(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
     'devnet_coins',
     'mint_to_wallet',
     typeParamStrings,
@@ -1129,35 +1129,35 @@ export function buildPayload_mint_to_wallet(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::CoinCaps',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::CoinCaps',
     CoinCaps.CoinCapsParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetBNB',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetBNB',
     DevnetBNB.DevnetBNBParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetBTC',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetBTC',
     DevnetBTC.DevnetBTCParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetDAI',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetDAI',
     DevnetDAI.DevnetDAIParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetETH',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetETH',
     DevnetETH.DevnetETHParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetSOL',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetSOL',
     DevnetSOL.DevnetSOLParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetUSDC',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetUSDC',
     DevnetUSDC.DevnetUSDCParser
   );
   repo.addParser(
-    '0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46::devnet_coins::DevnetUSDT',
+    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::devnet_coins::DevnetUSDT',
     DevnetUSDT.DevnetUSDTParser
   );
 }

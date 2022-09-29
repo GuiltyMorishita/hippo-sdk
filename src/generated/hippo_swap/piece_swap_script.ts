@@ -258,13 +258,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetUSDT',
         []
       ),
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetUSDC',
         []
@@ -313,13 +313,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
     $c,
     [
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetDAI',
         []
       ),
       new StructTag(
-        new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
         'devnet_coins',
         'DevnetUSDC',
         []
@@ -329,7 +329,7 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   initial_amount = u64('1000000').mul(u64('100000000'));
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetUSDT',
       []
@@ -337,7 +337,7 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -345,13 +345,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   ]);
   add_liquidity_script_(admin, $.copy(initial_amount), $.copy(initial_amount), $c, [
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetUSDT',
       []
     ),
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -359,7 +359,7 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetDAI',
       []
@@ -367,7 +367,7 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   ]);
   Coin_list.Devnet_coins.mint_to_wallet_(admin, $.copy(initial_amount), $c, [
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetUSDC',
       []
@@ -375,13 +375,13 @@ export function mock_deploy_script_(admin: HexString, $c: AptosDataCache): void 
   ]);
   add_liquidity_script_(admin, $.copy(initial_amount), $.copy(initial_amount), $c, [
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetDAI',
       []
     ),
     new StructTag(
-      new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
+      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
       'devnet_coins',
       'DevnetUSDC',
       []
