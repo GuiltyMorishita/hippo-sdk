@@ -660,6 +660,7 @@ export function assert_staking_contract_exists_(staker: HexString, operator: Hex
 
 export function commission_percentage_(staker: HexString, operator: HexString, $c: AptosDataCache): U64 {
   let staking_contracts;
+  assert_staking_contract_exists_($.copy(staker), $.copy(operator), $c);
   staking_contracts = $c.borrow_global<Store>(new SimpleStructTag(Store), $.copy(staker)).staking_contracts;
   return $.copy(
     Simple_map.borrow_(staking_contracts, operator, $c, [AtomicTypeTag.Address, new SimpleStructTag(StakingContract)])
@@ -941,6 +942,7 @@ export function get_staking_contract_amounts_internal_(
 
 export function last_recorded_principal_(staker: HexString, operator: HexString, $c: AptosDataCache): U64 {
   let staking_contracts;
+  assert_staking_contract_exists_($.copy(staker), $.copy(operator), $c);
   staking_contracts = $c.borrow_global<Store>(new SimpleStructTag(Store), $.copy(staker)).staking_contracts;
   return $.copy(
     Simple_map.borrow_(staking_contracts, operator, $c, [AtomicTypeTag.Address, new SimpleStructTag(StakingContract)])
@@ -970,6 +972,7 @@ export function new_staking_contracts_holder_(staker: HexString, $c: AptosDataCa
 
 export function pending_distribution_counts_(staker: HexString, operator: HexString, $c: AptosDataCache): U64 {
   let staking_contracts;
+  assert_staking_contract_exists_($.copy(staker), $.copy(operator), $c);
   staking_contracts = $c.borrow_global<Store>(new SimpleStructTag(Store), $.copy(staker)).staking_contracts;
   return Pool_u64.shareholders_count_(
     Simple_map.borrow_(staking_contracts, operator, $c, [AtomicTypeTag.Address, new SimpleStructTag(StakingContract)])
@@ -1106,6 +1109,7 @@ export function buildPayload_reset_lockup(
 }
 export function stake_pool_address_(staker: HexString, operator: HexString, $c: AptosDataCache): HexString {
   let staking_contracts;
+  assert_staking_contract_exists_($.copy(staker), $.copy(operator), $c);
   staking_contracts = $c.borrow_global<Store>(new SimpleStructTag(Store), $.copy(staker)).staking_contracts;
   return $.copy(
     Simple_map.borrow_(staking_contracts, operator, $c, [AtomicTypeTag.Address, new SimpleStructTag(StakingContract)])
@@ -1115,12 +1119,26 @@ export function stake_pool_address_(staker: HexString, operator: HexString, $c: 
 
 export function staking_contract_amounts_(staker: HexString, operator: HexString, $c: AptosDataCache): [U64, U64, U64] {
   let staking_contract, staking_contracts;
+  assert_staking_contract_exists_($.copy(staker), $.copy(operator), $c);
   staking_contracts = $c.borrow_global<Store>(new SimpleStructTag(Store), $.copy(staker)).staking_contracts;
   staking_contract = Simple_map.borrow_(staking_contracts, operator, $c, [
     AtomicTypeTag.Address,
     new SimpleStructTag(StakingContract)
   ]);
   return get_staking_contract_amounts_internal_(staking_contract, $c);
+}
+
+export function staking_contract_exists_(staker: HexString, operator: HexString, $c: AptosDataCache): boolean {
+  let store;
+  if (!$c.exists(new SimpleStructTag(Store), $.copy(staker))) {
+    return false;
+  } else {
+  }
+  store = $c.borrow_global<Store>(new SimpleStructTag(Store), $.copy(staker));
+  return Simple_map.contains_key_(store.staking_contracts, operator, $c, [
+    AtomicTypeTag.Address,
+    new SimpleStructTag(StakingContract)
+  ]);
 }
 
 export function switch_operator_(
@@ -1197,6 +1215,35 @@ export function buildPayload_switch_operator(
     'switch_operator',
     typeParamStrings,
     [old_operator, new_operator, new_commission_percentage],
+    isJSON
+  );
+}
+export function switch_operator_with_same_commission_(
+  staker: HexString,
+  old_operator: HexString,
+  new_operator: HexString,
+  $c: AptosDataCache
+): void {
+  let commission_percentage, staker_address;
+  staker_address = Signer.address_of_(staker, $c);
+  assert_staking_contract_exists_($.copy(staker_address), $.copy(old_operator), $c);
+  commission_percentage = commission_percentage_($.copy(staker_address), $.copy(old_operator), $c);
+  switch_operator_(staker, $.copy(old_operator), $.copy(new_operator), $.copy(commission_percentage), $c);
+  return;
+}
+
+export function buildPayload_switch_operator_with_same_commission(
+  old_operator: HexString,
+  new_operator: HexString,
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0x1'),
+    'staking_contract',
+    'switch_operator_with_same_commission',
+    typeParamStrings,
+    [old_operator, new_operator],
     isJSON
   );
 }
@@ -1588,6 +1635,23 @@ export class App {
     _isJSON = false
   ) {
     const payload = buildPayload_switch_operator(old_operator, new_operator, new_commission_percentage, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+  }
+  payload_switch_operator_with_same_commission(
+    old_operator: HexString,
+    new_operator: HexString,
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_switch_operator_with_same_commission(old_operator, new_operator, isJSON);
+  }
+  async switch_operator_with_same_commission(
+    _account: AptosAccount,
+    old_operator: HexString,
+    new_operator: HexString,
+    _maxGas = 1000,
+    _isJSON = false
+  ) {
+    const payload = buildPayload_switch_operator_with_same_commission(old_operator, new_operator, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
   payload_unlock_rewards(

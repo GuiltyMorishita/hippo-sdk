@@ -16,6 +16,7 @@ export const EINVALID_STAKE_RANGE: U64 = u64('3');
 export const EINVALID_VOTING_POWER_INCREASE_LIMIT: U64 = u64('4');
 export const EZERO_LOCKUP_DURATION: U64 = u64('1');
 export const EZERO_REWARDS_RATE_DENOMINATOR: U64 = u64('2');
+export const MAX_REWARDS_RATE: U64 = u64('1000000');
 
 export class StakingConfig {
   static moduleAddress = moduleAddress;
@@ -121,6 +122,12 @@ export function initialize_(
   if (!temp$1) {
     throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_VOTING_POWER_INCREASE_LIMIT), $c));
   }
+  if (!$.copy(rewards_rate).le($.copy(MAX_REWARDS_RATE))) {
+    throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_REWARDS_RATE), $c));
+  }
+  if (!$.copy(rewards_rate).le($.copy(rewards_rate_denominator))) {
+    throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_REWARDS_RATE), $c));
+  }
   $c.move_to(
     new SimpleStructTag(StakingConfig),
     aptos_framework,
@@ -180,6 +187,12 @@ export function update_rewards_rate_(
   System_addresses.assert_aptos_framework_(aptos_framework, $c);
   if (!$.copy(new_rewards_rate_denominator).gt(u64('0'))) {
     throw $.abortCode(Error.invalid_argument_($.copy(EZERO_REWARDS_RATE_DENOMINATOR), $c));
+  }
+  if (!$.copy(new_rewards_rate).le($.copy(MAX_REWARDS_RATE))) {
+    throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_REWARDS_RATE), $c));
+  }
+  if (!$.copy(new_rewards_rate).le($.copy(new_rewards_rate_denominator))) {
+    throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_REWARDS_RATE), $c));
   }
   staking_config = $c.borrow_global_mut<StakingConfig>(new SimpleStructTag(StakingConfig), new HexString('0x1'));
   staking_config.rewards_rate = $.copy(new_rewards_rate);
