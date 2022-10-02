@@ -3,14 +3,7 @@ import { Types } from 'aptos';
 import { App } from '../../generated';
 import { TokenPairMetadata } from '../../generated/hippo_swap/cp_swap';
 import { PieceSwapPoolInfo } from '../../generated/hippo_swap/piece_swap';
-import { StableCurvePoolInfo } from '../../generated/hippo_swap/stable_curve_swap';
-import {
-  HippoConstantProductPool,
-  HippoPieceSwapPool,
-  HippoPool,
-  HippoStableCurvePool,
-  HippoSwapClient
-} from '../../swap';
+import { HippoConstantProductPool, HippoPieceSwapPool, HippoPool, HippoSwapClient } from '../../swap';
 import { DexType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
 
 export enum HippoPoolTypes {
@@ -32,8 +25,6 @@ export class HippoTradingPool extends TradingPool {
   get poolType() {
     if (this.pool instanceof HippoConstantProductPool) {
       return u64(HippoPoolTypes.ConstantProduct);
-    } else if (this.pool instanceof HippoStableCurvePool) {
-      return u64(HippoPoolTypes.StableCurve);
     } else if (this.pool instanceof HippoPieceSwapPool) {
       return u64(HippoPoolTypes.ThreePiece);
     } else {
@@ -61,13 +52,6 @@ export class HippoTradingPool extends TradingPool {
         app.client,
         TokenPairMetadata.moduleAddress,
         (this.pool.cpPoolMeta.typeTag as StructTag).typeParams
-      );
-    } else if (this.pool instanceof HippoStableCurvePool) {
-      this.pool.stablePoolInfo = await StableCurvePoolInfo.load(
-        this.repo,
-        app.client,
-        TokenPairMetadata.moduleAddress,
-        (this.pool.stablePoolInfo.typeTag as StructTag).typeParams
       );
     } else if (this.pool instanceof HippoPieceSwapPool) {
       this.pool.poolInfo = await PieceSwapPoolInfo.load(

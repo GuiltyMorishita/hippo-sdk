@@ -2,13 +2,12 @@ import { getTypeTagFullname, parseMoveStructTag, SimulationKeys, StructTag, Type
 import { HexString } from 'aptos';
 import bigInt from 'big-integer';
 import { NetworkConfiguration } from '../config';
-import { Cp_swap, Stable_curve_swap, Piece_swap } from '../generated/hippo_swap';
+import { Cp_swap, Piece_swap } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
 import { CoinInfo } from '../generated/stdlib/coin';
 import { typeInfoToTypeTag } from '../utils';
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute } from './baseTypes';
 import { HippoConstantProductPool } from './constantProductPool';
-import { HippoStableCurvePool } from './stableCurvePool';
 import { HippoPieceSwapPool } from './pieceSwapPool';
 import { PieceSwapPoolInfo } from '../generated/hippo_swap/piece_swap';
 import { App } from '../generated';
@@ -16,7 +15,6 @@ import { App } from '../generated';
 export async function loadHippoDexResources(app: App, netConf: NetworkConfiguration) {
   const resources = await app.client.getAccountResources(netConf.hippoDexAddress);
   const cpPoolInfos: Cp_swap.TokenPairMetadata[] = [];
-  const stablePoolInfos: Stable_curve_swap.StableCurvePoolInfo[] = [];
   const piecePoolInfos: PieceSwapPoolInfo[] = [];
   for (const resource of resources) {
     try {
@@ -24,14 +22,12 @@ export async function loadHippoDexResources(app: App, netConf: NetworkConfigurat
       const parsed = app.parserRepo.parse(resource.data, typeTag);
       if (parsed instanceof Cp_swap.TokenPairMetadata) {
         cpPoolInfos.push(parsed);
-      } else if (parsed instanceof Stable_curve_swap.StableCurvePoolInfo) {
-        stablePoolInfos.push(parsed);
       } else if (parsed instanceof PieceSwapPoolInfo) {
         piecePoolInfos.push(parsed);
       }
     } catch (e) {}
   }
-  return { cpPoolInfos, stablePoolInfos, piecePoolInfos };
+  return { cpPoolInfos, piecePoolInfos };
 }
 export async function loadCoinListResources(app: App, netConf: NetworkConfiguration) {
   let coinRegister: Coin_list.CoinRegistry | null = null;
@@ -54,7 +50,6 @@ export async function loadResources(app: App, netConf: NetworkConfiguration) {
   const resources = await Promise.all([loadCoinListResources(app, netConf), loadHippoDexResources(app, netConf)]);
   return {
     cpPoolInfos: resources[1].cpPoolInfos,
-    stablePoolInfos: resources[1].stablePoolInfos,
     piecePoolInfos: resources[1].piecePoolInfos
   };
 }
@@ -86,24 +81,15 @@ export class HippoSwapClient {
   public contractAddress: HexString;
 
   static async createInOneCall(app: App, netConfig: NetworkConfiguration, fetcher: SimulationKeys) {
-    const { cpPoolInfos, stablePoolInfos, piecePoolInfos } = await loadHippoDexResources(app, netConfig);
+    const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(app, netConfig);
     const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.coinListAddress, []);
-    return new HippoSwapClient(
-      app,
-      netConfig,
-      fullList.coin_info_list,
-      cpPoolInfos,
-      stablePoolInfos,
-      piecePoolInfos,
-      fetcher
-    );
+    return new HippoSwapClient(app, netConfig, fullList.coin_info_list, cpPoolInfos, piecePoolInfos, fetcher);
   }
   constructor(
     public app: App,
     public netConfig: NetworkConfiguration,
     public coinInfoList: Coin_list.CoinInfo[],
     public cpPoolInfos: Cp_swap.TokenPairMetadata[],
-    public stablePoolInfos: Stable_curve_swap.StableCurvePoolInfo[],
     public piecePoolInfos: Piece_swap.PieceSwapPoolInfo[],
     public fetcher: SimulationKeys
   ) {
@@ -130,7 +116,7 @@ export class HippoSwapClient {
       if (
         coinTypeTag instanceof StructTag &&
         coinTypeTag.address.hex() === this.netConfig.hippoDexAddress.hex() &&
-        [Cp_swap.moduleName, Stable_curve_swap.moduleName, Piece_swap.moduleName].includes(coinTypeTag.module)
+        [Cp_swap.moduleName, Piece_swap.moduleName].includes(coinTypeTag.module)
       ) {
         // lp token
         continue;
@@ -141,10 +127,6 @@ export class HippoSwapClient {
     // add CP pools
     for (const cpMeta of this.cpPoolInfos) {
       this.setCPPool(cpMeta);
-    }
-    // add stable-curve pools
-    for (const stablePool of this.stablePoolInfos) {
-      this.setStableCurvePool(stablePool);
     }
     // add pieceswap pools
     for (const piecePool of this.piecePoolInfos) {
@@ -171,18 +153,6 @@ export class HippoSwapClient {
     const lpTag = new StructTag(Cp_swap.moduleAddress, Cp_swap.moduleName, Cp_swap.LPToken.structName, [xTag, yTag]);
     const lpTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(lpTag)];
     this.setPool(new HippoConstantProductPool(xTokenInfo, yTokenInfo, lpTokenInfo, cpMeta));
-  }
-
-  private setStableCurvePool(stablePool: Stable_curve_swap.StableCurvePoolInfo) {
-    const { xTokenInfo, yTokenInfo, xTag, yTag } = this.getXYTokenInfo(stablePool);
-    const lpTag = new StructTag(
-      Stable_curve_swap.moduleAddress,
-      Stable_curve_swap.moduleName,
-      Stable_curve_swap.LPToken.structName,
-      [xTag, yTag]
-    );
-    const lpTokenInfo = this.coinFullnameToCoinInfo[getTypeTagFullname(lpTag)];
-    this.setPool(new HippoStableCurvePool(xTokenInfo, yTokenInfo, lpTokenInfo, stablePool));
   }
 
   private setPiecePool(piecePool: Piece_swap.PieceSwapPoolInfo) {
@@ -374,8 +344,6 @@ export class HippoSwapClient {
     let tag: StructTag;
     if (pool instanceof HippoConstantProductPool) {
       tag = pool.cpPoolMeta.typeTag as StructTag;
-    } else if (pool instanceof HippoStableCurvePool) {
-      tag = pool.stablePoolInfo.typeTag as StructTag;
     } else {
       throw new Error();
     }
@@ -386,15 +354,13 @@ export class HippoSwapClient {
     const parsed = this.app.parserRepo.parse(resource.data, tag);
     if (parsed instanceof Cp_swap.TokenPairMetadata) {
       this.setCPPool(parsed);
-    } else if (parsed instanceof Stable_curve_swap.StableCurvePoolInfo) {
-      this.setStableCurvePool(parsed);
     } else {
       throw new Error();
     }
   }
 
   async reloadAllPools() {
-    const { cpPoolInfos, stablePoolInfos, piecePoolInfos } = await loadHippoDexResources(this.app, this.netConfig);
+    const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(this.app, this.netConfig);
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
       this.fetcher,
       this.netConfig.hippoDexAddress,
@@ -402,7 +368,6 @@ export class HippoSwapClient {
     );
     this.coinInfoList = fullList.coin_info_list;
     this.cpPoolInfos = cpPoolInfos;
-    this.stablePoolInfos = stablePoolInfos;
     this.piecePoolInfos = piecePoolInfos;
     this.buildCache();
   }

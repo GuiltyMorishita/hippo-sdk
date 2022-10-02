@@ -6,9 +6,10 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
+import * as Devnet_coins from './devnet_coins';
 import * as Iterable_table from './iterable_table';
 export const packageName = 'CoinList';
-export const moduleAddress = new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01');
+export const moduleAddress = new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68');
 export const moduleName = 'coin_list';
 
 export const E_APPROVER_ONLY: U64 = u64('5');
@@ -96,13 +97,13 @@ export class CoinList {
     {
       name: 'coin_types',
       typeTag: new StructTag(
-        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
         'iterable_table',
         'IterableTable',
         [
           new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
           new StructTag(
-            new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+            new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
             'coin_list',
             'Nothing',
             []
@@ -154,13 +155,13 @@ export class CoinRegistry {
     {
       name: 'type_to_coin_info',
       typeTag: new StructTag(
-        new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+        new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
         'iterable_table',
         'IterableTable',
         [
           new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
           new StructTag(
-            new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+            new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
             'coin_list',
             'CoinInfo',
             []
@@ -173,7 +174,7 @@ export class CoinRegistry {
       typeTag: new StructTag(new HexString('0x1'), 'table', 'Table', [
         new StructTag(new HexString('0x1'), 'string', 'String', []),
         new StructTag(
-          new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
           'coin_list',
           'Nothing',
           []
@@ -228,7 +229,7 @@ export class FullList {
       name: 'coin_info_list',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
           'coin_list',
           'CoinInfo',
           []
@@ -303,7 +304,7 @@ export function buildPayload_add_approver_to_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'add_approver_to_list',
     typeParamStrings,
@@ -317,14 +318,14 @@ export function add_approver_to_registry_(admin: HexString, approver: HexString,
   if (
     !(
       Stdlib.Signer.address_of_(admin, $c).hex() ===
-      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01').hex()
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68').hex()
     )
   ) {
     throw $.abortCode($.copy(E_CONTRACT_OWNER_ONLY));
   }
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   if (!!Stdlib.Vector.contains_(registry.approvers, approver, $c, [AtomicTypeTag.Address])) {
     throw $.abortCode(u64('0'));
@@ -339,7 +340,7 @@ export function buildPayload_add_approver_to_registry(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'add_approver_to_registry',
     typeParamStrings,
@@ -358,7 +359,7 @@ export function add_extension_(
   let coin_info, registry, type_info;
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
   if (!(Stdlib.Signer.address_of_(coin_owner, $c).hex() === Stdlib.Type_info.account_address_(type_info, $c).hex())) {
@@ -383,7 +384,7 @@ export function buildPayload_add_extension(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'add_extension',
     typeParamStrings,
@@ -432,7 +433,7 @@ export function buildPayload_add_to_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'add_to_list',
     typeParamStrings,
@@ -515,7 +516,7 @@ export function add_to_registry_by_approver_(
   let temp$1, temp$2, registry;
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   temp$2 = registry.approvers;
   temp$1 = Stdlib.Signer.address_of_(approver, $c);
@@ -548,7 +549,7 @@ export function buildPayload_add_to_registry_by_approver(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'add_to_registry_by_approver',
     typeParamStrings,
@@ -599,7 +600,7 @@ export function add_to_registry_by_proof_(
   }
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   add_to_registry_(
     registry,
@@ -633,7 +634,7 @@ export function add_to_registry_by_signer_(
   }
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   add_to_registry_(
     registry,
@@ -661,7 +662,7 @@ export function buildPayload_add_to_registry_by_signer(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'add_to_registry_by_signer',
     typeParamStrings,
@@ -695,7 +696,7 @@ export function buildPayload_create_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'create_list',
     typeParamStrings,
@@ -714,7 +715,7 @@ export function drop_extension_(
   let coin_info, registry, type_info;
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
   if (!(Stdlib.Signer.address_of_(coin_owner, $c).hex() === Stdlib.Type_info.account_address_(type_info, $c).hex())) {
@@ -739,7 +740,7 @@ export function buildPayload_drop_extension(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'drop_extension',
     typeParamStrings,
@@ -757,7 +758,7 @@ export function buildPayload_fetch_all_registered_coin_info(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'fetch_all_registered_coin_info',
     typeParamStrings,
@@ -793,7 +794,7 @@ export function buildPayload_fetch_full_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'fetch_full_list',
     typeParamStrings,
@@ -824,7 +825,7 @@ export function get_all_registered_coin_info_($c: AptosDataCache): FullList {
   let coin_info, fulllist, prev, registry, tail, tail_key;
   registry = $c.borrow_global<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   tail = Iterable_table.tail_key_(registry.type_to_coin_info, $c, [
     new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
@@ -858,7 +859,7 @@ export function get_coin_info_($c: AptosDataCache, $p: TypeTag[] /* <CoinType>*/
   let registry, type_info;
   registry = $c.borrow_global<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
   return $.copy(
@@ -874,7 +875,7 @@ export function get_full_list_(list_owner_addr: HexString, $c: AptosDataCache): 
   list = $c.borrow_global<CoinList>(new SimpleStructTag(CoinList), $.copy(list_owner_addr));
   registry = $c.borrow_global<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   tail = Iterable_table.tail_key_(list.coin_types, $c, [
     new StructTag(new HexString('0x1'), 'type_info', 'TypeInfo', []),
@@ -914,7 +915,7 @@ export function buildPayload_init_module(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'init_module',
     typeParamStrings,
@@ -927,7 +928,7 @@ export function initialize_(admin: HexString, $c: AptosDataCache): void {
   if (
     !(
       Stdlib.Signer.address_of_(admin, $c).hex() ===
-      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01').hex()
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68').hex()
     )
   ) {
     throw $.abortCode($.copy(E_CONTRACT_OWNER_ONLY));
@@ -953,6 +954,7 @@ export function initialize_(admin: HexString, $c: AptosDataCache): void {
     )
   );
   create_list_(admin, $c);
+  Devnet_coins.deploy_(admin, $c);
   return;
 }
 
@@ -961,7 +963,7 @@ export function buildPayload_initialize(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'initialize',
     typeParamStrings,
@@ -992,7 +994,7 @@ export function is_coin_registered_($c: AptosDataCache, $p: TypeTag[] /* <CoinTy
   let registry, type_info;
   registry = $c.borrow_global<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   type_info = Stdlib.Type_info.type_of_($c, [$p[0]]);
   return Iterable_table.contains_(registry.type_to_coin_info, $.copy(type_info), $c, [
@@ -1004,7 +1006,7 @@ export function is_coin_registered_($c: AptosDataCache, $p: TypeTag[] /* <CoinTy
 export function is_registry_initialized_($c: AptosDataCache): boolean {
   return $c.exists(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
 }
 
@@ -1025,7 +1027,7 @@ export function buildPayload_remove_approver_from_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'remove_approver_from_list',
     typeParamStrings,
@@ -1039,14 +1041,14 @@ export function remove_approver_from_registry_(admin: HexString, approver: HexSt
   if (
     !(
       Stdlib.Signer.address_of_(admin, $c).hex() ===
-      new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01').hex()
+      new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68').hex()
     )
   ) {
     throw $.abortCode($.copy(E_CONTRACT_OWNER_ONLY));
   }
   registry = $c.borrow_global_mut<CoinRegistry>(
     new SimpleStructTag(CoinRegistry),
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01')
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68')
   );
   if (!Stdlib.Vector.contains_(registry.approvers, approver, $c, [AtomicTypeTag.Address])) {
     throw $.abortCode(u64('0'));
@@ -1062,7 +1064,7 @@ export function buildPayload_remove_approver_from_registry(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'remove_approver_from_registry',
     typeParamStrings,
@@ -1088,7 +1090,7 @@ export function buildPayload_remove_from_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+    new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
     'coin_list',
     'remove_from_list',
     typeParamStrings,
@@ -1099,23 +1101,23 @@ export function buildPayload_remove_from_list(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::coin_list::CoinInfo',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::coin_list::CoinInfo',
     CoinInfo.CoinInfoParser
   );
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::coin_list::CoinList',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::coin_list::CoinList',
     CoinList.CoinListParser
   );
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::coin_list::CoinRegistry',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::coin_list::CoinRegistry',
     CoinRegistry.CoinRegistryParser
   );
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::coin_list::FullList',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::coin_list::FullList',
     FullList.FullListParser
   );
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::coin_list::Nothing',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::coin_list::Nothing',
     Nothing.NothingParser
   );
 }

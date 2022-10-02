@@ -64,21 +64,6 @@ const actionShowPools = async () => {
         structTag.typeParams
       );
       printResource(poolReserve);
-    } else if (
-      structTag instanceof StructTag &&
-      structTag.address.hex() == hippoDexAddress.hex() &&
-      structTag.module === hippo_swap.Stable_curve_swap.moduleName &&
-      structTag.name === hippo_swap.Stable_curve_swap.LPToken.structName
-    ) {
-      console.log(structTag.typeParams);
-
-      const poolMeta = await app.hippo_swap.stable_curve_swap.StableCurvePoolInfo.load(
-        app.parserRepo,
-        app.client,
-        hippoDexAddress,
-        structTag.typeParams
-      );
-      printResource(poolMeta);
     }
   }
 };

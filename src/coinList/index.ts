@@ -1,5 +1,4 @@
 import { Type_info } from '../generated/stdlib';
-import { Router } from '../generated/hippo_swap';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { App } from '../generated';
 import { SimulationKeys } from '@manahippo/move-to-ts';

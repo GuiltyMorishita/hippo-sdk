@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
+export const moduleAddress = new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778');
 export const moduleName = 'critbit';
 
 export const E_BIT_NOT_0_OR_1: U64 = u64('0');
@@ -40,7 +40,7 @@ export class CritBitTree {
       name: 'inner_nodes',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+          new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
           'critbit',
           'InnerNode',
           []
@@ -51,7 +51,7 @@ export class CritBitTree {
       name: 'outer_nodes',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+          new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
           'critbit',
           'OuterNode',
           [new $.TypeParamIdx(0)]
@@ -1184,15 +1184,15 @@ export function traverse_target_child_index_(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::CritBitTree',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::critbit::CritBitTree',
     CritBitTree.CritBitTreeParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::InnerNode',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::critbit::InnerNode',
     InnerNode.InnerNodeParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::critbit::OuterNode',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::critbit::OuterNode',
     OuterNode.OuterNodeParser
   );
 }

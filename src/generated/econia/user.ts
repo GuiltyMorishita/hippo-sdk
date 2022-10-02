@@ -11,7 +11,7 @@ import * as Open_table from './open_table';
 import * as Order_id from './order_id';
 import * as Registry from './registry';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
+export const moduleAddress = new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778');
 export const moduleName = 'user';
 
 export const ASK: boolean = true;
@@ -50,7 +50,7 @@ export class Collateral {
     {
       name: 'map',
       typeTag: new StructTag(
-        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+        new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
         'open_table',
         'OpenTable',
         [AtomicTypeTag.U128, new StructTag(new HexString('0x1'), 'coin', 'Coin', [new $.TypeParamIdx(0)])]
@@ -100,7 +100,7 @@ export class MarketAccount {
     {
       name: 'asks',
       typeTag: new StructTag(
-        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+        new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
         'critbit',
         'CritBitTree',
         [AtomicTypeTag.U64]
@@ -109,7 +109,7 @@ export class MarketAccount {
     {
       name: 'bids',
       typeTag: new StructTag(
-        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+        new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
         'critbit',
         'CritBitTree',
         [AtomicTypeTag.U64]
@@ -176,13 +176,13 @@ export class MarketAccounts {
     {
       name: 'map',
       typeTag: new StructTag(
-        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+        new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
         'open_table',
         'OpenTable',
         [
           AtomicTypeTag.U128,
           new StructTag(
-            new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+            new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
             'user',
             'MarketAccount',
             []
@@ -408,7 +408,7 @@ export function buildPayload_deposit_from_coinstore(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
     'user',
     'deposit_from_coinstore',
     typeParamStrings,
@@ -892,7 +892,7 @@ export function buildPayload_register_market_account(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
     'user',
     'register_market_account',
     typeParamStrings,
@@ -1325,7 +1325,7 @@ export function buildPayload_withdraw_to_coinstore(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
     'user',
     'withdraw_to_coinstore',
     typeParamStrings,
@@ -1336,15 +1336,15 @@ export function buildPayload_withdraw_to_coinstore(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::Collateral',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::user::Collateral',
     Collateral.CollateralParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::MarketAccount',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::user::MarketAccount',
     MarketAccount.MarketAccountParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::user::MarketAccounts',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::user::MarketAccounts',
     MarketAccounts.MarketAccountsParser
   );
 }

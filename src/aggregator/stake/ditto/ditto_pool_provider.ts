@@ -1,3 +1,4 @@
+/*
 import { TradingPool, TradingPoolProvider } from '../../types';
 import { DittoTradingPool } from './ditto_trading_pool';
 import { typeTagToTypeInfo } from '../../../utils';
@@ -11,3 +12,5 @@ export class DittoPoolProvider extends TradingPoolProvider {
     return [new DittoTradingPool(this.netConfig.dittoAddress, xCoinInfo, yCoinInfo)];
   }
 }
+
+*/

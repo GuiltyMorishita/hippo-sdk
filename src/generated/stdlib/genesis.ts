@@ -372,6 +372,7 @@ export function create_employee_validators_(employees: EmployeeAccountMap[], $c:
 export function create_initialize_validator_(
   aptos_framework: HexString,
   commission_config: ValidatorConfigurationWithCommission,
+  use_staking_contract: boolean,
   $c: AptosDataCache
 ): void {
   let temp$1, temp$2, owner, pool_address, validator;
@@ -380,16 +381,7 @@ export function create_initialize_validator_(
   owner = temp$1;
   create_account_(aptos_framework, $.copy(validator.operator_address), u64('0'), $c);
   create_account_(aptos_framework, $.copy(validator.voter_address), u64('0'), $c);
-  if ($.copy(commission_config.commission_percentage).eq(u64('0'))) {
-    Stake.initialize_stake_owner_(
-      owner,
-      $.copy(validator.stake_amount),
-      $.copy(validator.operator_address),
-      $.copy(validator.voter_address),
-      $c
-    );
-    temp$2 = $.copy(validator.owner_address);
-  } else {
+  if (use_staking_contract) {
     Staking_contract.create_staking_contract_(
       owner,
       $.copy(validator.operator_address),
@@ -404,6 +396,15 @@ export function create_initialize_validator_(
       $.copy(validator.operator_address),
       $c
     );
+  } else {
+    Stake.initialize_stake_owner_(
+      owner,
+      $.copy(validator.stake_amount),
+      $.copy(validator.operator_address),
+      $.copy(validator.voter_address),
+      $c
+    );
+    temp$2 = $.copy(validator.owner_address);
   }
   pool_address = temp$2;
   if ($.copy(commission_config.join_during_genesis)) {
@@ -438,12 +439,13 @@ export function create_initialize_validators_(
       i = $.copy(i).add(u64('1'));
     }
   }
-  create_initialize_validators_with_commission_(aptos_framework, $.copy(validators_with_commission), $c);
+  create_initialize_validators_with_commission_(aptos_framework, false, $.copy(validators_with_commission), $c);
   return;
 }
 
 export function create_initialize_validators_with_commission_(
   aptos_framework: HexString,
+  use_staking_contract: boolean,
   validators: ValidatorConfigurationWithCommission[],
   $c: AptosDataCache
 ): void {
@@ -455,7 +457,7 @@ export function create_initialize_validators_with_commission_(
       validator = Vector.borrow_(validators, $.copy(i), $c, [
         new SimpleStructTag(ValidatorConfigurationWithCommission)
       ]);
-      create_initialize_validator_(aptos_framework, validator, $c);
+      create_initialize_validator_(aptos_framework, validator, use_staking_contract, $c);
       i = $.copy(i).add(u64('1'));
     }
   }

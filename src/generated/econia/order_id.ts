@@ -6,7 +6,7 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
+export const moduleAddress = new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778');
 export const moduleName = 'order_id';
 
 export const ASK: boolean = true;

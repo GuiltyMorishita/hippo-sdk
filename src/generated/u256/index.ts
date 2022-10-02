@@ -1,17 +1,11 @@
 import { AptosClient } from 'aptos';
 import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
-import * as Lp from './lp';
-import * as Router from './router';
-import * as Scripts from './scripts';
+import * as U256 from './u256';
 
-export * as Lp from './lp';
-export * as Router from './router';
-export * as Scripts from './scripts';
+export * as U256 from './u256';
 
 export function loadParsers(repo: AptosParserRepo) {
-  Lp.loadParsers(repo);
-  Router.loadParsers(repo);
-  Scripts.loadParsers(repo);
+  U256.loadParsers(repo);
 }
 
 export function getPackageRepo(): AptosParserRepo {
@@ -28,12 +22,8 @@ export type AppType = {
 };
 
 export class App {
-  lp: Lp.App;
-  router: Router.App;
-  scripts: Scripts.App;
+  u256: U256.App;
   constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
-    this.lp = new Lp.App(client, repo, cache);
-    this.router = new Router.App(client, repo, cache);
-    this.scripts = new Scripts.App(client, repo, cache);
+    this.u256 = new U256.App(client, repo, cache);
   }
 }

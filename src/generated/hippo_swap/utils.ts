@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'hippo-swap';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f');
 export const moduleName = 'utils';
 
 export class PoolInfo {
@@ -53,7 +53,7 @@ export class PoolList {
       name: 'list',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'utils',
           'PoolInfo',
           []
@@ -114,7 +114,7 @@ export function buildPayload_get_pool_list(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+    new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
     'utils',
     'get_pool_list',
     typeParamStrings,
@@ -142,11 +142,11 @@ function make_query_get_pool_list(app: App) {
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolInfo',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::utils::PoolInfo',
     PoolInfo.PoolInfoParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::utils::PoolList',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::utils::PoolList',
     PoolList.PoolListParser
   );
 }
