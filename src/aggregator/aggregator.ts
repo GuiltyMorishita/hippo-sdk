@@ -32,9 +32,9 @@ export class TradeAggregator {
       new HippoPoolProvider(app, fetcher, netConfig, registryClient),
       new EconiaPoolProvider(app, fetcher, netConfig, registryClient),
       new PontemPoolProvider(app, fetcher, netConfig, registryClient),
-      new BasiqPoolProvider(app, fetcher, netConfig, registryClient),
+      new BasiqPoolProvider(app, fetcher, netConfig, registryClient)
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
-      new TortugaPoolProvider(app, fetcher, netConfig, registryClient)
+      //new TortugaPoolProvider(app, fetcher, netConfig, registryClient)
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;
