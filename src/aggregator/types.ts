@@ -273,7 +273,7 @@ export abstract class TradingPoolProvider {
   constructor(
     public app: App,
     public fetcher: SimulationKeys,
-    public netConfig = CONFIGS.devnet,
+    public netConfig = CONFIGS.testnet,
     public registry: CoinListClient
   ) {}
   abstract loadPoolList(): Promise<TradingPool[]>;
