@@ -8,7 +8,7 @@ import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'ap
 import * as Coin_list from '../coin_list';
 import * as Stdlib from '../stdlib';
 export const packageName = 'hippo-swap';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f');
 export const moduleName = 'devcoin_util';
 
 export function init_coin_(
@@ -37,9 +37,6 @@ export function init_coin_and_register_(
       admin,
       Stdlib.String.utf8_($.copy(name), $c),
       Stdlib.String.utf8_($.copy(symbol), $c),
-      Stdlib.String.utf8_(Stdlib.Vector.empty_($c, [AtomicTypeTag.U8]), $c),
-      Stdlib.String.utf8_(Stdlib.Vector.empty_($c, [AtomicTypeTag.U8]), $c),
-      Stdlib.String.utf8_(Stdlib.Vector.empty_($c, [AtomicTypeTag.U8]), $c),
       $.copy(decimals),
       $c,
       [$p[0]]

@@ -11,9 +11,6 @@ import * as Piece_swap_math from './piece_swap_math';
 import * as Piece_swap_script from './piece_swap_script';
 import * as Router from './router';
 import * as Safe_math from './safe_math';
-import * as Stable_curve_numeral from './stable_curve_numeral';
-import * as Stable_curve_scripts from './stable_curve_scripts';
-import * as Stable_curve_swap from './stable_curve_swap';
 import * as Utils from './utils';
 
 export * as Cp_scripts from './cp_scripts';
@@ -27,9 +24,6 @@ export * as Piece_swap_math from './piece_swap_math';
 export * as Piece_swap_script from './piece_swap_script';
 export * as Router from './router';
 export * as Safe_math from './safe_math';
-export * as Stable_curve_numeral from './stable_curve_numeral';
-export * as Stable_curve_scripts from './stable_curve_scripts';
-export * as Stable_curve_swap from './stable_curve_swap';
 export * as Utils from './utils';
 
 export function loadParsers(repo: AptosParserRepo) {
@@ -44,9 +38,6 @@ export function loadParsers(repo: AptosParserRepo) {
   Piece_swap_script.loadParsers(repo);
   Router.loadParsers(repo);
   Safe_math.loadParsers(repo);
-  Stable_curve_numeral.loadParsers(repo);
-  Stable_curve_scripts.loadParsers(repo);
-  Stable_curve_swap.loadParsers(repo);
   Utils.loadParsers(repo);
 }
 
@@ -75,9 +66,6 @@ export class App {
   piece_swap_script: Piece_swap_script.App;
   router: Router.App;
   safe_math: Safe_math.App;
-  stable_curve_numeral: Stable_curve_numeral.App;
-  stable_curve_scripts: Stable_curve_scripts.App;
-  stable_curve_swap: Stable_curve_swap.App;
   utils: Utils.App;
   constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
     this.cp_scripts = new Cp_scripts.App(client, repo, cache);
@@ -91,9 +79,6 @@ export class App {
     this.piece_swap_script = new Piece_swap_script.App(client, repo, cache);
     this.router = new Router.App(client, repo, cache);
     this.safe_math = new Safe_math.App(client, repo, cache);
-    this.stable_curve_numeral = new Stable_curve_numeral.App(client, repo, cache);
-    this.stable_curve_scripts = new Stable_curve_scripts.App(client, repo, cache);
-    this.stable_curve_swap = new Stable_curve_swap.App(client, repo, cache);
     this.utils = new Utils.App(client, repo, cache);
   }
 }

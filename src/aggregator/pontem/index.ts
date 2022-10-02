@@ -1,12 +1,10 @@
-import { parseMoveStructTag, SimulationKeys, StructTag, TypeTag, u64 } from '@manahippo/move-to-ts';
+import { parseMoveStructTag, StructTag, TypeTag, u64 } from '@manahippo/move-to-ts';
 import { HexString, Types } from 'aptos';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
-import { CoinListClient } from '../../coinList';
 import { typeTagToTypeInfo } from '../../utils';
-import { App, hippo_aggregator } from '../../generated';
+import { App } from '../../generated';
 import bigInt from 'big-integer';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
-import { CONFIGS } from '../../config';
 
 export class PontemTradingPool extends TradingPool {
   pontemPool: object | null;
@@ -88,7 +86,7 @@ export class PontemTradingPool extends TradingPool {
 export class PontemPoolProvider extends TradingPoolProvider {
   async loadPoolList(): Promise<TradingPool[]> {
     const poolList: TradingPool[] = [];
-    const ownerAddress = hippo_aggregator.Aggregator.moduleAddress;
+    const ownerAddress = this.netConfig.pontemAddress;
     const resources = await this.app.client.getAccountResources(ownerAddress);
     for (const resource of resources) {
       if (resource.type.indexOf('liquidity_pool::LiquidityPool') >= 0) {

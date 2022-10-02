@@ -1,6 +1,7 @@
 import { HexString } from 'aptos';
 import { Hippo_config } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
+import { hippo_aggregator, liquidswap_lp } from '../generated';
 
 export class NetworkConfiguration {
   constructor(
@@ -41,9 +42,9 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // coin list
   Coin_list.moduleAddress,
   // hippo aggregator
-  new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
+  hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+  liquidswap_lp.Lp_coin.moduleAddress,
   // econia
   new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
   // basiq
@@ -67,9 +68,9 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   // coin list
   Coin_list.moduleAddress,
   // hippo aggregator
-  new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
+  hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
+  liquidswap_lp.Lp_coin.moduleAddress,
   // econia
   new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
   // basiq

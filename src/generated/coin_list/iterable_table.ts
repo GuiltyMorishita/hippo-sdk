@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'CoinList';
-export const moduleAddress = new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01');
+export const moduleAddress = new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68');
 export const moduleName = 'iterable_table';
 
 export class IterableTable {
@@ -25,7 +25,7 @@ export class IterableTable {
       typeTag: new StructTag(new HexString('0x1'), 'table_with_length', 'TableWithLength', [
         new $.TypeParamIdx(0),
         new StructTag(
-          new HexString('0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01'),
+          new HexString('0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68'),
           'iterable_table',
           'IterableValue',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -294,11 +294,11 @@ export function tail_key_(table: IterableTable, $c: AptosDataCache, $p: TypeTag[
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::iterable_table::IterableTable',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::iterable_table::IterableTable',
     IterableTable.IterableTableParser
   );
   repo.addParser(
-    '0xdeae46f81671e76f444e2ce5a299d9e1ea06a8fa26e81dfd49aa7fa5a5a60e01::iterable_table::IterableValue',
+    '0x498d8926f16eb9ca90cab1b3a26aa6f97a080b3fcbe6e83ae150b7243a00fb68::iterable_table::IterableValue',
     IterableValue.IterableValueParser
   );
 }

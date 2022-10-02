@@ -47,10 +47,7 @@ export class HippoWalletClient {
       if (!(typeTag instanceof StructTag)) {
         throw new Error();
       }
-      if (
-        typeTag.address.hex() === this.app.coin_list.devnet_coins.moduleAddress.hex() &&
-        typeTag.module === this.app.coin_list.devnet_coins.moduleName
-      ) {
+      if (typeTag.module === this.app.coin_list.devnet_coins.moduleName) {
         this.devnetCoinSymbols.push(tokenInfo.symbol.str());
       }
     }

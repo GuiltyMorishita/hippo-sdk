@@ -10,7 +10,7 @@ import * as Cp_swap_utils from './cp_swap_utils';
 import * as Math from './math';
 import * as Safe_math from './safe_math';
 export const packageName = 'hippo-swap';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f');
 export const moduleName = 'cp_swap';
 
 export const BALANCE_MAX: U128 = u128('5192296858534827628530496329220095');
@@ -34,7 +34,7 @@ export const ERROR_X_NOT_REGISTERED: U64 = u64('16');
 export const ERROR_Y_NOT_REGISTERED: U64 = u64('16');
 export const MINIMUM_LIQUIDITY: U128 = u128('1000');
 export const MODULE_ADMIN: HexString = new HexString(
-  '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'
+  '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'
 );
 
 export class LPToken {
@@ -91,7 +91,7 @@ export class TokenPairMetadata {
       name: 'lp',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'Coin', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'cp_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -104,7 +104,7 @@ export class TokenPairMetadata {
       name: 'mint_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'MintCapability', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'cp_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -115,7 +115,7 @@ export class TokenPairMetadata {
       name: 'burn_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'BurnCapability', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'cp_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -126,7 +126,7 @@ export class TokenPairMetadata {
       name: 'freeze_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'FreezeCapability', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'cp_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -931,7 +931,7 @@ export function tranfer_lp_coin_in_(coins: Stdlib.Coin.Coin, $c: AptosDataCache,
   let metadata;
   metadata = $c.borrow_global_mut<TokenPairMetadata>(
     new SimpleStructTag(TokenPairMetadata, [$p[0], $p[1]]),
-    new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a')
+    new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f')
   );
   Stdlib.Coin.merge_(metadata.lp, coins, $c, [new SimpleStructTag(LPToken, [$p[0], $p[1]])]);
   return;
@@ -988,15 +988,15 @@ export function update_(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_swap::LPToken',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::cp_swap::LPToken',
     LPToken.LPTokenParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_swap::TokenPairMetadata',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::cp_swap::TokenPairMetadata',
     TokenPairMetadata.TokenPairMetadataParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::cp_swap::TokenPairReserve',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::cp_swap::TokenPairReserve',
     TokenPairReserve.TokenPairReserveParser
   );
 }

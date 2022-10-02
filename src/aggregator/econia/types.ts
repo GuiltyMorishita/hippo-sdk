@@ -5,7 +5,6 @@ import {
   AtomicTypeTag,
   getTypeTagFullname,
   moveValueToOpenApiObject,
-  SimulationKeys,
   u64,
   U64
 } from '@manahippo/move-to-ts';
@@ -13,11 +12,9 @@ import {
 import { EconiaClient } from './econia_client';
 import { OrderBook, OrderBooks } from '../../generated/econia/market';
 import { MarketInfo } from '../../generated/econia/registry';
-import { CoinListClient } from '../../coinList';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
 import { Registry } from '../../generated/econia';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
-import { CONFIGS } from '../../config';
 
 export * from './econia_client';
 

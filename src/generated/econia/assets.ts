@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
+export const moduleAddress = new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778');
 export const moduleName = 'assets';
 
 export const BASE_COIN_DECIMALS: U8 = u8('4');
@@ -146,7 +146,7 @@ export function burn_(coins: Stdlib.Coin.Coin, $c: AptosDataCache, $p: TypeTag[]
   let burn_capability;
   burn_capability = $c.borrow_global<CoinCapabilities>(
     new SimpleStructTag(CoinCapabilities, [$p[0]]),
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
   ).burn_capability;
   Stdlib.Coin.burn_(coins, burn_capability, $c, [$p[0]]);
   return;
@@ -164,7 +164,7 @@ export function init_coin_type_(
   if (
     !(
       Stdlib.Signer.address_of_(account, $c).hex() ===
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd').hex()
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
@@ -172,7 +172,7 @@ export function init_coin_type_(
   if (
     !!$c.exists(
       new SimpleStructTag(CoinCapabilities, [$p[0]]),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_HAS_CAPABILITIES));
@@ -216,7 +216,7 @@ export function buildPayload_init_coin_types(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
     'assets',
     'init_coin_types',
     typeParamStrings,
@@ -236,7 +236,7 @@ export function mint_(
   if (
     !(
       $.copy(account_address).hex() ===
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd').hex()
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
@@ -258,7 +258,7 @@ export function buildPayload_mint(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
     'assets',
     'mint',
     typeParamStrings,
@@ -268,12 +268,12 @@ export function buildPayload_mint(
 }
 
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::assets::BC', BC.BCParser);
+  repo.addParser('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::assets::BC', BC.BCParser);
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::assets::CoinCapabilities',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::assets::CoinCapabilities',
     CoinCapabilities.CoinCapabilitiesParser
   );
-  repo.addParser('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::assets::QC', QC.QCParser);
+  repo.addParser('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::assets::QC', QC.QCParser);
 }
 export class App {
   constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}

@@ -5,9 +5,10 @@ import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Stdlib from '../stdlib';
 import * as Math from './math';
 export const packageName = 'hippo-swap';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f');
 export const moduleName = 'piece_swap_math';
 
 export const BILLION: U128 = u128('1000000000');
@@ -76,6 +77,8 @@ export function get_add_liquidity_actual_amount_(
     temp$2 = $.copy(current_y).eq(u128('0'));
   }
   if (temp$2) {
+    Stdlib.Debug.print_(add_amt_x, $c, [AtomicTypeTag.U128]);
+    Stdlib.Debug.print_(add_amt_y, $c, [AtomicTypeTag.U128]);
     if (!$.copy(add_amt_x).eq($.copy(add_amt_y))) {
       throw $.abortCode($.copy(E_X_Y_NOT_EQUAL));
     }

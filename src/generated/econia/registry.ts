@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Econia';
-export const moduleAddress = new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd');
+export const moduleAddress = new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778');
 export const moduleName = 'registry';
 
 export const E_INVALID_BASE_ASSET: U64 = u64('10');
@@ -86,7 +86,7 @@ export class MarketInfo {
     {
       name: 'trading_pair_info',
       typeTag: new StructTag(
-        new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+        new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
         'registry',
         'TradingPairInfo',
         []
@@ -127,7 +127,7 @@ export class Registry {
       name: 'hosts',
       typeTag: new StructTag(new HexString('0x1'), 'table', 'Table', [
         new StructTag(
-          new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+          new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
           'registry',
           'TradingPairInfo',
           []
@@ -139,7 +139,7 @@ export class Registry {
       name: 'markets',
       typeTag: new VectorTag(
         new StructTag(
-          new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+          new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
           'registry',
           'MarketInfo',
           []
@@ -240,14 +240,14 @@ export function get_verified_market_custodian_id_(
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   registry_ref = $c.borrow_global<Registry>(
     new SimpleStructTag(Registry),
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
   );
   if (!$.copy(market_id).lt(Stdlib.Vector.length_(registry_ref.markets, $c, [new SimpleStructTag(MarketInfo)]))) {
     throw $.abortCode($.copy(E_INVALID_MARKET_ID));
@@ -268,7 +268,7 @@ export function init_registry_(account: HexString, $c: AptosDataCache): void {
   if (
     !(
       Stdlib.Signer.address_of_(account, $c).hex() ===
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd').hex()
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778').hex()
     )
   ) {
     throw $.abortCode($.copy(E_NOT_ECONIA));
@@ -276,7 +276,7 @@ export function init_registry_(account: HexString, $c: AptosDataCache): void {
   if (
     !!$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_REGISTRY_EXISTS));
@@ -301,7 +301,7 @@ export function buildPayload_init_registry(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = [] as string[];
   return $.buildPayload(
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778'),
     'registry',
     'init_registry',
     typeParamStrings,
@@ -340,7 +340,7 @@ export function is_registered_custodian_id_(custodian_id: U64, $c: AptosDataCach
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     return false;
@@ -359,7 +359,7 @@ export function is_registered_trading_pair_(trading_pair_info: TradingPairInfo, 
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     return false;
@@ -367,7 +367,7 @@ export function is_registered_trading_pair_(trading_pair_info: TradingPairInfo, 
   }
   registry_ref = $c.borrow_global<Registry>(
     new SimpleStructTag(Registry),
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
   );
   return Stdlib.Table.contains_(registry_ref.hosts, $.copy(trading_pair_info), $c, [
     new SimpleStructTag(TradingPairInfo),
@@ -379,7 +379,7 @@ export function n_custodians_($c: AptosDataCache): U64 {
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
@@ -387,7 +387,7 @@ export function n_custodians_($c: AptosDataCache): U64 {
   return $.copy(
     $c.borrow_global<Registry>(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     ).n_custodians
   );
 }
@@ -396,7 +396,7 @@ export function n_markets_($c: AptosDataCache): U64 {
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
@@ -404,7 +404,7 @@ export function n_markets_($c: AptosDataCache): U64 {
   return Stdlib.Vector.length_(
     $c.borrow_global<Registry>(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     ).markets,
     $c,
     [new SimpleStructTag(MarketInfo)]
@@ -416,14 +416,14 @@ export function register_custodian_capability_($c: AptosDataCache): CustodianCap
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
   }
   registry_ref_mut = $c.borrow_global_mut<Registry>(
     new SimpleStructTag(Registry),
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
   );
   custodian_id = $.copy(registry_ref_mut.n_custodians).add(u64('1'));
   registry_ref_mut.n_custodians = $.copy(custodian_id);
@@ -451,7 +451,7 @@ export function register_market_internal_(
   if (
     !$c.exists(
       new SimpleStructTag(Registry),
-      new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+      new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
     )
   ) {
     throw $.abortCode($.copy(E_NO_REGISTRY));
@@ -502,7 +502,7 @@ export function register_market_internal_(
   }
   registry_ref_mut = $c.borrow_global_mut<Registry>(
     new SimpleStructTag(Registry),
-    new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd')
+    new HexString('0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778')
   );
   Stdlib.Table.add_(registry_ref_mut.hosts, $.copy(trading_pair_info), $.copy(host), $c, [
     new SimpleStructTag(TradingPairInfo),
@@ -522,23 +522,23 @@ export function register_market_internal_(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::registry::CustodianCapability',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::CustodianCapability',
     CustodianCapability.CustodianCapabilityParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::registry::GenericAsset',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::GenericAsset',
     GenericAsset.GenericAssetParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::registry::MarketInfo',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::MarketInfo',
     MarketInfo.MarketInfoParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::registry::Registry',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::Registry',
     Registry.RegistryParser
   );
   repo.addParser(
-    '0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd::registry::TradingPairInfo',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::TradingPairInfo',
     TradingPairInfo.TradingPairInfoParser
   );
 }

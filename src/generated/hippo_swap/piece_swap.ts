@@ -9,7 +9,7 @@ import * as Stdlib from '../stdlib';
 import * as Math from './math';
 import * as Piece_swap_math from './piece_swap_math';
 export const packageName = 'hippo-swap';
-export const moduleAddress = new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a');
+export const moduleAddress = new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f');
 export const moduleName = 'piece_swap';
 
 export const ERROR_ALREADY_INITIALIZED: U64 = u64('1');
@@ -18,7 +18,7 @@ export const ERROR_NOT_CREATOR: U64 = u64('3');
 export const ERROR_ONLY_ADMIN: U64 = u64('0');
 export const MINIMUM_LIQUIDITY: U128 = u128('1000');
 export const MODULE_ADMIN: HexString = new HexString(
-  '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'
+  '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'
 );
 
 export class LPToken {
@@ -64,7 +64,7 @@ export class PieceSwapPoolInfo {
       name: 'lp_mint_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'MintCapability', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'piece_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -75,7 +75,7 @@ export class PieceSwapPoolInfo {
       name: 'lp_burn_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'BurnCapability', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'piece_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -86,7 +86,7 @@ export class PieceSwapPoolInfo {
       name: 'lp_freeze_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'FreezeCapability', [
         new StructTag(
-          new HexString('0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a'),
+          new HexString('0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f'),
           'piece_swap',
           'LPToken',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -669,11 +669,11 @@ export function swap_y_to_x_direct_(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap::LPToken',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::piece_swap::LPToken',
     LPToken.LPTokenParser
   );
   repo.addParser(
-    '0xa61e1e86e9f596e483283727d2739ba24b919012720648c29380f9cd0a96c11a::piece_swap::PieceSwapPoolInfo',
+    '0x46e159be621e7493284112c551733e6378f931fd2fc851975bc36bedaae4de0f::piece_swap::PieceSwapPoolInfo',
     PieceSwapPoolInfo.PieceSwapPoolInfoParser
   );
 }
