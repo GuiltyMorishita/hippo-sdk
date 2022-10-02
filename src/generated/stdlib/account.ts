@@ -991,7 +991,7 @@ export class App {
       await val.loadFullState(this);
     }
     if (fillCache) {
-      this.cache.move_to(val.typeTag, owner, val);
+      this.cache.set(val.typeTag, owner, val);
     }
     return val;
   }
@@ -1013,7 +1013,7 @@ export class App {
       await val.loadFullState(this);
     }
     if (fillCache) {
-      this.cache.move_to(val.typeTag, owner, val);
+      this.cache.set(val.typeTag, owner, val);
     }
     return val;
   }
