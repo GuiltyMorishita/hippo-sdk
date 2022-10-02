@@ -1,7 +1,7 @@
 import { HexString } from 'aptos';
 import { Hippo_config } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
-import { hippo_aggregator, liquidswap_lp } from '../generated';
+import { econia, hippo_aggregator, liquidswap_lp } from '../generated';
 
 export class NetworkConfiguration {
   constructor(
@@ -46,7 +46,7 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // pontem
   liquidswap_lp.Lp_coin.moduleAddress,
   // econia
-  new HexString('0xc0deb00c9154b6b64db01eeb77d08255300315e1fa35b687d384a703f6034fbd'),
+  econia.Market.moduleAddress,
   // basiq
   new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab'),
   // ditto
@@ -55,10 +55,10 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab')
 );
 
-export const DEVNET_CONFIG = new NetworkConfiguration(
+export const TESTNET_CONFIG = new NetworkConfiguration(
   'devnet',
-  'https://fullnode.devnet.aptoslabs.com/v1',
-  'https://faucet.devnet.aptoslabs.com',
+  'https://fullnode.testnet.aptoslabs.com/v1',
+  'https://faucet.testnet.aptoslabs.com',
   // simulationAddress coin list now
   new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
   // simulationPubkey coin list now
@@ -72,7 +72,7 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
   // pontem
   liquidswap_lp.Lp_coin.moduleAddress,
   // econia
-  new HexString('0xe56148c106146758a4172a7189cd8487f84997de6f6c2b3396106a8f82cb0c33'),
+  econia.Market.moduleAddress,
   // basiq
   new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab'),
   // ditto
@@ -83,5 +83,5 @@ export const DEVNET_CONFIG = new NetworkConfiguration(
 
 export const CONFIGS = {
   localhost: LOCAL_CONFIG,
-  devnet: DEVNET_CONFIG
+  testnet: TESTNET_CONFIG
 };

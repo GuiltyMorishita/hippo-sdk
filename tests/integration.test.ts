@@ -2,7 +2,7 @@ import { AptosAccount, AptosClient, FaucetClient } from 'aptos';
 import { CONFIGS, HippoSwapClient, HippoWalletClient, App } from '../src';
 import { printResource } from '../src/utils';
 import { getSimulationKeys, sendPayloadTx } from '@manahippo/move-to-ts';
-const { devnet: HIPPO_CONF } = CONFIGS;
+const { testnet: HIPPO_CONF } = CONFIGS;
 
 describe('Integration Tests', () => {
   let client: AptosClient, account: AptosAccount, swapClient: HippoSwapClient, walletClient: HippoWalletClient;

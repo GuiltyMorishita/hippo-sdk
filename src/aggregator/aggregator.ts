@@ -24,7 +24,7 @@ export class TradeAggregator {
     this.xToAnyPools = new Map();
   }
 
-  static async create(aptosClient: AptosClient, netConfig = CONFIGS.devnet) {
+  static async create(aptosClient: AptosClient, netConfig = CONFIGS.testnet) {
     const app = new App(aptosClient);
     const fetcher: SimulationKeys = netConfig.simulationKeys;
     const registryClient = await CoinListClient.load(app, fetcher);

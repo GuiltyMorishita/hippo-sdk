@@ -28,7 +28,7 @@ export const readConfig = (program: Command) => {
   }
   const privateKey = new HexString(privateKeyStr);
   const isDevnet = (url as string).includes('devnet');
-  const netConf = isDevnet ? CONFIGS.devnet : CONFIGS.localhost;
+  const netConf = isDevnet ? CONFIGS.testnet : CONFIGS.localhost;
   const hippoDexAddress = netConf.hippoDexAddress;
   const client = new AptosClient(result.profiles[profile].rest_url);
   const app = new App(client);
