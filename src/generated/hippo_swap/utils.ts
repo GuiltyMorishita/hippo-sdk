@@ -127,18 +127,14 @@ export async function query_get_pool_list(
   client: AptosClient,
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
-  $p: TypeTag[]
+  $p: TypeTag[],
+  _maxGas = 1000,
+  _isJSON = false
 ) {
-  const payload = buildPayload_get_pool_list();
+  const payload = buildPayload_get_pool_list(_isJSON);
   const outputTypeTag = new SimpleStructTag(PoolList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
   return $.takeSimulationValue<PoolList>(output, outputTypeTag, repo);
-}
-function make_query_get_pool_list(app: App) {
-  function maker(fetcher: $.SimulationKeys, $p: TypeTag[]) {
-    return query_get_pool_list(app.client, fetcher, app.repo, $p);
-  }
-  return maker;
 }
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
@@ -187,7 +183,7 @@ export class App {
     const payload = buildPayload_get_pool_list(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
-  get query_get_pool_list() {
-    return make_query_get_pool_list(this);
+  async query_get_pool_list(fetcher: $.SimulationKeys, $p: TypeTag[], _maxGas = 1000, _isJSON = false) {
+    return query_get_pool_list(this.client, fetcher, this.repo, $p, _maxGas, _isJSON);
   }
 }

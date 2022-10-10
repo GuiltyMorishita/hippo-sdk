@@ -9,7 +9,6 @@ import { CONFIGS } from '../config';
 import { SimulationKeys } from '@manahippo/move-to-ts';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
-import { TortugaPoolProvider } from './stake';
 
 export class TradeAggregator {
   public allPools: TradingPool[];

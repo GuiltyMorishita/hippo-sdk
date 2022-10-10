@@ -351,18 +351,14 @@ export async function query_fetch_volume(
   client: AptosClient,
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
-  $p: TypeTag[]
+  $p: TypeTag[],
+  _maxGas = 1000,
+  _isJSON = false
 ) {
-  const payload = buildPayload_fetch_volume();
+  const payload = buildPayload_fetch_volume(_isJSON);
   const outputTypeTag = new SimpleStructTag(Volume);
-  const output = await $.simulatePayloadTx(client, fetcher, payload);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
   return $.takeSimulationValue<Volume>(output, outputTypeTag, repo);
-}
-function make_query_fetch_volume(app: App) {
-  function maker(fetcher: $.SimulationKeys, $p: TypeTag[]) {
-    return query_fetch_volume(app.client, fetcher, app.repo, $p);
-  }
-  return maker;
 }
 export function get_volume_($c: AptosDataCache): Volume {
   return $.copy(
@@ -752,8 +748,8 @@ export class App {
     const payload = buildPayload_fetch_volume(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
-  get query_fetch_volume() {
-    return make_query_fetch_volume(this);
+  async query_fetch_volume(fetcher: $.SimulationKeys, $p: TypeTag[], _maxGas = 1000, _isJSON = false) {
+    return query_fetch_volume(this.client, fetcher, this.repo, $p, _maxGas, _isJSON);
   }
   payload_get_volume(
     isJSON = false

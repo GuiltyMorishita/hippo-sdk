@@ -771,18 +771,14 @@ export async function query_fetch_all_registered_coin_info(
   client: AptosClient,
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
-  $p: TypeTag[]
+  $p: TypeTag[],
+  _maxGas = 1000,
+  _isJSON = false
 ) {
-  const payload = buildPayload_fetch_all_registered_coin_info();
+  const payload = buildPayload_fetch_all_registered_coin_info(_isJSON);
   const outputTypeTag = new SimpleStructTag(FullList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
   return $.takeSimulationValue<FullList>(output, outputTypeTag, repo);
-}
-function make_query_fetch_all_registered_coin_info(app: App) {
-  function maker(fetcher: $.SimulationKeys, $p: TypeTag[]) {
-    return query_fetch_all_registered_coin_info(app.client, fetcher, app.repo, $p);
-  }
-  return maker;
 }
 export function fetch_full_list_(fetcher: HexString, list_owner_addr: HexString, $c: AptosDataCache): void {
   return $c.move_to(new SimpleStructTag(FullList), fetcher, get_full_list_($.copy(list_owner_addr), $c));
@@ -808,18 +804,14 @@ export async function query_fetch_full_list(
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
   list_owner_addr: HexString,
-  $p: TypeTag[]
+  $p: TypeTag[],
+  _maxGas = 1000,
+  _isJSON = false
 ) {
-  const payload = buildPayload_fetch_full_list(list_owner_addr);
+  const payload = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
   const outputTypeTag = new SimpleStructTag(FullList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
   return $.takeSimulationValue<FullList>(output, outputTypeTag, repo);
-}
-function make_query_fetch_full_list(app: App) {
-  function maker(fetcher: $.SimulationKeys, list_owner_addr: HexString, $p: TypeTag[]) {
-    return query_fetch_full_list(app.client, fetcher, app.repo, list_owner_addr, $p);
-  }
-  return maker;
 }
 export function get_all_registered_coin_info_($c: AptosDataCache): FullList {
   let coin_info, fulllist, prev, registry, tail, tail_key;
@@ -1361,8 +1353,13 @@ export class App {
     const payload = buildPayload_fetch_all_registered_coin_info(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
-  get query_fetch_all_registered_coin_info() {
-    return make_query_fetch_all_registered_coin_info(this);
+  async query_fetch_all_registered_coin_info(
+    fetcher: $.SimulationKeys,
+    $p: TypeTag[],
+    _maxGas = 1000,
+    _isJSON = false
+  ) {
+    return query_fetch_all_registered_coin_info(this.client, fetcher, this.repo, $p, _maxGas, _isJSON);
   }
   payload_fetch_full_list(
     list_owner_addr: HexString,
@@ -1374,8 +1371,14 @@ export class App {
     const payload = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
     return $.sendPayloadTx(this.client, _account, payload, _maxGas);
   }
-  get query_fetch_full_list() {
-    return make_query_fetch_full_list(this);
+  async query_fetch_full_list(
+    fetcher: $.SimulationKeys,
+    list_owner_addr: HexString,
+    $p: TypeTag[],
+    _maxGas = 1000,
+    _isJSON = false
+  ) {
+    return query_fetch_full_list(this.client, fetcher, this.repo, list_owner_addr, $p, _maxGas, _isJSON);
   }
   payload_init_module(
     isJSON = false

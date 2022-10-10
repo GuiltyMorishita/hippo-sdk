@@ -1,5 +1,5 @@
 import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache, u8, u64, u128 } from '@manahippo/move-to-ts';
 import * as basiq from './basiq';
 import * as coin_list from './coin_list';
 import * as econia from './econia';
@@ -8,7 +8,6 @@ import * as hippo_swap from './hippo_swap';
 import * as liquidswap from './liquidswap';
 import * as liquidswap_lp from './liquidswap_lp';
 import * as stdlib from './stdlib';
-import * as tortuga from './tortuga';
 import * as u256 from './u256';
 import * as uq64x64 from './uq64x64';
 
@@ -20,9 +19,10 @@ export * as hippo_swap from './hippo_swap';
 export * as liquidswap from './liquidswap';
 export * as liquidswap_lp from './liquidswap_lp';
 export * as stdlib from './stdlib';
-export * as tortuga from './tortuga';
 export * as u256 from './u256';
 export * as uq64x64 from './uq64x64';
+
+export { u8, u64, u128 };
 
 export function getProjectRepo(): AptosParserRepo {
   const repo = new AptosParserRepo();
@@ -34,7 +34,6 @@ export function getProjectRepo(): AptosParserRepo {
   liquidswap.loadParsers(repo);
   liquidswap_lp.loadParsers(repo);
   stdlib.loadParsers(repo);
-  tortuga.loadParsers(repo);
   u256.loadParsers(repo);
   uq64x64.loadParsers(repo);
   repo.addDefaultParsers();
@@ -52,7 +51,6 @@ export class App {
   liquidswap: liquidswap.App;
   liquidswap_lp: liquidswap_lp.App;
   stdlib: stdlib.App;
-  tortuga: tortuga.App;
   u256: u256.App;
   uq64x64: uq64x64.App;
   constructor(public client: AptosClient) {
@@ -66,7 +64,6 @@ export class App {
     this.liquidswap = new liquidswap.App(client, this.parserRepo, this.cache);
     this.liquidswap_lp = new liquidswap_lp.App(client, this.parserRepo, this.cache);
     this.stdlib = new stdlib.App(client, this.parserRepo, this.cache);
-    this.tortuga = new tortuga.App(client, this.parserRepo, this.cache);
     this.u256 = new u256.App(client, this.parserRepo, this.cache);
     this.uq64x64 = new uq64x64.App(client, this.parserRepo, this.cache);
   }
