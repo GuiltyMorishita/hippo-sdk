@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Error from './error';
 import * as Reconfiguration from './reconfiguration';
@@ -178,8 +179,8 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_set_version(major, isJSON);
   }
-  async set_version(_account: AptosAccount, major: U64, _maxGas = 1000, _isJSON = false) {
+  async set_version(_account: AptosAccount, major: U64, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_set_version(major, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

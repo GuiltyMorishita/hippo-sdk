@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'LiquidswapInit';
@@ -176,10 +177,10 @@ export class App {
     _account: AptosAccount,
     lp_coin_metadata_serialized: U8[],
     lp_coin_code: U8[],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_initialize_lp_account(lp_coin_metadata_serialized, lp_coin_code, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

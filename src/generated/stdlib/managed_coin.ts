@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Coin from './coin';
 import * as Error from './error';
@@ -212,9 +213,15 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_burn(amount, $p, isJSON);
   }
-  async burn(_account: AptosAccount, amount: U64, $p: TypeTag[] /* <CoinType>*/, _maxGas = 1000, _isJSON = false) {
+  async burn(
+    _account: AptosAccount,
+    amount: U64,
+    $p: TypeTag[] /* <CoinType>*/,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_burn(amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_initialize(
     name: U8[],
@@ -233,11 +240,11 @@ export class App {
     decimals: U8,
     monitor_supply: boolean,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_initialize(name, symbol, decimals, monitor_supply, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_mint(
     dst_addr: HexString,
@@ -252,11 +259,11 @@ export class App {
     dst_addr: HexString,
     amount: U64,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_mint(dst_addr, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_register(
     $p: TypeTag[] /* <CoinType>*/,
@@ -264,8 +271,8 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_register($p, isJSON);
   }
-  async register(_account: AptosAccount, $p: TypeTag[] /* <CoinType>*/, _maxGas = 1000, _isJSON = false) {
+  async register(_account: AptosAccount, $p: TypeTag[] /* <CoinType>*/, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_register($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

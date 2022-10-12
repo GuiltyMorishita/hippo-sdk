@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 import * as Critbit from './critbit';
@@ -1404,11 +1405,11 @@ export class App {
     general_custodian_id: U64,
     amount: U64,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_deposit_from_coinstore(market_id, general_custodian_id, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_register_market_account(
     market_id: U64,
@@ -1423,11 +1424,11 @@ export class App {
     market_id: U64,
     general_custodian_id: U64,
     $p: TypeTag[] /* <BaseType, QuoteType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_register_market_account(market_id, general_custodian_id, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_withdraw_to_coinstore(
     market_id: U64,
@@ -1442,10 +1443,10 @@ export class App {
     market_id: U64,
     amount: U64,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_withdraw_to_coinstore(market_id, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

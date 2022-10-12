@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Basiq from '../basiq';
 import * as Coin_list from '../coin_list';
@@ -398,9 +399,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_basiq(isJSON);
   }
-  async mock_deploy_basiq(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async mock_deploy_basiq(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_mock_deploy_basiq(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_mock_deploy_econia(
     market_id: U64,
@@ -408,18 +409,18 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_econia(market_id, isJSON);
   }
-  async mock_deploy_econia(_account: AptosAccount, market_id: U64, _maxGas = 1000, _isJSON = false) {
+  async mock_deploy_econia(_account: AptosAccount, market_id: U64, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_mock_deploy_econia(market_id, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_mock_deploy_pontem(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_pontem(isJSON);
   }
-  async mock_deploy_pontem(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async mock_deploy_pontem(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_mock_deploy_pontem(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_registe_coins(
     deploy_coin_list: boolean,
@@ -427,8 +428,8 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_registe_coins(deploy_coin_list, isJSON);
   }
-  async registe_coins(_account: AptosAccount, deploy_coin_list: boolean, _maxGas = 1000, _isJSON = false) {
+  async registe_coins(_account: AptosAccount, deploy_coin_list: boolean, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_registe_coins(deploy_coin_list, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

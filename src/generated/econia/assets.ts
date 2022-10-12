@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Econia';
@@ -311,9 +312,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_init_coin_types(isJSON);
   }
-  async init_coin_types(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async init_coin_types(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_init_coin_types(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_mint(
     amount: U64,
@@ -322,8 +323,14 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mint(amount, $p, isJSON);
   }
-  async mint(_account: AptosAccount, amount: U64, $p: TypeTag[] /* <CoinType>*/, _maxGas = 1000, _isJSON = false) {
+  async mint(
+    _account: AptosAccount,
+    amount: U64,
+    $p: TypeTag[] /* <CoinType>*/,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_mint(amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

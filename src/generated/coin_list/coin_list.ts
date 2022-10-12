@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 import * as Devnet_coins from './devnet_coins';
@@ -772,12 +773,12 @@ export async function query_fetch_all_registered_coin_info(
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
   $p: TypeTag[],
-  _maxGas = 1000,
+  option?: OptionTransaction,
   _isJSON = false
 ) {
   const payload = buildPayload_fetch_all_registered_coin_info(_isJSON);
   const outputTypeTag = new SimpleStructTag(FullList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
   return $.takeSimulationValue<FullList>(output, outputTypeTag, repo);
 }
 export function fetch_full_list_(fetcher: HexString, list_owner_addr: HexString, $c: AptosDataCache): void {
@@ -805,12 +806,12 @@ export async function query_fetch_full_list(
   repo: AptosParserRepo,
   list_owner_addr: HexString,
   $p: TypeTag[],
-  _maxGas = 1000,
+  option?: OptionTransaction,
   _isJSON = false
 ) {
   const payload = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
   const outputTypeTag = new SimpleStructTag(FullList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
   return $.takeSimulationValue<FullList>(output, outputTypeTag, repo);
 }
 export function get_all_registered_coin_info_($c: AptosDataCache): FullList {
@@ -1176,9 +1177,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_add_approver_to_list(approver, isJSON);
   }
-  async add_approver_to_list(_account: AptosAccount, approver: HexString, _maxGas = 1000, _isJSON = false) {
+  async add_approver_to_list(_account: AptosAccount, approver: HexString, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_add_approver_to_list(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_add_approver_to_registry(
     approver: HexString,
@@ -1186,9 +1187,14 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_add_approver_to_registry(approver, isJSON);
   }
-  async add_approver_to_registry(_account: AptosAccount, approver: HexString, _maxGas = 1000, _isJSON = false) {
+  async add_approver_to_registry(
+    _account: AptosAccount,
+    approver: HexString,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_add_approver_to_registry(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_add_extension(
     key: Stdlib.String.String,
@@ -1203,11 +1209,11 @@ export class App {
     key: Stdlib.String.String,
     value: Stdlib.String.String,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_add_extension(key, value, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_add_to_list(
     list: HexString,
@@ -1220,11 +1226,11 @@ export class App {
     _account: AptosAccount,
     list: HexString,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_add_to_list(list, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_add_to_registry_by_approver(
     name: Stdlib.String.String,
@@ -1256,7 +1262,7 @@ export class App {
     project_url: Stdlib.String.String,
     is_update: boolean,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_add_to_registry_by_approver(
@@ -1269,7 +1275,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_add_to_registry_by_signer(
     name: Stdlib.String.String,
@@ -1301,7 +1307,7 @@ export class App {
     project_url: Stdlib.String.String,
     is_update: boolean,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_add_to_registry_by_signer(
@@ -1314,16 +1320,16 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_create_list(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_create_list(isJSON);
   }
-  async create_list(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async create_list(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_create_list(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_drop_extension(
     key: Stdlib.String.String,
@@ -1338,28 +1344,28 @@ export class App {
     key: Stdlib.String.String,
     value: Stdlib.String.String,
     $p: TypeTag[] /* <CoinType>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_drop_extension(key, value, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_fetch_all_registered_coin_info(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_fetch_all_registered_coin_info(isJSON);
   }
-  async fetch_all_registered_coin_info(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async fetch_all_registered_coin_info(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_fetch_all_registered_coin_info(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   async query_fetch_all_registered_coin_info(
     fetcher: $.SimulationKeys,
     $p: TypeTag[],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
-    return query_fetch_all_registered_coin_info(this.client, fetcher, this.repo, $p, _maxGas, _isJSON);
+    return query_fetch_all_registered_coin_info(this.client, fetcher, this.repo, $p, option);
   }
   payload_fetch_full_list(
     list_owner_addr: HexString,
@@ -1367,36 +1373,41 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_fetch_full_list(list_owner_addr, isJSON);
   }
-  async fetch_full_list(_account: AptosAccount, list_owner_addr: HexString, _maxGas = 1000, _isJSON = false) {
+  async fetch_full_list(
+    _account: AptosAccount,
+    list_owner_addr: HexString,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   async query_fetch_full_list(
     fetcher: $.SimulationKeys,
     list_owner_addr: HexString,
     $p: TypeTag[],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
-    return query_fetch_full_list(this.client, fetcher, this.repo, list_owner_addr, $p, _maxGas, _isJSON);
+    return query_fetch_full_list(this.client, fetcher, this.repo, list_owner_addr, $p, option);
   }
   payload_init_module(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_init_module(isJSON);
   }
-  async init_module(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async init_module(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_init_module(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_initialize(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_initialize(isJSON);
   }
-  async initialize(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async initialize(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_initialize(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_remove_approver_from_list(
     approver: HexString,
@@ -1404,9 +1415,14 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_remove_approver_from_list(approver, isJSON);
   }
-  async remove_approver_from_list(_account: AptosAccount, approver: HexString, _maxGas = 1000, _isJSON = false) {
+  async remove_approver_from_list(
+    _account: AptosAccount,
+    approver: HexString,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_remove_approver_from_list(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_remove_approver_from_registry(
     approver: HexString,
@@ -1414,9 +1430,14 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_remove_approver_from_registry(approver, isJSON);
   }
-  async remove_approver_from_registry(_account: AptosAccount, approver: HexString, _maxGas = 1000, _isJSON = false) {
+  async remove_approver_from_registry(
+    _account: AptosAccount,
+    approver: HexString,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_remove_approver_from_registry(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_remove_from_list(
     $p: TypeTag[] /* <CoinType>*/,
@@ -1424,8 +1445,13 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_remove_from_list($p, isJSON);
   }
-  async remove_from_list(_account: AptosAccount, $p: TypeTag[] /* <CoinType>*/, _maxGas = 1000, _isJSON = false) {
+  async remove_from_list(
+    _account: AptosAccount,
+    $p: TypeTag[] /* <CoinType>*/,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_remove_from_list($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

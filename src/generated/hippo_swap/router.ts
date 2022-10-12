@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 import * as Cp_swap from './cp_swap';
@@ -329,7 +330,7 @@ export class App {
     x_in: U64,
     a_min_out: U64,
     $p: TypeTag[] /* <X, Y, Z, A>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_three_step_route_script(
@@ -344,7 +345,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_two_step_route_script(
     first_pool_type: U8,
@@ -376,7 +377,7 @@ export class App {
     x_in: U64,
     z_min_out: U64,
     $p: TypeTag[] /* <X, Y, Z>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_two_step_route_script(
@@ -389,6 +390,6 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

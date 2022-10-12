@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Coin_list from '../coin_list';
 import * as Stdlib from '../stdlib';
@@ -463,11 +464,11 @@ export class App {
     amount_x: U64,
     amount_y: U64,
     $p: TypeTag[] /* <X, Y>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_add_liquidity_script(amount_x, amount_y, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_create_new_pool_script(
     lp_name: U8[],
@@ -508,7 +509,7 @@ export class App {
     swap_fee_per_million: U64,
     protocol_fee_share_per_thousand: U64,
     $p: TypeTag[] /* <X, Y>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_create_new_pool_script(
@@ -524,16 +525,16 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_mock_deploy_script(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mock_deploy_script(isJSON);
   }
-  async mock_deploy_script(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async mock_deploy_script(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_mock_deploy_script(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_remove_liquidity_script(
     liquidity: U64,
@@ -546,11 +547,11 @@ export class App {
     _account: AptosAccount,
     liquidity: U64,
     $p: TypeTag[] /* <X, Y>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_remove_liquidity_script(liquidity, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_swap_script(
     x_in: U64,
@@ -569,10 +570,10 @@ export class App {
     x_min_out: U64,
     y_min_out: U64,
     $p: TypeTag[] /* <X, Y>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

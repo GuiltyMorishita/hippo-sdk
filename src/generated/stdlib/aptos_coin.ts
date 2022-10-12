@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Coin from './coin';
 import * as Error from './error';
@@ -390,9 +391,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_claim_mint_capability(isJSON);
   }
-  async claim_mint_capability(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async claim_mint_capability(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_claim_mint_capability(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_delegate_mint_capability(
     to: HexString,
@@ -400,9 +401,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_delegate_mint_capability(to, isJSON);
   }
-  async delegate_mint_capability(_account: AptosAccount, to: HexString, _maxGas = 1000, _isJSON = false) {
+  async delegate_mint_capability(_account: AptosAccount, to: HexString, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_delegate_mint_capability(to, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_mint(
     dst_addr: HexString,
@@ -411,8 +412,8 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_mint(dst_addr, amount, isJSON);
   }
-  async mint(_account: AptosAccount, dst_addr: HexString, amount: U64, _maxGas = 1000, _isJSON = false) {
+  async mint(_account: AptosAccount, dst_addr: HexString, amount: U64, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_mint(dst_addr, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

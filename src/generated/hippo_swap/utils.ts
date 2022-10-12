@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'hippo-swap';
@@ -128,12 +129,12 @@ export async function query_get_pool_list(
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
   $p: TypeTag[],
-  _maxGas = 1000,
+  option?: OptionTransaction,
   _isJSON = false
 ) {
   const payload = buildPayload_get_pool_list(_isJSON);
   const outputTypeTag = new SimpleStructTag(PoolList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
   return $.takeSimulationValue<PoolList>(output, outputTypeTag, repo);
 }
 export function loadParsers(repo: AptosParserRepo) {
@@ -179,11 +180,11 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_get_pool_list(isJSON);
   }
-  async get_pool_list(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async get_pool_list(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_get_pool_list(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
-  async query_get_pool_list(fetcher: $.SimulationKeys, $p: TypeTag[], _maxGas = 1000, _isJSON = false) {
-    return query_get_pool_list(this.client, fetcher, this.repo, $p, _maxGas, _isJSON);
+  async query_get_pool_list(fetcher: $.SimulationKeys, $p: TypeTag[], option?: OptionTransaction, _isJSON = false) {
+    return query_get_pool_list(this.client, fetcher, this.repo, $p, option);
   }
 }

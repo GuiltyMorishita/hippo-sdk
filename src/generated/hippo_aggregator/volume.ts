@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
@@ -352,12 +353,12 @@ export async function query_fetch_volume(
   fetcher: $.SimulationKeys,
   repo: AptosParserRepo,
   $p: TypeTag[],
-  _maxGas = 1000,
+  option?: OptionTransaction,
   _isJSON = false
 ) {
   const payload = buildPayload_fetch_volume(_isJSON);
   const outputTypeTag = new SimpleStructTag(Volume);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, _maxGas);
+  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
   return $.takeSimulationValue<Volume>(output, outputTypeTag, repo);
 }
 export function get_volume_($c: AptosDataCache): Volume {
@@ -735,30 +736,30 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_clean(isJSON);
   }
-  async clean(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async clean(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_clean(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_fetch_volume(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_fetch_volume(isJSON);
   }
-  async fetch_volume(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async fetch_volume(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_fetch_volume(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
-  async query_fetch_volume(fetcher: $.SimulationKeys, $p: TypeTag[], _maxGas = 1000, _isJSON = false) {
-    return query_fetch_volume(this.client, fetcher, this.repo, $p, _maxGas, _isJSON);
+  async query_fetch_volume(fetcher: $.SimulationKeys, $p: TypeTag[], option?: OptionTransaction, _isJSON = false) {
+    return query_fetch_volume(this.client, fetcher, this.repo, $p, option);
   }
   payload_get_volume(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_get_volume(isJSON);
   }
-  async get_volume(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async get_volume(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_get_volume(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_initialize(
     poster: HexString,
@@ -766,9 +767,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_initialize(poster, isJSON);
   }
-  async initialize(_account: AptosAccount, poster: HexString, _maxGas = 1000, _isJSON = false) {
+  async initialize(_account: AptosAccount, poster: HexString, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_initialize(poster, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_post(
     amount: U64,
@@ -830,7 +831,7 @@ export class App {
     pool_provider_24h_amount: U64[],
     pool_provider_7d_dex_type: U8[],
     pool_provider_7d_amount: U64[],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_post(
@@ -853,7 +854,7 @@ export class App {
       pool_provider_7d_amount,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_set_poster(
     new_poster: HexString,
@@ -861,8 +862,8 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_set_poster(new_poster, isJSON);
   }
-  async set_poster(_account: AptosAccount, new_poster: HexString, _maxGas = 1000, _isJSON = false) {
+  async set_poster(_account: AptosAccount, new_poster: HexString, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_set_poster(new_poster, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

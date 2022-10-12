@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Basiq from '../basiq';
 import * as Econia from '../econia';
@@ -871,27 +872,27 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_init_coin_store($p, isJSON);
   }
-  async init_coin_store(_account: AptosAccount, $p: TypeTag[] /* <X>*/, _maxGas = 1000, _isJSON = false) {
+  async init_coin_store(_account: AptosAccount, $p: TypeTag[] /* <X>*/, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_init_coin_store($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_init_coin_store_all(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_init_coin_store_all(isJSON);
   }
-  async init_coin_store_all(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async init_coin_store_all(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_init_coin_store_all(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_init_module(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_init_module(isJSON);
   }
-  async init_module(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async init_module(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_init_module(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_one_step_route(
     first_dex_type: U8,
@@ -912,7 +913,7 @@ export class App {
     x_in: U64,
     y_min_out: U64,
     $p: TypeTag[] /* <X, Y, E>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_one_step_route(
@@ -924,7 +925,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_three_step_route(
     first_dex_type: U8,
@@ -971,7 +972,7 @@ export class App {
     x_in: U64,
     m_min_out: U64,
     $p: TypeTag[] /* <X, Y, Z, M, E1, E2, E3>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_three_step_route(
@@ -989,7 +990,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_two_step_route(
     first_dex_type: U8,
@@ -1027,7 +1028,7 @@ export class App {
     x_in: U64,
     z_min_out: U64,
     $p: TypeTag[] /* <X, Y, Z, E1, E2>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_two_step_route(
@@ -1042,6 +1043,6 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 import * as Router from './router';
@@ -276,11 +277,11 @@ export class App {
     coin_y_val: U64,
     coin_y_val_min: U64,
     $p: TypeTag[] /* <X, Y, Curve>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_add_liquidity(coin_x_val, coin_x_val_min, coin_y_val, coin_y_val_min, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_register_pool(
     $p: TypeTag[] /* <X, Y, Curve>*/,
@@ -288,9 +289,14 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_register_pool($p, isJSON);
   }
-  async register_pool(_account: AptosAccount, $p: TypeTag[] /* <X, Y, Curve>*/, _maxGas = 1000, _isJSON = false) {
+  async register_pool(
+    _account: AptosAccount,
+    $p: TypeTag[] /* <X, Y, Curve>*/,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_register_pool($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_register_pool_and_add_liquidity(
     coin_x_val: U64,
@@ -316,7 +322,7 @@ export class App {
     coin_y_val: U64,
     coin_y_val_min: U64,
     $p: TypeTag[] /* <X, Y, Curve>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_register_pool_and_add_liquidity(
@@ -327,7 +333,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_remove_liquidity(
     lp_val: U64,
@@ -344,11 +350,11 @@ export class App {
     min_x_out_val: U64,
     min_y_out_val: U64,
     $p: TypeTag[] /* <X, Y, Curve>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_remove_liquidity(lp_val, min_x_out_val, min_y_out_val, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_swap(
     coin_val: U64,
@@ -363,11 +369,11 @@ export class App {
     coin_val: U64,
     coin_out_min_val: U64,
     $p: TypeTag[] /* <X, Y, Curve>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_swap(coin_val, coin_out_min_val, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_swap_into(
     coin_val_max: U64,
@@ -382,10 +388,10 @@ export class App {
     coin_val_max: U64,
     coin_out: U64,
     $p: TypeTag[] /* <X, Y, Curve>*/,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_swap_into(coin_val_max, coin_out, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

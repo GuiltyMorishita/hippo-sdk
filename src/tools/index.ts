@@ -24,12 +24,7 @@ import { TxnBuilderTypes } from 'aptos';
 
 const actionShowTokenRegistry = async () => {
   const { app, hippoDexAddress, account } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
-    getSimulationKeys(account),
-    hippoDexAddress,
-    [],
-    2000
-  );
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, []);
   for (const tokInfo of fullList.coin_info_list) {
     console.log(`########${tokInfo.symbol.str()}#######`);
     console.log(`name: ${tokInfo.name.str()}`);
@@ -44,12 +39,7 @@ const actionShowTokenRegistry = async () => {
 
 const actionShowPools = async () => {
   const { app, hippoDexAddress, account } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
-    getSimulationKeys(account),
-    hippoDexAddress,
-    [],
-    2000
-  );
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, []);
   for (const coinInfo of fullList.coin_info_list) {
     const structTag = typeInfoToTypeTag(coinInfo.token_type);
     if (
@@ -81,12 +71,7 @@ const actionShowPools = async () => {
 const actionHitFaucet = async (coinSymbol: string, rawAmount: string, _options: any) => {
   const amount = u64(rawAmount);
   const { app, hippoDexAddress, account } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
-    getSimulationKeys(account),
-    hippoDexAddress,
-    [],
-    2000
-  );
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, []);
   for (const coinInfo of fullList.coin_info_list) {
     if (coinInfo.symbol.str() === coinSymbol) {
       const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
@@ -101,12 +86,7 @@ const actionHitFaucet = async (coinSymbol: string, rawAmount: string, _options: 
 
 const actionShowWallet = async () => {
   const { app, hippoDexAddress, account } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
-    getSimulationKeys(account),
-    hippoDexAddress,
-    [],
-    2000
-  );
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, []);
   for (const coinInfo of fullList.coin_info_list) {
     const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
     try {
@@ -125,12 +105,7 @@ const getFromToAndLps = async (
   toSymbol: string,
   fetcher: AptosAccount
 ) => {
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
-    getSimulationKeys(fetcher),
-    hippoDexAddress,
-    [],
-    2000
-  );
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(fetcher), hippoDexAddress, []);
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -235,10 +210,10 @@ const actionRemoveLiquidity = async (lhsSymbol: string, rhsSymbol: string, remov
 const actionMockDeploy = async () => {
   const { client, account } = readConfig(program);
   const payload = await hippo_swap.Cp_scripts.buildPayload_mock_deploy_script();
-  await sendPayloadTx(client, account, payload, 10000);
+  await sendPayloadTx(client, account, payload);
   console.log('CPSwap');
   const pieceSwapPayload = await hippo_swap.Piece_swap_script.buildPayload_mock_deploy_script();
-  await sendPayloadTx(client, account, pieceSwapPayload, 10000);
+  await sendPayloadTx(client, account, pieceSwapPayload);
   console.log('PieceSwap');
 };
 
@@ -537,12 +512,7 @@ const checkTestCoin = async () => {
   );
   const testCoinInfo = await CoinInfo.load(repo, client, stdlib.Aptos_coin.moduleAddress, [testCoinTag]);
   printResource(testCoinInfo);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(
-    getSimulationKeys(account),
-    hippoDexAddress,
-    [],
-    2000
-  );
+  const fullList = await app.coin_list.coin_list.query_fetch_full_list(getSimulationKeys(account), hippoDexAddress, []);
   for (const tokenInfo of fullList.coin_info_list) {
     const tag = typeInfoToTypeTag(tokenInfo.token_type);
     if (getTypeTagFullname(tag) === getTypeTagFullname(testCoinTag)) {
@@ -588,7 +558,7 @@ const updateTokenRegistry = async (
     true,
     [testCoinTag]
   );
-  await sendPayloadTx(client, account, payload, 3000);
+  await sendPayloadTx(client, account, payload);
 };
 
 const furnishMockTokenDetails = async () => {

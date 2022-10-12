@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Account from './account';
 import * as Bcs from './bcs';
@@ -1539,9 +1540,15 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_add_stake(operator, amount, isJSON);
   }
-  async add_stake(_account: AptosAccount, operator: HexString, amount: U64, _maxGas = 1000, _isJSON = false) {
+  async add_stake(
+    _account: AptosAccount,
+    operator: HexString,
+    amount: U64,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_add_stake(operator, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_create_staking_contract(
     operator: HexString,
@@ -1567,7 +1574,7 @@ export class App {
     amount: U64,
     commission_percentage: U64,
     contract_creation_seed: U8[],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_create_staking_contract(
@@ -1578,7 +1585,7 @@ export class App {
       contract_creation_seed,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_distribute(
     staker: HexString,
@@ -1587,9 +1594,15 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_distribute(staker, operator, isJSON);
   }
-  async distribute(_account: AptosAccount, staker: HexString, operator: HexString, _maxGas = 1000, _isJSON = false) {
+  async distribute(
+    _account: AptosAccount,
+    staker: HexString,
+    operator: HexString,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_distribute(staker, operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_request_commission(
     staker: HexString,
@@ -1602,11 +1615,11 @@ export class App {
     _account: AptosAccount,
     staker: HexString,
     operator: HexString,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_request_commission(staker, operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_reset_lockup(
     operator: HexString,
@@ -1614,9 +1627,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_reset_lockup(operator, isJSON);
   }
-  async reset_lockup(_account: AptosAccount, operator: HexString, _maxGas = 1000, _isJSON = false) {
+  async reset_lockup(_account: AptosAccount, operator: HexString, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_reset_lockup(operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_switch_operator(
     old_operator: HexString,
@@ -1631,11 +1644,11 @@ export class App {
     old_operator: HexString,
     new_operator: HexString,
     new_commission_percentage: U64,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_switch_operator(old_operator, new_operator, new_commission_percentage, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_switch_operator_with_same_commission(
     old_operator: HexString,
@@ -1648,11 +1661,11 @@ export class App {
     _account: AptosAccount,
     old_operator: HexString,
     new_operator: HexString,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_switch_operator_with_same_commission(old_operator, new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_unlock_rewards(
     operator: HexString,
@@ -1660,9 +1673,9 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_unlock_rewards(operator, isJSON);
   }
-  async unlock_rewards(_account: AptosAccount, operator: HexString, _maxGas = 1000, _isJSON = false) {
+  async unlock_rewards(_account: AptosAccount, operator: HexString, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_unlock_rewards(operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_unlock_stake(
     operator: HexString,
@@ -1671,9 +1684,15 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_unlock_stake(operator, amount, isJSON);
   }
-  async unlock_stake(_account: AptosAccount, operator: HexString, amount: U64, _maxGas = 1000, _isJSON = false) {
+  async unlock_stake(
+    _account: AptosAccount,
+    operator: HexString,
+    amount: U64,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
     const payload = buildPayload_unlock_stake(operator, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_update_voter(
     operator: HexString,
@@ -1686,10 +1705,10 @@ export class App {
     _account: AptosAccount,
     operator: HexString,
     new_voter: HexString,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_update_voter(operator, new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Liquidswap';
@@ -245,26 +246,26 @@ export class App {
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_disable_forever(isJSON);
   }
-  async disable_forever(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async disable_forever(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_disable_forever(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_pause(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_pause(isJSON);
   }
-  async pause(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async pause(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_pause(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_resume(
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
     return buildPayload_resume(isJSON);
   }
-  async resume(_account: AptosAccount, _maxGas = 1000, _isJSON = false) {
+  async resume(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
     const payload = buildPayload_resume(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }

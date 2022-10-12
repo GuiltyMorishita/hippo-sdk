@@ -4,6 +4,7 @@ import { U8, U64, U128 } from '@manahippo/move-to-ts';
 import { u8, u64, u128 } from '@manahippo/move-to-ts';
 import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
+import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Account from './account';
 import * as Code from './code';
@@ -327,11 +328,11 @@ export class App {
     _account: AptosAccount,
     seed: U8[],
     optional_auth_key: U8[],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_create_resource_account(seed, optional_auth_key, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_create_resource_account_and_fund(
     seed: U8[],
@@ -346,11 +347,11 @@ export class App {
     seed: U8[],
     optional_auth_key: U8[],
     fund_amount: U64,
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_create_resource_account_and_fund(seed, optional_auth_key, fund_amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
   payload_create_resource_account_and_publish_package(
     seed: U8[],
@@ -365,10 +366,10 @@ export class App {
     seed: U8[],
     metadata_serialized: U8[],
     code: U8[][],
-    _maxGas = 1000,
+    option?: OptionTransaction,
     _isJSON = false
   ) {
     const payload = buildPayload_create_resource_account_and_publish_package(seed, metadata_serialized, code, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, _maxGas);
+    return $.sendPayloadTx(this.client, _account, payload, option);
   }
 }
