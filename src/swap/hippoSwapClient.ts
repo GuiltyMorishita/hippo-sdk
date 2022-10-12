@@ -82,7 +82,7 @@ export class HippoSwapClient {
 
   static async createInOneCall(app: App, netConfig: NetworkConfiguration, fetcher: SimulationKeys) {
     const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(app, netConfig);
-    const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.coinListAddress, []);
+    const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.coinListAddress, [], 2000);
     return new HippoSwapClient(app, netConfig, fullList.coin_info_list, cpPoolInfos, piecePoolInfos, fetcher);
   }
   constructor(
@@ -364,7 +364,8 @@ export class HippoSwapClient {
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
       this.fetcher,
       this.netConfig.hippoDexAddress,
-      []
+      [],
+      2000
     );
     this.coinInfoList = fullList.coin_info_list;
     this.cpPoolInfos = cpPoolInfos;

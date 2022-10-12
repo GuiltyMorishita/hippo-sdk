@@ -36,7 +36,12 @@ export class CoinListClient {
   }
 
   private async buildCache() {
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(this.fetcher, CoinInfo.moduleAddress, []);
+    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
+      this.fetcher,
+      CoinInfo.moduleAddress,
+      [],
+      2000
+    );
     this.coinList = fullList.coin_info_list;
     for (const tokenInfo of fullList.coin_info_list) {
       const fullname = tokenInfo.token_type.typeFullname();

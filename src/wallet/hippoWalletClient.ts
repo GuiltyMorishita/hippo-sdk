@@ -37,7 +37,8 @@ export class HippoWalletClient {
     const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
       this.fetcher,
       this.netConf.coinListAddress,
-      []
+      [],
+      2000
     );
     for (const tokenInfo of fullList.coin_info_list) {
       const typeTag = typeInfoToTypeTag(tokenInfo.token_type);
