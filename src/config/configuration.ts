@@ -18,6 +18,7 @@ export class NetworkConfiguration {
     public basiqAddress: HexString,
     public dittoAddress: HexString,
     public tortugaAddress: HexString,
+    public aptoswapAddress: HexString,
     public isMainNet = false
   ) {}
 
@@ -52,7 +53,9 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // ditto
   new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
   // tortuga
-  new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab')
+  new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
+  // aptoswap
+  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba')
 );
 
 export const TESTNET_CONFIG = new NetworkConfiguration(
@@ -78,7 +81,9 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   // ditto
   new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
   // tortuga
-  new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab')
+  new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
+  // aptoswap
+  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba')
 );
 
 export const CONFIGS = {

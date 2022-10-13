@@ -37,7 +37,9 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   Ditto = 5,
   // eslint-disable-next-line no-unused-vars
-  Tortuga = 6
+  Tortuga = 6,
+  // eslint-disable-next-line no-unused-vars
+  Aptoswap = 7
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo]: 'Hippo',
@@ -45,7 +47,8 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Pontem]: 'Pontem',
   [DexType.Basiq]: 'Basiq',
   [DexType.Ditto]: 'Ditto',
-  [DexType.Tortuga]: 'Tortuga'
+  [DexType.Tortuga]: 'Tortuga',
+  [DexType.Aptoswap]: 'Aptoswap'
 };
 export type PoolType = U64;
 

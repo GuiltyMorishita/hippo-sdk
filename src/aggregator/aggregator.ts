@@ -9,6 +9,7 @@ import { CONFIGS } from '../config';
 import { SimulationKeys } from '@manahippo/move-to-ts';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
+import { AptoswapPoolProvider } from './aptoswap/aptoswap';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -31,9 +32,10 @@ export class TradeAggregator {
       new HippoPoolProvider(app, fetcher, netConfig, registryClient),
       new EconiaPoolProvider(app, fetcher, netConfig, registryClient),
       new PontemPoolProvider(app, fetcher, netConfig, registryClient),
-      new BasiqPoolProvider(app, fetcher, netConfig, registryClient)
+      new BasiqPoolProvider(app, fetcher, netConfig, registryClient),
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
-      //new TortugaPoolProvider(app, fetcher, netConfig, registryClient)
+      //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
+      new AptoswapPoolProvider(app, fetcher, netConfig, registryClient),
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;
