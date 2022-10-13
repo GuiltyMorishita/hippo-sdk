@@ -12,7 +12,7 @@ import { AptosClient, HexString } from 'aptos';
 import * as AptosStdlib from './generated/stdlib';
 import * as AptosFramework from './generated/stdlib';
 import { Coin_list } from './generated/coin_list';
-import { coin_list } from './generated';
+import { App, coin_list } from './generated';
 import * as Aptos_std from './generated/stdlib';
 import { Nothing } from './generated/coin_list/coin_list';
 import * as Std from './generated/stdlib';
@@ -106,4 +106,10 @@ export function parseCoinInfoListFromCoinList(
     }
   }
   return coinInfoList;
+}
+
+export async function queryFetchFullList(app: App, owner: HexString, expireTimestampSecFromNow = 60) {
+  return app.coin_list.coin_list.query_fetch_full_list(owner, [], {
+    expireTimestamp: Math.floor(Date.now() / 1000) + expireTimestampSecFromNow
+  });
 }

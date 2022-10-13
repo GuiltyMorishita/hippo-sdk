@@ -5,7 +5,7 @@ import { NetworkConfiguration } from '../config';
 import { Cp_swap, Piece_swap } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
 import { CoinInfo } from '../generated/stdlib/coin';
-import { typeInfoToTypeTag } from '../utils';
+import { queryFetchFullList, typeInfoToTypeTag } from '../utils';
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute } from './baseTypes';
 import { HippoConstantProductPool } from './constantProductPool';
 import { HippoPieceSwapPool } from './pieceSwapPool';
@@ -82,7 +82,7 @@ export class HippoSwapClient {
 
   static async createInOneCall(app: App, netConfig: NetworkConfiguration) {
     const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(app, netConfig);
-    const fullList = await app.coin_list.coin_list.query_fetch_full_list(netConfig.coinListAddress, []);
+    const fullList = await queryFetchFullList(app, netConfig.coinListAddress);
     return new HippoSwapClient(app, netConfig, fullList.coin_info_list, cpPoolInfos, piecePoolInfos);
   }
   constructor(
@@ -360,7 +360,7 @@ export class HippoSwapClient {
 
   async reloadAllPools() {
     const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(this.app, this.netConfig);
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(this.netConfig.hippoDexAddress, []);
+    const fullList = await queryFetchFullList(this.app, this.netConfig.hippoDexAddress);
     this.coinInfoList = fullList.coin_info_list;
     this.cpPoolInfos = cpPoolInfos;
     this.piecePoolInfos = piecePoolInfos;

@@ -12,7 +12,7 @@ import { Command } from 'commander';
 import { App, getProjectRepo } from '../generated';
 import { stdlib, hippo_swap } from '../generated/';
 import { Devnet_coins } from '../generated/coin_list';
-import { printResource, printResources, typeInfoToTypeTag } from '../utils';
+import { printResource, printResources, queryFetchFullList, typeInfoToTypeTag } from '../utils';
 import { readConfig, strToString } from './utils';
 import { HippoSwapClient } from '../swap';
 import { HippoWalletClient } from '../wallet';
@@ -24,7 +24,7 @@ import { TxnBuilderTypes } from 'aptos';
 
 const actionShowTokenRegistry = async () => {
   const { app, hippoDexAddress } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(hippoDexAddress, []);
+  const fullList = await queryFetchFullList(app, hippoDexAddress);
   for (const tokInfo of fullList.coin_info_list) {
     console.log(`########${tokInfo.symbol.str()}#######`);
     console.log(`name: ${tokInfo.name.str()}`);
@@ -39,7 +39,7 @@ const actionShowTokenRegistry = async () => {
 
 const actionShowPools = async () => {
   const { app, hippoDexAddress } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(hippoDexAddress, []);
+  const fullList = await queryFetchFullList(app, hippoDexAddress);
   for (const coinInfo of fullList.coin_info_list) {
     const structTag = typeInfoToTypeTag(coinInfo.token_type);
     if (
@@ -71,7 +71,7 @@ const actionShowPools = async () => {
 const actionHitFaucet = async (coinSymbol: string, rawAmount: string, _options: any) => {
   const amount = u64(rawAmount);
   const { app, hippoDexAddress, account } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(hippoDexAddress, []);
+  const fullList = await queryFetchFullList(app, hippoDexAddress);
   for (const coinInfo of fullList.coin_info_list) {
     if (coinInfo.symbol.str() === coinSymbol) {
       const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
@@ -86,7 +86,7 @@ const actionHitFaucet = async (coinSymbol: string, rawAmount: string, _options: 
 
 const actionShowWallet = async () => {
   const { app, hippoDexAddress, account } = readConfig(program);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(hippoDexAddress, []);
+  const fullList = await queryFetchFullList(app, hippoDexAddress);
   for (const coinInfo of fullList.coin_info_list) {
     const coinTypeTag = typeInfoToTypeTag(coinInfo.token_type);
     try {
@@ -105,7 +105,7 @@ const getFromToAndLps = async (
   toSymbol: string,
   fetcher: AptosAccount
 ) => {
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(hippoDexAddress, []);
+  const fullList = await queryFetchFullList(app, hippoDexAddress);
   let fromTag, toTag;
   const lpTokenTags = [];
   const symbolToCoinTagFullname: Record<string, string> = {};
@@ -502,7 +502,7 @@ const checkTestCoin = async () => {
   );
   const testCoinInfo = await CoinInfo.load(repo, client, stdlib.Aptos_coin.moduleAddress, [testCoinTag]);
   printResource(testCoinInfo);
-  const fullList = await app.coin_list.coin_list.query_fetch_full_list(hippoDexAddress, []);
+  const fullList = await queryFetchFullList(app, hippoDexAddress);
   for (const tokenInfo of fullList.coin_info_list) {
     const tag = typeInfoToTypeTag(tokenInfo.token_type);
     if (getTypeTagFullname(tag) === getTypeTagFullname(testCoinTag)) {

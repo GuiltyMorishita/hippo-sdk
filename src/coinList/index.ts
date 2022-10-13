@@ -1,6 +1,7 @@
 import { Type_info } from '../generated/stdlib';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { App } from '../generated';
+import { queryFetchFullList } from '../utils';
 
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;
@@ -35,7 +36,7 @@ export class CoinListClient {
   }
 
   private async buildCache() {
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(CoinInfo.moduleAddress, []);
+    const fullList = await queryFetchFullList(this.app, CoinInfo.moduleAddress);
     this.coinList = fullList.coin_info_list;
     for (const tokenInfo of fullList.coin_info_list) {
       const fullname = tokenInfo.token_type.typeFullname();

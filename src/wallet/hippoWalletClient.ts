@@ -4,7 +4,7 @@ import { NetworkConfiguration } from '../config';
 
 import * as AptosFramework from '../generated/stdlib';
 import * as CoinList from '../generated/coin_list';
-import { getCoinStoresForAddress, typeInfoToTypeTag } from '../utils';
+import { getCoinStoresForAddress, queryFetchFullList, typeInfoToTypeTag } from '../utils';
 import { App } from '../generated';
 
 export class HippoWalletClient {
@@ -33,7 +33,7 @@ export class HippoWalletClient {
     this.fullnameToTokenInfo = {};
     this.symbolToTokenInfo = {};
     this.devnetCoinSymbols = [];
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(this.netConf.coinListAddress, []);
+    const fullList = await queryFetchFullList(this.app, this.netConf.coinListAddress);
     for (const tokenInfo of fullList.coin_info_list) {
       const typeTag = typeInfoToTypeTag(tokenInfo.token_type);
       const fullname = getTypeTagFullname(typeTag);
