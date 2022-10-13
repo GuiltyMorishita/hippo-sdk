@@ -6,7 +6,6 @@ import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, T
 import { PontemPoolProvider } from './pontem';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
-import { SimulationKeys } from '@manahippo/move-to-ts';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
 
@@ -16,7 +15,6 @@ export class TradeAggregator {
   private constructor(
     public registryClient: CoinListClient,
     public app: App,
-    public fetcher: SimulationKeys,
     public readonly poolProviders: TradingPoolProvider[]
   ) {
     this.allPools = [];
@@ -25,13 +23,12 @@ export class TradeAggregator {
 
   static async create(aptosClient: AptosClient, netConfig = CONFIGS.testnet) {
     const app = new App(aptosClient);
-    const fetcher: SimulationKeys = netConfig.simulationKeys;
-    const registryClient = await CoinListClient.load(app, fetcher);
-    const aggregator = new TradeAggregator(registryClient, app, fetcher, [
-      new HippoPoolProvider(app, fetcher, netConfig, registryClient),
-      new EconiaPoolProvider(app, fetcher, netConfig, registryClient),
-      new PontemPoolProvider(app, fetcher, netConfig, registryClient),
-      new BasiqPoolProvider(app, fetcher, netConfig, registryClient)
+    const registryClient = await CoinListClient.load(app);
+    const aggregator = new TradeAggregator(registryClient, app, [
+      new HippoPoolProvider(app, netConfig, registryClient),
+      new EconiaPoolProvider(app, netConfig, registryClient),
+      new PontemPoolProvider(app, netConfig, registryClient),
+      new BasiqPoolProvider(app, netConfig, registryClient)
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
       //new TortugaPoolProvider(app, fetcher, netConfig, registryClient)
     ]);

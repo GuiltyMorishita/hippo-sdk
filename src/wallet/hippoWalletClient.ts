@@ -1,4 +1,4 @@
-import { getTypeTagFullname, SimulationKeys, StructTag, u64 } from '@manahippo/move-to-ts';
+import { getTypeTagFullname, StructTag, u64 } from '@manahippo/move-to-ts';
 import { HexString, TxnBuilderTypes, Types } from 'aptos';
 import { NetworkConfiguration } from '../config';
 
@@ -18,8 +18,7 @@ export class HippoWalletClient {
     public netConf: NetworkConfiguration,
     public app: App,
     public walletAddress: HexString,
-    public coinStores: AptosFramework.Coin.CoinStore[],
-    public fetcher: SimulationKeys
+    public coinStores: AptosFramework.Coin.CoinStore[]
   ) {
     this.symbolToCoinStore = {};
     this.fullnameToCoinStore = {};
@@ -34,11 +33,7 @@ export class HippoWalletClient {
     this.fullnameToTokenInfo = {};
     this.symbolToTokenInfo = {};
     this.devnetCoinSymbols = [];
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
-      this.fetcher,
-      this.netConf.coinListAddress,
-      []
-    );
+    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(this.netConf.coinListAddress, []);
     for (const tokenInfo of fullList.coin_info_list) {
       const typeTag = typeInfoToTypeTag(tokenInfo.token_type);
       const fullname = getTypeTagFullname(typeTag);
@@ -75,14 +70,9 @@ export class HippoWalletClient {
     await this.buildCache();
   }
 
-  static async createInTwoCalls(
-    netConf: NetworkConfiguration,
-    app: App,
-    walletAddress: HexString,
-    fetcher: SimulationKeys
-  ) {
+  static async createInTwoCalls(netConf: NetworkConfiguration, app: App, walletAddress: HexString) {
     const stores = await getCoinStoresForAddress(app.client, walletAddress, app.parserRepo);
-    const client = new HippoWalletClient(netConf, app, walletAddress, stores, fetcher);
+    const client = new HippoWalletClient(netConf, app, walletAddress, stores);
     await client.buildCache();
     return client;
   }

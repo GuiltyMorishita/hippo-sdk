@@ -749,7 +749,12 @@ export class App {
     const payload = buildPayload_fetch_volume(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, option);
   }
-  async query_fetch_volume(fetcher: $.SimulationKeys, $p: TypeTag[], option?: OptionTransaction, _isJSON = false) {
+  async query_fetch_volume(
+    $p: TypeTag[],
+    option?: OptionTransaction,
+    _isJSON = false,
+    fetcher: $.SimulationKeys = $.SIM_KEYS
+  ) {
     return query_fetch_volume(this.client, fetcher, this.repo, $p, option);
   }
   payload_get_volume(
