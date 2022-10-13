@@ -78,7 +78,7 @@ export class HippoTradingPool extends TradingPool {
 
 export class HippoPoolProvider extends TradingPoolProvider {
   async loadPoolList(): Promise<TradingPool[]> {
-    const swapClient = await HippoSwapClient.createInOneCall(this.app, this.netConfig, this.fetcher);
+    const swapClient = await HippoSwapClient.createInOneCall(this.app, this.netConfig);
     const poolList: TradingPool[] = [];
     for (const fullname in swapClient.xyFullnameToPoolSet) {
       const poolSet = swapClient.xyFullnameToPoolSet[fullname];

@@ -184,7 +184,12 @@ export class App {
     const payload = buildPayload_get_pool_list(_isJSON);
     return $.sendPayloadTx(this.client, _account, payload, option);
   }
-  async query_get_pool_list(fetcher: $.SimulationKeys, $p: TypeTag[], option?: OptionTransaction, _isJSON = false) {
+  async query_get_pool_list(
+    $p: TypeTag[],
+    option?: OptionTransaction,
+    _isJSON = false,
+    fetcher: $.SimulationKeys = $.SIM_KEYS
+  ) {
     return query_get_pool_list(this.client, fetcher, this.repo, $p, option);
   }
 }

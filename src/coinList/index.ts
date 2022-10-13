@@ -1,13 +1,13 @@
 import { Type_info } from '../generated/stdlib';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { App } from '../generated';
-import { SimulationKeys } from '@manahippo/move-to-ts';
+import { queryFetchFullList } from '../utils';
 
 export class CoinListClient {
   fullnameToCoinInfo: Record<string, CoinInfo>;
   symbolToCoinInfo: Record<string, CoinInfo>;
   coinList: CoinInfo[];
-  constructor(public app: App, public fetcher: SimulationKeys) {
+  constructor(public app: App) {
     this.fullnameToCoinInfo = {};
     this.symbolToCoinInfo = {};
     this.coinList = [];
@@ -29,14 +29,14 @@ export class CoinListClient {
     return this.fullnameToCoinInfo[tokenType.typeFullname()];
   }
 
-  static async load(app: App, fetcher: SimulationKeys) {
-    const coinRegistry = new CoinListClient(app, fetcher);
+  static async load(app: App) {
+    const coinRegistry = new CoinListClient(app);
     await coinRegistry.buildCache();
     return coinRegistry;
   }
 
   private async buildCache() {
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(this.fetcher, CoinInfo.moduleAddress, []);
+    const fullList = await queryFetchFullList(this.app, CoinInfo.moduleAddress);
     this.coinList = fullList.coin_info_list;
     for (const tokenInfo of fullList.coin_info_list) {
       const fullname = tokenInfo.token_type.typeFullname();

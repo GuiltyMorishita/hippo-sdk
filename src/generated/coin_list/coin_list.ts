@@ -1360,10 +1360,10 @@ export class App {
     return $.sendPayloadTx(this.client, _account, payload, option);
   }
   async query_fetch_all_registered_coin_info(
-    fetcher: $.SimulationKeys,
     $p: TypeTag[],
     option?: OptionTransaction,
-    _isJSON = false
+    _isJSON = false,
+    fetcher: $.SimulationKeys = $.SIM_KEYS
   ) {
     return query_fetch_all_registered_coin_info(this.client, fetcher, this.repo, $p, option);
   }
@@ -1383,11 +1383,11 @@ export class App {
     return $.sendPayloadTx(this.client, _account, payload, option);
   }
   async query_fetch_full_list(
-    fetcher: $.SimulationKeys,
     list_owner_addr: HexString,
     $p: TypeTag[],
     option?: OptionTransaction,
-    _isJSON = false
+    _isJSON = false,
+    fetcher: $.SimulationKeys = $.SIM_KEYS
   ) {
     return query_fetch_full_list(this.client, fetcher, this.repo, list_owner_addr, $p, option);
   }

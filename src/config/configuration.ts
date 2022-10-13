@@ -8,8 +8,6 @@ export class NetworkConfiguration {
     public name: string,
     public fullNodeUrl: string,
     public faucetUrl: string,
-    public simulationAddress: HexString,
-    public simulationPubkey: HexString,
     public hippoDexAddress: HexString,
     public coinListAddress: HexString,
     public hippoAggregatorAddress: HexString,
@@ -21,23 +19,12 @@ export class NetworkConfiguration {
     public aptoswapAddress: HexString,
     public isMainNet = false
   ) {}
-
-  get simulationKeys() {
-    return {
-      pubkey: this.simulationPubkey,
-      address: this.simulationAddress
-    };
-  }
 }
 
 export const LOCAL_CONFIG = new NetworkConfiguration(
   'localhost',
   'http://0.0.0.0:8080',
   'http://0.0.0.0:8000',
-  // simulationAddress coin list now
-  new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
-  // simulationPubkey coin list now
-  new HexString('0xc5aad5bddffb7516c7a02a2fb14fa50cfaf7497281bc89f90024005f44f3e393'),
   // hippo dex
   Hippo_config.moduleAddress,
   // coin list
@@ -62,10 +49,6 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   'devnet',
   'https://fullnode.testnet.aptoslabs.com/v1',
   'https://faucet.testnet.aptoslabs.com',
-  // simulationAddress coin list now
-  new HexString('0xb5d6dbc225e8c42cec66664ebbccaef2098107f699510613a0b90214f659bb46'),
-  // simulationPubkey coin list now
-  new HexString('0xc5aad5bddffb7516c7a02a2fb14fa50cfaf7497281bc89f90024005f44f3e393'),
   // hippo dex
   Hippo_config.moduleAddress,
   // coin list

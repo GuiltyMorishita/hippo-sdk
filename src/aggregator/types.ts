@@ -1,4 +1,4 @@
-import { AtomicTypeTag, SimulationKeys, TypeTag, u64, u8, U64 } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, TypeTag, u64, u8, U64 } from '@manahippo/move-to-ts';
 import { Types, TxnBuilderTypes } from 'aptos';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { Aggregator } from '../generated/hippo_aggregator';
@@ -273,12 +273,7 @@ export interface RouteAndQuote {
 
 // Each DEX is a TradeStepProvider
 export abstract class TradingPoolProvider {
-  constructor(
-    public app: App,
-    public fetcher: SimulationKeys,
-    public netConfig = CONFIGS.testnet,
-    public registry: CoinListClient
-  ) {}
+  constructor(public app: App, public netConfig = CONFIGS.testnet, public registry: CoinListClient) {}
   abstract loadPoolList(): Promise<TradingPool[]>;
 
   async reloadAllPoolState() {

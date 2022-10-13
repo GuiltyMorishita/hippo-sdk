@@ -1,11 +1,11 @@
-import { getTypeTagFullname, parseMoveStructTag, SimulationKeys, StructTag, TypeTag } from '@manahippo/move-to-ts';
+import { getTypeTagFullname, parseMoveStructTag, StructTag, TypeTag } from '@manahippo/move-to-ts';
 import { HexString } from 'aptos';
 import bigInt from 'big-integer';
 import { NetworkConfiguration } from '../config';
 import { Cp_swap, Piece_swap } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
 import { CoinInfo } from '../generated/stdlib/coin';
-import { typeInfoToTypeTag } from '../utils';
+import { queryFetchFullList, typeInfoToTypeTag } from '../utils';
 import { HippoPool, PoolType, poolTypeToName, RouteStep, SteppedRoute } from './baseTypes';
 import { HippoConstantProductPool } from './constantProductPool';
 import { HippoPieceSwapPool } from './pieceSwapPool';
@@ -80,18 +80,17 @@ export class HippoSwapClient {
   public xyFullnameToPoolSet: Record<string, PoolSet>;
   public contractAddress: HexString;
 
-  static async createInOneCall(app: App, netConfig: NetworkConfiguration, fetcher: SimulationKeys) {
+  static async createInOneCall(app: App, netConfig: NetworkConfiguration) {
     const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(app, netConfig);
-    const fullList = await app.coin_list.coin_list.query_fetch_full_list(fetcher, netConfig.coinListAddress, []);
-    return new HippoSwapClient(app, netConfig, fullList.coin_info_list, cpPoolInfos, piecePoolInfos, fetcher);
+    const fullList = await queryFetchFullList(app, netConfig.coinListAddress);
+    return new HippoSwapClient(app, netConfig, fullList.coin_info_list, cpPoolInfos, piecePoolInfos);
   }
   constructor(
     public app: App,
     public netConfig: NetworkConfiguration,
     public coinInfoList: Coin_list.CoinInfo[],
     public cpPoolInfos: Cp_swap.TokenPairMetadata[],
-    public piecePoolInfos: Piece_swap.PieceSwapPoolInfo[],
-    public fetcher: SimulationKeys
+    public piecePoolInfos: Piece_swap.PieceSwapPoolInfo[]
   ) {
     // init cached maps/lists
     this.singleCoins = [];
@@ -361,11 +360,7 @@ export class HippoSwapClient {
 
   async reloadAllPools() {
     const { cpPoolInfos, piecePoolInfos } = await loadHippoDexResources(this.app, this.netConfig);
-    const fullList = await this.app.coin_list.coin_list.query_fetch_full_list(
-      this.fetcher,
-      this.netConfig.hippoDexAddress,
-      []
-    );
+    const fullList = await queryFetchFullList(this.app, this.netConfig.hippoDexAddress);
     this.coinInfoList = fullList.coin_info_list;
     this.cpPoolInfos = cpPoolInfos;
     this.piecePoolInfos = piecePoolInfos;
