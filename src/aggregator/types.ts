@@ -1,8 +1,8 @@
-import { AtomicTypeTag, TypeTag, u64, u8, U64 } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, TypeTag, u64, u8, U64, ActualStringClass } from '@manahippo/move-to-ts';
 import { Types, TxnBuilderTypes } from 'aptos';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { Aggregator } from '../generated/hippo_aggregator';
-import { App } from '../generated';
+import { App, stdlib } from '../generated';
 import { CONFIGS } from '../config';
 import { CoinListClient } from '../coinList';
 
@@ -180,6 +180,112 @@ export class TradeRoute {
     // whether something like A -> B -> A or A -> B -> C -> B happens
     const fullnameSet = new Set(this.tokens.map((ti) => ti.token_type.typeFullname()));
     return fullnameSet.size < this.tokens.length;
+  }
+
+  makeSwapPayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
+    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
+    const dummyTag = stdlib.String.String.getTag();
+    if (this.steps.length === 1) {
+      const step0 = this.steps[0];
+      return Aggregator.buildPayload_swap(
+        u8(1),
+        // first
+        u8(step0.pool.dexType),
+        step0.pool.poolType,
+        step0.isXtoY,
+        // second
+        u8(0),
+        u64(0),
+        false,
+        // third
+        u8(0),
+        u64(0),
+        false,
+        // sizes
+        u64(inputSize),
+        u64(minOutputSize),
+        [
+          this.xCoinInfo.token_type.toTypeTag(), // X
+          dummyTag, // Y
+          dummyTag, // Z
+          this.yCoinInfo.token_type.toTypeTag(), // CoinOut
+          step0.getTagE(), // E1
+          dummyTag, // E2
+          dummyTag // E3
+        ],
+        isJSONPayload
+      );
+    } else if (this.steps.length === 2) {
+      const step0 = this.steps[0];
+      const step1 = this.steps[1];
+      return Aggregator.buildPayload_swap(
+        u8(2),
+        // first
+        u8(step0.pool.dexType),
+        step0.pool.poolType,
+        step0.isXtoY,
+        // second
+        u8(step1.pool.dexType),
+        step1.pool.poolType,
+        step1.isXtoY,
+        // third
+        u8(0),
+        u64(0),
+        false,
+        // sizes
+        u64(inputSize),
+        u64(minOutputSize),
+        [
+          this.tokens[0].token_type.toTypeTag(), // X
+          this.tokens[1].token_type.toTypeTag(), // Y
+          dummyTag, // Z
+          this.tokens[2].token_type.toTypeTag(), // CoinOut
+          step0.getTagE(), // E1
+          step1.getTagE(), // E2
+          dummyTag // E3
+        ],
+        isJSONPayload
+      );
+    } else if (this.steps.length === 3) {
+      const step0 = this.steps[0];
+      const step1 = this.steps[1];
+      const step2 = this.steps[2];
+      return Aggregator.buildPayload_swap(
+        u8(3),
+        // first
+        u8(step0.pool.dexType),
+        step0.pool.poolType,
+        step0.isXtoY,
+        // second
+        u8(step1.pool.dexType),
+        step1.pool.poolType,
+        step1.isXtoY,
+        // third
+        u8(step2.pool.dexType),
+        step2.pool.poolType,
+        step2.isXtoY,
+        // sizes
+        u64(inputSize),
+        u64(minOutputSize),
+        [
+          this.tokens[0].token_type.toTypeTag(), // X
+          this.tokens[1].token_type.toTypeTag(), // Y
+          this.tokens[2].token_type.toTypeTag(), // Z
+          this.tokens[3].token_type.toTypeTag(), // CoinOut
+          step0.getTagE(), // E1
+          step1.getTagE(), // E2
+          step2.getTagE() // E3
+        ],
+        isJSONPayload
+      );
+    } else {
+      throw new Error('Unreachable');
+    }
   }
 
   makePayload(

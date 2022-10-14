@@ -5,7 +5,8 @@ import {
   parseMoveStructTag,
   sendPayloadTx,
   simulatePayloadTx,
-  getSimulationKeys
+  getSimulationKeys,
+  sendPayloadTxAndLog
 } from '@manahippo/move-to-ts';
 import { AptosAccount, HexString } from 'aptos';
 import { Command } from 'commander';
@@ -673,8 +674,8 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
     console.log('No route available');
     return;
   }
-  const payload = quotes[0].route.makePayload(inputAmt, 0);
-  await sendPayloadTx(client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
+  const payload = quotes[0].route.makeSwapPayload(inputAmt, 0);
+  await sendPayloadTxAndLog(client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
   await testWalletClient();
 };
 
@@ -689,8 +690,8 @@ const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt
     console.log('No route available');
     return;
   }
-  const payload = quotes[parseInt(routeIdx)].route.makePayload(inputAmt, 0);
-  await sendPayloadTx(client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
+  const payload = quotes[parseInt(routeIdx)].route.makeSwapPayload(inputAmt, 0);
+  await sendPayloadTxAndLog(client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
   await testWalletClient();
 };
 

@@ -26,7 +26,7 @@ export class TradeAggregator {
     const app = new App(aptosClient);
     const registryClient = await CoinListClient.load(app);
     const aggregator = new TradeAggregator(registryClient, app, [
-      new HippoPoolProvider(app, netConfig, registryClient),
+      //new HippoPoolProvider(app, netConfig, registryClient),
       new EconiaPoolProvider(app, netConfig, registryClient),
       new PontemPoolProvider(app, netConfig, registryClient),
       new BasiqPoolProvider(app, netConfig, registryClient),
