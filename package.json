@@ -1,6 +1,6 @@
 {
   "name": "@manahippo/hippo-sdk",
-  "version": "0.8.12",
+  "version": "0.8.14",
   "description": "Hippo SDK for Aptos",
   "sideEffects": false,
   "exports": {
@@ -23,8 +23,8 @@
     "build": "rm -rf dist; rollup -c rollup.config.js",
     "build-cli": "rm -rf dist; rollup -c rollup.config.cli.js",
     "build-tsc": "rm -rf dist; tsc -p tsconfig.json",
+    "cli-ts": "ts-node src/tools/index.ts test hippo-client -c ../.aptos/config.yaml",
     "cli": "node cli/index.js",
-    "cli-ts": "ts-node src/tools/index.ts -c ../.aptos/config.yaml test hippo-client",
     "test": "jest"
   },
   "devDependencies": {

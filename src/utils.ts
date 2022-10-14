@@ -108,7 +108,7 @@ export function parseCoinInfoListFromCoinList(
   return coinInfoList;
 }
 
-export async function queryFetchFullList(app: App, owner: HexString, expireTimestampSecFromNow = 60) {
+export async function queryFetchFullList(app: App, owner: HexString, expireTimestampSecFromNow = 3 * 60) {
   return app.coin_list.coin_list.query_fetch_full_list(owner, [], {
     expireTimestamp: Math.floor(Date.now() / 1000) + expireTimestampSecFromNow
   });

@@ -1,397 +1,447 @@
-import { parseMoveStructTag, StructTag, TypeTag, u64 } from '@manahippo/move-to-ts';
+import { parseMoveStructTag, StructTag, u64 } from '@manahippo/move-to-ts';
 import { HexString, Types } from 'aptos';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
 import { typeTagToTypeInfo } from '../../utils';
 import { App } from '../../generated';
 import bigInt from 'big-integer';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
-import { CoinListClient } from '../../coinList';
 
 class BigIntConstants {
-    static ZERO = BigInt(0);
+  static ZERO = BigInt(0);
 
-    static _1E0 = BigInt(1);
-    static _1E1 = BigInt(10 ** 1);
-    static _1E2 = BigInt(10 ** 2);
-    static _1E3 = BigInt(10 ** 3);
-    static _1E4 = BigInt(10 ** 4);
-    static _1E5 = BigInt(10 ** 5);
-    static _1E6 = BigInt(10 ** 6);
-    static _1E7 = BigInt(10 ** 7);
-    static _1E8 = BigInt(10 ** 8);
-    static _1E9 = BigInt(10 ** 9);
+  static _1E0 = BigInt(1);
+  static _1E1 = BigInt(10 ** 1);
+  static _1E2 = BigInt(10 ** 2);
+  static _1E3 = BigInt(10 ** 3);
+  static _1E4 = BigInt(10 ** 4);
+  static _1E5 = BigInt(10 ** 5);
+  static _1E6 = BigInt(10 ** 6);
+  static _1E7 = BigInt(10 ** 7);
+  static _1E8 = BigInt(10 ** 8);
+  static _1E9 = BigInt(10 ** 9);
 
-    static TWO = BigInt(2);
-    static ONE = BigInt(1);
+  static TWO = BigInt(2);
+  static ONE = BigInt(1);
 }
 
-type AptoswapSwapType = "v2" | "stable";
-type AptoswapFeeDirection = "X" | "Y";
+type AptoswapSwapType = 'v2' | 'stable';
+type AptoswapFeeDirection = 'X' | 'Y';
 
 interface AptoswapCoinType {
-    network: string;
-    name: string;
+  network: string;
+  name: string;
 }
 
 interface AptoswapPoolType {
-    xTokenType: AptoswapCoinType;
-    yTokenType: AptoswapCoinType
-};
+  xTokenType: AptoswapCoinType;
+  yTokenType: AptoswapCoinType;
+}
 
 class AptoswapPoolInfo {
+  static BPS_SCALING: bigint = BigInt('10000');
 
-    static BPS_SCALING: bigint = BigInt("10000");
+  type: AptoswapPoolType;
+  typeString: string;
 
+  index: number;
+  swapType: AptoswapSwapType;
+
+  x: bigint;
+  y: bigint;
+  lspSupply: bigint;
+
+  feeDirection: AptoswapFeeDirection;
+
+  freeze: boolean;
+
+  adminFee: bigint;
+  lpFee: bigint;
+  incentiveFee: bigint;
+  connectFee: bigint;
+  withdrawFee: bigint;
+
+  _fAdmin: number;
+  _fLp: number;
+  _aAdmin: number;
+  _aLp: number;
+
+  static mapResourceToPoolInfo = (resource: Types.MoveResource) => {
+    try {
+      const typeString = resource.type;
+      const mtt = parseMoveStructTag(typeString);
+
+      const xCoinType = {
+        network: 'aptos',
+        name: mtt.typeParams[0]
+      } as AptoswapCoinType;
+
+      const yCoinType = {
+        network: 'aptos',
+        name: mtt.typeParams[1]
+      } as AptoswapCoinType;
+
+      const data = resource.data as any;
+
+      const poolType = { xTokenType: xCoinType, yTokenType: yCoinType } as AptoswapPoolType;
+      const poolInfo = new AptoswapPoolInfo({
+        type: poolType,
+        typeString: typeString,
+
+        index: Number(data.index),
+        swapType: Number(data.pool_type) === 100 ? 'v2' : 'stable',
+
+        x: BigInt(data.x.value),
+        y: BigInt(data.y.value),
+        lspSupply: BigInt(data.lsp_supply),
+
+        feeDirection: Number(data.fee_direction) === 200 ? 'X' : 'Y',
+
+        freeze: data.freeze,
+
+        adminFee: BigInt(data.admin_fee),
+        lpFee: BigInt(data.lp_fee),
+        incentiveFee: BigInt(data.incentive_fee),
+        connectFee: BigInt(data.connect_fee),
+        withdrawFee: BigInt(data.withdraw_fee)
+      });
+
+      return poolInfo;
+    } catch {}
+
+    return null;
+  };
+
+  constructor({
+    type,
+    typeString,
+    index,
+    swapType,
+    x,
+    y,
+    lspSupply,
+    feeDirection,
+    freeze,
+    adminFee,
+    lpFee,
+    incentiveFee,
+    connectFee,
+    withdrawFee
+  }: {
     type: AptoswapPoolType;
     typeString: string;
-
     index: number;
     swapType: AptoswapSwapType;
-
     x: bigint;
     y: bigint;
     lspSupply: bigint;
-
     feeDirection: AptoswapFeeDirection;
-
     freeze: boolean;
-
     adminFee: bigint;
     lpFee: bigint;
     incentiveFee: bigint;
     connectFee: bigint;
     withdrawFee: bigint;
+  }) {
+    this.type = type;
+    this.typeString = typeString;
+    this.index = index;
+    this.swapType = swapType;
+    this.x = x;
+    this.y = y;
+    this.lspSupply = lspSupply;
+    this.feeDirection = feeDirection;
+    this.freeze = freeze;
+    this.adminFee = adminFee;
+    this.lpFee = lpFee;
+    this.incentiveFee = incentiveFee;
+    this.connectFee = connectFee;
+    this.withdrawFee = withdrawFee;
 
-    _fAdmin: number;
-    _fLp: number;
-    _aAdmin: number;
-    _aLp: number;
+    this._fAdmin = Number(this.adminFee + this.connectFee) / 10000.0;
+    this._fLp = Number(this.lpFee + this.incentiveFee) / 10000.0;
+    this._aAdmin = 1.0 - this._fAdmin;
+    this._aLp = 1.0 - this._fLp;
+  }
 
-    static mapResourceToPoolInfo = (resource: Types.MoveResource) => {
-        try {
-            const typeString = resource.type;
-            const mtt = parseMoveStructTag(typeString);
+  totalAdminFee = () => {
+    return this.adminFee + this.connectFee;
+  };
 
-            const xCoinType = {
-                network: "aptos",
-                name: mtt.typeParams[0]
-            } as AptoswapCoinType;
+  totalLpFee = () => {
+    return this.incentiveFee + this.lpFee;
+  };
 
-            const yCoinType = {
-                network: "aptos",
-                name: mtt.typeParams[1]
-            } as AptoswapCoinType;
-
-            const data = resource.data as any;
-
-            const poolType = { xTokenType: xCoinType, yTokenType: yCoinType } as AptoswapPoolType;
-            const poolInfo = new AptoswapPoolInfo({
-                type: poolType,
-                typeString: typeString,
-
-                index: Number(data.index),
-                swapType: (Number(data.pool_type) === 100) ? "v2" : "stable",
-
-                x: BigInt(data.x.value),
-                y: BigInt(data.y.value),
-                lspSupply: BigInt(data.lsp_supply),
-
-                feeDirection: (Number(data.fee_direction) === 200) ? "X" : "Y",
-
-                freeze: data.freeze,
-
-                adminFee: BigInt(data.admin_fee),
-                lpFee: BigInt(data.lp_fee),
-                incentiveFee: BigInt(data.incentive_fee),
-                connectFee: BigInt(data.connect_fee),
-                withdrawFee: BigInt(data.withdraw_fee)
-            });
-
-            return poolInfo;
-        } catch {}
-
-        return null;
+  isAvaliableForSwap = () => {
+    if (this.freeze) {
+      return false;
+    } else if (this.x === BigIntConstants.ZERO || this.y === BigIntConstants.ZERO) {
+      return false;
     }
 
-    constructor({ type, typeString, index, swapType, x, y, lspSupply, feeDirection, freeze, adminFee, lpFee, incentiveFee, connectFee, withdrawFee }: { type: AptoswapPoolType, typeString: string, index: number, swapType: AptoswapSwapType, x: bigint, y: bigint, lspSupply: bigint, feeDirection: AptoswapFeeDirection, freeze: boolean, adminFee: bigint, lpFee: bigint, incentiveFee: bigint, connectFee: bigint, withdrawFee: bigint }) {
-        this.type = type;
-        this.typeString = typeString;
-        this.index = index;
-        this.swapType = swapType;
-        this.x = x;
-        this.y = y;
-        this.lspSupply = lspSupply;
-        this.feeDirection = feeDirection;
-        this.freeze = freeze;
-        this.adminFee = adminFee;
-        this.lpFee = lpFee;
-        this.incentiveFee = incentiveFee;
-        this.connectFee = connectFee;
-        this.withdrawFee = withdrawFee;
+    return true;
+  };
 
-        this._fAdmin = Number(this.adminFee + this.connectFee) / 10000.0;
-        this._fLp = Number(this.lpFee + this.incentiveFee) / 10000.0;
-        this._aAdmin = 1.0 - this._fAdmin;
-        this._aLp = 1.0 - this._fLp;
+  getPrice = () => {
+    // Define with base token, since X is quote and Y is base
+    // which is -1 / (dX / dY) = - dY / dX
+    // As X * Y = K
+    // ==> X * dY + Y * dX = 0
+    // ==> - dY / dX = Y / X
+    if (this.x === BigIntConstants.ZERO) return 0.0;
+    return Number(this.y) / Number(this.x);
+  };
+
+  getPriceBuy = () => {
+    // Excahnge y to x by taking fee
+    return this.getPrice() / (this._aAdmin * this._aLp);
+  };
+
+  getPriceSell = () => {
+    // Excahnge x to y by taking fee
+    return this.getPrice() * (this._aAdmin * this._aLp);
+  };
+
+  getXToYAmount = (dx: bigint) => {
+    const x_reserve_amt = this.x;
+    const y_reserve_amt = this.y;
+
+    if (this.feeDirection === 'X') {
+      dx = dx - (dx * this.totalAdminFee()) / AptoswapPoolInfo.BPS_SCALING;
     }
 
-    totalAdminFee = () => {
-        return this.adminFee + this.connectFee;
+    dx = dx - (dx * this.totalLpFee()) / AptoswapPoolInfo.BPS_SCALING;
+    if (dx < BigIntConstants.ZERO) {
+      return BigIntConstants.ZERO;
     }
 
-    totalLpFee = () => {
-        return this.incentiveFee + this.lpFee;
+    let dy = this._computeAmount(dx, x_reserve_amt, y_reserve_amt);
+    if (this.feeDirection === 'Y') {
+      dy = dy - (dy * this.totalAdminFee()) / AptoswapPoolInfo.BPS_SCALING;
     }
 
-    isAvaliableForSwap = () => {
-        if (this.freeze) {
-            return false
-        }
-        else if (this.x === BigIntConstants.ZERO || this.y === BigIntConstants.ZERO) {
-            return false;
-        }
+    return dy;
+  };
 
-        return true;
+  getYToXAmount = (dy: bigint) => {
+    const x_reserve_amt = this.x;
+    const y_reserve_amt = this.y;
+
+    if (this.feeDirection === 'Y') {
+      dy = dy - (dy * this.totalAdminFee()) / AptoswapPoolInfo.BPS_SCALING;
     }
 
-    getPrice = () => {
-        // Define with base token, since X is quote and Y is base
-        // which is -1 / (dX / dY) = - dY / dX
-        // As X * Y = K 
-        // ==> X * dY + Y * dX = 0
-        // ==> - dY / dX = Y / X
-        if (this.x === BigIntConstants.ZERO) return 0.0;
-        return Number(this.y) / Number(this.x)
+    dy = dy - (dy * this.totalLpFee()) / AptoswapPoolInfo.BPS_SCALING;
+    if (dy < BigIntConstants.ZERO) {
+      return BigIntConstants.ZERO;
     }
 
-    getPriceBuy = () => {
-        // Excahnge y to x by taking fee
-        return this.getPrice() / (this._aAdmin * this._aLp)
+    let dx = this._computeAmount(dy, y_reserve_amt, x_reserve_amt);
+    if (this.feeDirection === 'X') {
+      dx = dx - (dx * this.totalAdminFee()) / AptoswapPoolInfo.BPS_SCALING;
     }
 
-    getPriceSell = () => {
-        // Excahnge x to y by taking fee
-        return this.getPrice() * (this._aAdmin * this._aLp);
+    return dx;
+  };
+
+  getPriceBuyWithInput = (dy: bigint) => {
+    const dx = this.getYToXAmount(dy);
+    return Number(dy) / Number(dx);
+  };
+
+  getPriceSellWithInput = (dx: bigint) => {
+    const dy = this.getXToYAmount(dx);
+    return Number(dy) / Number(dx);
+  };
+
+  getPriceBuySlippage = (dy: bigint) => {
+    // TODO: Refine swap slippage computation, which should be actual amount / target amount
+    const amountActual = this.getYToXAmount(dy) * BigIntConstants._1E8;
+    const amountExpect = (dy * this.x * BigIntConstants._1E8) / this.y;
+
+    if (amountExpect === BigIntConstants.ZERO) {
+      return 0.0;
     }
 
-    getXToYAmount = (dx: bigint) => {
-        const x_reserve_amt = this.x;
-        const y_reserve_amt = this.y;
-
-        if (this.feeDirection === "X") {
-            dx = dx - dx * this.totalAdminFee() / AptoswapPoolInfo.BPS_SCALING;
-        }
-
-        dx = dx - dx * this.totalLpFee() / AptoswapPoolInfo.BPS_SCALING;
-        if (dx < BigIntConstants.ZERO) { return BigIntConstants.ZERO; }
-
-        let dy = this._computeAmount(dx, x_reserve_amt, y_reserve_amt);
-        if (this.feeDirection === "Y") {
-            dy = dy - dy * this.totalAdminFee() / AptoswapPoolInfo.BPS_SCALING;
-        }
-
-        return dy;
+    let diff = amountExpect - amountActual;
+    if (diff < BigIntConstants.ZERO) {
+      diff = -diff;
     }
 
-    getYToXAmount = (dy: bigint) => {
-        const x_reserve_amt = this.x;
-        const y_reserve_amt = this.y;
+    return Number((diff * BigIntConstants._1E8) / amountExpect) / 10 ** 8;
+  };
 
-        if (this.feeDirection === "Y") {
-            dy = dy - dy * this.totalAdminFee() / AptoswapPoolInfo.BPS_SCALING;
-        }
+  getPriceSellSlippage = (dx: bigint) => {
+    // TODO: Refine swap slippage computation, which should be actual amount / target amount
+    // const priceActual = this.getPriceSellWithInput(dx);
+    // const priceExpect = this.getPriceSell();
+    // const slippage = Math.max(0.0, priceExpect - priceActual) / priceExpect;
+    // return (!isNaN(slippage)) ? slippage : 0.0;
 
-        dy = dy - dy * this.totalLpFee() / AptoswapPoolInfo.BPS_SCALING;
-        if (dy < BigIntConstants.ZERO) { return BigIntConstants.ZERO; }
+    const amountActual = this.getXToYAmount(dx) * BigIntConstants._1E8;
+    const amountExpect = (dx * this.y * BigIntConstants._1E8) / this.x;
 
-        let dx = this._computeAmount(dy, y_reserve_amt, x_reserve_amt);
-        if (this.feeDirection === "X") {
-            dx = dx - dx * this.totalAdminFee() / AptoswapPoolInfo.BPS_SCALING;
-        }
-
-        return dx;
+    if (amountExpect === BigIntConstants.ZERO) {
+      return 0.0;
     }
 
-    getPriceBuyWithInput = (dy: bigint) => {
-        const dx = this.getYToXAmount(dy);
-        return Number(dy) / Number(dx);
+    let diff = amountExpect - amountActual;
+    if (diff < BigIntConstants.ZERO) {
+      diff = -diff;
     }
 
-    getPriceSellWithInput = (dx: bigint) => {
-        const dy = this.getXToYAmount(dx);
-        return Number(dy) / Number(dx);
+    return Number((diff * BigIntConstants._1E8) / amountExpect) / 10 ** 8;
+  };
+
+  getXToYMinOutputAmount = (dx: bigint, slippage: number) => {
+    const dy = this.getXToYAmount(dx);
+    return (dy * BigInt(Math.round(10 ** 9 * (1.0 - slippage)))) / BigIntConstants._1E9;
+  };
+
+  getYToXMinOutputAmount = (dy: bigint, slippage: number) => {
+    const dx = this.getYToXAmount(dy);
+    return (dx * BigInt(Math.round(10 ** 9 * (1.0 - slippage)))) / BigIntConstants._1E9;
+  };
+
+  getDepositXAmount = (y: bigint) => {
+    if (this.y === BigIntConstants.ZERO) {
+      return BigIntConstants.ZERO;
     }
+    return (this.x * y) / this.y;
+  };
 
-    getPriceBuySlippage = (dy: bigint) => {
-        // TODO: Refine swap slippage computation, which should be actual amount / target amount
-        const amountActual = this.getYToXAmount(dy) * BigIntConstants._1E8;
-        const amountExpect = dy * this.x * BigIntConstants._1E8 / this.y;
-
-        if (amountExpect === BigIntConstants.ZERO) {
-            return 0.0;
-        }
-
-        let diff = amountExpect - amountActual;
-        if (diff < BigIntConstants.ZERO) {
-            diff = -diff;
-        }
-
-        return Number((diff * BigIntConstants._1E8 / amountExpect)) / (10 ** 8);
+  getDepositYAmount = (x: bigint) => {
+    if (this.x === BigIntConstants.ZERO) {
+      return BigIntConstants.ZERO;
     }
+    return (x * this.y) / this.x;
+  };
 
-    getPriceSellSlippage = (dx: bigint) => {
-        // TODO: Refine swap slippage computation, which should be actual amount / target amount
-        // const priceActual = this.getPriceSellWithInput(dx);
-        // const priceExpect = this.getPriceSell();
-        // const slippage = Math.max(0.0, priceExpect - priceActual) / priceExpect;
-        // return (!isNaN(slippage)) ? slippage : 0.0;
+  isInitialized = () => {
+    return this.x > BigIntConstants.ZERO && this.y > BigIntConstants.ZERO;
+  };
 
-        const amountActual = this.getXToYAmount(dx) * BigIntConstants._1E8;
-        const amountExpect = dx * this.y * BigIntConstants._1E8 / this.x;
-
-        if (amountExpect === BigIntConstants.ZERO) {
-            return 0.0;
-        }
-
-        let diff = amountExpect - amountActual;
-        if (diff < BigIntConstants.ZERO) {
-            diff = -diff;
-        }
-
-        return Number((diff * BigIntConstants._1E8 / amountExpect)) / (10 ** 8);
-    }
-
-    getXToYMinOutputAmount = (dx: bigint, slippage: number) => {
-        const dy = this.getXToYAmount(dx);
-        return dy * BigInt(Math.round((10 ** 9) * (1.0 - slippage))) / BigIntConstants._1E9;
-    }
-
-    getYToXMinOutputAmount = (dy: bigint, slippage: number) => {
-        const dx = this.getYToXAmount(dy);
-        return dx * BigInt(Math.round((10 ** 9) * (1.0 - slippage))) / BigIntConstants._1E9;
-    }
-
-    getDepositXAmount = (y: bigint) => {
-        if (this.y === BigIntConstants.ZERO) { return BigIntConstants.ZERO; }
-        return (this.x * y) / this.y;
-    }
-
-    getDepositYAmount = (x: bigint) => {
-        if (this.x === BigIntConstants.ZERO) { return BigIntConstants.ZERO; }
-        return (x * this.y) / this.x;
-    }
-
-    isInitialized = () => {
-        return (this.x > BigIntConstants.ZERO) && (this.y > BigIntConstants.ZERO);
-    }
-
-    _computeAmount = (dx: bigint, x: bigint, y: bigint) => {
-        const numerator = y * dx;
-        const denominator = x + dx;
-        const dy = numerator / denominator;
-        return dy;
-    }
+  _computeAmount = (dx: bigint, x: bigint, y: bigint) => {
+    const numerator = y * dx;
+    const denominator = x + dx;
+    const dy = numerator / denominator;
+    return dy;
+  };
 }
 
 export class AptoswapTradingPool extends TradingPool {
-    packageAddr: HexString;
-    _xCoinInfo: CoinInfo;
-    _yCoinInfo: CoinInfo;
-    tag: StructTag;
-    pool: AptoswapPoolInfo;
+  packageAddr: HexString;
+  _xCoinInfo: CoinInfo;
+  _yCoinInfo: CoinInfo;
+  tag: StructTag;
+  pool: AptoswapPoolInfo;
 
-    constructor(packageAddr: HexString, tag: StructTag, xCoinInfo: CoinInfo, yCoinInfo: CoinInfo, resource: Types.MoveResource) {
-        super();
-        this.packageAddr = packageAddr;
-        this.tag = tag;
-        this._xCoinInfo = xCoinInfo;
-        this._yCoinInfo = yCoinInfo;
-        
-        const pool = AptoswapPoolInfo.mapResourceToPoolInfo(resource);
-        if (pool === null) {
-            throw Error('Error while parsing Aptoswap pool from resource');
-        }
-        this.pool = pool;
+  constructor(
+    packageAddr: HexString,
+    tag: StructTag,
+    xCoinInfo: CoinInfo,
+    yCoinInfo: CoinInfo,
+    resource: Types.MoveResource
+  ) {
+    super();
+    this.packageAddr = packageAddr;
+    this.tag = tag;
+    this._xCoinInfo = xCoinInfo;
+    this._yCoinInfo = yCoinInfo;
+
+    const pool = AptoswapPoolInfo.mapResourceToPoolInfo(resource);
+    if (pool === null) {
+      throw Error('Error while parsing Aptoswap pool from resource');
     }
+    this.pool = pool;
+  }
 
-    get dexType() { return DexType.Aptoswap; }
-    get poolType() { return u64(0); } // ignored
+  get dexType() {
+    return DexType.Aptoswap;
+  }
+  get poolType() {
+    return u64(0);
+  } // ignored
 
-    get isRoutable() { return true;}
+  get isRoutable() {
+    return true;
+  }
 
-    get xCoinInfo() { return this._xCoinInfo; }
-    get yCoinInfo() { return this._yCoinInfo; }
+  get xCoinInfo() {
+    return this._xCoinInfo;
+  }
+  get yCoinInfo() {
+    return this._yCoinInfo;
+  }
 
-    // state-dependent
-    isStateLoaded(): boolean {
-        return true;
-    }
+  // state-dependent
+  isStateLoaded(): boolean {
+    return true;
+  }
 
-    async reloadState(app: App): Promise<void> {
-        const resource = await app.client.getAccountResource(this.packageAddr, this.tag.getAptosMoveTypeTag());
-        this.pool = AptoswapPoolInfo.mapResourceToPoolInfo(resource)!;
-    }
+  async reloadState(app: App): Promise<void> {
+    const resource = await app.client.getAccountResource(this.packageAddr, this.tag.getAptosMoveTypeTag());
+    this.pool = AptoswapPoolInfo.mapResourceToPoolInfo(resource)!;
+  }
 
-    getPrice(): PriceType {
-        const p = this.pool.getPrice();
-        return {
-            xToY: (p > 0.0) ? 1.0 / p : 0.0,
-            yToX: (p > 0.0) ? p : 0.0,
-        };
-    }
+  getPrice(): PriceType {
+    const p = this.pool.getPrice();
+    return {
+      xToY: p > 0.0 ? 1.0 / p : 0.0,
+      yToX: p > 0.0 ? p : 0.0
+    };
+  }
 
-    getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
+  getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
+    const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
+    const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
 
-        const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
-        const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
+    const coinInAmt = BigInt(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
+    const coinOutAmt = isXtoY ? this.pool.getXToYAmount(coinInAmt) : this.pool.getYToXAmount(coinInAmt);
+    const outputUiAmt = bigInt(coinOutAmt).toJSNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber());
 
-        const coinInAmt = BigInt(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
-        const coinOutAmt = (isXtoY) ? this.pool.getXToYAmount(coinInAmt) : this.pool.getYToXAmount(coinInAmt);
-        const outputUiAmt = bigInt(coinOutAmt).toJSNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber());
+    return {
+      inputSymbol: inputTokenInfo.symbol.str(),
+      outputSymbol: outputTokenInfo.symbol.str(),
+      inputUiAmt: inputUiAmt,
+      outputUiAmt: outputUiAmt,
+      avgPrice: outputUiAmt / inputUiAmt
+    };
+  }
 
-        return {
-            inputSymbol: inputTokenInfo.symbol.str(),
-            outputSymbol: outputTokenInfo.symbol.str(),
-            inputUiAmt: inputUiAmt,
-            outputUiAmt: outputUiAmt,
-            avgPrice: outputUiAmt / inputUiAmt
-        };
-    }
-
-    // build payload directly if not routable
-    makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
-        throw new Error('Not Implemented');
-    }
+  // build payload directly if not routable
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
+    throw new Error('Not Implemented');
+  }
 }
 
 export class AptoswapPoolProvider extends TradingPoolProvider {
-    async loadPoolList(): Promise<TradingPool[]> {
-        const poolList: TradingPool[] = [];
-        const packageAddr = this.netConfig.aptoswapAddress;
-        const resources = await this.app.client.getAccountResources(packageAddr);
+  async loadPoolList(): Promise<TradingPool[]> {
+    const poolList: TradingPool[] = [];
+    const packageAddr = this.netConfig.aptoswapAddress;
+    const resources = await this.app.client.getAccountResources(packageAddr);
 
-        for (const resource of resources) {
-            if (resource.type.indexOf('pool::Pool') >= 0) {
-                const tag = parseMoveStructTag(resource.type);
-                const xTag = tag.typeParams[0] as StructTag;
-                const yTag = tag.typeParams[1] as StructTag;
-                const xCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
-                const yCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
-                if (!xCoinInfo || !yCoinInfo) {
-                  continue;
-                }
-
-                try {
-                    const pool = new AptoswapTradingPool(packageAddr, tag, xCoinInfo, yCoinInfo, resource);
-                    if (pool.pool.isAvaliableForSwap()) {
-                        poolList.push(pool);
-                    }
-                } catch {
-                    // ignore
-                }
-            }
+    for (const resource of resources) {
+      if (resource.type.indexOf('pool::Pool') >= 0) {
+        const tag = parseMoveStructTag(resource.type);
+        const xTag = tag.typeParams[0] as StructTag;
+        const yTag = tag.typeParams[1] as StructTag;
+        const xCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
+        const yCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
+        if (!xCoinInfo || !yCoinInfo) {
+          continue;
         }
 
-        return poolList;
+        try {
+          const pool = new AptoswapTradingPool(packageAddr, tag, xCoinInfo, yCoinInfo, resource);
+          if (pool.pool.isAvaliableForSwap()) {
+            poolList.push(pool);
+          }
+        } catch {
+          // ignore
+        }
+      }
     }
+
+    return poolList;
+  }
 }
