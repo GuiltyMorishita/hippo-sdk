@@ -29,12 +29,12 @@ export const readConfig = (program: Command) => {
   const privateKey = new HexString(privateKeyStr);
   const isDevnet = (url as string).includes('devnet');
   const netConf = isDevnet ? CONFIGS.testnet : CONFIGS.localhost;
-  const hippoDexAddress = netConf.hippoDexAddress;
+  const coinListAddress = netConf.coinListAddress;
   const client = new AptosClient(result.profiles[profile].rest_url);
   const app = new App(client);
   const account = new AptosAccount(privateKey.toUint8Array());
   console.log(`Using address ${account.address().hex()}`);
-  return { app, client, account, hippoDexAddress, netConf };
+  return { app, client, account, coinListAddress, netConf };
 };
 
 export function strToString(str: string, $c: AptosDataCache) {

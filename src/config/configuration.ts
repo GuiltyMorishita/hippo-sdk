@@ -1,5 +1,4 @@
 import { HexString } from 'aptos';
-import { Hippo_config } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
 import { econia, hippo_aggregator } from '../generated';
 
@@ -8,7 +7,6 @@ export class NetworkConfiguration {
     public name: string,
     public fullNodeUrl: string,
     public faucetUrl: string,
-    public hippoDexAddress: HexString,
     public coinListAddress: HexString,
     public hippoAggregatorAddress: HexString,
     public pontemAddress: HexString,
@@ -25,8 +23,6 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   'localhost',
   'http://0.0.0.0:8080',
   'http://0.0.0.0:8000',
-  // hippo dex
-  Hippo_config.moduleAddress,
   // coin list
   Coin_list.moduleAddress,
   // hippo aggregator
@@ -49,8 +45,6 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   'devnet',
   'https://fullnode.testnet.aptoslabs.com/v1',
   'https://faucet.testnet.aptoslabs.com',
-  // hippo dex
-  Hippo_config.moduleAddress,
   // coin list
   Coin_list.moduleAddress,
   // hippo aggregator

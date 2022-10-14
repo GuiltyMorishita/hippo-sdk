@@ -1,5 +1,6 @@
-import { AptosClient } from 'aptos';
-import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
+
+import { AptosClient } from "aptos";
+import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from "@manahippo/move-to-ts";
 import * as Account from './account';
 import * as Acl from './acl';
 import * as Aggregator from './aggregator';
@@ -134,6 +135,7 @@ export * as Version from './version';
 export * as Vesting from './vesting';
 export * as Voting from './voting';
 
+
 export function loadParsers(repo: AptosParserRepo) {
   Account.loadParsers(repo);
   Acl.loadParsers(repo);
@@ -211,79 +213,83 @@ export function getPackageRepo(): AptosParserRepo {
 }
 
 export type AppType = {
-  client: AptosClient;
-  repo: AptosParserRepo;
-  cache: AptosLocalCache;
+  client: AptosClient,
+  repo: AptosParserRepo,
+  cache: AptosLocalCache,
 };
 
 export class App {
-  account: Account.App;
-  acl: Acl.App;
-  aggregator: Aggregator.App;
-  aggregator_factory: Aggregator_factory.App;
-  any: Any.App;
-  aptos_account: Aptos_account.App;
-  aptos_coin: Aptos_coin.App;
-  aptos_governance: Aptos_governance.App;
-  aptos_hash: Aptos_hash.App;
-  bcs: Bcs.App;
-  bit_vector: Bit_vector.App;
-  block: Block.App;
-  bls12381: Bls12381.App;
-  capability: Capability.App;
-  chain_id: Chain_id.App;
-  chain_status: Chain_status.App;
-  code: Code.App;
-  coin: Coin.App;
-  comparator: Comparator.App;
-  consensus_config: Consensus_config.App;
-  copyable_any: Copyable_any.App;
-  debug: Debug.App;
-  ed25519: Ed25519.App;
-  error: Error.App;
-  event: Event.App;
-  features: Features.App;
-  fixed_point32: Fixed_point32.App;
-  from_bcs: From_bcs.App;
-  gas_schedule: Gas_schedule.App;
-  genesis: Genesis.App;
-  governance_proposal: Governance_proposal.App;
-  guid: Guid.App;
-  hash: Hash.App;
-  managed_coin: Managed_coin.App;
-  math128: Math128.App;
-  math64: Math64.App;
-  multi_ed25519: Multi_ed25519.App;
-  option: Option.App;
-  optional_aggregator: Optional_aggregator.App;
-  pool_u64: Pool_u64.App;
-  reconfiguration: Reconfiguration.App;
-  resource_account: Resource_account.App;
-  ristretto255: Ristretto255.App;
-  secp256k1: Secp256k1.App;
-  signer: Signer.App;
-  simple_map: Simple_map.App;
-  stake: Stake.App;
-  staking_config: Staking_config.App;
-  staking_contract: Staking_contract.App;
-  staking_proxy: Staking_proxy.App;
-  state_storage: State_storage.App;
-  storage_gas: Storage_gas.App;
-  string: String.App;
-  system_addresses: System_addresses.App;
-  table: Table.App;
-  table_with_length: Table_with_length.App;
-  timestamp: Timestamp.App;
-  transaction_context: Transaction_context.App;
-  transaction_fee: Transaction_fee.App;
-  transaction_validation: Transaction_validation.App;
-  type_info: Type_info.App;
-  util: Util.App;
-  vector: Vector.App;
-  version: Version.App;
-  vesting: Vesting.App;
-  voting: Voting.App;
-  constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
+  account : Account.App
+  acl : Acl.App
+  aggregator : Aggregator.App
+  aggregator_factory : Aggregator_factory.App
+  any : Any.App
+  aptos_account : Aptos_account.App
+  aptos_coin : Aptos_coin.App
+  aptos_governance : Aptos_governance.App
+  aptos_hash : Aptos_hash.App
+  bcs : Bcs.App
+  bit_vector : Bit_vector.App
+  block : Block.App
+  bls12381 : Bls12381.App
+  capability : Capability.App
+  chain_id : Chain_id.App
+  chain_status : Chain_status.App
+  code : Code.App
+  coin : Coin.App
+  comparator : Comparator.App
+  consensus_config : Consensus_config.App
+  copyable_any : Copyable_any.App
+  debug : Debug.App
+  ed25519 : Ed25519.App
+  error : Error.App
+  event : Event.App
+  features : Features.App
+  fixed_point32 : Fixed_point32.App
+  from_bcs : From_bcs.App
+  gas_schedule : Gas_schedule.App
+  genesis : Genesis.App
+  governance_proposal : Governance_proposal.App
+  guid : Guid.App
+  hash : Hash.App
+  managed_coin : Managed_coin.App
+  math128 : Math128.App
+  math64 : Math64.App
+  multi_ed25519 : Multi_ed25519.App
+  option : Option.App
+  optional_aggregator : Optional_aggregator.App
+  pool_u64 : Pool_u64.App
+  reconfiguration : Reconfiguration.App
+  resource_account : Resource_account.App
+  ristretto255 : Ristretto255.App
+  secp256k1 : Secp256k1.App
+  signer : Signer.App
+  simple_map : Simple_map.App
+  stake : Stake.App
+  staking_config : Staking_config.App
+  staking_contract : Staking_contract.App
+  staking_proxy : Staking_proxy.App
+  state_storage : State_storage.App
+  storage_gas : Storage_gas.App
+  string : String.App
+  system_addresses : System_addresses.App
+  table : Table.App
+  table_with_length : Table_with_length.App
+  timestamp : Timestamp.App
+  transaction_context : Transaction_context.App
+  transaction_fee : Transaction_fee.App
+  transaction_validation : Transaction_validation.App
+  type_info : Type_info.App
+  util : Util.App
+  vector : Vector.App
+  version : Version.App
+  vesting : Vesting.App
+  voting : Voting.App
+  constructor(
+    public client: AptosClient,
+    public repo: AptosParserRepo,
+    public cache: AptosLocalCache,
+  ) {
     this.account = new Account.App(client, repo, cache);
     this.acl = new Acl.App(client, repo, cache);
     this.aggregator = new Aggregator.App(client, repo, cache);

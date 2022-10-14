@@ -1,7 +1,6 @@
 import { App } from '../generated';
 import { CoinListClient } from '../coinList';
 import { EconiaPoolProvider } from './econia';
-import { HippoPoolProvider } from './hippo';
 import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from './types';
 import { PontemPoolProvider } from './pontem';
 import { CoinInfo } from '../generated/coin_list/coin_list';
