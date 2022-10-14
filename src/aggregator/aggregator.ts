@@ -8,6 +8,7 @@ import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
+import { AptoswapPoolProvider } from './aptoswap/aptoswap';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -28,9 +29,10 @@ export class TradeAggregator {
       new HippoPoolProvider(app, netConfig, registryClient),
       new EconiaPoolProvider(app, netConfig, registryClient),
       new PontemPoolProvider(app, netConfig, registryClient),
-      new BasiqPoolProvider(app, netConfig, registryClient)
+      new BasiqPoolProvider(app, netConfig, registryClient),
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
-      //new TortugaPoolProvider(app, fetcher, netConfig, registryClient)
+      //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
+      new AptoswapPoolProvider(app, netConfig, registryClient),
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;
