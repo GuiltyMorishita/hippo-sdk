@@ -392,8 +392,8 @@ export class App {
     return buildPayload_claim_mint_capability(isJSON);
   }
   async claim_mint_capability(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_claim_mint_capability(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_claim_mint_capability(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_delegate_mint_capability(
     to: HexString,
@@ -402,8 +402,8 @@ export class App {
     return buildPayload_delegate_mint_capability(to, isJSON);
   }
   async delegate_mint_capability(_account: AptosAccount, to: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_delegate_mint_capability(to, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_delegate_mint_capability(to, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_mint(
     dst_addr: HexString,
@@ -413,7 +413,7 @@ export class App {
     return buildPayload_mint(dst_addr, amount, isJSON);
   }
   async mint(_account: AptosAccount, dst_addr: HexString, amount: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_mint(dst_addr, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mint(dst_addr, amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

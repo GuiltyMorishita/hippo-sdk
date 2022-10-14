@@ -31,6 +31,7 @@ export const E_OUTPUT_LESS_THAN_MINIMUM: U64 = u64('2');
 export const E_TYPE_NOT_EQUAL: U64 = u64('7');
 export const E_UNKNOWN_DEX: U64 = u64('3');
 export const E_UNKNOWN_POOL_TYPE: U64 = u64('1');
+export const E_UNSUPPORTED_NUM_STEPS: U64 = u64('9');
 export const HIPPO_CONSTANT_PRODUCT: U64 = u64('1');
 export const HIPPO_PIECEWISE: U64 = u64('3');
 export const HI_64: U64 = u64('18446744073709551615');
@@ -617,6 +618,211 @@ export function buildPayload_one_step_route(
   );
 }
 
+export function swap_(
+  sender: HexString,
+  num_steps: U8,
+  first_dex_type: U8,
+  first_pool_type: U64,
+  first_is_x_to_y: boolean,
+  second_dex_type: U8,
+  second_pool_type: U64,
+  second_is_x_to_y: boolean,
+  third_dex_type: U8,
+  third_pool_type: U64,
+  third_is_x_to_y: boolean,
+  x_in: U64,
+  m_min_out: U64,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <X, Y, Z, OutCoin, E1, E2, E3>*/
+): void {
+  let coin_m, coin_x, x_remain, y_remain, z_remain;
+  coin_x = Stdlib.Coin.withdraw_(sender, $.copy(x_in), $c, [$p[0]]);
+  [x_remain, y_remain, z_remain, coin_m] = swap_direct_(
+    $.copy(num_steps),
+    $.copy(first_dex_type),
+    $.copy(first_pool_type),
+    first_is_x_to_y,
+    $.copy(second_dex_type),
+    $.copy(second_pool_type),
+    second_is_x_to_y,
+    $.copy(third_dex_type),
+    $.copy(third_pool_type),
+    third_is_x_to_y,
+    coin_x,
+    $c,
+    [$p[0], $p[1], $p[2], $p[3], $p[4], $p[5], $p[6]]
+  );
+  if (!Stdlib.Coin.value_(coin_m, $c, [$p[3]]).ge($.copy(m_min_out))) {
+    throw $.abortCode($.copy(E_OUTPUT_LESS_THAN_MINIMUM));
+  }
+  check_and_deposit_opt_(sender, x_remain, $c, [$p[0]]);
+  check_and_deposit_opt_(sender, y_remain, $c, [$p[1]]);
+  check_and_deposit_opt_(sender, z_remain, $c, [$p[2]]);
+  check_and_deposit_(sender, coin_m, $c, [$p[3]]);
+  return;
+}
+
+export function buildPayload_swap(
+  num_steps: U8,
+  first_dex_type: U8,
+  first_pool_type: U64,
+  first_is_x_to_y: boolean,
+  second_dex_type: U8,
+  second_pool_type: U64,
+  second_is_x_to_y: boolean,
+  third_dex_type: U8,
+  third_pool_type: U64,
+  third_is_x_to_y: boolean,
+  x_in: U64,
+  m_min_out: U64,
+  $p: TypeTag[] /* <X, Y, Z, OutCoin, E1, E2, E3>*/,
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
+  return $.buildPayload(
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
+    'aggregator',
+    'swap',
+    typeParamStrings,
+    [
+      num_steps,
+      first_dex_type,
+      first_pool_type,
+      first_is_x_to_y,
+      second_dex_type,
+      second_pool_type,
+      second_is_x_to_y,
+      third_dex_type,
+      third_pool_type,
+      third_is_x_to_y,
+      x_in,
+      m_min_out
+    ],
+    isJSON
+  );
+}
+
+export function swap_direct_(
+  num_steps: U8,
+  first_dex_type: U8,
+  first_pool_type: U64,
+  first_is_x_to_y: boolean,
+  second_dex_type: U8,
+  second_pool_type: U64,
+  second_is_x_to_y: boolean,
+  third_dex_type: U8,
+  third_pool_type: U64,
+  third_is_x_to_y: boolean,
+  x_in: Stdlib.Coin.Coin,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <X, Y, Z, OutCoin, E1, E2, E3>*/
+): [Stdlib.Option.Option, Stdlib.Option.Option, Stdlib.Option.Option, Stdlib.Coin.Coin] {
+  let temp$10,
+    temp$11,
+    temp$12,
+    temp$13,
+    temp$14,
+    temp$15,
+    temp$16,
+    temp$17,
+    temp$18,
+    temp$7,
+    temp$8,
+    temp$9,
+    coin_m,
+    coin_m__2,
+    coin_m__6,
+    coin_x_remain,
+    coin_x_remain__1,
+    coin_x_remain__3,
+    coin_y,
+    coin_y__4,
+    coin_y_remain,
+    coin_y_remain__5,
+    coin_z,
+    coin_z_remain;
+  if ($.copy(num_steps).eq(u8('1'))) {
+    [coin_x_remain, coin_m] = get_intermediate_output_(
+      $.copy(first_dex_type),
+      $.copy(first_pool_type),
+      first_is_x_to_y,
+      x_in,
+      $c,
+      [$p[0], $p[3], $p[4]]
+    );
+    [temp$15, temp$16, temp$17, temp$18] = [
+      coin_x_remain,
+      Stdlib.Option.some_(Stdlib.Coin.zero_($c, [$p[1]]), $c, [
+        new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[1]])
+      ]),
+      Stdlib.Option.some_(Stdlib.Coin.zero_($c, [$p[2]]), $c, [
+        new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[2]])
+      ]),
+      coin_m
+    ];
+  } else {
+    if ($.copy(num_steps).eq(u8('2'))) {
+      [coin_x_remain__1, coin_y] = get_intermediate_output_(
+        $.copy(first_dex_type),
+        $.copy(first_pool_type),
+        first_is_x_to_y,
+        x_in,
+        $c,
+        [$p[0], $p[1], $p[4]]
+      );
+      [coin_y_remain, coin_m__2] = get_intermediate_output_(
+        $.copy(second_dex_type),
+        $.copy(second_pool_type),
+        second_is_x_to_y,
+        coin_y,
+        $c,
+        [$p[1], $p[3], $p[5]]
+      );
+      [temp$11, temp$12, temp$13, temp$14] = [
+        coin_x_remain__1,
+        coin_y_remain,
+        Stdlib.Option.some_(Stdlib.Coin.zero_($c, [$p[2]]), $c, [
+          new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[2]])
+        ]),
+        coin_m__2
+      ];
+    } else {
+      if ($.copy(num_steps).eq(u8('3'))) {
+        [coin_x_remain__3, coin_y__4] = get_intermediate_output_(
+          $.copy(first_dex_type),
+          $.copy(first_pool_type),
+          first_is_x_to_y,
+          x_in,
+          $c,
+          [$p[0], $p[1], $p[4]]
+        );
+        [coin_y_remain__5, coin_z] = get_intermediate_output_(
+          $.copy(second_dex_type),
+          $.copy(second_pool_type),
+          second_is_x_to_y,
+          coin_y__4,
+          $c,
+          [$p[1], $p[2], $p[5]]
+        );
+        [coin_z_remain, coin_m__6] = get_intermediate_output_(
+          $.copy(third_dex_type),
+          $.copy(third_pool_type),
+          third_is_x_to_y,
+          coin_z,
+          $c,
+          [$p[2], $p[3], $p[6]]
+        );
+        [temp$7, temp$8, temp$9, temp$10] = [coin_x_remain__3, coin_y_remain__5, coin_z_remain, coin_m__6];
+      } else {
+        throw $.abortCode($.copy(E_UNSUPPORTED_NUM_STEPS));
+      }
+      [temp$11, temp$12, temp$13, temp$14] = [temp$7, temp$8, temp$9, temp$10];
+    }
+    [temp$15, temp$16, temp$17, temp$18] = [temp$11, temp$12, temp$13, temp$14];
+  }
+  return [temp$15, temp$16, temp$17, temp$18];
+}
+
 export function three_step_direct_(
   first_dex_type: U8,
   first_pool_type: U64,
@@ -899,8 +1105,8 @@ export class App {
     return buildPayload_init_coin_store($p, isJSON);
   }
   async init_coin_store(_account: AptosAccount, $p: TypeTag[] /* <X>*/, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_init_coin_store($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_init_coin_store($p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_init_coin_store_all(
     isJSON = false
@@ -908,8 +1114,8 @@ export class App {
     return buildPayload_init_coin_store_all(isJSON);
   }
   async init_coin_store_all(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_init_coin_store_all(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_init_coin_store_all(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_init_module(
     isJSON = false
@@ -917,8 +1123,8 @@ export class App {
     return buildPayload_init_module(isJSON);
   }
   async init_module(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_init_module(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_init_module(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_one_step_route(
     first_dex_type: U8,
@@ -942,7 +1148,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_one_step_route(
+    const payload__ = buildPayload_one_step_route(
       first_dex_type,
       first_pool_type,
       first_is_x_to_y,
@@ -951,7 +1157,76 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
+  }
+  payload_swap(
+    num_steps: U8,
+    first_dex_type: U8,
+    first_pool_type: U64,
+    first_is_x_to_y: boolean,
+    second_dex_type: U8,
+    second_pool_type: U64,
+    second_is_x_to_y: boolean,
+    third_dex_type: U8,
+    third_pool_type: U64,
+    third_is_x_to_y: boolean,
+    x_in: U64,
+    m_min_out: U64,
+    $p: TypeTag[] /* <X, Y, Z, OutCoin, E1, E2, E3>*/,
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_swap(
+      num_steps,
+      first_dex_type,
+      first_pool_type,
+      first_is_x_to_y,
+      second_dex_type,
+      second_pool_type,
+      second_is_x_to_y,
+      third_dex_type,
+      third_pool_type,
+      third_is_x_to_y,
+      x_in,
+      m_min_out,
+      $p,
+      isJSON
+    );
+  }
+  async swap(
+    _account: AptosAccount,
+    num_steps: U8,
+    first_dex_type: U8,
+    first_pool_type: U64,
+    first_is_x_to_y: boolean,
+    second_dex_type: U8,
+    second_pool_type: U64,
+    second_is_x_to_y: boolean,
+    third_dex_type: U8,
+    third_pool_type: U64,
+    third_is_x_to_y: boolean,
+    x_in: U64,
+    m_min_out: U64,
+    $p: TypeTag[] /* <X, Y, Z, OutCoin, E1, E2, E3>*/,
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
+    const payload__ = buildPayload_swap(
+      num_steps,
+      first_dex_type,
+      first_pool_type,
+      first_is_x_to_y,
+      second_dex_type,
+      second_pool_type,
+      second_is_x_to_y,
+      third_dex_type,
+      third_pool_type,
+      third_is_x_to_y,
+      x_in,
+      m_min_out,
+      $p,
+      _isJSON
+    );
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_three_step_route(
     first_dex_type: U8,
@@ -1001,7 +1276,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_three_step_route(
+    const payload__ = buildPayload_three_step_route(
       first_dex_type,
       first_pool_type,
       first_is_x_to_y,
@@ -1016,7 +1291,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_two_step_route(
     first_dex_type: U8,
@@ -1057,7 +1332,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_two_step_route(
+    const payload__ = buildPayload_two_step_route(
       first_dex_type,
       first_pool_type,
       first_is_x_to_y,
@@ -1069,6 +1344,6 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

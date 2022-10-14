@@ -1057,14 +1057,14 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_offer_signer_capability(
+    const payload__ = buildPayload_offer_signer_capability(
       signer_capability_sig_bytes,
       account_scheme,
       account_public_key_bytes,
       recipient_address,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_revoke_signer_capability(
     to_be_revoked_address: HexString,
@@ -1078,8 +1078,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_revoke_signer_capability(to_be_revoked_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_revoke_signer_capability(to_be_revoked_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_rotate_authentication_key(
     from_scheme: U8,
@@ -1111,7 +1111,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_rotate_authentication_key(
+    const payload__ = buildPayload_rotate_authentication_key(
       from_scheme,
       from_public_key_bytes,
       to_scheme,
@@ -1120,6 +1120,6 @@ export class App {
       cap_update_table,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

@@ -1,7 +1,7 @@
 import { HexString } from 'aptos';
 import { Hippo_config } from '../generated/hippo_swap';
 import { Coin_list } from '../generated/coin_list';
-import { econia, hippo_aggregator, liquidswap_lp } from '../generated';
+import { econia, hippo_aggregator } from '../generated';
 
 export class NetworkConfiguration {
   constructor(
@@ -32,7 +32,7 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // hippo aggregator
   hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  liquidswap_lp.Lp_coin.moduleAddress,
+  new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
   // econia
   econia.Market.moduleAddress,
   // basiq
@@ -56,7 +56,7 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   // hippo aggregator
   hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  liquidswap_lp.Lp_coin.moduleAddress,
+  new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
   // econia
   econia.Market.moduleAddress,
   // basiq

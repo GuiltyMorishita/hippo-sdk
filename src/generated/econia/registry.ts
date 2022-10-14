@@ -586,7 +586,7 @@ export class App {
     return buildPayload_init_registry(isJSON);
   }
   async init_registry(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_init_registry(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_init_registry(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

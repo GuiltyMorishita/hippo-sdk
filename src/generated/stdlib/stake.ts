@@ -2603,8 +2603,8 @@ export class App {
     return buildPayload_add_stake(amount, isJSON);
   }
   async add_stake(_account: AptosAccount, amount: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_add_stake(amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_stake(amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_increase_lockup(
     isJSON = false
@@ -2612,8 +2612,8 @@ export class App {
     return buildPayload_increase_lockup(isJSON);
   }
   async increase_lockup(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_increase_lockup(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_increase_lockup(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_initialize_stake_owner(
     initial_stake_amount: U64,
@@ -2631,8 +2631,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_initialize_stake_owner(initial_stake_amount, operator, voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_initialize_stake_owner(initial_stake_amount, operator, voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_initialize_validator(
     consensus_pubkey: U8[],
@@ -2658,14 +2658,14 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_initialize_validator(
+    const payload__ = buildPayload_initialize_validator(
       consensus_pubkey,
       proof_of_possession,
       network_addresses,
       fullnode_addresses,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_join_validator_set(
     pool_address: HexString,
@@ -2679,8 +2679,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_join_validator_set(pool_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_join_validator_set(pool_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_leave_validator_set(
     pool_address: HexString,
@@ -2694,8 +2694,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_leave_validator_set(pool_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_leave_validator_set(pool_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_reactivate_stake(
     amount: U64,
@@ -2704,8 +2704,8 @@ export class App {
     return buildPayload_reactivate_stake(amount, isJSON);
   }
   async reactivate_stake(_account: AptosAccount, amount: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_reactivate_stake(amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_reactivate_stake(amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_rotate_consensus_key(
     pool_address: HexString,
@@ -2723,8 +2723,13 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_rotate_consensus_key(pool_address, new_consensus_pubkey, proof_of_possession, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_rotate_consensus_key(
+      pool_address,
+      new_consensus_pubkey,
+      proof_of_possession,
+      _isJSON
+    );
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_delegated_voter(
     new_voter: HexString,
@@ -2733,8 +2738,8 @@ export class App {
     return buildPayload_set_delegated_voter(new_voter, isJSON);
   }
   async set_delegated_voter(_account: AptosAccount, new_voter: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_set_delegated_voter(new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_delegated_voter(new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_operator(
     new_operator: HexString,
@@ -2743,8 +2748,8 @@ export class App {
     return buildPayload_set_operator(new_operator, isJSON);
   }
   async set_operator(_account: AptosAccount, new_operator: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_set_operator(new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_operator(new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_unlock(
     amount: U64,
@@ -2753,8 +2758,8 @@ export class App {
     return buildPayload_unlock(amount, isJSON);
   }
   async unlock(_account: AptosAccount, amount: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_unlock(amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_unlock(amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_update_network_and_fullnode_addresses(
     pool_address: HexString,
@@ -2777,13 +2782,13 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_update_network_and_fullnode_addresses(
+    const payload__ = buildPayload_update_network_and_fullnode_addresses(
       pool_address,
       new_network_addresses,
       new_fullnode_addresses,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_withdraw(
     withdraw_amount: U64,
@@ -2792,7 +2797,7 @@ export class App {
     return buildPayload_withdraw(withdraw_amount, isJSON);
   }
   async withdraw(_account: AptosAccount, withdraw_amount: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_withdraw(withdraw_amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_withdraw(withdraw_amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

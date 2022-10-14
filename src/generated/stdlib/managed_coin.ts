@@ -220,8 +220,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_burn(amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_burn(amount, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_initialize(
     name: U8[],
@@ -243,8 +243,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_initialize(name, symbol, decimals, monitor_supply, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_initialize(name, symbol, decimals, monitor_supply, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_mint(
     dst_addr: HexString,
@@ -262,8 +262,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_mint(dst_addr, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mint(dst_addr, amount, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_register(
     $p: TypeTag[] /* <CoinType>*/,
@@ -272,7 +272,7 @@ export class App {
     return buildPayload_register($p, isJSON);
   }
   async register(_account: AptosAccount, $p: TypeTag[] /* <CoinType>*/, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_register($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_register($p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

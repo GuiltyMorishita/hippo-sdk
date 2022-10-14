@@ -313,8 +313,8 @@ export class App {
     return buildPayload_init_coin_types(isJSON);
   }
   async init_coin_types(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_init_coin_types(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_init_coin_types(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_mint(
     amount: U64,
@@ -330,7 +330,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_mint(amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mint(amount, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

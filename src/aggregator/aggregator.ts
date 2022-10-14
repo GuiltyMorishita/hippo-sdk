@@ -32,7 +32,7 @@ export class TradeAggregator {
       new BasiqPoolProvider(app, netConfig, registryClient),
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
       //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
-      new AptoswapPoolProvider(app, netConfig, registryClient),
+      new AptoswapPoolProvider(app, netConfig, registryClient)
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;

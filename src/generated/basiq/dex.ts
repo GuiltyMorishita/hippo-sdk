@@ -137,8 +137,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_liquidity_entry(_amount_x, _amount_y, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_liquidity_entry(_amount_x, _amount_y, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_admin_create_pool(
     _x_price: U64,
@@ -162,7 +162,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_admin_create_pool(
+    const payload__ = buildPayload_admin_create_pool(
       _x_price,
       _y_price,
       _lp_name,
@@ -171,6 +171,6 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

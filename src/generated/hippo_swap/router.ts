@@ -333,7 +333,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_three_step_route_script(
+    const payload__ = buildPayload_three_step_route_script(
       first_pool_type,
       first_is_x_to_y,
       second_pool_type,
@@ -345,7 +345,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_two_step_route_script(
     first_pool_type: U8,
@@ -380,7 +380,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_two_step_route_script(
+    const payload__ = buildPayload_two_step_route_script(
       first_pool_type,
       first_is_x_to_y,
       second_pool_type,
@@ -390,6 +390,6 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

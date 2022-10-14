@@ -85,8 +85,8 @@ export class App {
     return buildPayload_create_account(auth_key, isJSON);
   }
   async create_account(_account: AptosAccount, auth_key: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_create_account(auth_key, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_create_account(auth_key, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_transfer(
     to: HexString,
@@ -96,7 +96,7 @@ export class App {
     return buildPayload_transfer(to, amount, isJSON);
   }
   async transfer(_account: AptosAccount, to: HexString, amount: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_transfer(to, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_transfer(to, amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

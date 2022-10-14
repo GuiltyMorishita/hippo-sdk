@@ -1077,8 +1077,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_approved_script_hash_script(proposal_id, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_approved_script_hash_script(proposal_id, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_create_proposal(
     stake_pool: HexString,
@@ -1098,8 +1098,14 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_create_proposal(stake_pool, execution_hash, metadata_location, metadata_hash, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_create_proposal(
+      stake_pool,
+      execution_hash,
+      metadata_location,
+      metadata_hash,
+      _isJSON
+    );
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_vote(
     stake_pool: HexString,
@@ -1117,7 +1123,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_vote(stake_pool, proposal_id, should_pass, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_vote(stake_pool, proposal_id, should_pass, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

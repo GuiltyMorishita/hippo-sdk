@@ -835,8 +835,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_transfer(to, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_transfer(to, amount, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_upgrade_supply(
     $p: TypeTag[] /* <CoinType>*/,
@@ -850,7 +850,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_upgrade_supply($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_upgrade_supply($p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

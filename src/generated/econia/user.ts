@@ -1408,8 +1408,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_deposit_from_coinstore(market_id, general_custodian_id, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_deposit_from_coinstore(market_id, general_custodian_id, amount, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_register_market_account(
     market_id: U64,
@@ -1427,8 +1427,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_register_market_account(market_id, general_custodian_id, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_register_market_account(market_id, general_custodian_id, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_withdraw_to_coinstore(
     market_id: U64,
@@ -1446,7 +1446,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_withdraw_to_coinstore(market_id, amount, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_withdraw_to_coinstore(market_id, amount, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

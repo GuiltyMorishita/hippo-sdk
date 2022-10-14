@@ -400,8 +400,8 @@ export class App {
     return buildPayload_mock_deploy_basiq(isJSON);
   }
   async mock_deploy_basiq(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_mock_deploy_basiq(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mock_deploy_basiq(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_mock_deploy_econia(
     market_id: U64,
@@ -410,8 +410,8 @@ export class App {
     return buildPayload_mock_deploy_econia(market_id, isJSON);
   }
   async mock_deploy_econia(_account: AptosAccount, market_id: U64, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_mock_deploy_econia(market_id, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mock_deploy_econia(market_id, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_mock_deploy_pontem(
     isJSON = false
@@ -419,8 +419,8 @@ export class App {
     return buildPayload_mock_deploy_pontem(isJSON);
   }
   async mock_deploy_pontem(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_mock_deploy_pontem(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mock_deploy_pontem(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_registe_coins(
     deploy_coin_list: boolean,
@@ -429,7 +429,7 @@ export class App {
     return buildPayload_registe_coins(deploy_coin_list, isJSON);
   }
   async registe_coins(_account: AptosAccount, deploy_coin_list: boolean, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_registe_coins(deploy_coin_list, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_registe_coins(deploy_coin_list, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

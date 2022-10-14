@@ -2049,8 +2049,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_admin_withdraw(contract_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_admin_withdraw(contract_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_distribute(
     contract_address: HexString,
@@ -2059,8 +2059,8 @@ export class App {
     return buildPayload_distribute(contract_address, isJSON);
   }
   async distribute(_account: AptosAccount, contract_address: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_distribute(contract_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_distribute(contract_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_reset_beneficiary(
     contract_address: HexString,
@@ -2076,8 +2076,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_reset_beneficiary(contract_address, shareholder, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_reset_beneficiary(contract_address, shareholder, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_reset_lockup(
     contract_address: HexString,
@@ -2086,8 +2086,8 @@ export class App {
     return buildPayload_reset_lockup(contract_address, isJSON);
   }
   async reset_lockup(_account: AptosAccount, contract_address: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_reset_lockup(contract_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_reset_lockup(contract_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_beneficiary(
     contract_address: HexString,
@@ -2105,8 +2105,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_beneficiary(contract_address, shareholder, new_beneficiary, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_beneficiary(contract_address, shareholder, new_beneficiary, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_beneficiary_resetter(
     contract_address: HexString,
@@ -2122,8 +2122,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_beneficiary_resetter(contract_address, beneficiary_resetter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_beneficiary_resetter(contract_address, beneficiary_resetter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_management_role(
     contract_address: HexString,
@@ -2141,8 +2141,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_management_role(contract_address, role, role_holder, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_management_role(contract_address, role, role_holder, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_terminate_vesting_contract(
     contract_address: HexString,
@@ -2156,8 +2156,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_terminate_vesting_contract(contract_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_terminate_vesting_contract(contract_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_unlock_rewards(
     contract_address: HexString,
@@ -2171,8 +2171,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_unlock_rewards(contract_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_unlock_rewards(contract_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_update_operator(
     contract_address: HexString,
@@ -2190,8 +2190,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_update_operator(contract_address, new_operator, commission_percentage, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_update_operator(contract_address, new_operator, commission_percentage, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_update_operator_with_same_commission(
     contract_address: HexString,
@@ -2207,8 +2207,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_update_operator_with_same_commission(contract_address, new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_update_operator_with_same_commission(contract_address, new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_update_voter(
     contract_address: HexString,
@@ -2224,8 +2224,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_update_voter(contract_address, new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_update_voter(contract_address, new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_vest(
     contract_address: HexString,
@@ -2234,7 +2234,7 @@ export class App {
     return buildPayload_vest(contract_address, isJSON);
   }
   async vest(_account: AptosAccount, contract_address: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_vest(contract_address, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_vest(contract_address, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

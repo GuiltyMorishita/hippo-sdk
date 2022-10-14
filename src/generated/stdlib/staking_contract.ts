@@ -1547,8 +1547,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_stake(operator, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_stake(operator, amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_create_staking_contract(
     operator: HexString,
@@ -1577,7 +1577,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_create_staking_contract(
+    const payload__ = buildPayload_create_staking_contract(
       operator,
       voter,
       amount,
@@ -1585,7 +1585,7 @@ export class App {
       contract_creation_seed,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_distribute(
     staker: HexString,
@@ -1601,8 +1601,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_distribute(staker, operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_distribute(staker, operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_request_commission(
     staker: HexString,
@@ -1618,8 +1618,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_request_commission(staker, operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_request_commission(staker, operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_reset_lockup(
     operator: HexString,
@@ -1628,8 +1628,8 @@ export class App {
     return buildPayload_reset_lockup(operator, isJSON);
   }
   async reset_lockup(_account: AptosAccount, operator: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_reset_lockup(operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_reset_lockup(operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_switch_operator(
     old_operator: HexString,
@@ -1647,8 +1647,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_switch_operator(old_operator, new_operator, new_commission_percentage, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_switch_operator(old_operator, new_operator, new_commission_percentage, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_switch_operator_with_same_commission(
     old_operator: HexString,
@@ -1664,8 +1664,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_switch_operator_with_same_commission(old_operator, new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_switch_operator_with_same_commission(old_operator, new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_unlock_rewards(
     operator: HexString,
@@ -1674,8 +1674,8 @@ export class App {
     return buildPayload_unlock_rewards(operator, isJSON);
   }
   async unlock_rewards(_account: AptosAccount, operator: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_unlock_rewards(operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_unlock_rewards(operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_unlock_stake(
     operator: HexString,
@@ -1691,8 +1691,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_unlock_stake(operator, amount, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_unlock_stake(operator, amount, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_update_voter(
     operator: HexString,
@@ -1708,7 +1708,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_update_voter(operator, new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_update_voter(operator, new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

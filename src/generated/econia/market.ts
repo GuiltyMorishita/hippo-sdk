@@ -2539,8 +2539,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_cancel_all_limit_orders_user(host, market_id, side, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_cancel_all_limit_orders_user(host, market_id, side, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_cancel_limit_order_user(
     host: HexString,
@@ -2560,8 +2560,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_cancel_limit_order_user(host, market_id, side, order_id, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_cancel_limit_order_user(host, market_id, side, order_id, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_place_limit_order_user(
     host: HexString,
@@ -2602,7 +2602,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_place_limit_order_user(
+    const payload__ = buildPayload_place_limit_order_user(
       host,
       market_id,
       side,
@@ -2614,7 +2614,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_place_market_order_user(
     host: HexString,
@@ -2655,7 +2655,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_place_market_order_user(
+    const payload__ = buildPayload_place_market_order_user(
       host,
       market_id,
       direction,
@@ -2667,7 +2667,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_register_market_pure_coin(
     lot_size: U64,
@@ -2685,8 +2685,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_register_market_pure_coin(lot_size, tick_size, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_register_market_pure_coin(lot_size, tick_size, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_swap_between_coinstores(
     host: HexString,
@@ -2727,7 +2727,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_swap_between_coinstores(
+    const payload__ = buildPayload_swap_between_coinstores(
       host,
       market_id,
       direction,
@@ -2739,6 +2739,6 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

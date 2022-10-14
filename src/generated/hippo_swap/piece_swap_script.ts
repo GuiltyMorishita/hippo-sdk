@@ -467,8 +467,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_liquidity_script(amount_x, amount_y, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_liquidity_script(amount_x, amount_y, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_create_new_pool_script(
     lp_name: U8[],
@@ -512,7 +512,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_create_new_pool_script(
+    const payload__ = buildPayload_create_new_pool_script(
       lp_name,
       lp_symbol,
       k,
@@ -525,7 +525,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_mock_deploy_script(
     isJSON = false
@@ -533,8 +533,8 @@ export class App {
     return buildPayload_mock_deploy_script(isJSON);
   }
   async mock_deploy_script(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_mock_deploy_script(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_mock_deploy_script(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_remove_liquidity_script(
     liquidity: U64,
@@ -550,8 +550,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_remove_liquidity_script(liquidity, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_remove_liquidity_script(liquidity, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_swap_script(
     x_in: U64,
@@ -573,7 +573,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_swap_script(x_in, y_in, x_min_out, y_min_out, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

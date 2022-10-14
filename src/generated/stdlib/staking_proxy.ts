@@ -295,8 +295,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_operator(old_operator, new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_operator(old_operator, new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_stake_pool_operator(
     new_operator: HexString,
@@ -310,8 +310,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_stake_pool_operator(new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_stake_pool_operator(new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_stake_pool_voter(
     new_voter: HexString,
@@ -325,8 +325,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_stake_pool_voter(new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_stake_pool_voter(new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_staking_contract_operator(
     old_operator: HexString,
@@ -342,8 +342,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_staking_contract_operator(old_operator, new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_staking_contract_operator(old_operator, new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_staking_contract_voter(
     operator: HexString,
@@ -359,8 +359,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_staking_contract_voter(operator, new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_staking_contract_voter(operator, new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_vesting_contract_operator(
     old_operator: HexString,
@@ -376,8 +376,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_vesting_contract_operator(old_operator, new_operator, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_vesting_contract_operator(old_operator, new_operator, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_vesting_contract_voter(
     operator: HexString,
@@ -393,8 +393,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_vesting_contract_voter(operator, new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_vesting_contract_voter(operator, new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_voter(
     operator: HexString,
@@ -410,7 +410,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_set_voter(operator, new_voter, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_voter(operator, new_voter, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

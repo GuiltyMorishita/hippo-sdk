@@ -356,9 +356,9 @@ export async function query_fetch_volume(
   option?: OptionTransaction,
   _isJSON = false
 ) {
-  const payload = buildPayload_fetch_volume(_isJSON);
+  const payload__ = buildPayload_fetch_volume(_isJSON);
   const outputTypeTag = new SimpleStructTag(Volume);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
+  const output = await $.simulatePayloadTx(client, fetcher, payload__, option);
   return $.takeSimulationValue<Volume>(output, outputTypeTag, repo);
 }
 export function get_volume_($c: AptosDataCache): Volume {
@@ -737,8 +737,8 @@ export class App {
     return buildPayload_clean(isJSON);
   }
   async clean(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_clean(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_clean(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_fetch_volume(
     isJSON = false
@@ -746,8 +746,8 @@ export class App {
     return buildPayload_fetch_volume(isJSON);
   }
   async fetch_volume(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_fetch_volume(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_fetch_volume(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   async query_fetch_volume(
     $p: TypeTag[],
@@ -763,8 +763,8 @@ export class App {
     return buildPayload_get_volume(isJSON);
   }
   async get_volume(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_get_volume(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_get_volume(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_initialize(
     poster: HexString,
@@ -773,8 +773,8 @@ export class App {
     return buildPayload_initialize(poster, isJSON);
   }
   async initialize(_account: AptosAccount, poster: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_initialize(poster, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_initialize(poster, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_post(
     amount: U64,
@@ -839,7 +839,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_post(
+    const payload__ = buildPayload_post(
       amount,
       last_24_volume,
       last_7d_volume,
@@ -859,7 +859,7 @@ export class App {
       pool_provider_7d_amount,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_set_poster(
     new_poster: HexString,
@@ -868,7 +868,7 @@ export class App {
     return buildPayload_set_poster(new_poster, isJSON);
   }
   async set_poster(_account: AptosAccount, new_poster: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_set_poster(new_poster, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_set_poster(new_poster, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }

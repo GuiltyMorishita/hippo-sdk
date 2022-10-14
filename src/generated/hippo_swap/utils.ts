@@ -132,9 +132,9 @@ export async function query_get_pool_list(
   option?: OptionTransaction,
   _isJSON = false
 ) {
-  const payload = buildPayload_get_pool_list(_isJSON);
+  const payload__ = buildPayload_get_pool_list(_isJSON);
   const outputTypeTag = new SimpleStructTag(PoolList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
+  const output = await $.simulatePayloadTx(client, fetcher, payload__, option);
   return $.takeSimulationValue<PoolList>(output, outputTypeTag, repo);
 }
 export function loadParsers(repo: AptosParserRepo) {
@@ -181,8 +181,8 @@ export class App {
     return buildPayload_get_pool_list(isJSON);
   }
   async get_pool_list(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_get_pool_list(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_get_pool_list(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   async query_get_pool_list(
     $p: TypeTag[],

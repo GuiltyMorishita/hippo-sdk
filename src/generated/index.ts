@@ -7,10 +7,8 @@ import * as econia from './econia';
 import * as hippo_aggregator from './hippo_aggregator';
 import * as hippo_swap from './hippo_swap';
 import * as liquidswap from './liquidswap';
-import * as liquidswap_lp from './liquidswap_lp';
+import * as pontemlp from './pontemlp';
 import * as stdlib from './stdlib';
-import * as u256 from './u256';
-import * as uq64x64 from './uq64x64';
 
 export * as Aptoswap from './Aptoswap';
 export * as basiq from './basiq';
@@ -19,10 +17,8 @@ export * as econia from './econia';
 export * as hippo_aggregator from './hippo_aggregator';
 export * as hippo_swap from './hippo_swap';
 export * as liquidswap from './liquidswap';
-export * as liquidswap_lp from './liquidswap_lp';
+export * as pontemlp from './pontemlp';
 export * as stdlib from './stdlib';
-export * as u256 from './u256';
-export * as uq64x64 from './uq64x64';
 
 export { u8, u64, u128 };
 
@@ -35,10 +31,8 @@ export function getProjectRepo(): AptosParserRepo {
   hippo_aggregator.loadParsers(repo);
   hippo_swap.loadParsers(repo);
   liquidswap.loadParsers(repo);
-  liquidswap_lp.loadParsers(repo);
+  pontemlp.loadParsers(repo);
   stdlib.loadParsers(repo);
-  u256.loadParsers(repo);
-  uq64x64.loadParsers(repo);
   repo.addDefaultParsers();
   return repo;
 }
@@ -53,10 +47,8 @@ export class App {
   hippo_aggregator: hippo_aggregator.App;
   hippo_swap: hippo_swap.App;
   liquidswap: liquidswap.App;
-  liquidswap_lp: liquidswap_lp.App;
+  pontemlp: pontemlp.App;
   stdlib: stdlib.App;
-  u256: u256.App;
-  uq64x64: uq64x64.App;
   constructor(public client: AptosClient) {
     this.parserRepo = getProjectRepo();
     this.cache = new AptosLocalCache();
@@ -67,9 +59,7 @@ export class App {
     this.hippo_aggregator = new hippo_aggregator.App(client, this.parserRepo, this.cache);
     this.hippo_swap = new hippo_swap.App(client, this.parserRepo, this.cache);
     this.liquidswap = new liquidswap.App(client, this.parserRepo, this.cache);
-    this.liquidswap_lp = new liquidswap_lp.App(client, this.parserRepo, this.cache);
+    this.pontemlp = new pontemlp.App(client, this.parserRepo, this.cache);
     this.stdlib = new stdlib.App(client, this.parserRepo, this.cache);
-    this.u256 = new u256.App(client, this.parserRepo, this.cache);
-    this.uq64x64 = new uq64x64.App(client, this.parserRepo, this.cache);
   }
 }

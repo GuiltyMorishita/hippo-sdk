@@ -776,9 +776,9 @@ export async function query_fetch_all_registered_coin_info(
   option?: OptionTransaction,
   _isJSON = false
 ) {
-  const payload = buildPayload_fetch_all_registered_coin_info(_isJSON);
+  const payload__ = buildPayload_fetch_all_registered_coin_info(_isJSON);
   const outputTypeTag = new SimpleStructTag(FullList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
+  const output = await $.simulatePayloadTx(client, fetcher, payload__, option);
   return $.takeSimulationValue<FullList>(output, outputTypeTag, repo);
 }
 export function fetch_full_list_(fetcher: HexString, list_owner_addr: HexString, $c: AptosDataCache): void {
@@ -809,9 +809,9 @@ export async function query_fetch_full_list(
   option?: OptionTransaction,
   _isJSON = false
 ) {
-  const payload = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
+  const payload__ = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
   const outputTypeTag = new SimpleStructTag(FullList);
-  const output = await $.simulatePayloadTx(client, fetcher, payload, option);
+  const output = await $.simulatePayloadTx(client, fetcher, payload__, option);
   return $.takeSimulationValue<FullList>(output, outputTypeTag, repo);
 }
 export function get_all_registered_coin_info_($c: AptosDataCache): FullList {
@@ -1178,8 +1178,8 @@ export class App {
     return buildPayload_add_approver_to_list(approver, isJSON);
   }
   async add_approver_to_list(_account: AptosAccount, approver: HexString, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_add_approver_to_list(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_approver_to_list(approver, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_add_approver_to_registry(
     approver: HexString,
@@ -1193,8 +1193,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_approver_to_registry(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_approver_to_registry(approver, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_add_extension(
     key: Stdlib.String.String,
@@ -1212,8 +1212,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_extension(key, value, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_extension(key, value, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_add_to_list(
     list: HexString,
@@ -1229,8 +1229,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_to_list(list, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_add_to_list(list, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_add_to_registry_by_approver(
     name: Stdlib.String.String,
@@ -1265,7 +1265,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_to_registry_by_approver(
+    const payload__ = buildPayload_add_to_registry_by_approver(
       name,
       symbol,
       coingecko_id,
@@ -1275,7 +1275,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_add_to_registry_by_signer(
     name: Stdlib.String.String,
@@ -1310,7 +1310,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_add_to_registry_by_signer(
+    const payload__ = buildPayload_add_to_registry_by_signer(
       name,
       symbol,
       coingecko_id,
@@ -1320,7 +1320,7 @@ export class App {
       $p,
       _isJSON
     );
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_create_list(
     isJSON = false
@@ -1328,8 +1328,8 @@ export class App {
     return buildPayload_create_list(isJSON);
   }
   async create_list(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_create_list(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_create_list(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_drop_extension(
     key: Stdlib.String.String,
@@ -1347,8 +1347,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_drop_extension(key, value, $p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_drop_extension(key, value, $p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_fetch_all_registered_coin_info(
     isJSON = false
@@ -1356,8 +1356,8 @@ export class App {
     return buildPayload_fetch_all_registered_coin_info(isJSON);
   }
   async fetch_all_registered_coin_info(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_fetch_all_registered_coin_info(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_fetch_all_registered_coin_info(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   async query_fetch_all_registered_coin_info(
     $p: TypeTag[],
@@ -1379,8 +1379,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_fetch_full_list(list_owner_addr, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   async query_fetch_full_list(
     list_owner_addr: HexString,
@@ -1397,8 +1397,8 @@ export class App {
     return buildPayload_init_module(isJSON);
   }
   async init_module(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_init_module(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_init_module(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_initialize(
     isJSON = false
@@ -1406,8 +1406,8 @@ export class App {
     return buildPayload_initialize(isJSON);
   }
   async initialize(_account: AptosAccount, option?: OptionTransaction, _isJSON = false) {
-    const payload = buildPayload_initialize(_isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_initialize(_isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_remove_approver_from_list(
     approver: HexString,
@@ -1421,8 +1421,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_remove_approver_from_list(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_remove_approver_from_list(approver, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_remove_approver_from_registry(
     approver: HexString,
@@ -1436,8 +1436,8 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_remove_approver_from_registry(approver, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_remove_approver_from_registry(approver, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_remove_from_list(
     $p: TypeTag[] /* <CoinType>*/,
@@ -1451,7 +1451,7 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload = buildPayload_remove_from_list($p, _isJSON);
-    return $.sendPayloadTx(this.client, _account, payload, option);
+    const payload__ = buildPayload_remove_from_list($p, _isJSON);
+    return $.sendPayloadTx(this.client, _account, payload__, option);
   }
 }
