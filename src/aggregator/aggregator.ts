@@ -8,6 +8,7 @@ import { CONFIGS } from '../config';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
 import { AptoswapPoolProvider } from './aptoswap/aptoswap';
+import { AuxPooProvider } from './aux';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -25,13 +26,13 @@ export class TradeAggregator {
     const app = new App(aptosClient);
     const registryClient = await CoinListClient.load(app);
     const aggregator = new TradeAggregator(registryClient, app, [
-      //new HippoPoolProvider(app, netConfig, registryClient),
       new EconiaPoolProvider(app, netConfig, registryClient),
       new PontemPoolProvider(app, netConfig, registryClient),
       new BasiqPoolProvider(app, netConfig, registryClient),
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
       //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
-      new AptoswapPoolProvider(app, netConfig, registryClient)
+      new AptoswapPoolProvider(app, netConfig, registryClient),
+      new AuxPooProvider(app, netConfig, registryClient)
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;

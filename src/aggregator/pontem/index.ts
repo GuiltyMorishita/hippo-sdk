@@ -36,7 +36,7 @@ export class PontemTradingPool extends TradingPool {
   }
   // state-dependent
   isStateLoaded(): boolean {
-    return true;
+    return this.pontemPool != undefined;
   }
   async reloadState(app: App): Promise<void> {
     this.pontemPool = await app.client.getAccountResource(
@@ -45,7 +45,7 @@ export class PontemTradingPool extends TradingPool {
     );
   }
   getPrice(): PriceType {
-    if (!this.pontemPool) {
+    if (!this.isStateLoaded()) {
       throw new Error('Pontem pool not loaded. cannot compute price');
     }
     throw new Error('Not Implemented');

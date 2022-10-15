@@ -1,17 +1,14 @@
 import { AptosClient } from 'aptos';
 import { AptosParserRepo, AptosLocalCache, AptosSyncedCache } from '@manahippo/move-to-ts';
-import * as Aggregator from './aggregator';
-import * as Devnet from './devnet';
-import * as Volume from './volume';
+import * as Amm from './amm';
+import * as Uint256 from './uint256';
 
-export * as Aggregator from './aggregator';
-export * as Devnet from './devnet';
-export * as Volume from './volume';
+export * as Amm from './amm';
+export * as Uint256 from './uint256';
 
 export function loadParsers(repo: AptosParserRepo) {
-  Aggregator.loadParsers(repo);
-  Devnet.loadParsers(repo);
-  Volume.loadParsers(repo);
+  Amm.loadParsers(repo);
+  Uint256.loadParsers(repo);
 }
 
 export function getPackageRepo(): AptosParserRepo {
@@ -28,12 +25,10 @@ export type AppType = {
 };
 
 export class App {
-  aggregator: Aggregator.App;
-  devnet: Devnet.App;
-  volume: Volume.App;
+  amm: Amm.App;
+  uint256: Uint256.App;
   constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {
-    this.aggregator = new Aggregator.App(client, repo, cache);
-    this.devnet = new Devnet.App(client, repo, cache);
-    this.volume = new Volume.App(client, repo, cache);
+    this.amm = new Amm.App(client, repo, cache);
+    this.uint256 = new Uint256.App(client, repo, cache);
   }
 }

@@ -1,5 +1,6 @@
 import { HexString } from 'aptos';
 import { Coin_list } from '../generated/coin_list';
+import { aux } from '../generated';
 import { econia, hippo_aggregator } from '../generated';
 
 export class NetworkConfiguration {
@@ -15,6 +16,7 @@ export class NetworkConfiguration {
     public dittoAddress: HexString,
     public tortugaAddress: HexString,
     public aptoswapAddress: HexString,
+    public auxAddress: HexString,
     public isMainNet = false
   ) {}
 }
@@ -38,7 +40,9 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba')
+  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba'),
+  // aux
+  aux.Amm.moduleAddress
 );
 
 export const TESTNET_CONFIG = new NetworkConfiguration(
@@ -60,7 +64,9 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba')
+  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba'),
+  // aux
+  aux.Amm.moduleAddress
 );
 
 export const CONFIGS = {
