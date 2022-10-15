@@ -1,4 +1,4 @@
-import { AtomicTypeTag, TypeTag, u64, u8, U64, ActualStringClass } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, TypeTag, u64, u8, U64, ActualStringClass, U8 } from '@manahippo/move-to-ts';
 import { Types, TxnBuilderTypes } from 'aptos';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { Aggregator } from '../generated/hippo_aggregator';
@@ -117,6 +117,22 @@ export class TradeStep {
   }
 }
 
+export type SwapParamType = {
+  numSteps: U8;
+  firstDexType: U8;
+  firstPoolType: U64;
+  firstIsReversed: boolean;
+  secondDexType: U8;
+  secondPoolType: U64;
+  secondIsReversed: boolean;
+  thirdDexType: U8;
+  thirdPoolType: U64;
+  thirdIsReversed: boolean;
+  inAmt: U64,
+  minOutAmt: U64,
+  types: [TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag]
+};
+
 export class TradeRoute {
   tokens: CoinInfo[];
   constructor(public readonly steps: TradeStep[]) {
@@ -185,34 +201,30 @@ export class TradeRoute {
     return fullnameSet.size < this.tokens.length;
   }
 
-  makeSwapPayload(
-    inputUiAmt: UITokenAmount,
-    minOutAmt: UITokenAmount,
-    isJSONPayload = false
-  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  getSwapParams(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): SwapParamType {
     const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals.toJsNumber()));
     const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals.toJsNumber()));
     const dummyTag = stdlib.String.String.getTag();
     if (this.steps.length === 1) {
       const step0 = this.steps[0];
-      return Aggregator.buildPayload_swap(
-        u8(1),
+      return {
+        numSteps: u8(1),
         // first
-        u8(step0.pool.dexType),
-        step0.pool.poolType,
-        step0.isXtoY,
+        firstDexType: u8(step0.pool.dexType),
+        firstPoolType: step0.pool.poolType,
+        firstIsReversed: step0.isXtoY,
         // second
-        u8(0),
-        u64(0),
-        false,
+        secondDexType: u8(0),
+        secondPoolType: u64(0),
+        secondIsReversed: false,
         // third
-        u8(0),
-        u64(0),
-        false,
+        thirdDexType: u8(0),
+        thirdPoolType: u64(0),
+        thirdIsReversed: false,
         // sizes
-        u64(inputSize),
-        u64(minOutputSize),
-        [
+        inAmt: u64(inputSize),
+        minOutAmt: u64(minOutputSize),
+        types: [
           this.xCoinInfo.token_type.toTypeTag(), // X
           dummyTag, // Y
           dummyTag, // Z
@@ -220,30 +232,29 @@ export class TradeRoute {
           step0.getTagE(), // E1
           dummyTag, // E2
           dummyTag // E3
-        ],
-        isJSONPayload
-      );
+        ]
+      };
     } else if (this.steps.length === 2) {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
-      return Aggregator.buildPayload_swap(
-        u8(2),
+      return {
+        numSteps: u8(2),
         // first
-        u8(step0.pool.dexType),
-        step0.pool.poolType,
-        step0.isXtoY,
+        firstDexType: u8(step0.pool.dexType),
+        firstPoolType: step0.pool.poolType,
+        firstIsReversed: step0.isXtoY,
         // second
-        u8(step1.pool.dexType),
-        step1.pool.poolType,
-        step1.isXtoY,
+        secondDexType: u8(step1.pool.dexType),
+        secondPoolType: step1.pool.poolType,
+        secondIsReversed: step1.isXtoY,
         // third
-        u8(0),
-        u64(0),
-        false,
+        thirdDexType: u8(0),
+        thirdPoolType: u64(0),
+        thirdIsReversed: false,
         // sizes
-        u64(inputSize),
-        u64(minOutputSize),
-        [
+        inAmt: u64(inputSize),
+        minOutAmt: u64(minOutputSize),
+        types: [
           this.tokens[0].token_type.toTypeTag(), // X
           this.tokens[1].token_type.toTypeTag(), // Y
           dummyTag, // Z
@@ -251,31 +262,30 @@ export class TradeRoute {
           step0.getTagE(), // E1
           step1.getTagE(), // E2
           dummyTag // E3
-        ],
-        isJSONPayload
-      );
+        ]
+      };
     } else if (this.steps.length === 3) {
       const step0 = this.steps[0];
       const step1 = this.steps[1];
       const step2 = this.steps[2];
-      return Aggregator.buildPayload_swap(
-        u8(3),
+      return {
+        numSteps: u8(3),
         // first
-        u8(step0.pool.dexType),
-        step0.pool.poolType,
-        step0.isXtoY,
+        firstDexType: u8(step0.pool.dexType),
+        firstPoolType: step0.pool.poolType,
+        firstIsReversed: step0.isXtoY,
         // second
-        u8(step1.pool.dexType),
-        step1.pool.poolType,
-        step1.isXtoY,
+        secondDexType: u8(step1.pool.dexType),
+        secondPoolType: step1.pool.poolType,
+        secondIsReversed: step1.isXtoY,
         // third
-        u8(step2.pool.dexType),
-        step2.pool.poolType,
-        step2.isXtoY,
+        thirdDexType: u8(step2.pool.dexType),
+        thirdPoolType: step2.pool.poolType,
+        thirdIsReversed: step2.isXtoY,
         // sizes
-        u64(inputSize),
-        u64(minOutputSize),
-        [
+        inAmt: u64(inputSize),
+        minOutAmt: u64(minOutputSize),
+        types: [
           this.tokens[0].token_type.toTypeTag(), // X
           this.tokens[1].token_type.toTypeTag(), // Y
           this.tokens[2].token_type.toTypeTag(), // Z
@@ -283,12 +293,39 @@ export class TradeRoute {
           step0.getTagE(), // E1
           step1.getTagE(), // E2
           step2.getTagE() // E3
-        ],
-        isJSONPayload
-      );
+        ]
+      };
     } else {
       throw new Error('Unreachable');
     }
+  }
+
+  makeSwapPayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    const params = this.getSwapParams(inputUiAmt, minOutAmt);
+    return Aggregator.buildPayload_swap(
+      params.numSteps,
+      // first
+      params.firstDexType,
+      params.firstPoolType,
+      params.firstIsReversed,
+      // second
+      params.firstDexType,
+      params.firstPoolType,
+      params.firstIsReversed,
+      // third
+      params.firstDexType,
+      params.firstPoolType,
+      params.firstIsReversed,
+      // sizes
+      params.inAmt,
+      params.minOutAmt,
+      params.types,
+      isJSONPayload
+    );
   }
 
   makePayload(
