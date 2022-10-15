@@ -1,4 +1,4 @@
-import { AtomicTypeTag, TypeTag, u64, u8, U64, ActualStringClass, U8 } from '@manahippo/move-to-ts';
+import { AtomicTypeTag, TypeTag, u64, u8, U64, U8 } from '@manahippo/move-to-ts';
 import { Types, TxnBuilderTypes } from 'aptos';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { Aggregator } from '../generated/hippo_aggregator';

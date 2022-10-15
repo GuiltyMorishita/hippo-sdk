@@ -1,12 +1,10 @@
-import { parseMoveStructTag, SimulationKeys, StructTag, TypeTag, u8 } from '@manahippo/move-to-ts';
+import { parseMoveStructTag, StructTag, u64 } from '@manahippo/move-to-ts';
 import { HexString, Types } from 'aptos';
 import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
-import { CoinListClient } from '../../coinList';
 import { typeTagToTypeInfo } from '../../utils';
 import { App } from '../../generated';
 import bigInt from 'big-integer';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
-import { CONFIGS } from '../../config';
 
 export class BasiqTradingPool extends TradingPool {
   basiqPool: object | null;
@@ -23,7 +21,7 @@ export class BasiqTradingPool extends TradingPool {
     return DexType.Basiq;
   }
   get poolType() {
-    return u8(0);
+    return u64(0);
   } // ignored
   get isRoutable() {
     return true;
