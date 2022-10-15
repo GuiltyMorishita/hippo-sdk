@@ -28,8 +28,7 @@ export class TradeAggregator {
     const aggregator = new TradeAggregator(registryClient, app, [
       new EconiaPoolProvider(app, netConfig, registryClient),
       new PontemPoolProvider(app, netConfig, registryClient),
-      // Temporarily disable basiq
-      //new BasiqPoolProvider(app, netConfig, registryClient),
+      new BasiqPoolProvider(app, netConfig, registryClient),
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
       //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
       new AptoswapPoolProvider(app, netConfig, registryClient),
