@@ -99,6 +99,10 @@ export class PontemPoolProvider extends TradingPoolProvider {
         if (!xCoinInfo || !yCoinInfo) {
           continue;
         }
+        // temporarily disable pontem stable routes due to out-of-gas
+        if (lpTag.getFullname().indexOf('Stable') > 0) {
+          continue;
+        }
         const pool = new PontemTradingPool(ownerAddress, xCoinInfo, yCoinInfo, lpTag, tag);
         poolList.push(pool);
       }
