@@ -8,7 +8,7 @@ import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 import * as Stdlib from '../stdlib';
 export const packageName = 'Aptoswap';
-export const moduleAddress = new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba');
+export const moduleAddress = new HexString('0xa5d3ac4d429052674ed38adc62d010e52d7c24ca159194d17ddc196ddb7e480b');
 export const moduleName = 'pool';
 
 export function swap_x_to_y_direct_(

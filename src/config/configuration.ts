@@ -40,7 +40,7 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba'),
+  new HexString('0xa5d3ac4d429052674ed38adc62d010e52d7c24ca159194d17ddc196ddb7e480b'),
   // aux
   aux.Amm.moduleAddress
 );
@@ -64,7 +64,7 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0x6b6f23b7ecaa50a02c699be6cc1d3e60a545090ba24e6b145ad71639e38bf4ba'),
+  new HexString('0xa5d3ac4d429052674ed38adc62d010e52d7c24ca159194d17ddc196ddb7e480b'),
   // aux
   aux.Amm.moduleAddress
 );
