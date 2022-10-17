@@ -307,6 +307,8 @@ export function clean_(poster: HexString, $c: AptosDataCache): void {
   volume.total_volume = u128('0');
   volume.data_end_sequence_number = u64('0');
   volume.data_end_time = u64('0');
+  volume.last_24h_volume = u64('0');
+  volume.last_7d_volume = u64('0');
   volume.total_volume_history_24h = Stdlib.Vector.empty_($c, [new SimpleStructTag(TotalVolume)]);
   volume.total_volume_history_7d = Stdlib.Vector.empty_($c, [new SimpleStructTag(TotalVolume)]);
   volume.top_trading_pairs_24h = Stdlib.Vector.empty_($c, [new SimpleStructTag(TradingPair)]);
@@ -497,15 +499,117 @@ export function parse_trading_pairs_vector_(
   return $.copy(trading_pairs);
 }
 
+export function parse_volume_history_vector_(
+  start_time_vector: U64[],
+  amount_vector: U64[],
+  $c: AptosDataCache
+): TotalVolume[] {
+  let i, volume_history;
+  volume_history = Stdlib.Vector.empty_($c, [new SimpleStructTag(TotalVolume)]);
+  i = u64('0');
+  while ($.copy(i).lt(Stdlib.Vector.length_(start_time_vector, $c, [AtomicTypeTag.U64]))) {
+    {
+      Stdlib.Vector.push_back_(
+        volume_history,
+        new TotalVolume(
+          {
+            start_time: $.copy(Stdlib.Vector.borrow_(start_time_vector, $.copy(i), $c, [AtomicTypeTag.U64])),
+            amount: $.copy(Stdlib.Vector.borrow_(amount_vector, $.copy(i), $c, [AtomicTypeTag.U64]))
+          },
+          new SimpleStructTag(TotalVolume)
+        ),
+        $c,
+        [new SimpleStructTag(TotalVolume)]
+      );
+      i = $.copy(i).add(u64('1'));
+    }
+  }
+  return $.copy(volume_history);
+}
+
 export function post_(
+  _poster: HexString,
+  _amount: U64,
+  _last_24_volume: U64,
+  _last_7d_volume: U64,
+  _round_start_time_24h: U64,
+  _round_start_time_7d: U64,
+  _new_data_end_time: U64,
+  _new_data_end_seauence_number: U64,
+  _trading_pairs_24h_coin_x: U8[][],
+  _trading_pairs_24h_coin_y: U8[][],
+  _trading_pairs_24h_amount: U64[],
+  _trading_pairs_7d_coin_x: U8[][],
+  _trading_pairs_7d_coin_y: U8[][],
+  _trading_pairs_7d_amount: U64[],
+  _pool_provider_24h_dex_type: U8[],
+  _pool_provider_24h_amount: U64[],
+  _pool_provider_7d_dex_type: U8[],
+  _pool_provider_7d_amount: U64[],
+  $c: AptosDataCache
+): void {
+  return;
+}
+
+export function buildPayload_post(
+  _amount: U64,
+  _last_24_volume: U64,
+  _last_7d_volume: U64,
+  _round_start_time_24h: U64,
+  _round_start_time_7d: U64,
+  _new_data_end_time: U64,
+  _new_data_end_seauence_number: U64,
+  _trading_pairs_24h_coin_x: U8[][],
+  _trading_pairs_24h_coin_y: U8[][],
+  _trading_pairs_24h_amount: U64[],
+  _trading_pairs_7d_coin_x: U8[][],
+  _trading_pairs_7d_coin_y: U8[][],
+  _trading_pairs_7d_amount: U64[],
+  _pool_provider_24h_dex_type: U8[],
+  _pool_provider_24h_amount: U64[],
+  _pool_provider_7d_dex_type: U8[],
+  _pool_provider_7d_amount: U64[],
+  isJSON = false
+): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+  const typeParamStrings = [] as string[];
+  return $.buildPayload(
+    new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
+    'volume',
+    'post',
+    typeParamStrings,
+    [
+      _amount,
+      _last_24_volume,
+      _last_7d_volume,
+      _round_start_time_24h,
+      _round_start_time_7d,
+      _new_data_end_time,
+      _new_data_end_seauence_number,
+      _trading_pairs_24h_coin_x,
+      _trading_pairs_24h_coin_y,
+      _trading_pairs_24h_amount,
+      _trading_pairs_7d_coin_x,
+      _trading_pairs_7d_coin_y,
+      _trading_pairs_7d_amount,
+      _pool_provider_24h_dex_type,
+      _pool_provider_24h_amount,
+      _pool_provider_7d_dex_type,
+      _pool_provider_7d_amount
+    ],
+    isJSON
+  );
+}
+export function post_v2_(
   poster: HexString,
-  amount: U64,
+  total_volume: U128,
   last_24_volume: U64,
   last_7d_volume: U64,
-  round_start_time_24h: U64,
-  round_start_time_7d: U64,
-  new_data_end_time: U64,
-  new_data_end_seauence_number: U64,
+  data_end_time: U64,
+  data_end_seauence_number: U64,
+  total_volume_history_24h_start_time: U64[],
+  total_volume_history_24h_volume: U64[],
+  total_volume_history_7d_start_time: U64[],
+  total_volume_history_7d_volume: U64[],
   trading_pairs_24h_coin_x: U8[][],
   trading_pairs_24h_coin_y: U8[][],
   trading_pairs_24h_amount: U64[],
@@ -518,7 +622,7 @@ export function post_(
   pool_provider_7d_amount: U64[],
   $c: AptosDataCache
 ): void {
-  let temp$1, volume;
+  let volume;
   volume = $c.borrow_global_mut<Volume>(
     new SimpleStructTag(Volume),
     new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
@@ -526,63 +630,11 @@ export function post_(
   if (!(Stdlib.Signer.address_of_(poster, $c).hex() === $.copy(volume.poster).hex())) {
     throw $.abortCode($.copy(E_NOT_POSTER));
   }
-  if ($.copy(volume.data_end_sequence_number).eq(u64('0'))) {
-    temp$1 = true;
-  } else {
-    temp$1 = $.copy(new_data_end_seauence_number).neq($.copy(volume.data_end_sequence_number));
-  }
-  if (!temp$1) {
-    throw $.abortCode($.copy(E_REPEAT_POST));
-  }
-  if (
-    !Stdlib.Vector.length_(trading_pairs_24h_coin_x, $c, [new VectorTag(AtomicTypeTag.U8)]).eq(
-      Stdlib.Vector.length_(trading_pairs_24h_coin_y, $c, [new VectorTag(AtomicTypeTag.U8)])
-    )
-  ) {
-    throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
-  }
-  if (
-    !Stdlib.Vector.length_(trading_pairs_24h_coin_x, $c, [new VectorTag(AtomicTypeTag.U8)]).eq(
-      Stdlib.Vector.length_(trading_pairs_24h_amount, $c, [AtomicTypeTag.U64])
-    )
-  ) {
-    throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
-  }
-  if (
-    !Stdlib.Vector.length_(trading_pairs_7d_coin_x, $c, [new VectorTag(AtomicTypeTag.U8)]).eq(
-      Stdlib.Vector.length_(trading_pairs_7d_coin_y, $c, [new VectorTag(AtomicTypeTag.U8)])
-    )
-  ) {
-    throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
-  }
-  if (
-    !Stdlib.Vector.length_(trading_pairs_7d_coin_x, $c, [new VectorTag(AtomicTypeTag.U8)]).eq(
-      Stdlib.Vector.length_(trading_pairs_7d_amount, $c, [AtomicTypeTag.U64])
-    )
-  ) {
-    throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
-  }
-  if (
-    !Stdlib.Vector.length_(pool_provider_24h_dex_type, $c, [AtomicTypeTag.U8]).eq(
-      Stdlib.Vector.length_(pool_provider_24h_amount, $c, [AtomicTypeTag.U64])
-    )
-  ) {
-    throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
-  }
-  if (
-    !Stdlib.Vector.length_(pool_provider_7d_dex_type, $c, [AtomicTypeTag.U8]).eq(
-      Stdlib.Vector.length_(pool_provider_7d_amount, $c, [AtomicTypeTag.U64])
-    )
-  ) {
-    throw $.abortCode($.copy(E_VERCTOR_LENGT_NOT_EQUAL));
-  }
+  volume.total_volume = $.copy(total_volume);
   volume.last_24h_volume = $.copy(last_24_volume);
   volume.last_7d_volume = $.copy(last_7d_volume);
-  volume.data_end_time = $.copy(new_data_end_time);
-  volume.data_end_sequence_number = $.copy(new_data_end_seauence_number);
-  volume.total_volume = $.copy(volume.total_volume).add(u128($.copy(amount)));
-  add_volume_(volume.total_volume_history_24h, $.copy(round_start_time_24h), $.copy(amount), $c);
-  add_volume_(volume.total_volume_history_7d, $.copy(round_start_time_7d), $.copy(amount), $c);
+  volume.data_end_time = $.copy(data_end_time);
+  volume.data_end_sequence_number = $.copy(data_end_seauence_number);
   volume.top_trading_pairs_24h = parse_trading_pairs_vector_(
     trading_pairs_24h_coin_x,
     trading_pairs_24h_coin_y,
@@ -597,17 +649,29 @@ export function post_(
   );
   volume.top_pool_provider_24h = parse_pool_provider_vector_(pool_provider_24h_dex_type, pool_provider_24h_amount, $c);
   volume.top_pool_provider_7d = parse_pool_provider_vector_(pool_provider_7d_dex_type, pool_provider_7d_amount, $c);
+  volume.total_volume_history_24h = parse_volume_history_vector_(
+    total_volume_history_24h_start_time,
+    total_volume_history_24h_volume,
+    $c
+  );
+  volume.total_volume_history_7d = parse_volume_history_vector_(
+    total_volume_history_7d_start_time,
+    total_volume_history_7d_volume,
+    $c
+  );
   return;
 }
 
-export function buildPayload_post(
-  amount: U64,
+export function buildPayload_post_v2(
+  total_volume: U128,
   last_24_volume: U64,
   last_7d_volume: U64,
-  round_start_time_24h: U64,
-  round_start_time_7d: U64,
-  new_data_end_time: U64,
-  new_data_end_seauence_number: U64,
+  data_end_time: U64,
+  data_end_seauence_number: U64,
+  total_volume_history_24h_start_time: U64[],
+  total_volume_history_24h_volume: U64[],
+  total_volume_history_7d_start_time: U64[],
+  total_volume_history_7d_volume: U64[],
   trading_pairs_24h_coin_x: U8[][],
   trading_pairs_24h_coin_y: U8[][],
   trading_pairs_24h_amount: U64[],
@@ -624,16 +688,18 @@ export function buildPayload_post(
   return $.buildPayload(
     new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
     'volume',
-    'post',
+    'post_v2',
     typeParamStrings,
     [
-      amount,
+      total_volume,
       last_24_volume,
       last_7d_volume,
-      round_start_time_24h,
-      round_start_time_7d,
-      new_data_end_time,
-      new_data_end_seauence_number,
+      data_end_time,
+      data_end_seauence_number,
+      total_volume_history_24h_start_time,
+      total_volume_history_24h_volume,
+      total_volume_history_7d_start_time,
+      total_volume_history_7d_volume,
       trading_pairs_24h_coin_x,
       trading_pairs_24h_coin_y,
       trading_pairs_24h_amount,
@@ -777,13 +843,100 @@ export class App {
     return $.sendPayloadTx(this.client, _account, payload__, option);
   }
   payload_post(
-    amount: U64,
+    _amount: U64,
+    _last_24_volume: U64,
+    _last_7d_volume: U64,
+    _round_start_time_24h: U64,
+    _round_start_time_7d: U64,
+    _new_data_end_time: U64,
+    _new_data_end_seauence_number: U64,
+    _trading_pairs_24h_coin_x: U8[][],
+    _trading_pairs_24h_coin_y: U8[][],
+    _trading_pairs_24h_amount: U64[],
+    _trading_pairs_7d_coin_x: U8[][],
+    _trading_pairs_7d_coin_y: U8[][],
+    _trading_pairs_7d_amount: U64[],
+    _pool_provider_24h_dex_type: U8[],
+    _pool_provider_24h_amount: U64[],
+    _pool_provider_7d_dex_type: U8[],
+    _pool_provider_7d_amount: U64[],
+    isJSON = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    return buildPayload_post(
+      _amount,
+      _last_24_volume,
+      _last_7d_volume,
+      _round_start_time_24h,
+      _round_start_time_7d,
+      _new_data_end_time,
+      _new_data_end_seauence_number,
+      _trading_pairs_24h_coin_x,
+      _trading_pairs_24h_coin_y,
+      _trading_pairs_24h_amount,
+      _trading_pairs_7d_coin_x,
+      _trading_pairs_7d_coin_y,
+      _trading_pairs_7d_amount,
+      _pool_provider_24h_dex_type,
+      _pool_provider_24h_amount,
+      _pool_provider_7d_dex_type,
+      _pool_provider_7d_amount,
+      isJSON
+    );
+  }
+  async post(
+    _account: AptosAccount,
+    _amount: U64,
+    _last_24_volume: U64,
+    _last_7d_volume: U64,
+    _round_start_time_24h: U64,
+    _round_start_time_7d: U64,
+    _new_data_end_time: U64,
+    _new_data_end_seauence_number: U64,
+    _trading_pairs_24h_coin_x: U8[][],
+    _trading_pairs_24h_coin_y: U8[][],
+    _trading_pairs_24h_amount: U64[],
+    _trading_pairs_7d_coin_x: U8[][],
+    _trading_pairs_7d_coin_y: U8[][],
+    _trading_pairs_7d_amount: U64[],
+    _pool_provider_24h_dex_type: U8[],
+    _pool_provider_24h_amount: U64[],
+    _pool_provider_7d_dex_type: U8[],
+    _pool_provider_7d_amount: U64[],
+    option?: OptionTransaction,
+    _isJSON = false
+  ) {
+    const payload__ = buildPayload_post(
+      _amount,
+      _last_24_volume,
+      _last_7d_volume,
+      _round_start_time_24h,
+      _round_start_time_7d,
+      _new_data_end_time,
+      _new_data_end_seauence_number,
+      _trading_pairs_24h_coin_x,
+      _trading_pairs_24h_coin_y,
+      _trading_pairs_24h_amount,
+      _trading_pairs_7d_coin_x,
+      _trading_pairs_7d_coin_y,
+      _trading_pairs_7d_amount,
+      _pool_provider_24h_dex_type,
+      _pool_provider_24h_amount,
+      _pool_provider_7d_dex_type,
+      _pool_provider_7d_amount,
+      _isJSON
+    );
+    return $.sendPayloadTx(this.client, _account, payload__, option);
+  }
+  payload_post_v2(
+    total_volume: U128,
     last_24_volume: U64,
     last_7d_volume: U64,
-    round_start_time_24h: U64,
-    round_start_time_7d: U64,
-    new_data_end_time: U64,
-    new_data_end_seauence_number: U64,
+    data_end_time: U64,
+    data_end_seauence_number: U64,
+    total_volume_history_24h_start_time: U64[],
+    total_volume_history_24h_volume: U64[],
+    total_volume_history_7d_start_time: U64[],
+    total_volume_history_7d_volume: U64[],
     trading_pairs_24h_coin_x: U8[][],
     trading_pairs_24h_coin_y: U8[][],
     trading_pairs_24h_amount: U64[],
@@ -796,14 +949,16 @@ export class App {
     pool_provider_7d_amount: U64[],
     isJSON = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    return buildPayload_post(
-      amount,
+    return buildPayload_post_v2(
+      total_volume,
       last_24_volume,
       last_7d_volume,
-      round_start_time_24h,
-      round_start_time_7d,
-      new_data_end_time,
-      new_data_end_seauence_number,
+      data_end_time,
+      data_end_seauence_number,
+      total_volume_history_24h_start_time,
+      total_volume_history_24h_volume,
+      total_volume_history_7d_start_time,
+      total_volume_history_7d_volume,
       trading_pairs_24h_coin_x,
       trading_pairs_24h_coin_y,
       trading_pairs_24h_amount,
@@ -817,15 +972,17 @@ export class App {
       isJSON
     );
   }
-  async post(
+  async post_v2(
     _account: AptosAccount,
-    amount: U64,
+    total_volume: U128,
     last_24_volume: U64,
     last_7d_volume: U64,
-    round_start_time_24h: U64,
-    round_start_time_7d: U64,
-    new_data_end_time: U64,
-    new_data_end_seauence_number: U64,
+    data_end_time: U64,
+    data_end_seauence_number: U64,
+    total_volume_history_24h_start_time: U64[],
+    total_volume_history_24h_volume: U64[],
+    total_volume_history_7d_start_time: U64[],
+    total_volume_history_7d_volume: U64[],
     trading_pairs_24h_coin_x: U8[][],
     trading_pairs_24h_coin_y: U8[][],
     trading_pairs_24h_amount: U64[],
@@ -839,14 +996,16 @@ export class App {
     option?: OptionTransaction,
     _isJSON = false
   ) {
-    const payload__ = buildPayload_post(
-      amount,
+    const payload__ = buildPayload_post_v2(
+      total_volume,
       last_24_volume,
       last_7d_volume,
-      round_start_time_24h,
-      round_start_time_7d,
-      new_data_end_time,
-      new_data_end_seauence_number,
+      data_end_time,
+      data_end_seauence_number,
+      total_volume_history_24h_start_time,
+      total_volume_history_24h_volume,
+      total_volume_history_7d_start_time,
+      total_volume_history_7d_volume,
       trading_pairs_24h_coin_x,
       trading_pairs_24h_coin_y,
       trading_pairs_24h_amount,

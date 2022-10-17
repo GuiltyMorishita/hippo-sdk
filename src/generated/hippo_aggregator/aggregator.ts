@@ -591,6 +591,7 @@ export function init_module_(admin: HexString, $c: AptosDataCache): void {
       new SimpleStructTag(EventStore)
     )
   );
+  create_aux_signer_(admin, $c);
   return;
 }
 
