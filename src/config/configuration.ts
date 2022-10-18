@@ -78,7 +78,7 @@ export const MAINNET_CONFIG = new NetworkConfiguration(
   // hippo aggregator
   hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
+  new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948'),
   // econia
   econia.Market.moduleAddress,
   // basiq
@@ -88,7 +88,7 @@ export const MAINNET_CONFIG = new NetworkConfiguration(
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0xa5d3ac4d429052674ed38adc62d010e52d7c24ca159194d17ddc196ddb7e480b'),
+  Aptoswap.Pool.moduleAddress,
   // aux
   aux.Amm.moduleAddress
 );
