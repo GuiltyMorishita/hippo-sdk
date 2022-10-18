@@ -495,6 +495,43 @@ export class SignerCapabilityOfferProofChallengeV2 {
     this.__app = app;
   }
 }
+export function assert_valid_signature_and_get_auth_key_(
+  scheme: U8,
+  public_key_bytes: U8[],
+  signature: U8[],
+  challenge: RotationProofChallenge,
+  $c: AptosDataCache
+): U8[] {
+  let temp$3, temp$4, pk, pk__1, sig, sig__2;
+  if ($.copy(scheme).eq($.copy(ED25519_SCHEME))) {
+    pk = Ed25519.new_unvalidated_public_key_from_bytes_($.copy(public_key_bytes), $c);
+    sig = Ed25519.new_signature_from_bytes_($.copy(signature), $c);
+    if (
+      !Ed25519.signature_verify_strict_t_(sig, pk, $.copy(challenge), $c, [new SimpleStructTag(RotationProofChallenge)])
+    ) {
+      throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_PROOF_OF_KNOWLEDGE), $c));
+    }
+    temp$4 = Ed25519.unvalidated_public_key_to_authentication_key_(pk, $c);
+  } else {
+    if ($.copy(scheme).eq($.copy(MULTI_ED25519_SCHEME))) {
+      pk__1 = Multi_ed25519.new_unvalidated_public_key_from_bytes_($.copy(public_key_bytes), $c);
+      sig__2 = Multi_ed25519.new_signature_from_bytes_($.copy(signature), $c);
+      if (
+        !Multi_ed25519.signature_verify_strict_t_(sig__2, pk__1, $.copy(challenge), $c, [
+          new SimpleStructTag(RotationProofChallenge)
+        ])
+      ) {
+        throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_PROOF_OF_KNOWLEDGE), $c));
+      }
+      temp$3 = Multi_ed25519.unvalidated_public_key_to_authentication_key_(pk__1, $c);
+    } else {
+      throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_SCHEME), $c));
+    }
+    temp$4 = temp$3;
+  }
+  return temp$4;
+}
+
 export function create_account_(new_address: HexString, $c: AptosDataCache): HexString {
   let temp$1, temp$2;
   if (!!$c.exists(new SimpleStructTag(Account), $.copy(new_address))) {
@@ -738,23 +775,17 @@ export function offer_signer_capability_(
   recipient_address: HexString,
   $c: AptosDataCache
 ): void {
-  let temp$1,
-    account_resource,
+  let account_resource,
     expected_auth_key,
-    expected_auth_key__3,
+    expected_auth_key__2,
     proof_challenge,
     pubkey,
-    pubkey__2,
+    pubkey__1,
     signer_capability_sig,
-    signer_capability_sig__4,
+    signer_capability_sig__3,
     source_address;
   source_address = Signer.address_of_(account, $c);
-  if (exists_at_($.copy(source_address), $c)) {
-    temp$1 = exists_at_($.copy(recipient_address), $c);
-  } else {
-    temp$1 = false;
-  }
-  if (!temp$1) {
+  if (!exists_at_($.copy(recipient_address), $c)) {
     throw $.abortCode(Error.not_found_($.copy(EACCOUNT_DOES_NOT_EXIST), $c));
   }
   account_resource = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(source_address));
@@ -782,14 +813,14 @@ export function offer_signer_capability_(
     }
   } else {
     if ($.copy(account_scheme).eq($.copy(MULTI_ED25519_SCHEME))) {
-      pubkey__2 = Multi_ed25519.new_unvalidated_public_key_from_bytes_($.copy(account_public_key_bytes), $c);
-      expected_auth_key__3 = Multi_ed25519.unvalidated_public_key_to_authentication_key_(pubkey__2, $c);
-      if (!$.veq($.copy(account_resource.authentication_key), $.copy(expected_auth_key__3))) {
+      pubkey__1 = Multi_ed25519.new_unvalidated_public_key_from_bytes_($.copy(account_public_key_bytes), $c);
+      expected_auth_key__2 = Multi_ed25519.unvalidated_public_key_to_authentication_key_(pubkey__1, $c);
+      if (!$.veq($.copy(account_resource.authentication_key), $.copy(expected_auth_key__2))) {
         throw $.abortCode(Error.invalid_argument_($.copy(EWRONG_CURRENT_PUBLIC_KEY), $c));
       }
-      signer_capability_sig__4 = Multi_ed25519.new_signature_from_bytes_($.copy(signer_capability_sig_bytes), $c);
+      signer_capability_sig__3 = Multi_ed25519.new_signature_from_bytes_($.copy(signer_capability_sig_bytes), $c);
       if (
-        !Multi_ed25519.signature_verify_strict_t_(signer_capability_sig__4, pubkey__2, proof_challenge, $c, [
+        !Multi_ed25519.signature_verify_strict_t_(signer_capability_sig__3, pubkey__1, proof_challenge, $c, [
           new SimpleStructTag(SignerCapabilityOfferProofChallengeV2)
         ])
       ) {
@@ -839,16 +870,11 @@ export function revoke_signer_capability_(
   to_be_revoked_address: HexString,
   $c: AptosDataCache
 ): void {
-  let temp$1, account_resource, addr;
-  addr = Signer.address_of_(account, $c);
-  if (exists_at_($.copy(addr), $c)) {
-    temp$1 = exists_at_($.copy(to_be_revoked_address), $c);
-  } else {
-    temp$1 = false;
-  }
-  if (!temp$1) {
+  let account_resource, addr;
+  if (!exists_at_($.copy(to_be_revoked_address), $c)) {
     throw $.abortCode(Error.not_found_($.copy(EACCOUNT_DOES_NOT_EXIST), $c));
   }
+  addr = Signer.address_of_(account, $c);
   account_resource = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(addr));
   if (
     !Option.contains_(account_resource.signer_capability_offer.for__, to_be_revoked_address, $c, [
@@ -885,22 +911,20 @@ export function rotate_authentication_key_(
   cap_update_table: U8[],
   $c: AptosDataCache
 ): void {
-  let temp$4,
-    temp$5,
+  let temp$3,
+    temp$4,
     account_resource,
-    account_resource__6,
     addr,
     address_map,
     challenge,
-    curr_address,
     curr_auth_key,
-    curr_auth_key__3,
+    curr_auth_key_as_address,
     from_auth_key,
     from_auth_key__2,
     from_pk,
     from_pk__1,
-    new_address,
-    new_auth_key;
+    new_auth_key,
+    new_auth_key_as_address;
   addr = Signer.address_of_(account, $c);
   if (!exists_at_($.copy(addr), $c)) {
     throw $.abortCode(Error.not_found_($.copy(EACCOUNT_DOES_NOT_EXIST), $c));
@@ -923,24 +947,24 @@ export function rotate_authentication_key_(
       throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_SCHEME), $c));
     }
   }
-  curr_auth_key = From_bcs.to_address_($.copy(account_resource.authentication_key), $c);
+  curr_auth_key_as_address = From_bcs.to_address_($.copy(account_resource.authentication_key), $c);
   challenge = new RotationProofChallenge(
     {
       sequence_number: $.copy(account_resource.sequence_number),
       originator: $.copy(addr),
-      current_auth_key: $.copy(curr_auth_key),
+      current_auth_key: $.copy(curr_auth_key_as_address),
       new_public_key: $.copy(to_public_key_bytes)
     },
     new SimpleStructTag(RotationProofChallenge)
   );
-  curr_auth_key__3 = verify_key_rotation_signature_and_get_auth_key_(
+  curr_auth_key = assert_valid_signature_and_get_auth_key_(
     $.copy(from_scheme),
     $.copy(from_public_key_bytes),
     $.copy(cap_rotate_key),
     challenge,
     $c
   );
-  new_auth_key = verify_key_rotation_signature_and_get_auth_key_(
+  new_auth_key = assert_valid_signature_and_get_auth_key_(
     $.copy(to_scheme),
     $.copy(to_public_key_bytes),
     $.copy(cap_update_table),
@@ -951,35 +975,36 @@ export function rotate_authentication_key_(
     new SimpleStructTag(OriginatingAddress),
     new HexString('0x1')
   ).address_map;
-  curr_address = From_bcs.to_address_($.copy(curr_auth_key__3), $c);
-  new_address = From_bcs.to_address_($.copy(new_auth_key), $c);
-  [temp$4, temp$5] = [address_map, $.copy(curr_address)];
-  if (Table.contains_(temp$4, temp$5, $c, [AtomicTypeTag.Address, AtomicTypeTag.Address])) {
+  new_auth_key_as_address = From_bcs.to_address_($.copy(new_auth_key), $c);
+  [temp$3, temp$4] = [address_map, $.copy(curr_auth_key_as_address)];
+  if (Table.contains_(temp$3, temp$4, $c, [AtomicTypeTag.Address, AtomicTypeTag.Address])) {
     if (
       !(
         $.copy(addr).hex() ===
-        Table.remove_(address_map, $.copy(curr_address), $c, [AtomicTypeTag.Address, AtomicTypeTag.Address]).hex()
+        Table.remove_(address_map, $.copy(curr_auth_key_as_address), $c, [
+          AtomicTypeTag.Address,
+          AtomicTypeTag.Address
+        ]).hex()
       )
     ) {
       throw $.abortCode(Error.not_found_($.copy(EINVALID_ORIGINATING_ADDRESS), $c));
     }
   } else {
   }
-  Table.add_(address_map, $.copy(new_address), $.copy(addr), $c, [AtomicTypeTag.Address, AtomicTypeTag.Address]);
-  account_resource__6 = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(addr));
+  Table.add_(address_map, $.copy(new_auth_key_as_address), $.copy(addr), $c, [
+    AtomicTypeTag.Address,
+    AtomicTypeTag.Address
+  ]);
   Event.emit_event_(
-    account_resource__6.key_rotation_events,
+    account_resource.key_rotation_events,
     new KeyRotationEvent(
-      {
-        old_authentication_key: $.copy(account_resource__6.authentication_key),
-        new_authentication_key: $.copy(new_auth_key)
-      },
+      { old_authentication_key: $.copy(curr_auth_key), new_authentication_key: $.copy(new_auth_key) },
       new SimpleStructTag(KeyRotationEvent)
     ),
     $c,
     [new SimpleStructTag(KeyRotationEvent)]
   );
-  account_resource__6.authentication_key = $.copy(new_auth_key);
+  account_resource.authentication_key = $.copy(new_auth_key);
   return;
 }
 
@@ -1014,43 +1039,6 @@ export function rotate_authentication_key_internal_(account: HexString, new_auth
   account_resource = $c.borrow_global_mut<Account>(new SimpleStructTag(Account), $.copy(addr));
   account_resource.authentication_key = $.copy(new_auth_key);
   return;
-}
-
-export function verify_key_rotation_signature_and_get_auth_key_(
-  scheme: U8,
-  public_key_bytes: U8[],
-  signature: U8[],
-  challenge: RotationProofChallenge,
-  $c: AptosDataCache
-): U8[] {
-  let temp$3, temp$4, pk, pk__1, sig, sig__2;
-  if ($.copy(scheme).eq($.copy(ED25519_SCHEME))) {
-    pk = Ed25519.new_unvalidated_public_key_from_bytes_($.copy(public_key_bytes), $c);
-    sig = Ed25519.new_signature_from_bytes_($.copy(signature), $c);
-    if (
-      !Ed25519.signature_verify_strict_t_(sig, pk, $.copy(challenge), $c, [new SimpleStructTag(RotationProofChallenge)])
-    ) {
-      throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_PROOF_OF_KNOWLEDGE), $c));
-    }
-    temp$4 = Ed25519.unvalidated_public_key_to_authentication_key_(pk, $c);
-  } else {
-    if ($.copy(scheme).eq($.copy(MULTI_ED25519_SCHEME))) {
-      pk__1 = Multi_ed25519.new_unvalidated_public_key_from_bytes_($.copy(public_key_bytes), $c);
-      sig__2 = Multi_ed25519.new_signature_from_bytes_($.copy(signature), $c);
-      if (
-        !Multi_ed25519.signature_verify_strict_t_(sig__2, pk__1, $.copy(challenge), $c, [
-          new SimpleStructTag(RotationProofChallenge)
-        ])
-      ) {
-        throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_PROOF_OF_KNOWLEDGE), $c));
-      }
-      temp$3 = Multi_ed25519.unvalidated_public_key_to_authentication_key_(pk__1, $c);
-    } else {
-      throw $.abortCode(Error.invalid_argument_($.copy(EINVALID_SCHEME), $c));
-    }
-    temp$4 = temp$3;
-  }
-  return temp$4;
 }
 
 export function loadParsers(repo: AptosParserRepo) {
