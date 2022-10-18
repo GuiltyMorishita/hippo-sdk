@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 export const packageName = 'Liquidswap';
-export const moduleAddress = new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9');
+export const moduleAddress = new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12');
 export const moduleName = 'scripts';
 
 export function register_pool_and_add_liquidity_(
@@ -32,7 +32,7 @@ export function buildPayload_register_pool_and_add_liquidity(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
+    new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12'),
     'scripts',
     'register_pool_and_add_liquidity',
     typeParamStrings,

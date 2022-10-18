@@ -16,17 +16,13 @@ export class LP {
   __app: $.AppType | null = null;
   static structName: string = 'LP';
   static typeParameters: TypeParamDeclType[] = [
-    { name: 'T0', isPhantom: true },
-    { name: 'T1', isPhantom: true },
-    { name: 'T2', isPhantom: true }
+    { name: 'X', isPhantom: true },
+    { name: 'Y', isPhantom: true },
+    { name: 'Curve', isPhantom: true }
   ];
-  static fields: FieldDeclType[] = [{ name: 'dummy_field', typeTag: AtomicTypeTag.Bool }];
+  static fields: FieldDeclType[] = [];
 
-  dummy_field: boolean;
-
-  constructor(proto: any, public typeTag: TypeTag) {
-    this.dummy_field = proto['dummy_field'] as boolean;
-  }
+  constructor(proto: any, public typeTag: TypeTag) {}
 
   static LPParser(data: any, typeTag: TypeTag, repo: AptosParserRepo): LP {
     const proto = $.parseStructProto(data, typeTag, repo, LP);

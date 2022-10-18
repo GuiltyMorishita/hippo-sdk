@@ -401,7 +401,7 @@ export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void 
       []
     ),
     new StructTag(
-      new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
+      new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12'),
       'curves',
       'Uncorrelated',
       []
@@ -421,7 +421,7 @@ export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void 
       []
     ),
     new StructTag(
-      new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
+      new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12'),
       'curves',
       'Uncorrelated',
       []
@@ -441,7 +441,7 @@ export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void 
       []
     ),
     new StructTag(
-      new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
+      new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12'),
       'curves',
       'Stable',
       []
@@ -461,7 +461,7 @@ export function mock_deploy_pontem_(admin: HexString, $c: AptosDataCache): void 
       []
     ),
     new StructTag(
-      new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9'),
+      new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12'),
       'curves',
       'Stable',
       []

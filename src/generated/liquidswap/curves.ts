@@ -6,8 +6,9 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as Stdlib from '../stdlib';
 export const packageName = 'Liquidswap';
-export const moduleAddress = new HexString('0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9');
+export const moduleAddress = new HexString('0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12');
 export const moduleName = 'curves';
 
 export const ERR_INVALID_CURVE: U64 = u64('10001');
@@ -57,13 +58,44 @@ export class Uncorrelated {
     this.__app = app;
   }
 }
+export function assert_valid_curve_($c: AptosDataCache, $p: TypeTag[] /* <Curve>*/): void {
+  if (!is_valid_curve_($c, [$p[0]])) {
+    throw $.abortCode($.copy(ERR_INVALID_CURVE));
+  }
+  return;
+}
+
+export function is_stable_($c: AptosDataCache, $p: TypeTag[] /* <Curve>*/): boolean {
+  return $.deep_eq(
+    Stdlib.Type_info.type_of_($c, [$p[0]]),
+    Stdlib.Type_info.type_of_($c, [new SimpleStructTag(Stable)])
+  );
+}
+
+export function is_uncorrelated_($c: AptosDataCache, $p: TypeTag[] /* <Curve>*/): boolean {
+  return $.deep_eq(
+    Stdlib.Type_info.type_of_($c, [$p[0]]),
+    Stdlib.Type_info.type_of_($c, [new SimpleStructTag(Uncorrelated)])
+  );
+}
+
+export function is_valid_curve_($c: AptosDataCache, $p: TypeTag[] /* <Curve>*/): boolean {
+  let temp$1;
+  if (is_uncorrelated_($c, [$p[0]])) {
+    temp$1 = true;
+  } else {
+    temp$1 = is_stable_($c, [$p[0]]);
+  }
+  return temp$1;
+}
+
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9::curves::Stable',
+    '0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12::curves::Stable',
     Stable.StableParser
   );
   repo.addParser(
-    '0x43417434fd869edee76cca2a4d2301e528a1551b1d719b75c350c3c97d15b8b9::curves::Uncorrelated',
+    '0x190d44266241744264b964a37b8f09863167a12d3e70cda39376cfb4e3561e12::curves::Uncorrelated',
     Uncorrelated.UncorrelatedParser
   );
 }

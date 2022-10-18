@@ -1,6 +1,6 @@
 import { HexString } from 'aptos';
 import { Coin_list } from '../generated/coin_list';
-import { aux } from '../generated';
+import { aux, basiq, Aptoswap } from '../generated';
 import { econia, hippo_aggregator } from '../generated';
 
 export class NetworkConfiguration {
@@ -30,17 +30,17 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // hippo aggregator
   hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
+  new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948'),
   // econia
   econia.Market.moduleAddress,
   // basiq
-  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab'),
+  basiq.Dex.moduleAddress,
   // ditto
   new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0xa5d3ac4d429052674ed38adc62d010e52d7c24ca159194d17ddc196ddb7e480b'),
+  Aptoswap.Pool.moduleAddress,
   // aux
   aux.Amm.moduleAddress
 );
@@ -54,17 +54,17 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   // hippo aggregator
   hippo_aggregator.Aggregator.moduleAddress,
   // pontem
-  new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
+  new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948'),
   // econia
   econia.Market.moduleAddress,
   // basiq
-  new HexString('0x4885b08864b81ca42b19c38fff2eb958b5e312b1ec366014d4afff2775c19aab'),
+  basiq.Dex.moduleAddress,
   // ditto
   new HexString('0x4d87417a2fb3248887d820f7737d9c4aeeb9591c5de91d08f7f490550e733894'),
   // tortuga
   new HexString('0x12d75d5bde2535789041cd380e832038da873a4ba86348ca891d374e1d0e15ab'),
   // aptoswap
-  new HexString('0xa5d3ac4d429052674ed38adc62d010e52d7c24ca159194d17ddc196ddb7e480b'),
+  Aptoswap.Pool.moduleAddress,
   // aux
   aux.Amm.moduleAddress
 );
