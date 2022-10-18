@@ -160,7 +160,7 @@ export function assert_pool_unlocked_($c: AptosDataCache, $p: TypeTag[] /* <X, Y
   let pool;
   pool = $c.borrow_global<LiquidityPool>(
     new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-    new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+    new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
   );
   if (!($.copy(pool.locked) == false)) {
     throw $.abortCode($.copy(ERR_POOL_IS_LOCKED));
@@ -176,14 +176,14 @@ export function get_decimals_scales_($c: AptosDataCache, $p: TypeTag[] /* <X, Y,
   if (
     !$c.exists(
       new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-      new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+      new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
     )
   ) {
     throw $.abortCode($.copy(ERR_POOL_DOES_NOT_EXIST));
   }
   pool = $c.borrow_global<LiquidityPool>(
     new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-    new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+    new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
   );
   return [$.copy(pool.x_scale), $.copy(pool.y_scale)];
 }
@@ -196,14 +196,14 @@ export function get_fee_($c: AptosDataCache, $p: TypeTag[] /* <X, Y, Curve>*/): 
   if (
     !$c.exists(
       new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-      new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+      new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
     )
   ) {
     throw $.abortCode($.copy(ERR_POOL_DOES_NOT_EXIST));
   }
   pool = $c.borrow_global<LiquidityPool>(
     new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-    new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+    new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
   );
   return $.copy(pool.fee);
 }
@@ -221,7 +221,7 @@ export function get_reserves_size_($c: AptosDataCache, $p: TypeTag[] /* <X, Y, C
   if (
     !$c.exists(
       new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-      new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+      new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
     )
   ) {
     throw $.abortCode($.copy(ERR_POOL_DOES_NOT_EXIST));
@@ -229,7 +229,7 @@ export function get_reserves_size_($c: AptosDataCache, $p: TypeTag[] /* <X, Y, C
   assert_pool_unlocked_($c, [$p[0], $p[1], $p[2]]);
   liquidity_pool = $c.borrow_global<LiquidityPool>(
     new SimpleStructTag(LiquidityPool, [$p[0], $p[1], $p[2]]),
-    new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
+    new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948')
   );
   x_reserve = Stdlib.Coin.value_(liquidity_pool.coin_x_reserve, $c, [$p[0]]);
   y_reserve = Stdlib.Coin.value_(liquidity_pool.coin_y_reserve, $c, [$p[1]]);

@@ -1,2 +1,2 @@
 export * from './AuxTradingPool';
-export * from './AuxPooProvider';
+export * from './AuxPoolProvider';
