@@ -313,13 +313,13 @@ export class TradeRoute {
       params.firstPoolType,
       params.firstIsReversed,
       // second
-      params.firstDexType,
-      params.firstPoolType,
-      params.firstIsReversed,
+      params.secondDexType,
+      params.secondPoolType,
+      params.secondIsReversed,
       // third
-      params.firstDexType,
-      params.firstPoolType,
-      params.firstIsReversed,
+      params.thirdDexType,
+      params.thirdPoolType,
+      params.thirdIsReversed,
       // sizes
       params.inAmt,
       params.minOutAmt,
