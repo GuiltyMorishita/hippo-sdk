@@ -9,7 +9,7 @@ import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'ap
 import * as Stdlib from '../stdlib';
 import * as Uint256 from './uint256';
 export const packageName = 'aux';
-export const moduleAddress = new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27');
+export const moduleAddress = new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541');
 export const moduleName = 'amm';
 
 export const EINSUFFICIENT_INPUT_AMOUNT: U64 = u64('16');
@@ -106,7 +106,7 @@ export class Pool {
       name: 'swap_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+          new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
           'amm',
           'SwapEvent',
           []
@@ -117,7 +117,7 @@ export class Pool {
       name: 'add_liquidity_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+          new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
           'amm',
           'AddLiquidityEvent',
           []
@@ -128,7 +128,7 @@ export class Pool {
       name: 'remove_liquidity_events',
       typeTag: new StructTag(new HexString('0x1'), 'event', 'EventHandle', [
         new StructTag(
-          new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+          new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
           'amm',
           'RemoveLiquidityEvent',
           []
@@ -141,7 +141,7 @@ export class Pool {
       name: 'lp_mint',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'MintCapability', [
         new StructTag(
-          new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+          new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
           'amm',
           'LP',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -152,7 +152,7 @@ export class Pool {
       name: 'lp_burn',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'BurnCapability', [
         new StructTag(
-          new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+          new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
           'amm',
           'LP',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1)]
@@ -332,7 +332,7 @@ export function buildPayload_add_exact_liquidity(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+    new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
     'amm',
     'add_exact_liquidity',
     typeParamStrings,
@@ -345,12 +345,12 @@ export function au_in_(au_out: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinIn
   if (
     $c.exists(
       new SimpleStructTag(Pool, [$p[0], $p[1]]),
-      new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+      new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
     )
   ) {
     pool = $c.borrow_global<Pool>(
       new SimpleStructTag(Pool, [$p[0], $p[1]]),
-      new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+      new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
     );
     x_reserve = Stdlib.Coin.value_(pool.x_reserve, $c, [$p[0]]);
     y_reserve = Stdlib.Coin.value_(pool.y_reserve, $c, [$p[1]]);
@@ -359,12 +359,12 @@ export function au_in_(au_out: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinIn
     if (
       $c.exists(
         new SimpleStructTag(Pool, [$p[1], $p[0]]),
-        new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+        new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
       )
     ) {
       pool__1 = $c.borrow_global<Pool>(
         new SimpleStructTag(Pool, [$p[1], $p[0]]),
-        new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+        new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
       );
       x_reserve__2 = Stdlib.Coin.value_(pool__1.x_reserve, $c, [$p[1]]);
       y_reserve__3 = Stdlib.Coin.value_(pool__1.y_reserve, $c, [$p[0]]);
@@ -382,12 +382,12 @@ export function au_out_(au_in: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinIn
   if (
     $c.exists(
       new SimpleStructTag(Pool, [$p[0], $p[1]]),
-      new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+      new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
     )
   ) {
     pool = $c.borrow_global<Pool>(
       new SimpleStructTag(Pool, [$p[0], $p[1]]),
-      new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+      new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
     );
     x_reserve = Stdlib.Coin.value_(pool.x_reserve, $c, [$p[0]]);
     y_reserve = Stdlib.Coin.value_(pool.y_reserve, $c, [$p[1]]);
@@ -396,12 +396,12 @@ export function au_out_(au_in: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinIn
     if (
       $c.exists(
         new SimpleStructTag(Pool, [$p[1], $p[0]]),
-        new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+        new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
       )
     ) {
       pool__1 = $c.borrow_global<Pool>(
         new SimpleStructTag(Pool, [$p[1], $p[0]]),
-        new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27')
+        new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541')
       );
       x_reserve__2 = Stdlib.Coin.value_(pool__1.x_reserve, $c, [$p[1]]);
       y_reserve__3 = Stdlib.Coin.value_(pool__1.y_reserve, $c, [$p[0]]);
@@ -412,21 +412,6 @@ export function au_out_(au_in: U64, $c: AptosDataCache, $p: TypeTag[] /* <CoinIn
     temp$5 = temp$4;
   }
   return temp$5;
-}
-
-export function coin_swap_exact_coin_for_coin_(
-  _sender: HexString,
-  _user_in: Stdlib.Coin.Coin,
-  _user_out: Stdlib.Coin.Coin,
-  _au_in: U64,
-  _min_au_out: U64,
-  _use_limit_price: boolean,
-  _max_out_per_in_au_numerator: U64,
-  _max_out_per_in_au_denominator: U64,
-  $c: AptosDataCache,
-  $p: TypeTag[] /* <CoinIn, CoinOut>*/
-): [U64, U64] {
-  return [u64('0'), u64('0')];
 }
 
 export function create_pool_(_sender: HexString, _fee_bps: U64, $c: AptosDataCache, $p: TypeTag[] /* <X, Y>*/): void {
@@ -440,7 +425,7 @@ export function buildPayload_create_pool(
 ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
   const typeParamStrings = $p.map((t) => $.getTypeTagFullname(t));
   return $.buildPayload(
-    new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27'),
+    new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541'),
     'amm',
     'create_pool',
     typeParamStrings,
@@ -502,19 +487,34 @@ export function get_amount_out_(
   return u64($.copy(numerator).div($.copy(denominator)));
 }
 
+export function swap_exact_coin_for_coin_mut_(
+  _sender_addr: HexString,
+  _user_in: Stdlib.Coin.Coin,
+  _user_out: Stdlib.Coin.Coin,
+  _au_in: U64,
+  _min_au_out: U64,
+  _use_limit_price: boolean,
+  _max_out_per_in_au_numerator: U128,
+  _max_out_per_in_au_denominator: U128,
+  $c: AptosDataCache,
+  $p: TypeTag[] /* <CoinIn, CoinOut>*/
+): [U64, U64] {
+  return [u64('0'), u64('0')];
+}
+
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27::amm::AddLiquidityEvent',
+    '0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541::amm::AddLiquidityEvent',
     AddLiquidityEvent.AddLiquidityEventParser
   );
-  repo.addParser('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27::amm::LP', LP.LPParser);
-  repo.addParser('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27::amm::Pool', Pool.PoolParser);
+  repo.addParser('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541::amm::LP', LP.LPParser);
+  repo.addParser('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541::amm::Pool', Pool.PoolParser);
   repo.addParser(
-    '0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27::amm::RemoveLiquidityEvent',
+    '0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541::amm::RemoveLiquidityEvent',
     RemoveLiquidityEvent.RemoveLiquidityEventParser
   );
   repo.addParser(
-    '0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27::amm::SwapEvent',
+    '0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541::amm::SwapEvent',
     SwapEvent.SwapEventParser
   );
 }

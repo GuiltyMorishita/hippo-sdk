@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 export const packageName = 'aux';
-export const moduleAddress = new HexString('0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27');
+export const moduleAddress = new HexString('0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541');
 export const moduleName = 'uint256';
 
 export const E_OVERFLOW: U64 = u64('1001');
@@ -111,7 +111,7 @@ export function underlying_overflow_(x: Uint256, $c: AptosDataCache): boolean {
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0xe1d61154f57bbbb256bb6e3ea786102e7d5c9af481cb4d11b11e579f98218f27::uint256::Uint256',
+    '0xbd35135844473187163ca197ca93b2ab014370587bb0ed3befff9e902d6bb541::uint256::Uint256',
     Uint256.Uint256Parser
   );
 }

@@ -6,10 +6,7 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
-import * as Aptoswap from '../Aptoswap';
 import * as Aux from '../aux';
-import * as Basiq from '../basiq';
-import * as Econia from '../econia';
 import * as Liquidswap from '../liquidswap';
 import * as Stdlib from '../stdlib';
 export const packageName = 'HippoAggregator';
@@ -349,154 +346,57 @@ export function get_intermediate_output_(
   $p: TypeTag[] /* <X, Y, E>*/
 ): [Stdlib.Option.Option, Stdlib.Coin.Coin] {
   let temp$1,
-    temp$10,
-    temp$11,
-    temp$12,
-    temp$13,
-    temp$14,
-    temp$15,
-    temp$16,
-    temp$17,
-    temp$18,
-    temp$19,
     temp$2,
-    temp$20,
-    temp$22,
+    temp$3,
+    temp$4,
     temp$5,
     temp$6,
     temp$8,
-    temp$9,
-    auxSigner,
+    _is_x_to_y,
     coin_in_value,
-    coin_in_value__23,
-    market_id,
+    coin_in_value__9,
     x_out_opt,
-    x_value,
     y_out,
-    y_out__21,
-    y_out__3,
-    y_out__4,
     y_out__7;
   coin_in_value = Stdlib.Coin.value_(x_in, $c, [$p[0]]);
+  _is_x_to_y = is_x_to_y;
   if ($.copy(dex_type).eq($.copy(DEX_HIPPO))) {
     throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
   } else {
-    if ($.copy(dex_type).eq($.copy(DEX_ECONIA))) {
-      y_out = Stdlib.Coin.zero_($c, [$p[1]]);
-      x_value = Stdlib.Coin.value_(x_in, $c, [$p[0]]);
-      market_id = $.copy(pool_type);
-      if (is_x_to_y) {
-        Econia.Market.swap_coins_(
+    if ($.copy(dex_type).eq($.copy(DEX_PONTEM))) {
+      [temp$3, temp$4] = [
+        Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+        Liquidswap.Router.swap_exact_coin_for_coin_(x_in, u64('0'), $c, [$p[0], $p[1], $p[2]])
+      ];
+    } else {
+      if ($.copy(dex_type).eq($.copy(DEX_AUX))) {
+        y_out = Stdlib.Coin.zero_($c, [$p[1]]);
+        Aux.Amm.swap_exact_coin_for_coin_mut_(
           new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
-          $.copy(market_id),
-          false,
-          u64('0'),
-          $.copy(x_value),
-          u64('0'),
-          $.copy(HI_64),
-          u64('0'),
           x_in,
           y_out,
+          $.copy(coin_in_value),
+          u64('0'),
+          false,
+          u128('0'),
+          u128('0'),
           $c,
           [$p[0], $p[1]]
         );
-      } else {
-        Econia.Market.swap_coins_(
-          new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039'),
-          $.copy(market_id),
-          true,
-          u64('0'),
-          $.copy(HI_64),
-          u64('0'),
-          $.copy(x_value),
-          $.copy(HI_64),
-          y_out,
-          x_in,
-          $c,
-          [$p[1], $p[0]]
-        );
-      }
-      if (Stdlib.Coin.value_(x_in, $c, [$p[0]]).eq(u64('0'))) {
-        Stdlib.Coin.destroy_zero_(x_in, $c, [$p[0]]);
-        [temp$1, temp$2] = [
-          Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-          y_out
-        ];
-      } else {
         [temp$1, temp$2] = [
           Stdlib.Option.some_(x_in, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           y_out
         ];
-      }
-      [temp$17, temp$18] = [temp$1, temp$2];
-    } else {
-      if ($.copy(dex_type).eq($.copy(DEX_PONTEM))) {
-        [temp$15, temp$16] = [
-          Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-          Liquidswap.Router.swap_exact_coin_for_coin_(x_in, u64('0'), $c, [$p[0], $p[1], $p[2]])
-        ];
       } else {
-        if ($.copy(dex_type).eq($.copy(DEX_BASIQ))) {
-          [temp$13, temp$14] = [
-            Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-            Basiq.Dex.swap_(x_in, $c, [$p[0], $p[1]])
-          ];
-        } else {
-          if ($.copy(dex_type).eq($.copy(DEX_APTOSWAP))) {
-            if (is_x_to_y) {
-              y_out__3 = Aptoswap.Pool.swap_x_to_y_direct_(x_in, $c, [$p[0], $p[1]]);
-              [temp$5, temp$6] = [
-                Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-                y_out__3
-              ];
-            } else {
-              y_out__4 = Aptoswap.Pool.swap_y_to_x_direct_(x_in, $c, [$p[1], $p[0]]);
-              [temp$5, temp$6] = [
-                Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-                y_out__4
-              ];
-            }
-            [temp$11, temp$12] = [temp$5, temp$6];
-          } else {
-            if ($.copy(dex_type).eq($.copy(DEX_AUX))) {
-              y_out__7 = Stdlib.Coin.zero_($c, [$p[1]]);
-              auxSigner = $c.borrow_global<AuxSigner>(
-                new SimpleStructTag(AuxSigner),
-                new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039')
-              );
-              temp$8 = Stdlib.Account.create_signer_with_capability_(auxSigner.signerCapability, $c);
-              Aux.Amm.coin_swap_exact_coin_for_coin_(
-                temp$8,
-                x_in,
-                y_out__7,
-                $.copy(coin_in_value),
-                u64('0'),
-                false,
-                u64('0'),
-                u64('0'),
-                $c,
-                [$p[0], $p[1]]
-              );
-              [temp$9, temp$10] = [
-                Stdlib.Option.some_(x_in, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
-                y_out__7
-              ];
-            } else {
-              throw $.abortCode($.copy(E_UNKNOWN_DEX));
-            }
-            [temp$11, temp$12] = [temp$9, temp$10];
-          }
-          [temp$13, temp$14] = [temp$11, temp$12];
-        }
-        [temp$15, temp$16] = [temp$13, temp$14];
+        throw $.abortCode($.copy(E_UNKNOWN_DEX));
       }
-      [temp$17, temp$18] = [temp$15, temp$16];
+      [temp$3, temp$4] = [temp$1, temp$2];
     }
-    [temp$19, temp$20] = [temp$17, temp$18];
+    [temp$5, temp$6] = [temp$3, temp$4];
   }
-  [x_out_opt, y_out__21] = [temp$19, temp$20];
+  [x_out_opt, y_out__7] = [temp$5, temp$6];
   if (Stdlib.Option.is_some_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])) {
-    temp$22 = $.copy(coin_in_value).sub(
+    temp$8 = $.copy(coin_in_value).sub(
       Stdlib.Coin.value_(
         Stdlib.Option.borrow_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
         $c,
@@ -504,18 +404,18 @@ export function get_intermediate_output_(
       )
     );
   } else {
-    temp$22 = $.copy(coin_in_value);
+    temp$8 = $.copy(coin_in_value);
   }
-  coin_in_value__23 = temp$22;
+  coin_in_value__9 = temp$8;
   emit_swap_step_event_(
     $.copy(dex_type),
     $.copy(pool_type),
-    $.copy(coin_in_value__23),
-    Stdlib.Coin.value_(y_out__21, $c, [$p[1]]),
+    $.copy(coin_in_value__9),
+    Stdlib.Coin.value_(y_out__7, $c, [$p[1]]),
     $c,
     [$p[0], $p[1]]
   );
-  return [x_out_opt, y_out__21];
+  return [x_out_opt, y_out__7];
 }
 
 export function init_coin_store_(admin: HexString, $c: AptosDataCache, $p: TypeTag[] /* <X>*/): void {
