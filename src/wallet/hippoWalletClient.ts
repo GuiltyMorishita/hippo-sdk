@@ -70,8 +70,13 @@ export class HippoWalletClient {
     await this.buildCache();
   }
 
-  static async createInTwoCalls(netConf: NetworkConfiguration, app: App, walletAddress: HexString) {
-    const stores = await getCoinStoresForAddress(app.client, walletAddress, app.parserRepo);
+  static async createInTwoCalls(
+    netConf: NetworkConfiguration,
+    app: App,
+    walletAddress: HexString,
+    version: undefined | number | bigint = undefined
+  ) {
+    const stores = await getCoinStoresForAddress(app.client, walletAddress, app.parserRepo, version);
     const client = new HippoWalletClient(netConf, app, walletAddress, stores);
     await client.buildCache();
     return client;
