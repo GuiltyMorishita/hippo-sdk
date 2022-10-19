@@ -17,6 +17,7 @@ import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
 import { AptoswapPoolProvider } from './aptoswap/aptoswap';
 import { AuxPooProvider } from './aux';
+import { coin_list } from '../../cli';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -66,6 +67,15 @@ export class TradeAggregator {
         xToAny.push(pool);
       }
     }
+  }
+
+  getTradableCoinInfo(): coin_list.Coin_list.CoinInfo[] {
+    const set = new Set<coin_list.Coin_list.CoinInfo>();
+    for (const pool of this.allPools) {
+      set.add(pool.xCoinInfo);
+      set.add(pool.yCoinInfo);
+    }
+    return Array.from(set.values());
   }
 
   getXtoYDirectSteps(x: CoinInfo, y: CoinInfo, requireRoutable = true): TradeStep[] {
