@@ -1,7 +1,15 @@
 import { App } from '../generated';
 import { CoinListClient } from '../coinList';
 import { EconiaPoolProvider } from './econia';
-import { RouteAndQuote, TokenTypeFullname, TradeRoute, TradeStep, TradingPool, TradingPoolProvider } from './types';
+import {
+  QuoteType,
+  RouteAndQuote,
+  TokenTypeFullname,
+  TradeRoute,
+  TradeStep,
+  TradingPool,
+  TradingPoolProvider
+} from './types';
 import { PontemPoolProvider } from './pontem';
 import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
@@ -22,7 +30,7 @@ export class TradeAggregator {
     this.xToAnyPools = new Map();
   }
 
-  static async create(aptosClient: AptosClient, netConfig = CONFIGS.testnet) {
+  static async create(aptosClient: AptosClient, netConfig = CONFIGS.mainnet) {
     const app = new App(aptosClient);
     const registryClient = await CoinListClient.load(app);
     const aggregator = new TradeAggregator(registryClient, app, [
@@ -187,16 +195,23 @@ export class TradeAggregator {
     const promises: Promise<void>[] = [];
     for (const pool of poolSet) {
       if (!pool.isStateLoaded || reloadState) {
-        promises.push(pool.reloadState(this.app));
+        try {
+          promises.push(pool.reloadState(this.app));
+        } catch (e) {
+          console.log('Load state err: ', e);
+        }
       }
     }
     await Promise.all(promises);
-    const result = routes.map((route) => {
-      return {
-        route: route,
-        quote: route.getQuote(inputUiAmt)
-      };
-    });
+    const result: { route: TradeRoute; quote: QuoteType }[] = [];
+    for (const route of routes) {
+      try {
+        const quote = route.getQuote(inputUiAmt);
+        result.push({ route, quote });
+      } catch (e) {
+        console.log('Get quote err: ', e);
+      }
+    }
     result.sort((a, b) => b.quote.outputUiAmt - a.quote.outputUiAmt);
     return result;
   }
