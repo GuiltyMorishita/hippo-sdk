@@ -62,8 +62,17 @@ export function printResources(resources: any[]) {
   }
 }
 export async function getCoinStoresForAddress(client: AptosClient, address: HexString, repo: AptosParserRepo) {
-  const walletResources = await client.getAccountResources(address);
   const stores: AptosFramework.Coin.CoinStore[] = [];
+  let walletResources;
+  try {
+    walletResources = await client.getAccountResources(address);
+  } catch (e: any) {
+    if (e.status == 404 && e.errorCode === 'account_not_found') {
+      return stores;
+    } else {
+      throw e;
+    }
+  }
   for (const resource of walletResources) {
     try {
       const typeTag = parseMoveStructTag(resource.type);
