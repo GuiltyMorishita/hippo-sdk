@@ -65,8 +65,8 @@ export class HippoWalletClient {
     }
   }
 
-  async refreshStores() {
-    this.coinStores = await getCoinStoresForAddress(this.app.client, this.walletAddress, this.app.parserRepo);
+  async refreshStores(version: undefined | number | bigint = undefined) {
+    this.coinStores = await getCoinStoresForAddress(this.app.client, this.walletAddress, this.app.parserRepo, version);
     await this.buildCache();
   }
 
