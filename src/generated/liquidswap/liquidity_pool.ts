@@ -71,7 +71,7 @@ export class LiquidityPool {
       name: 'lp_mint_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'MintCapability', [
         new StructTag(
-          new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
+          new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948'),
           'lp_coin',
           'LP',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1), new $.TypeParamIdx(2)]
@@ -82,7 +82,7 @@ export class LiquidityPool {
       name: 'lp_burn_cap',
       typeTag: new StructTag(new HexString('0x1'), 'coin', 'BurnCapability', [
         new StructTag(
-          new HexString('0x385068db10693e06512ed54b1e6e8f1fb9945bb7a78c28a45585939ce953f99e'),
+          new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948'),
           'lp_coin',
           'LP',
           [new $.TypeParamIdx(0), new $.TypeParamIdx(1), new $.TypeParamIdx(2)]

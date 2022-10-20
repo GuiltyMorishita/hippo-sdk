@@ -58,6 +58,9 @@ export class PontemTradingPool extends TradingPool {
     }
     const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
+    const pool = this.pontemPool!;
+    const cache = pool.__app?.cache!;
+    cache.move_to(pool.typeTag, this.ownerAddress, pool, true)
     const outAmount = get_amount_out_(
       u64(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber()))),
       this.pontemPool?.__app?.cache!,

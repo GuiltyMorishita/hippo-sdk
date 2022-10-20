@@ -6,6 +6,7 @@ import { TypeParamDeclType, FieldDeclType } from '@manahippo/move-to-ts';
 import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@manahippo/move-to-ts';
 import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
+import * as SwapDeployer from '../SwapDeployer';
 import * as Aux from '../aux';
 import * as Liquidswap from '../liquidswap';
 import * as Stdlib from '../stdlib';
@@ -13,6 +14,7 @@ export const packageName = 'HippoAggregator';
 export const moduleAddress = new HexString('0x89576037b3cc0b89645ea393a47787bb348272c76d6941c574b053672b848039');
 export const moduleName = 'aggregator';
 
+export const DEX_ANIMESWAP: U8 = u8('9');
 export const DEX_APTOSWAP: U8 = u8('7');
 export const DEX_AUX: U8 = u8('8');
 export const DEX_BASIQ: U8 = u8('4');
@@ -346,25 +348,27 @@ export function get_intermediate_output_(
   $p: TypeTag[] /* <X, Y, E>*/
 ): [Stdlib.Option.Option, Stdlib.Coin.Coin] {
   let temp$1,
+    temp$10,
     temp$2,
     temp$3,
     temp$4,
     temp$5,
     temp$6,
+    temp$7,
     temp$8,
     _is_x_to_y,
     coin_in_value,
-    coin_in_value__9,
+    coin_in_value__11,
     x_out_opt,
     y_out,
-    y_out__7;
+    y_out__9;
   coin_in_value = Stdlib.Coin.value_(x_in, $c, [$p[0]]);
   _is_x_to_y = is_x_to_y;
   if ($.copy(dex_type).eq($.copy(DEX_HIPPO))) {
     throw $.abortCode($.copy(E_UNKNOWN_POOL_TYPE));
   } else {
     if ($.copy(dex_type).eq($.copy(DEX_PONTEM))) {
-      [temp$3, temp$4] = [
+      [temp$5, temp$6] = [
         Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
         Liquidswap.Router.swap_exact_coin_for_coin_(x_in, u64('0'), $c, [$p[0], $p[1], $p[2]])
       ];
@@ -383,20 +387,28 @@ export function get_intermediate_output_(
           $c,
           [$p[0], $p[1]]
         );
-        [temp$1, temp$2] = [
+        [temp$3, temp$4] = [
           Stdlib.Option.some_(x_in, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
           y_out
         ];
       } else {
-        throw $.abortCode($.copy(E_UNKNOWN_DEX));
+        if ($.copy(dex_type).eq($.copy(DEX_ANIMESWAP))) {
+          [temp$1, temp$2] = [
+            Stdlib.Option.none_($c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
+            SwapDeployer.AnimeSwapPoolV1.swap_coins_for_coins_(x_in, $c, [$p[0], $p[1]])
+          ];
+        } else {
+          throw $.abortCode($.copy(E_UNKNOWN_DEX));
+        }
+        [temp$3, temp$4] = [temp$1, temp$2];
       }
-      [temp$3, temp$4] = [temp$1, temp$2];
+      [temp$5, temp$6] = [temp$3, temp$4];
     }
-    [temp$5, temp$6] = [temp$3, temp$4];
+    [temp$7, temp$8] = [temp$5, temp$6];
   }
-  [x_out_opt, y_out__7] = [temp$5, temp$6];
+  [x_out_opt, y_out__9] = [temp$7, temp$8];
   if (Stdlib.Option.is_some_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])])) {
-    temp$8 = $.copy(coin_in_value).sub(
+    temp$10 = $.copy(coin_in_value).sub(
       Stdlib.Coin.value_(
         Stdlib.Option.borrow_(x_out_opt, $c, [new StructTag(new HexString('0x1'), 'coin', 'Coin', [$p[0]])]),
         $c,
@@ -404,18 +416,18 @@ export function get_intermediate_output_(
       )
     );
   } else {
-    temp$8 = $.copy(coin_in_value);
+    temp$10 = $.copy(coin_in_value);
   }
-  coin_in_value__9 = temp$8;
+  coin_in_value__11 = temp$10;
   emit_swap_step_event_(
     $.copy(dex_type),
     $.copy(pool_type),
-    $.copy(coin_in_value__9),
-    Stdlib.Coin.value_(y_out__7, $c, [$p[1]]),
+    $.copy(coin_in_value__11),
+    Stdlib.Coin.value_(y_out__9, $c, [$p[1]]),
     $c,
     [$p[0], $p[1]]
   );
-  return [x_out_opt, y_out__7];
+  return [x_out_opt, y_out__9];
 }
 
 export function init_coin_store_(admin: HexString, $c: AptosDataCache, $p: TypeTag[] /* <X>*/): void {

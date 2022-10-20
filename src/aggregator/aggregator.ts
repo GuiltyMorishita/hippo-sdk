@@ -18,6 +18,7 @@ import { BasiqPoolProvider } from './basiq';
 import { AptoswapPoolProvider } from './aptoswap/aptoswap';
 import { AuxPooProvider } from './aux';
 import { coin_list } from '../../cli';
+import { AnimePoolProvider } from './animeswap';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -41,7 +42,8 @@ export class TradeAggregator {
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
       //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
       // new AptoswapPoolProvider(app, netConfig, registryClient),
-      new AuxPooProvider(app, netConfig, registryClient)
+      new AuxPooProvider(app, netConfig, registryClient),
+      new AnimePoolProvider(app, netConfig, registryClient)
     ]);
     await aggregator.loadAllPoolLists();
     return aggregator;

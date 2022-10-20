@@ -41,7 +41,9 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   Aptoswap = 7,
   // eslint-disable-next-line no-unused-vars
-  Aux = 8
+  Aux = 8,
+  // eslint-disable-next-line no-unused-vars
+  AnimeSwap = 9
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo]: 'Hippo',
@@ -50,8 +52,9 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Basiq]: 'Basiq',
   [DexType.Ditto]: 'Ditto',
   [DexType.Tortuga]: 'Tortuga',
-  [DexType.Aptoswap]: 'Aptoswap',
-  [DexType.Aux]: 'Aux'
+  [DexType.Aptoswap]: 'AptoSwap',
+  [DexType.Aux]: 'Aux',
+  [DexType.AnimeSwap]: 'AnimeSwap'
 };
 export type PoolType = U64;
 
@@ -128,9 +131,9 @@ export type SwapParamType = {
   thirdDexType: U8;
   thirdPoolType: U64;
   thirdIsReversed: boolean;
-  inAmt: U64,
-  minOutAmt: U64,
-  types: [TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag]
+  inAmt: U64;
+  minOutAmt: U64;
+  types: [TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag];
 };
 
 export class TradeRoute {
