@@ -26,7 +26,8 @@ export class TradeAggregator {
   private constructor(
     public registryClient: CoinListClient,
     public app: App,
-    public readonly poolProviders: TradingPoolProvider[]
+    public readonly poolProviders: TradingPoolProvider[],
+    public printError = false
   ) {
     this.allPools = [];
     this.xToAnyPools = new Map();
@@ -41,7 +42,7 @@ export class TradeAggregator {
       // new BasiqPoolProvider(app, netConfig, registryClient),
       //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
       //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
-      // new AptoswapPoolProvider(app, netConfig, registryClient),
+      new AptoswapPoolProvider(app, netConfig, registryClient),
       new AuxPooProvider(app, netConfig, registryClient),
       new AnimePoolProvider(app, netConfig, registryClient)
     ]);
@@ -210,7 +211,9 @@ export class TradeAggregator {
         try {
           promises.push(pool.reloadState(this.app));
         } catch (e) {
-          console.log('Load state err: ', e);
+          if (this.printError) {
+            console.log('Load state err: ', e);
+          }
         }
       }
     }
@@ -221,7 +224,9 @@ export class TradeAggregator {
         const quote = route.getQuote(inputUiAmt);
         result.push({ route, quote });
       } catch (e) {
-        console.log('Get quote err: ', e);
+        if (this.printError) {
+          console.log('Get quote err: ', e);
+        }
       }
     }
     result.sort((a, b) => b.quote.outputUiAmt - a.quote.outputUiAmt);

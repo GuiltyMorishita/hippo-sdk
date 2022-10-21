@@ -7,7 +7,7 @@ import { AtomicTypeTag, StructTag, TypeTag, VectorTag, SimpleStructTag } from '@
 import { OptionTransaction } from '@manahippo/move-to-ts';
 import { HexString, AptosClient, AptosAccount, TxnBuilderTypes, Types } from 'aptos';
 export const packageName = 'LiquidswapLP';
-export const moduleAddress = new HexString('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948');
+export const moduleAddress = new HexString('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948');
 export const moduleName = 'lp_coin';
 
 export class LP {
@@ -37,7 +37,7 @@ export class LP {
   }
 }
 export function loadParsers(repo: AptosParserRepo) {
-  repo.addParser('0x5a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948::lp_coin::LP', LP.LPParser);
+  repo.addParser('0x05a97986a9d031c4567e15b797be516910cfcb4156312482efc6a19c0a30c948::lp_coin::LP', LP.LPParser);
 }
 export class App {
   constructor(public client: AptosClient, public repo: AptosParserRepo, public cache: AptosLocalCache) {}
