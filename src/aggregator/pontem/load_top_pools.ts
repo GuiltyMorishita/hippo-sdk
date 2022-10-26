@@ -6,6 +6,7 @@ import { MAINNET_CONFIG } from '../../config';
 import { LiquidityPool } from '../../generated/liquidswap/liquidity_pool';
 import { CoinInfo } from '../../generated/stdlib/coin';
 import { StructType } from './type';
+import { POOLS } from './pools';
 
 const SUPPORTED_COINS: [StructTag, number][] = [
   // APT
@@ -131,6 +132,7 @@ type PoolValue = {
   value: number;
 };
 async function main() {
+  console.log(POOLS.length);
   const client = new AptosClient(MAINNET_CONFIG.fullNodeUrl);
   const app = new App(client);
   const curvesTag = Uncorrelated.getTag();
@@ -192,7 +194,7 @@ async function main() {
     pools.push([toStructType(typeParams[0]), toStructType(typeParams[1])]);
   }
   poolValues.forEach((poolValue) => {});
-  console.log(pools.slice(20));
+  console.log(pools.slice(0, 20));
 }
 function toStructType(structTag: StructTag) {
   return { address: structTag.address.hex(), module: structTag.module, name: structTag.name } as StructType;
