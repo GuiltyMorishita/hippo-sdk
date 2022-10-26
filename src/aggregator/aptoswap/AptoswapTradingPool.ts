@@ -1,7 +1,6 @@
 import { parseMoveStructTag, StructTag, u64 } from '@manahippo/move-to-ts';
 import { HexString, Types } from 'aptos';
-import { DexType, PriceType, QuoteType, TradingPool, TradingPoolProvider, UITokenAmount } from '../types';
-import { typeTagToTypeInfo } from '../../utils';
+import { DexType, PriceType, QuoteType, TradingPool, UITokenAmount } from '../types';
 import { App } from '../../generated';
 import bigInt from 'big-integer';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
@@ -411,37 +410,5 @@ export class AptoswapTradingPool extends TradingPool {
   // build payload directly if not routable
   makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
     throw new Error('Not Implemented');
-  }
-}
-
-export class AptoswapPoolProvider extends TradingPoolProvider {
-  async loadPoolList(): Promise<TradingPool[]> {
-    const poolList: TradingPool[] = [];
-    const packageAddr = this.netConfig.aptoswapAddress;
-    const resources = await this.app.client.getAccountResources(packageAddr);
-
-    for (const resource of resources) {
-      if (resource.type.indexOf('pool::Pool') >= 0) {
-        const tag = parseMoveStructTag(resource.type);
-        const xTag = tag.typeParams[0] as StructTag;
-        const yTag = tag.typeParams[1] as StructTag;
-        const xCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(xTag));
-        const yCoinInfo = this.registry.getCoinInfoByType(typeTagToTypeInfo(yTag));
-        if (!xCoinInfo || !yCoinInfo) {
-          continue;
-        }
-
-        try {
-          const pool = new AptoswapTradingPool(packageAddr, tag, xCoinInfo, yCoinInfo, resource);
-          if (pool.pool.isAvaliableForSwap()) {
-            poolList.push(pool);
-          }
-        } catch {
-          // ignore
-        }
-      }
-    }
-
-    return poolList;
   }
 }

@@ -15,7 +15,7 @@ import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
 import { AptosClient } from 'aptos';
 import { BasiqPoolProvider } from './basiq';
-import { AptoswapPoolProvider } from './aptoswap/aptoswap';
+import { AptoswapPoolProvider } from './aptoswap';
 import { AuxPooProvider } from './aux';
 import { coin_list } from '../../cli';
 import { AnimePoolProvider } from './animeswap';
