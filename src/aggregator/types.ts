@@ -57,6 +57,11 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.AnimeSwap]: 'AnimeSwap'
 };
 export type PoolType = U64;
+export type StructType = {
+  address: string;
+  module: string;
+  name: string;
+};
 
 // An AMM pool or ohchain orderbook that supports trading directly between X and Y
 export abstract class TradingPool {

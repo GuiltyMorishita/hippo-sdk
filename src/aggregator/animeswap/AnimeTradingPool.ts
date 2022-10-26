@@ -1,4 +1,4 @@
-import { AptosDataCache, StructTag, u64 } from '@manahippo/move-to-ts';
+import { AptosDataCache, u64 } from '@manahippo/move-to-ts';
 import { HexString, Types } from 'aptos';
 import { CoinInfo } from '../../generated/coin_list/coin_list';
 import { DexType, PriceType, QuoteType, TradingPool, UITokenAmount } from '../types';
@@ -10,13 +10,11 @@ export class AnimeTradingPool extends TradingPool {
   ownerAddr: HexString;
   _xCoinInfo: CoinInfo;
   _yCoinInfo: CoinInfo;
-  tag: StructTag;
   pool: AnimeSwapPoolV1.LiquidityPool | null;
 
-  constructor(ownerAddr: HexString, tag: StructTag, xCoinInfo: CoinInfo, yCoinInfo: CoinInfo) {
+  constructor(ownerAddr: HexString, xCoinInfo: CoinInfo, yCoinInfo: CoinInfo) {
     super();
     this.ownerAddr = ownerAddr;
-    this.tag = tag;
     this._xCoinInfo = xCoinInfo;
     this._yCoinInfo = yCoinInfo;
 
@@ -48,12 +46,10 @@ export class AnimeTradingPool extends TradingPool {
 
   async reloadState(app: App): Promise<void> {
     // eslint-disable-next-line max-len
-    this.pool = await app.SwapDeployer.AnimeSwapPoolV1.LiquidityPool.load(
-      app.parserRepo,
-      app.client,
-      this.ownerAddr,
-      this.tag.typeParams
-    );
+    this.pool = await app.SwapDeployer.AnimeSwapPoolV1.LiquidityPool.load(app.parserRepo, app.client, this.ownerAddr, [
+      this.xCoinInfo.token_type.toTypeTag(),
+      this.yCoinInfo.token_type.toTypeTag()
+    ]);
   }
 
   getPrice(): PriceType {

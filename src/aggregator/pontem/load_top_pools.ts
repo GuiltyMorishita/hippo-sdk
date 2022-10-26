@@ -5,8 +5,9 @@ import { App } from '../../generated';
 import { MAINNET_CONFIG } from '../../config';
 import { LiquidityPool } from '../../generated/liquidswap/liquidity_pool';
 import { CoinInfo } from '../../generated/stdlib/coin';
-import { StructType } from './type';
+import { StructType } from '../types';
 import { POOLS } from './pools';
+import { toStructType } from '../utils';
 
 const SUPPORTED_COINS: [StructTag, number][] = [
   // APT
@@ -196,9 +197,7 @@ async function main() {
   poolValues.forEach((poolValue) => {});
   console.log(pools.slice(0, 20));
 }
-function toStructType(structTag: StructTag) {
-  return { address: structTag.address.hex(), module: structTag.module, name: structTag.name } as StructType;
-}
+
 async function getPool(app: App, xTag: StructTag, yTag: StructTag, curvesTag: StructTag) {
   try {
     return {

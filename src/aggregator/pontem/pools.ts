@@ -1,4 +1,4 @@
-import { StructType } from './type';
+import { StructType } from '../types';
 
 export const POOLS: StructType[][] = [
   [
