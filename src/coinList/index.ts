@@ -28,7 +28,9 @@ export class CoinListClient {
   getCoinInfoByType(tokenType: Type_info.TypeInfo) {
     return this.fullnameToCoinInfo[tokenType.typeFullname()];
   }
-
+  getCoinInfoByFullName(fullName: string) {
+    return this.fullnameToCoinInfo[fullName];
+  }
   static async load(app: App) {
     const coinRegistry = new CoinListClient(app);
     await coinRegistry.buildCache();

@@ -12,8 +12,7 @@ export class PontemTradingPool extends TradingPool {
     public ownerAddress: HexString,
     public _xCoinInfo: CoinInfo,
     public _yCoinInfo: CoinInfo,
-    public curvesTag: StructTag,
-    public poolResourceTag: StructTag
+    public curvesTag: StructTag
   ) {
     super();
     this.pontemPool = null;
