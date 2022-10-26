@@ -52,7 +52,7 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Basiq]: 'Basiq',
   [DexType.Ditto]: 'Ditto',
   [DexType.Tortuga]: 'Tortuga',
-  [DexType.Aptoswap]: 'AptoSwap',
+  [DexType.Aptoswap]: 'Aptoswap',
   [DexType.Aux]: 'Aux',
   [DexType.AnimeSwap]: 'AnimeSwap'
 };
