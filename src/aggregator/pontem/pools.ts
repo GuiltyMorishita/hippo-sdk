@@ -1,6 +1,6 @@
-import { StructType } from '../types';
+import { RawStruct } from '../types';
 
-export const POOLS: StructType[][] = [
+export const POOLS: RawStruct[][] = [
   [
     {
       address: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa',

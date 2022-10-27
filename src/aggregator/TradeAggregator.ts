@@ -1,6 +1,4 @@
 import { App } from '../generated';
-import { CoinListClient } from '../coinList';
-import { EconiaPoolProvider } from './econia';
 import {
   QuoteType,
   RouteAndQuote,
@@ -11,59 +9,70 @@ import {
   TradingPoolProvider
 } from './types';
 import { PontemPoolProvider } from './pontem';
-import { CoinInfo } from '../generated/coin_list/coin_list';
 import { CONFIGS } from '../config';
-import { AptosClient } from 'aptos';
-import { BasiqPoolProvider } from './basiq';
 import { AptoswapPoolProvider } from './aptoswap';
-import { AuxPooProvider } from './aux';
-import { coin_list } from '../../cli';
+import { AuxPoolProvider } from './aux';
 import { AnimePoolProvider } from './animeswap';
+import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
   public xToAnyPools: Map<TokenTypeFullname, TradingPool[]>;
-  private constructor(
-    public registryClient: CoinListClient,
+  public coinListClient: CoinListClient;
+  public poolProviders: TradingPoolProvider[];
+
+  constructor(
     public app: App,
-    public readonly poolProviders: TradingPoolProvider[],
-    public printError = false
+    netConfig = CONFIGS.mainnet,
+    coinListClient?: CoinListClient,
+    poolProviders?: TradingPoolProvider[],
+    public printError = false,
+    buildDefaultPoolList = true
   ) {
     this.allPools = [];
     this.xToAnyPools = new Map();
-  }
-
-  static async create(aptosClient: AptosClient, netConfig = CONFIGS.mainnet) {
-    const app = new App(aptosClient);
-    const registryClient = await CoinListClient.load(app);
-    const aggregator = new TradeAggregator(registryClient, app, [
-      // new EconiaPoolProvider(app, netConfig, registryClient),
-      new PontemPoolProvider(app, netConfig, registryClient),
-      // new BasiqPoolProvider(app, netConfig, registryClient),
-      //new DittoPoolProvider(app, fetcher, netConfig, registryClient),
-      //new TortugaPoolProvider(app, fetcher, netConfig, registryClient),
-      new AptoswapPoolProvider(app, netConfig, registryClient),
-      new AuxPooProvider(app, netConfig, registryClient),
-      new AnimePoolProvider(app, netConfig, registryClient)
-    ]);
-    await aggregator.loadAllPoolLists();
-    return aggregator;
-  }
-
-  async loadAllPoolLists() {
-    const promises = [];
-    for (const provider of this.poolProviders) {
-      promises.push(provider.loadPoolList());
+    this.coinListClient = coinListClient ? coinListClient : new CoinListClient(netConfig.name as NetworkType);
+    this.poolProviders = poolProviders
+      ? poolProviders
+      : [
+          new PontemPoolProvider(this.app, netConfig, this.coinListClient),
+          new AptoswapPoolProvider(this.app, netConfig, this.coinListClient),
+          new AuxPoolProvider(this.app, netConfig, this.coinListClient),
+          new AnimePoolProvider(this.app, netConfig, this.coinListClient)
+        ];
+    if (buildDefaultPoolList) {
+      this.buildDefaultPoolList();
     }
-    const allResult = await Promise.all(promises);
-    this.allPools = allResult.flat();
+  }
+
+  static async create(
+    app: App,
+    netConfig = CONFIGS.mainnet,
+    coinListClient?: CoinListClient,
+    poolProviders?: TradingPoolProvider[],
+    printError = false
+  ) {
+    const agg = new TradeAggregator(app, netConfig, coinListClient, poolProviders, printError, true);
+    // await agg.updatePoolLists();
+    return agg;
+  }
+
+  buildDefaultPoolList() {
+    this.allPools = [];
+    for (const provider of this.poolProviders) {
+      this.allPools = this.allPools.concat(provider.getDefaultPoolList());
+    }
+    this.buildCache();
+  }
+
+  private buildCache() {
     this.xToAnyPools = new Map();
     for (const pool of this.allPools) {
-      const xFullname = pool.xCoinInfo.token_type.typeFullname();
-      if (!this.xToAnyPools.has(xFullname)) {
-        this.xToAnyPools.set(xFullname, [pool]);
+      const xType = pool.xCoinInfo.token_type.type;
+      if (!this.xToAnyPools.has(xType)) {
+        this.xToAnyPools.set(xType, [pool]);
       } else {
-        const xToAny = this.xToAnyPools.get(xFullname);
+        const xToAny = this.xToAnyPools.get(xType);
         if (!xToAny) {
           throw new Error('Unreachable');
         }
@@ -72,8 +81,19 @@ export class TradeAggregator {
     }
   }
 
-  getTradableCoinInfo(): coin_list.Coin_list.CoinInfo[] {
-    const set = new Set<coin_list.Coin_list.CoinInfo>();
+  async updatePoolLists() {
+    await this.coinListClient.update(this.app.client);
+    const promises = [];
+    for (const provider of this.poolProviders) {
+      promises.push(provider.loadPoolList());
+    }
+    const allResult = await Promise.all(promises);
+    this.allPools = allResult.flat();
+    this.buildCache();
+  }
+
+  getTradableCoinInfo(): RawCoinInfo[] {
+    const set = new Set<RawCoinInfo>();
     for (const pool of this.allPools) {
       set.add(pool.xCoinInfo);
       set.add(pool.yCoinInfo);
@@ -81,11 +101,11 @@ export class TradeAggregator {
     return Array.from(set.values());
   }
 
-  getXtoYDirectSteps(x: CoinInfo, y: CoinInfo, requireRoutable = true): TradeStep[] {
-    const xFullname = x.token_type.typeFullname();
-    const yFullname = y.token_type.typeFullname();
+  getXtoYDirectSteps(x: RawCoinInfo, y: RawCoinInfo, requireRoutable = true): TradeStep[] {
+    const xFullname = x.token_type.type;
+    const yFullname = y.token_type.type;
     if (xFullname === yFullname) {
-      throw new Error(`Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`);
+      throw new Error(`Cannot swap ${x.symbol} to ${y.symbol}. They are the same coin.`);
     }
     const steps: TradeStep[] = [];
     const xToYCandidates = this.xToAnyPools.get(xFullname);
@@ -95,14 +115,14 @@ export class TradeAggregator {
         if (requireRoutable && !pool.isRoutable) {
           continue;
         }
-        if (pool.yCoinInfo.token_type.typeFullname() === yFullname) {
+        if (pool.yCoinInfo.token_type.type === yFullname) {
           steps.push(new TradeStep(pool, true));
         }
       }
     }
     if (yToXCandidates) {
       for (const pool of yToXCandidates) {
-        if (pool.yCoinInfo.token_type.typeFullname() === xFullname) {
+        if (pool.yCoinInfo.token_type.type === xFullname) {
           if (requireRoutable && !pool.isRoutable) {
             continue;
           }
@@ -113,21 +133,21 @@ export class TradeAggregator {
     return steps;
   }
 
-  getOneStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
-    const xFullname = x.token_type.typeFullname();
-    if (xFullname === y.token_type.typeFullname()) {
-      throw new Error(`Cannot swap ${x.symbol.str()} to ${y.symbol.str()}. They are the same coin.`);
+  getOneStepRoutes(x: RawCoinInfo, y: RawCoinInfo): TradeRoute[] {
+    const xFullname = x.token_type.type;
+    if (xFullname === y.token_type.type) {
+      throw new Error(`Cannot swap ${x.symbol} to ${y.symbol}. They are the same coin.`);
     }
     const steps = this.getXtoYDirectSteps(x, y, false);
     return steps.map((step) => new TradeRoute([step]));
   }
 
-  getTwoStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
-    const xFullname = x.token_type.typeFullname();
-    const yFullname = y.token_type.typeFullname();
+  getTwoStepRoutes(x: RawCoinInfo, y: RawCoinInfo): TradeRoute[] {
+    const xFullname = x.token_type.type;
+    const yFullname = y.token_type.type;
     const results: TradeRoute[] = [];
-    for (const k of this.registryClient.getCoinInfoList()) {
-      const kFullname = k.token_type.typeFullname();
+    for (const k of this.coinListClient.getCoinInfoList()) {
+      const kFullname = k.token_type.type;
       if (kFullname === xFullname || kFullname === yFullname) {
         continue;
       }
@@ -151,13 +171,13 @@ export class TradeAggregator {
     return results;
   }
 
-  getThreeStepRoutes(x: CoinInfo, y: CoinInfo): TradeRoute[] {
-    const xFullname = x.token_type.typeFullname();
-    const yFullname = y.token_type.typeFullname();
+  getThreeStepRoutes(x: RawCoinInfo, y: RawCoinInfo): TradeRoute[] {
+    const xFullname = x.token_type.type;
+    const yFullname = y.token_type.type;
     const results: TradeRoute[] = [];
 
-    for (const k of this.registryClient.getCoinInfoList()) {
-      const kFullname = k.token_type.typeFullname();
+    for (const k of this.coinListClient.getCoinInfoList()) {
+      const kFullname = k.token_type.type;
       if (kFullname === xFullname || kFullname === yFullname) {
         continue;
       }
@@ -182,7 +202,7 @@ export class TradeAggregator {
     return results;
   }
 
-  getAllRoutes(x: CoinInfo, y: CoinInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip = false): TradeRoute[] {
+  getAllRoutes(x: RawCoinInfo, y: RawCoinInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip = false): TradeRoute[] {
     // max 3 steps
     const step1Routes = maxSteps >= 1 ? this.getOneStepRoutes(x, y) : [];
     const step2Routes = maxSteps >= 2 ? this.getTwoStepRoutes(x, y) : [];
@@ -197,8 +217,8 @@ export class TradeAggregator {
 
   async getQuotes(
     inputUiAmt: number,
-    x: CoinInfo,
-    y: CoinInfo,
+    x: RawCoinInfo,
+    y: RawCoinInfo,
     maxSteps: 1 | 2 | 3 = 3,
     reloadState = true,
     allowRoundTrip = false
@@ -235,8 +255,8 @@ export class TradeAggregator {
 
   async getBestQuote(
     inputUiAmt: number,
-    x: CoinInfo,
-    y: CoinInfo,
+    x: RawCoinInfo,
+    y: RawCoinInfo,
     maxSteps: 1 | 2 | 3 = 3,
     reloadState = true,
     allowRoundTrip = false

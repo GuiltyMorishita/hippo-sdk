@@ -1,2 +1,2 @@
-export * from './econia_client';
-export * from './types';
+export * from './EconiaTradingPoolV1';
+export * from './EconiaPoolProvider';

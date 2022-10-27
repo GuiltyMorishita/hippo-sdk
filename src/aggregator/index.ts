@@ -1,4 +1,4 @@
 export * from './econia';
 export * from './pontem';
-export * from './aggregator';
+export * from './TradeAggregator';
 export * as AggregatorTypes from './types';

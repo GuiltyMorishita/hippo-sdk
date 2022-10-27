@@ -1,13 +1,13 @@
 import { StructTag } from '@manahippo/move-to-ts';
 import { AptosClient, HexString } from 'aptos';
-import { Uncorrelated } from '../../generated/liquidswap/curves';
-import { App } from '../../generated';
-import { MAINNET_CONFIG } from '../../config';
-import { LiquidityPool } from '../../generated/liquidswap/liquidity_pool';
-import { CoinInfo } from '../../generated/stdlib/coin';
-import { StructType } from '../types';
-import { POOLS } from './pools';
-import { toStructType } from '../utils';
+import { Uncorrelated } from '../../src/generated/liquidswap/curves';
+import { App } from '../../src/generated';
+import { MAINNET_CONFIG } from '../../src/config';
+import { LiquidityPool } from '../../src/generated/liquidswap/liquidity_pool';
+import { CoinInfo } from '../../src/generated/stdlib/coin';
+import { RawStruct } from '../../src/aggregator/types';
+import { POOLS } from '../../src/aggregator/pontem/pools';
+import { toRawStruct } from '../../src/aggregator/utils';
 
 const SUPPORTED_COINS: [StructTag, number][] = [
   // APT
@@ -187,12 +187,12 @@ async function main() {
   poolValues = poolValues.sort((a, b) => {
     return b.value - a.value;
   });
-  const pools: StructType[][] = [];
+  const pools: RawStruct[][] = [];
   for (let i = 0; i < poolValues.length; i++) {
     const poolValue = poolValues[i];
     let typeParams = (poolValue.pool.typeTag as StructTag).typeParams as StructTag[];
     console.log(i, ' = ', poolValue.value);
-    pools.push([toStructType(typeParams[0]), toStructType(typeParams[1])]);
+    pools.push([toRawStruct(typeParams[0]), toRawStruct(typeParams[1])]);
   }
   poolValues.forEach((poolValue) => {});
   console.log(pools.slice(0, 20));

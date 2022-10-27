@@ -1,11 +1,11 @@
 import { parseMoveStructTag, StructTag } from '@manahippo/move-to-ts';
 import { AptosClient } from 'aptos';
-import { App } from '../../generated';
-import { MAINNET_CONFIG } from '../../config';
-import { LiquidityPool } from '../../generated/SwapDeployer/AnimeSwapPoolV1';
-import { CoinInfo } from '../../generated/stdlib/coin';
-import { StructType } from '../types';
-import { toStructType } from '../utils';
+import { App } from '../../src/generated';
+import { MAINNET_CONFIG } from '../../src/config';
+import { LiquidityPool } from '../../src/generated/SwapDeployer/AnimeSwapPoolV1';
+import { CoinInfo } from '../../src/generated/stdlib/coin';
+import { RawStruct } from '../../src/aggregator/types';
+import { toRawStruct } from '../../src/aggregator/utils';
 
 // import { POOLS } from './pools';
 
@@ -61,10 +61,10 @@ async function main() {
     console.log(poolValue.value);
   });
   poolList = poolList.slice(0, 20);
-  let pools: StructType[][] = [];
+  let pools: RawStruct[][] = [];
   poolList.forEach((poolValue) => {
     let typeParams = (poolValue.pool.typeTag as StructTag).typeParams as StructTag[];
-    pools.push([toStructType(typeParams[0]), toStructType(typeParams[1])]);
+    pools.push([toRawStruct(typeParams[0]), toRawStruct(typeParams[1])]);
   });
   console.log(pools);
 }

@@ -523,23 +523,23 @@ export function register_market_internal_(
 
 export function loadParsers(repo: AptosParserRepo) {
   repo.addParser(
-    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::CustodianCapability',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::coinList::CustodianCapability',
     CustodianCapability.CustodianCapabilityParser
   );
   repo.addParser(
-    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::GenericAsset',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::coinList::GenericAsset',
     GenericAsset.GenericAssetParser
   );
   repo.addParser(
-    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::MarketInfo',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::coinList::MarketInfo',
     MarketInfo.MarketInfoParser
   );
   repo.addParser(
-    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::Registry',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::coinList::Registry',
     Registry.RegistryParser
   );
   repo.addParser(
-    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::registry::TradingPairInfo',
+    '0x51d8534aba004732df9a7229f89d6d7a687ad56f8c906e482f62ee298ec7c778::coinList::TradingPairInfo',
     TradingPairInfo.TradingPairInfoParser
   );
 }

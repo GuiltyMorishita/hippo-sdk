@@ -3,7 +3,7 @@ import { HexString, Types } from 'aptos';
 import { DexType, PriceType, QuoteType, TradingPool, UITokenAmount } from '../types';
 import { App } from '../../generated';
 import bigInt from 'big-integer';
-import { CoinInfo } from '../../generated/coin_list/coin_list';
+import { RawCoinInfo } from '@manahippo/coin-list';
 
 class BigIntConstants {
   static ZERO = BigInt(0);
@@ -328,30 +328,24 @@ class AptoswapPoolInfo {
 }
 
 export class AptoswapTradingPool extends TradingPool {
-  packageAddr: HexString;
-  _xCoinInfo: CoinInfo;
-  _yCoinInfo: CoinInfo;
-  tag: StructTag;
-  pool: AptoswapPoolInfo;
-
+  pool: AptoswapPoolInfo | null;
   constructor(
-    packageAddr: HexString,
-    tag: StructTag,
-    xCoinInfo: CoinInfo,
-    yCoinInfo: CoinInfo,
-    resource: Types.MoveResource
+    public packageAddr: HexString,
+    public tag: StructTag,
+    public xCoinInfo: RawCoinInfo,
+    public yCoinInfo: RawCoinInfo,
+    resource?: Types.MoveResource
   ) {
     super();
-    this.packageAddr = packageAddr;
-    this.tag = tag;
-    this._xCoinInfo = xCoinInfo;
-    this._yCoinInfo = yCoinInfo;
-
-    const pool = AptoswapPoolInfo.mapResourceToPoolInfo(resource);
-    if (pool === null) {
-      throw Error('Error while parsing Aptoswap pool from resource');
+    if (resource) {
+      const pool = AptoswapPoolInfo.mapResourceToPoolInfo(resource);
+      if (pool === null) {
+        throw Error('Error while parsing Aptoswap pool from resource');
+      }
+      this.pool = pool;
+    } else {
+      this.pool = null;
     }
-    this.pool = pool;
   }
 
   get dexType() {
@@ -365,16 +359,9 @@ export class AptoswapTradingPool extends TradingPool {
     return true;
   }
 
-  get xCoinInfo() {
-    return this._xCoinInfo;
-  }
-  get yCoinInfo() {
-    return this._yCoinInfo;
-  }
-
   // state-dependent
   isStateLoaded(): boolean {
-    return true;
+    return this.pool != null;
   }
 
   async reloadState(app: App): Promise<void> {
@@ -383,6 +370,9 @@ export class AptoswapTradingPool extends TradingPool {
   }
 
   getPrice(): PriceType {
+    if (this.pool == null) {
+      throw new Error('Aptoswap Pool not loaded ');
+    }
     const p = this.pool.getPrice();
     return {
       xToY: p > 0.0 ? 1.0 / p : 0.0,
@@ -391,16 +381,19 @@ export class AptoswapTradingPool extends TradingPool {
   }
 
   getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType {
+    if (this.pool == null) {
+      throw new Error('Aptoswap Pool not loaded ');
+    }
     const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
 
-    const coinInAmt = BigInt(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber())));
+    const coinInAmt = BigInt(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals)));
     const coinOutAmt = isXtoY ? this.pool.getXToYAmount(coinInAmt) : this.pool.getYToXAmount(coinInAmt);
-    const outputUiAmt = bigInt(coinOutAmt).toJSNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber());
+    const outputUiAmt = bigInt(coinOutAmt).toJSNumber() / Math.pow(10, outputTokenInfo.decimals);
 
     return {
-      inputSymbol: inputTokenInfo.symbol.str(),
-      outputSymbol: outputTokenInfo.symbol.str(),
+      inputSymbol: inputTokenInfo.symbol,
+      outputSymbol: outputTokenInfo.symbol,
       inputUiAmt: inputUiAmt,
       outputUiAmt: outputUiAmt,
       avgPrice: outputUiAmt / inputUiAmt

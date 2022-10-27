@@ -1,6 +1,6 @@
-import { StructType } from '../types';
+import { RawStruct } from '../types';
 
-export const POOLS: StructType[][] = [
+export const POOLS: RawStruct[][] = [
   [
     { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' },
     {

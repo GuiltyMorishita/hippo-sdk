@@ -13,7 +13,6 @@ import * as AptosStdlib from './generated/stdlib';
 import * as AptosFramework from './generated/stdlib';
 import { Coin_list } from './generated/coin_list';
 import { App, coin_list } from './generated';
-import * as Aptos_std from './generated/stdlib';
 import { Nothing } from './generated/coin_list/coin_list';
 import * as Std from './generated/stdlib';
 import * as $ from '@manahippo/move-to-ts';
@@ -70,6 +69,7 @@ export async function getCoinStoresForAddress(
   const stores: AptosFramework.Coin.CoinStore[] = [];
   let walletResources;
   try {
+    // todo may more than 10000
     walletResources = await client.getAccountResources(address, version ? { ledgerVersion: version } : {});
   } catch (e: any) {
     if (e.status == 404 && e.errorCode === 'account_not_found') {

@@ -27,13 +27,17 @@ export const readConfig = (program: Command) => {
     throw new Error(`Expect private_key to be present in ${profile} profile`);
   }
   const privateKey = new HexString(privateKeyStr);
-  const isDevnet = (url as string).includes('devnet');
-  const netConf = isDevnet ? CONFIGS.testnet : CONFIGS.localhost;
+
+  const netConf = (url as string).includes('mainnet')
+    ? CONFIGS.mainnet
+    : (url as string).includes('testnet')
+    ? CONFIGS.testnet
+    : CONFIGS.localhost;
   const coinListAddress = netConf.coinListAddress;
   const client = new AptosClient(result.profiles[profile].rest_url);
   const app = new App(client);
   const account = new AptosAccount(privateKey.toUint8Array());
-  console.log(`Using address ${account.address().hex()}`);
+  console.log(`Using address ${account.address().hex()} on ${netConf.name}`);
   return { app, client, account, coinListAddress, netConf };
 };
 

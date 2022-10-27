@@ -1,17 +1,17 @@
 import { DexType, PriceType, QuoteType, TradingPool, UITokenAmount } from '../types';
 import { HexString, Types } from 'aptos';
-import { CoinInfo } from '../../generated/coin_list/coin_list';
 import { StructTag, TypeTag, u64 } from '@manahippo/move-to-ts';
 import { App } from '../../generated';
 import { LiquidityPool as PontemPool } from '../../generated/liquidswap/liquidity_pool';
 import { get_amount_out_ } from '../../generated/liquidswap/router';
+import { RawCoinInfo } from '@manahippo/coin-list';
 
 export class PontemTradingPool extends TradingPool {
   pontemPool: PontemPool | null;
   constructor(
     public ownerAddress: HexString,
-    public _xCoinInfo: CoinInfo,
-    public _yCoinInfo: CoinInfo,
+    public xCoinInfo: RawCoinInfo,
+    public yCoinInfo: RawCoinInfo,
     public curvesTag: StructTag
   ) {
     super();
@@ -26,22 +26,14 @@ export class PontemTradingPool extends TradingPool {
   get isRoutable() {
     return true;
   }
-  // X-Y
-  get xCoinInfo() {
-    return this._xCoinInfo;
-  }
-  get yCoinInfo() {
-    return this._yCoinInfo;
-  }
   // state-dependent
   isStateLoaded(): boolean {
     return this.pontemPool != undefined;
   }
   async reloadState(app: App): Promise<void> {
     this.pontemPool = await app.liquidswap.liquidity_pool.loadLiquidityPool(this.ownerAddress, [
-      this.xCoinInfo.token_type.toTypeTag(),
-      this.yCoinInfo.token_type.toTypeTag(),
-      // todo may err
+      this.xTag,
+      this.yTag,
       this.getCurves()
     ]);
   }
@@ -57,24 +49,21 @@ export class PontemTradingPool extends TradingPool {
     }
     const inputTokenInfo = isXtoY ? this.xCoinInfo : this.yCoinInfo;
     const outputTokenInfo = isXtoY ? this.yCoinInfo : this.xCoinInfo;
+    const inputTag = isXtoY ? this.xTag : this.yTag;
+    const outputTag = isXtoY ? this.yTag : this.xTag;
     const pool = this.pontemPool!;
     const cache = pool.__app?.cache!;
     cache.move_to(pool.typeTag, this.ownerAddress, pool, true);
     const outAmount = get_amount_out_(
-      u64(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals.toJsNumber()))),
+      u64(Math.floor(inputUiAmt * Math.pow(10, inputTokenInfo.decimals))),
       this.pontemPool?.__app?.cache!,
-      [
-        inputTokenInfo.token_type.toTypeTag(),
-        outputTokenInfo.token_type.toTypeTag(),
-        // todo may err
-        this.getCurves()
-      ]
+      [inputTag, outputTag, this.getCurves()]
     );
-    const outputUiAmt = outAmount.toJsNumber() / Math.pow(10, outputTokenInfo.decimals.toJsNumber());
+    const outputUiAmt = outAmount.toJsNumber() / Math.pow(10, outputTokenInfo.decimals);
 
     return {
-      inputSymbol: inputTokenInfo.symbol.str(),
-      outputSymbol: outputTokenInfo.symbol.str(),
+      inputSymbol: inputTokenInfo.symbol,
+      outputSymbol: outputTokenInfo.symbol,
       inputUiAmt,
       outputUiAmt,
       avgPrice: outputUiAmt / inputUiAmt

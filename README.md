@@ -3,7 +3,7 @@
 `hippo-sdk` provides the following TypeScript interface:
 - Hippo's trade aggregator
 - Hippo Swap
-- Token registry
+- Token coinList
 
 # Directories
 - `src/config`: node configuration, allows us to specify which network/fullnode/contract to use.
@@ -187,9 +187,9 @@ BTC: 0.1
 
 ## Token Registry
 
-List coins registered in registry:
+List coins registered in coinList:
 ```
-$ yarn cli -c .aptos/config.yaml show-token-registry
+$ yarn cli -c .aptos/config.yaml show-token-coinList
 ########BTC#######
 name: Bitcoin
 description: Bitcoin
@@ -238,7 +238,7 @@ Options:
 Commands:
   mock-deploy
   list-modules
-  show-token-registry
+  show-token-coinList
   show-pools
   hit-faucet <coin-name> <raw-amount>
   show-wallet
