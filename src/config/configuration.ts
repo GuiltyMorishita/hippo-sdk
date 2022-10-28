@@ -1,7 +1,6 @@
 import { HexString } from 'aptos';
 import { Coin_list } from '../generated/coin_list';
-import { aux, basiq, Aptoswap } from '../generated';
-import { econia, hippo_aggregator } from '../generated';
+import { aux, basiq, Aptoswap, cetus_amm, econia, hippo_aggregator } from '../generated';
 
 export class NetworkConfiguration {
   constructor(
@@ -18,6 +17,7 @@ export class NetworkConfiguration {
     public aptoswapAddress: HexString,
     public auxAddress: HexString,
     public animeAddress: HexString,
+    public cetusAddress: HexString,
     public isMainNet = false
   ) {}
 }
@@ -45,7 +45,9 @@ export const LOCAL_CONFIG = new NetworkConfiguration(
   // aux
   aux.Amm.moduleAddress,
   // anime
-  new HexString('0x796900ebe1a1a54ff9e932f19c548f5c1af5c6e7d34965857ac2f7b1d1ab2cbf')
+  new HexString('0x796900ebe1a1a54ff9e932f19c548f5c1af5c6e7d34965857ac2f7b1d1ab2cbf'),
+  // cetus
+  cetus_amm.Amm_swap.Pool.moduleAddress
 );
 
 export const TESTNET_CONFIG = new NetworkConfiguration(
@@ -71,7 +73,9 @@ export const TESTNET_CONFIG = new NetworkConfiguration(
   // aux
   aux.Amm.moduleAddress,
   // anime
-  new HexString('0x796900ebe1a1a54ff9e932f19c548f5c1af5c6e7d34965857ac2f7b1d1ab2cbf')
+  new HexString('0x796900ebe1a1a54ff9e932f19c548f5c1af5c6e7d34965857ac2f7b1d1ab2cbf'),
+  // cetus
+  cetus_amm.Amm_swap.Pool.moduleAddress
 );
 
 export const MAINNET_CONFIG = new NetworkConfiguration(
@@ -97,7 +101,9 @@ export const MAINNET_CONFIG = new NetworkConfiguration(
   // aux
   aux.Amm.moduleAddress,
   // anime
-  new HexString('0x796900ebe1a1a54ff9e932f19c548f5c1af5c6e7d34965857ac2f7b1d1ab2cbf')
+  new HexString('0x796900ebe1a1a54ff9e932f19c548f5c1af5c6e7d34965857ac2f7b1d1ab2cbf'),
+  // cetus
+  cetus_amm.Amm_swap.Pool.moduleAddress
 );
 
 export const CONFIGS = {
