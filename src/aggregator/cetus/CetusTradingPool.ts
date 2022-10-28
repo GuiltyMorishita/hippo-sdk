@@ -74,6 +74,9 @@ export class CetusTradingPool extends TradingPool {
   }
 
   async reloadState(app: App): Promise<void> {
+    if (this.pool == null) {
+      await app.cetus_amm.amm_config.loadPoolFeeConfig(this.ownerAddr, [this.xTag, this.yTag]);
+    }
     this.pool = await app.cetus_amm.amm_swap.loadPool(this.ownerAddr, [this.xTag, this.yTag]);
   }
 }

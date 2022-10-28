@@ -1,8 +1,8 @@
-import { TradingPool, TradingPoolProvider } from '../types';
+import { TradingPoolProvider } from '../types';
 import { parseMoveStructTag, StructTag } from '@manahippo/move-to-ts';
 import { typeTagToTypeInfo } from '../../utils';
 import { AptoswapTradingPool } from './index';
-import { POOLS } from '../animeswap/pools';
+import { POOLS } from './pools';
 import { toStructTag } from '../utils';
 import { Aptoswap } from '../../generated';
 

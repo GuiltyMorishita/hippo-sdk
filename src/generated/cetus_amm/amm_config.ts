@@ -10,8 +10,8 @@ export const packageName = 'Cetue-AMM';
 export const moduleAddress = new HexString('0xec42a352cc65eca17a9fa85d0fc602295897ed6b8b8af6a6c79ef490eb8f9eba');
 export const moduleName = 'amm_config';
 
-export const DEFAULT_TRADE_FEE_DENOMINATOR: U64 = u64('1');
-export const DEFAULT_TRADE_FEE_NUMERATOR: U64 = u64('10000');
+export const DEFAULT_TRADE_FEE_DENOMINATOR: U64 = u64('10000');
+export const DEFAULT_TRADE_FEE_NUMERATOR: U64 = u64('1');
 
 export class PoolFeeConfig {
   static moduleAddress = moduleAddress;

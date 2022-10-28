@@ -14,6 +14,14 @@ export const POOLS: RawStruct[][] = [
     {
       address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
       module: 'celer_coin_manager',
+      name: 'DaiCoin'
+    }
+  ],
+  [
+    { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
       name: 'BusdCoin'
     }
   ],
@@ -23,6 +31,14 @@ export const POOLS: RawStruct[][] = [
       address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
       module: 'celer_coin_manager',
       name: 'UsdcCoin'
+    }
+  ],
+  [
+    { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'UsdtCoin'
     }
   ],
   [
@@ -51,11 +67,67 @@ export const POOLS: RawStruct[][] = [
   ],
   [
     {
+      address: '0x881ac202b1f1e6ad4efcff7a1d0579411533f2502417a19211cfc49751ddb5f4',
+      module: 'coin',
+      name: 'MOJO'
+    },
+    { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' }
+  ],
+  [
+    {
+      address: '0x881ac202b1f1e6ad4efcff7a1d0579411533f2502417a19211cfc49751ddb5f4',
+      module: 'coin',
+      name: 'MOJO'
+    },
+    {
+      address: '0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea',
+      module: 'coin',
+      name: 'T'
+    }
+  ],
+  [
+    {
+      address: '0x881ac202b1f1e6ad4efcff7a1d0579411533f2502417a19211cfc49751ddb5f4',
+      module: 'coin',
+      name: 'MOJO'
+    },
+    {
+      address: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa',
+      module: 'asset',
+      name: 'USDC'
+    }
+  ],
+  [
+    {
+      address: '0x881ac202b1f1e6ad4efcff7a1d0579411533f2502417a19211cfc49751ddb5f4',
+      module: 'coin',
+      name: 'MOJO'
+    },
+    {
+      address: '0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa',
+      module: 'asset',
+      name: 'USDT'
+    }
+  ],
+  [
+    {
       address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
       module: 'celer_coin_manager',
       name: 'BnbCoin'
     },
     { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' }
+  ],
+  [
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'BnbCoin'
+    },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'DaiCoin'
+    }
   ],
   [
     {
@@ -85,9 +157,33 @@ export const POOLS: RawStruct[][] = [
     {
       address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
       module: 'celer_coin_manager',
+      name: 'BnbCoin'
+    },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'UsdtCoin'
+    }
+  ],
+  [
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
       name: 'WbtcCoin'
     },
     { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' }
+  ],
+  [
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'WbtcCoin'
+    },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'DaiCoin'
+    }
   ],
   [
     {
@@ -117,6 +213,18 @@ export const POOLS: RawStruct[][] = [
     {
       address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
       module: 'celer_coin_manager',
+      name: 'WbtcCoin'
+    },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'UsdtCoin'
+    }
+  ],
+  [
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
       name: 'WethCoin'
     },
     { address: '0x1', module: 'aptos_coin', name: 'AptosCoin' }
@@ -130,7 +238,31 @@ export const POOLS: RawStruct[][] = [
     {
       address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
       module: 'celer_coin_manager',
+      name: 'DaiCoin'
+    }
+  ],
+  [
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'WethCoin'
+    },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
       name: 'UsdcCoin'
+    }
+  ],
+  [
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'WethCoin'
+    },
+    {
+      address: '0x8d87a65ba30e09357fa2edea2c80dbac296e5dec2b18287113500b902942929d',
+      module: 'celer_coin_manager',
+      name: 'UsdtCoin'
     }
   ],
   [
