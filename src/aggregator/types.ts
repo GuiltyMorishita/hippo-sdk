@@ -42,7 +42,9 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   Aux = 8,
   // eslint-disable-next-line no-unused-vars
-  AnimeSwap = 9
+  AnimeSwap = 9,
+  // eslint-disable-next-line no-unused-vars
+  Cetus = 10
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo]: 'Hippo',
@@ -53,7 +55,8 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Tortuga]: 'Tortuga',
   [DexType.Aptoswap]: 'Aptoswap',
   [DexType.Aux]: 'Aux',
-  [DexType.AnimeSwap]: 'AnimeSwap'
+  [DexType.AnimeSwap]: 'AnimeSwap',
+  [DexType.Cetus]: 'Cetus'
 };
 export type PoolType = U64;
 export type RawStruct = {
