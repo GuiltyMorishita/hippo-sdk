@@ -1,5 +1,5 @@
 import { getTypeTagFullname, StructTag, u64 } from '@manahippo/move-to-ts';
-import { HexString, TxnBuilderTypes, Types } from 'aptos';
+import { AptosClient, HexString, TxnBuilderTypes, Types } from 'aptos';
 import * as AptosFramework from '../generated/stdlib';
 import { getCoinStoresForAddress } from '../utils';
 import { App } from '../generated';
@@ -11,13 +11,15 @@ export class HippoWalletClient {
   public fullnameToCoinStore: Record<string, AptosFramework.Coin.CoinStore>;
   public coinStores: AptosFramework.Coin.CoinStore[];
   public coinListClient: CoinListClient;
+  private app: App;
 
   constructor(
-    public app: App,
+    public client: AptosClient,
     public walletAddress: HexString,
     netConfig = CONFIGS.mainnet,
     coinListClient?: CoinListClient
   ) {
+    this.app = new App(client);
     this.symbolToCoinStore = {};
     this.fullnameToCoinStore = {};
     this.coinStores = [];
@@ -25,19 +27,19 @@ export class HippoWalletClient {
   }
 
   static async create(
-    app: App,
+    client: AptosClient,
     walletAddress: HexString,
     netConfig = CONFIGS.mainnet,
     coinListClient?: CoinListClient
   ) {
-    const hippoWalletClient = new HippoWalletClient(app, walletAddress, netConfig, coinListClient);
+    const hippoWalletClient = new HippoWalletClient(client, walletAddress, netConfig, coinListClient);
     await hippoWalletClient.refreshStores();
     return hippoWalletClient;
   }
 
   async refreshStores(version: undefined | number | bigint = undefined) {
     this.coinStores = await getCoinStoresForAddress(this.app.client, this.walletAddress, this.app.parserRepo, version);
-    await this.buildCache();
+    this.buildCache();
   }
 
   buildCache() {

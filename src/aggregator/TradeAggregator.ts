@@ -14,21 +14,24 @@ import { AptoswapPoolProvider } from './aptoswap';
 import { AuxPoolProvider } from './aux';
 import { AnimePoolProvider } from './animeswap';
 import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
+import { AptosClient } from 'aptos';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
   public xToAnyPools: Map<TokenTypeFullname, TradingPool[]>;
   public coinListClient: CoinListClient;
   public poolProviders: TradingPoolProvider[];
+  public app: App;
 
   constructor(
-    public app: App,
+    public client: AptosClient,
     netConfig = CONFIGS.mainnet,
     coinListClient?: CoinListClient,
     poolProviders?: TradingPoolProvider[],
     public printError = false,
     buildDefaultPoolList = true
   ) {
+    this.app = new App(client);
     this.allPools = [];
     this.xToAnyPools = new Map();
     this.coinListClient = coinListClient ? coinListClient : new CoinListClient(netConfig.name as NetworkType);
@@ -46,14 +49,14 @@ export class TradeAggregator {
   }
 
   static async create(
-    app: App,
+    client: AptosClient,
     netConfig = CONFIGS.mainnet,
     coinListClient?: CoinListClient,
     poolProviders?: TradingPoolProvider[],
     printError = false
   ) {
-    const agg = new TradeAggregator(app, netConfig, coinListClient, poolProviders, printError, true);
-    // await agg.updatePoolLists();
+    const agg = new TradeAggregator(client, netConfig, coinListClient, poolProviders, printError, false);
+    await agg.updatePoolLists();
     return agg;
   }
 
