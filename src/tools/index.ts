@@ -84,8 +84,8 @@ program.command('show-wallet').action(actionShowWallet);
 const testCommand = new Command('test');
 
 const testWalletClient = async () => {
-  const { app, account, netConf } = readConfig(program);
-  const walletClient = await HippoWalletClient.create(app, account.address(), netConf);
+  const { client, account, netConf } = readConfig(program);
+  const walletClient = await HippoWalletClient.create(client, account.address(), netConf);
   walletClient.debugPrint();
 };
 
@@ -94,10 +94,10 @@ const testWalletClientFaucet = async (symbol: string, uiAmount: string) => {
   if (uiAmountNum <= 0) {
     throw new Error(`Input amount needs to be greater than 0`);
   }
-  const { app, account, netConf } = readConfig(program);
-  const walletClient = await HippoWalletClient.create(app, account.address(), netConf);
+  const { client, account, netConf } = readConfig(program);
+  const walletClient = await HippoWalletClient.create(client, account.address(), netConf);
   const payload = await walletClient.makeFaucetMintToPayload(uiAmountNum, symbol);
-  await sendPayloadTx(app.client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
+  await sendPayloadTx(client, account, payload as TxnBuilderTypes.TransactionPayloadEntryFunction);
   await walletClient.refreshStores();
   walletClient.debugPrint();
 };
@@ -134,8 +134,8 @@ program.addCommand(pontem);
 
 const aggListTradingPools = async () => {
   try {
-    const { app, netConf } = readConfig(program);
-    const agg = await TradeAggregator.create(app, netConf);
+    const { client, netConf } = readConfig(program);
+    const agg = await TradeAggregator.create(client, netConf);
     for (const pool of agg.allPools) {
       console.log('###########');
       console.log(`Pair: ${pool.xCoinInfo.symbol} - ${pool.yCoinInfo.symbol}`);
@@ -149,8 +149,8 @@ const aggListTradingPools = async () => {
 };
 
 const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
-  const { app, netConf } = readConfig(program);
-  const agg = await TradeAggregator.create(app, netConf);
+  const { client, netConf } = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
   const xCoinInfos = agg.coinListClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfos = agg.coinListClient.getCoinInfoBySymbol(toSymbol);
   const routes = agg.getAllRoutes(xCoinInfos[0], yCoinInfos[0]);
@@ -161,8 +161,8 @@ const aggListRoutes = async (fromSymbol: string, toSymbol: string) => {
 };
 
 const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const { app, netConf } = readConfig(program);
-  const agg = await TradeAggregator.create(app, netConf);
+  const { client, netConf } = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
   const xCoinInfos = agg.coinListClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfos = agg.coinListClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -176,8 +176,8 @@ const aggListQuotes = async (fromSymbol: string, toSymbol: string, inputUiAmt: s
 };
 
 const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string) => {
-  const { app, netConf, account, client } = readConfig(program);
-  const agg = await TradeAggregator.create(app, netConf);
+  const { netConf, account, client } = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
   const xCoinInfos = agg.coinListClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfos = agg.coinListClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -192,8 +192,8 @@ const aggSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string)
 };
 
 const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, routeIdx: string) => {
-  const { app, netConf, account, client } = readConfig(program);
-  const agg = await TradeAggregator.create(app, netConf);
+  const { netConf, account, client } = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
   const xCoinInfos = agg.coinListClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfos = agg.coinListClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -208,8 +208,8 @@ const aggSwapWithRoute = async (fromSymbol: string, toSymbol: string, inputUiAmt
 };
 
 const aggSimulateSwap = async (fromSymbol: string, toSymbol: string, inputUiAmt: string, minOutAmt: string) => {
-  const { app, netConf, account, client } = readConfig(program);
-  const agg = await TradeAggregator.create(app, netConf);
+  const { netConf, account, client } = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
   const xCoinInfos = agg.coinListClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfos = agg.coinListClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
@@ -236,8 +236,8 @@ const aggSimulateSwapWithRoute = async (
   minOutAmt: string,
   routeIdx: string
 ) => {
-  const { app, netConf, account, client } = readConfig(program);
-  const agg = await TradeAggregator.create(app, netConf);
+  const { netConf, account, client } = readConfig(program);
+  const agg = await TradeAggregator.create(client, netConf);
   const xCoinInfos = agg.coinListClient.getCoinInfoBySymbol(fromSymbol);
   const yCoinInfos = agg.coinListClient.getCoinInfoBySymbol(toSymbol);
   const inputAmt = parseFloat(inputUiAmt);
