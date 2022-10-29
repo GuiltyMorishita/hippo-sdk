@@ -223,7 +223,7 @@ export class TradeAggregator {
 
     const filteredRoutes = allowRoundTrip ? allRoutes : allRoutes.filter((r) => !r.hasRoundTrip());
 
-    this.cachedRoutes.push([key, allRoutes]);
+    this.cachedRoutes.push([key, filteredRoutes]);
     // if cache list longer than 10, pop from first
     while (this.cachedRoutes.length > 10) {
       this.cachedRoutes.shift();
