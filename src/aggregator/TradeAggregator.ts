@@ -218,7 +218,13 @@ export class TradeAggregator {
     }
   }
 
-  async reloadPools(x: RawCoinInfo, y: RawCoinInfo, maxSteps: 1 | 2 | 3 = 3, reloadState = true, allowRoundTrip = false) {
+  async reloadPools(
+    x: RawCoinInfo,
+    y: RawCoinInfo,
+    maxSteps: 1 | 2 | 3 = 3,
+    reloadState = true,
+    allowRoundTrip = false
+  ) {
     const routes = this.getAllRoutes(x, y, maxSteps, allowRoundTrip);
     const poolSet = new Set(routes.flatMap((r) => r.steps).map((s) => s.pool));
     const promises: Promise<void>[] = [];
@@ -246,20 +252,6 @@ export class TradeAggregator {
     allowRoundTrip = false
   ): Promise<RouteAndQuote[]> {
     const routes = await this.reloadPools(x, y, maxSteps, reloadState, allowRoundTrip);
-    const poolSet = new Set(routes.flatMap((r) => r.steps).map((s) => s.pool));
-    const promises: Promise<void>[] = [];
-    for (const pool of poolSet) {
-      if (!pool.isStateLoaded || reloadState) {
-        try {
-          promises.push(pool.reloadState(this.app));
-        } catch (e) {
-          if (this.printError) {
-            console.log('Load state err: ', e);
-          }
-        }
-      }
-    }
-    await Promise.all(promises);
     const result: { route: TradeRoute; quote: QuoteType }[] = [];
     for (const route of routes) {
       try {
