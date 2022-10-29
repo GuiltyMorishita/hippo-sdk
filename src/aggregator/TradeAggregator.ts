@@ -22,6 +22,7 @@ export class TradeAggregator {
   public coinListClient: CoinListClient;
   public poolProviders: TradingPoolProvider[];
   public app: App;
+  public cachedRoutes: [string, TradeRoute[]][];
 
   constructor(
     public client: AptosClient,
@@ -43,6 +44,7 @@ export class TradeAggregator {
           new AuxPoolProvider(this.app, netConfig, this.coinListClient),
           new AnimePoolProvider(this.app, netConfig, this.coinListClient)
         ];
+    this.cachedRoutes = [];
     if (buildDefaultPoolList) {
       this.buildDefaultPoolList();
     }
@@ -207,15 +209,27 @@ export class TradeAggregator {
 
   getAllRoutes(x: RawCoinInfo, y: RawCoinInfo, maxSteps: 1 | 2 | 3 = 3, allowRoundTrip = false): TradeRoute[] {
     // max 3 steps
+    const key = `${x.symbol}<->${y.symbol}(${maxSteps})`;
+    for (const keyAndRoutes of this.cachedRoutes) {
+      const [cachedKey, cachedRoutes] = keyAndRoutes;
+      if (key === cachedKey) {
+        return cachedRoutes;
+      }
+    }
     const step1Routes = maxSteps >= 1 ? this.getOneStepRoutes(x, y) : [];
     const step2Routes = maxSteps >= 2 ? this.getTwoStepRoutes(x, y) : [];
     const step3Routes = maxSteps >= 3 ? this.getThreeStepRoutes(x, y) : [];
     const allRoutes = step1Routes.concat(step2Routes).concat(step3Routes);
-    if (allowRoundTrip) {
-      return allRoutes;
-    } else {
-      return allRoutes.filter((r) => !r.hasRoundTrip());
+
+    const filteredRoutes = allowRoundTrip ? allRoutes : allRoutes.filter((r) => !r.hasRoundTrip());
+
+    this.cachedRoutes.push([key, allRoutes]);
+    // if cache list longer than 10, pop from first
+    while (this.cachedRoutes.length > 10) {
+      this.cachedRoutes.shift();
     }
+
+    return filteredRoutes;
   }
 
   async reloadPools(
@@ -239,6 +253,7 @@ export class TradeAggregator {
         }
       }
     }
+    console.log(`Reloading ${promises.length} pools`);
     await Promise.all(promises);
     return routes;
   }
