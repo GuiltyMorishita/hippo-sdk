@@ -243,7 +243,7 @@ export class TradeAggregator {
     const poolSet = new Set(routes.flatMap((r) => r.steps).map((s) => s.pool));
     const promises: Promise<void>[] = [];
     for (const pool of poolSet) {
-      if (!pool.isStateLoaded || reloadState) {
+      if (!pool.isStateLoaded() || reloadState) {
         try {
           promises.push(pool.reloadState(this.app));
         } catch (e) {
