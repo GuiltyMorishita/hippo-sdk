@@ -15,6 +15,7 @@ import { AuxPoolProvider } from './aux';
 import { AnimePoolProvider } from './animeswap';
 import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
 import { AptosClient } from 'aptos';
+import { CetusPoolProvider } from './cetus';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -42,7 +43,8 @@ export class TradeAggregator {
           new PontemPoolProvider(this.app, netConfig, this.coinListClient),
           new AptoswapPoolProvider(this.app, netConfig, this.coinListClient),
           new AuxPoolProvider(this.app, netConfig, this.coinListClient),
-          new AnimePoolProvider(this.app, netConfig, this.coinListClient)
+          new AnimePoolProvider(this.app, netConfig, this.coinListClient),
+          new CetusPoolProvider(this.app, netConfig, this.coinListClient)
         ];
     this.cachedRoutes = [];
     if (buildDefaultPoolList) {
