@@ -1,7 +1,7 @@
-import { DexType, PoolType, PriceType, QuoteType, TradingPool, UITokenAmount } from '../types';
+import { DexType, PoolType, PriceType, QuoteType, TradingPool, UITokenAmount } from '../../types';
 import { HexString, Types } from 'aptos';
-import { App } from '../../generated';
-import { au_out_, Pool as AuxPool } from '../../generated/aux/amm';
+import { App } from '../../../generated';
+import { au_out_, Pool as AuxPool } from '../../../generated/aux/amm';
 import { u64 } from '@manahippo/move-to-ts';
 import { RawCoinInfo } from '@manahippo/coin-list';
 
