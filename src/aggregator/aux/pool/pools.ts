@@ -1,4 +1,4 @@
-import { RawStruct } from '../types';
+import { RawStruct } from '../../types';
 
 export const POOLS: RawStruct[][] = [
   [

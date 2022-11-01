@@ -22,7 +22,8 @@
   "scripts": {
     "build": "rm -rf dist; rollup -c rollup.config.js",
     "cli": "ts-node src/tools/index.ts",
-    "debug": "ts-node src/tools/index.ts agg list-quotes APT USDC 1 -c ../.aptos/config.yaml",
+    "debug-list-quotes": "ts-node src/tools/index.ts agg list-quotes APT USDC 0.1 -c ../.aptos/config.yaml",
+    "debug-sumulate": "ts-node src/tools/index.ts agg simulate-swap-with-route APT USDC 0.1 0 0 -c ../.aptos/config.yaml",
     "test": "jest"
   },
   "devDependencies": {

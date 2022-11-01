@@ -2,10 +2,25 @@ import { TradingPoolProvider } from '../../types';
 import { AuxTradingMarket } from './AuxTradingMarket';
 import { parseMoveStructTag, StructTag } from '@manahippo/move-to-ts';
 import { typeTagToTypeInfo } from '../../../utils';
+import { POOLS } from './pools';
+import { toStructTag } from '../../utils';
 
 export class AuxMarketProvider extends TradingPoolProvider {
   getDefaultPoolList(): AuxTradingMarket[] {
-    return [];
+    const poolList: AuxTradingMarket[] = [];
+    const ownerAddr = this.netConfig.auxAddress;
+    for (const poolType of POOLS) {
+      const xTag = toStructTag(poolType[0]);
+      const yTag = toStructTag(poolType[1]);
+      const xCoinInfo = this.coinList.getCoinInfoByType(typeTagToTypeInfo(xTag));
+      const yCoinInfo = this.coinList.getCoinInfoByType(typeTagToTypeInfo(yTag));
+      if (xCoinInfo == undefined || yCoinInfo == undefined) {
+        continue;
+      }
+      const pool = new AuxTradingMarket(ownerAddr, xCoinInfo, yCoinInfo);
+      poolList.push(pool);
+    }
+    return poolList;
   }
 
   async loadPoolList(): Promise<AuxTradingMarket[]> {

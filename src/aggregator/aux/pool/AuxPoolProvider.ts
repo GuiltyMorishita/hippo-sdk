@@ -2,7 +2,7 @@ import { TradingPool, TradingPoolProvider } from '../../types';
 import { parseMoveStructTag, StructTag } from '@manahippo/move-to-ts';
 import { typeTagToTypeInfo } from '../../../utils';
 import { AuxTradingPool } from './AuxTradingPool';
-import { POOLS } from '../pools';
+import { POOLS } from './pools';
 import { toStructTag } from '../../utils';
 
 export class AuxPoolProvider extends TradingPoolProvider {

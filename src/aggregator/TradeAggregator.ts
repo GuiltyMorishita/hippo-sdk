@@ -13,7 +13,7 @@ import {
 import { PontemPoolProvider } from './pontem';
 import { CONFIGS } from '../config';
 import { AptoswapPoolProvider } from './aptoswap';
-import { AuxPoolProvider } from './aux';
+import { AuxMarketProvider, AuxPoolProvider } from './aux';
 import { AnimePoolProvider } from './animeswap';
 import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
 import { AptosClient } from 'aptos';
@@ -46,6 +46,7 @@ export class TradeAggregator {
           new PontemPoolProvider(this.app, netConfig, this.coinListClient),
           new AptoswapPoolProvider(this.app, netConfig, this.coinListClient),
           new AuxPoolProvider(this.app, netConfig, this.coinListClient),
+          new AuxMarketProvider(this.app, netConfig, this.coinListClient),
           new AnimePoolProvider(this.app, netConfig, this.coinListClient),
           new CetusPoolProvider(this.app, netConfig, this.coinListClient)
         ];
