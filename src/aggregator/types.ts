@@ -54,7 +54,9 @@ export enum DexType {
   // eslint-disable-next-line no-unused-vars
   AnimeSwap = 9,
   // eslint-disable-next-line no-unused-vars
-  Cetus = 10
+  Cetus = 10,
+  // eslint-disable-next-line no-unused-vars
+  Pancake = 11
 }
 export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Hippo]: 'Hippo',
@@ -66,7 +68,8 @@ export const DEX_TYPE_NAME: Record<DexType, string> = {
   [DexType.Aptoswap]: 'Aptoswap',
   [DexType.Aux]: 'Aux',
   [DexType.AnimeSwap]: 'AnimeSwap',
-  [DexType.Cetus]: 'Cetus'
+  [DexType.Cetus]: 'Cetus',
+  [DexType.Pancake]: 'Pancake'
 };
 export type PoolType = U64;
 export type RawStruct = {
@@ -79,6 +82,8 @@ export type RawStruct = {
 export abstract class TradingPool {
   private _xTag: StructTag | undefined;
   private _yTag: StructTag | undefined;
+  private lastReloadTs: number = 0;
+
   constructor(public readonly reloadMinInterval = 10_000) {}
   // poolType
   abstract get dexType(): DexType;
@@ -102,7 +107,6 @@ export abstract class TradingPool {
   // functions that depend on pool's onchain state
   abstract isStateLoaded(): boolean;
   abstract reloadStateInternal(app: App): Promise<void>;
-  private lastReloadTs: number = 0;
   async reloadState(app: App, customReloadMinInterval: number | undefined = undefined, isForce = false): Promise<void> {
     const now = Date.now();
     if (now - this.lastReloadTs > (customReloadMinInterval ?? this.reloadMinInterval) || isForce) {
@@ -113,7 +117,9 @@ export abstract class TradingPool {
   abstract getPrice(): PriceType;
   abstract getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType;
   // build payload directly if not routable
-  abstract makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload;
+  makePayload(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): Types.EntryFunctionPayload {
+    throw new Error('Not Implemented');
+  }
   getTagE(): TypeTag {
     return AtomicTypeTag.U8;
   }
