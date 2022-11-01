@@ -1,4 +1,14 @@
-import { AtomicTypeTag, TypeTag, u64, u8, U64, U8, StructTag } from '@manahippo/move-to-ts';
+import {
+  AtomicTypeTag,
+  TypeTag,
+  u64,
+  u8,
+  U64,
+  U8,
+  parseTypeTagOrThrow,
+  getTypeTagFullname,
+  StructTag
+} from '@manahippo/move-to-ts';
 import { Types, TxnBuilderTypes } from 'aptos';
 import { Aggregator } from '../generated/hippo_aggregator';
 import { App, stdlib } from '../generated';
@@ -69,6 +79,7 @@ export type RawStruct = {
 export abstract class TradingPool {
   private _xTag: StructTag | undefined;
   private _yTag: StructTag | undefined;
+  constructor(public readonly reloadMinInterval = 10_000) {}
   // poolType
   abstract get dexType(): DexType;
   abstract get poolType(): PoolType;
@@ -90,7 +101,15 @@ export abstract class TradingPool {
   }
   // functions that depend on pool's onchain state
   abstract isStateLoaded(): boolean;
-  abstract reloadState(app: App): Promise<void>;
+  abstract reloadStateInternal(app: App): Promise<void>;
+  private lastReloadTs: number = 0;
+  async reloadState(app: App, customReloadMinInterval: number | undefined = undefined, isForce = false): Promise<void> {
+    const now = Date.now();
+    if (now - this.lastReloadTs > (customReloadMinInterval ?? this.reloadMinInterval) || isForce) {
+      await this.reloadStateInternal(app);
+      this.lastReloadTs = now;
+    }
+  }
   abstract getPrice(): PriceType;
   abstract getQuote(inputUiAmt: UITokenAmount, isXtoY: boolean): QuoteType;
   // build payload directly if not routable
@@ -100,9 +119,15 @@ export abstract class TradingPool {
   }
 }
 
+abstract class TradeStepBase {
+  public abstract readonly isXtoY: boolean;
+}
+
 // a single trade step involving a Pool and a direction (X-to-Y or Y-to-X)
-export class TradeStep {
-  constructor(public readonly pool: TradingPool, public readonly isXtoY: boolean) {}
+export class TradeStep extends TradeStepBase {
+  constructor(public readonly pool: TradingPool, public readonly isXtoY: boolean) {
+    super();
+  }
   get xCoinInfo() {
     return this.isXtoY ? this.pool.xCoinInfo : this.pool.yCoinInfo;
   }
@@ -133,6 +158,19 @@ export class TradeStep {
   getTagE(): TypeTag {
     return this.pool.getTagE();
   }
+
+  toApiTradeStepJSON(): IApiTradeStepJSON {
+    return {
+      dexType: this.pool.dexType as number,
+      poolType: this.pool.poolType.toBigInt().toString(),
+      isXToY: this.isXtoY,
+      tagE: getTypeTagFullname(this.getTagE())
+    };
+  }
+
+  toApiTradeStep(): ApiTradeStep {
+    return new ApiTradeStep(this.pool.dexType, this.pool.poolType, this.isXtoY, this.getTagE());
+  }
 }
 
 export type SwapParamType = {
@@ -151,9 +189,22 @@ export type SwapParamType = {
   types: [TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag, TypeTag];
 };
 
-export class TradeRoute {
+abstract class TradeRouteBase<T> {
+  abstract tokens: RawCoinInfo[];
+  abstract steps: T[];
+  abstract xCoinInfo: RawCoinInfo;
+  abstract yCoinInfo: RawCoinInfo;
+  abstract makePayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload: boolean
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload;
+}
+
+export class TradeRoute extends TradeRouteBase<TradeStep> {
   tokens: RawCoinInfo[];
   constructor(public readonly steps: TradeStep[]) {
+    super();
     // at least 1 step
     if (steps.length < 1) {
       throw new Error('A TradeRoute requires at least one TradeStep');
@@ -351,70 +402,9 @@ export class TradeRoute {
     minOutAmt: UITokenAmount,
     isJSONPayload = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals));
-    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals));
-    if (this.steps.length === 1) {
-      const step0 = this.steps[0];
-      return Aggregator.buildPayload_one_step_route(
-        u8(step0.pool.dexType),
-        step0.pool.poolType,
-        step0.isXtoY,
-        u64(inputSize),
-        u64(minOutputSize),
-        [this.xTag, this.yTag, step0.getTagE()], // X, Y, E
-        isJSONPayload
-      );
-    } else if (this.steps.length === 2) {
-      const step0 = this.steps[0];
-      const step1 = this.steps[1];
-      return Aggregator.buildPayload_two_step_route(
-        u8(step0.pool.dexType),
-        step0.pool.poolType,
-        step0.isXtoY,
-        u8(step1.pool.dexType),
-        step1.pool.poolType,
-        step1.isXtoY,
-        u64(inputSize),
-        u64(minOutputSize),
-        [
-          coinInfoToTag(this.tokens[0]),
-          coinInfoToTag(this.tokens[1]),
-          coinInfoToTag(this.tokens[2]),
-          step0.getTagE(),
-          step1.getTagE()
-        ], // X, Y, Z, E1, E2
-        isJSONPayload
-      );
-    } else if (this.steps.length === 3) {
-      const step0 = this.steps[0];
-      const step1 = this.steps[1];
-      const step2 = this.steps[2];
-      return Aggregator.buildPayload_three_step_route(
-        u8(step0.pool.dexType),
-        step0.pool.poolType,
-        step0.isXtoY,
-        u8(step1.pool.dexType),
-        step1.pool.poolType,
-        step1.isXtoY,
-        u8(step2.pool.dexType),
-        step2.pool.poolType,
-        step2.isXtoY,
-        u64(inputSize),
-        u64(minOutputSize),
-        [
-          coinInfoToTag(this.tokens[0]),
-          coinInfoToTag(this.tokens[1]),
-          coinInfoToTag(this.tokens[2]),
-          coinInfoToTag(this.tokens[3]),
-          step0.getTagE(),
-          step1.getTagE(),
-          step2.getTagE()
-        ], // X, Y, Z, M, E1, E2, E3
-        isJSONPayload
-      );
-    } else {
-      throw new Error('Unreachable');
-    }
+    // not implement a function twice to avoid inconsistency
+    const routeSnippet = this.toApiTradeRoute();
+    return routeSnippet.makePayload(inputUiAmt, minOutAmt, isJSONPayload);
   }
 
   debugPrint() {
@@ -426,11 +416,162 @@ export class TradeRoute {
       );
     });
   }
+
+  toJSON(): IApiRouteJSON {
+    const tokens = this.tokens.map((t) => t.token_type.type); // full name
+    const steps = this.steps.map((s) => s.toApiTradeStepJSON());
+    return {
+      tokens,
+      steps
+    };
+  }
+
+  toApiTradeRoute(): ApiTradeRoute {
+    const steps = this.steps.map((s) => s.toApiTradeStep());
+    return new ApiTradeRoute(this.tokens, steps);
+  }
+}
+
+class ApiTradeStep extends TradeStepBase {
+  constructor(public dexType: DexType, public poolType: PoolType, public isXtoY: boolean, public tagE: TypeTag) {
+    super();
+  }
+
+  static fromJSON(json: IApiTradeStepJSON) {
+    const dexType = json.dexType as DexType;
+    const poolType = new U64(json.poolType);
+    const isXtoY = json.isXToY;
+    const tagE = parseTypeTagOrThrow(json.tagE);
+
+    return new ApiTradeStep(dexType, poolType, isXtoY, tagE);
+  }
+}
+
+export interface IApiTradeStepJSON {
+  dexType: number;
+  poolType: string;
+  isXToY: boolean;
+  tagE: string;
+}
+
+export interface IApiRouteJSON {
+  tokens: string[];
+  steps: IApiTradeStepJSON[];
+}
+
+export class ApiTradeRoute extends TradeRouteBase<ApiTradeStep> {
+  constructor(public tokens: RawCoinInfo[], public steps: ApiTradeStep[]) {
+    super();
+  }
+
+  get xCoinInfo(): RawCoinInfo {
+    return this.tokens[0];
+  }
+  get yCoinInfo(): RawCoinInfo {
+    return this.tokens.slice(-1)[0];
+  }
+
+  static fromJSON(json: IApiRouteJSON, registry: CoinListClient) {
+    const tokens = json.tokens.map((t) => registry.fullnameToCoinInfo[t]);
+    const steps = json.steps.map((s) => ApiTradeStep.fromJSON(s));
+    return new ApiTradeRoute(tokens, steps);
+  }
+
+  makePayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals));
+    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals));
+    if (this.steps.length === 1) {
+      const step0 = this.steps[0];
+      return Aggregator.buildPayload_one_step_route(
+        u8(step0.dexType),
+        step0.poolType,
+        step0.isXtoY,
+        u64(inputSize),
+        u64(minOutputSize),
+        [coinInfoToTag(this.xCoinInfo), coinInfoToTag(this.yCoinInfo), step0.tagE], // X, Y, E
+        isJSONPayload
+      );
+    } else if (this.steps.length === 2) {
+      const step0 = this.steps[0];
+      const step1 = this.steps[1];
+      return Aggregator.buildPayload_two_step_route(
+        u8(step0.dexType),
+        step0.poolType,
+        step0.isXtoY,
+        u8(step1.dexType),
+        step1.poolType,
+        step1.isXtoY,
+        u64(inputSize),
+        u64(minOutputSize),
+        [
+          coinInfoToTag(this.tokens[0]),
+          coinInfoToTag(this.tokens[1]),
+          coinInfoToTag(this.tokens[2]),
+          step0.tagE,
+          step1.tagE
+        ], // X, Y, Z, E1, E2
+        isJSONPayload
+      );
+    } else if (this.steps.length === 3) {
+      const step0 = this.steps[0];
+      const step1 = this.steps[1];
+      const step2 = this.steps[2];
+      return Aggregator.buildPayload_three_step_route(
+        u8(step0.dexType),
+        step0.poolType,
+        step0.isXtoY,
+        u8(step1.dexType),
+        step1.poolType,
+        step1.isXtoY,
+        u8(step2.dexType),
+        step2.poolType,
+        step2.isXtoY,
+        u64(inputSize),
+        u64(minOutputSize),
+        [
+          coinInfoToTag(this.tokens[0]),
+          coinInfoToTag(this.tokens[1]),
+          coinInfoToTag(this.tokens[2]),
+          coinInfoToTag(this.tokens[3]),
+          step0.tagE,
+          step1.tagE,
+          step2.tagE
+        ], // X, Y, Z, M, E1, E2, E3
+        isJSONPayload
+      );
+    } else {
+      throw new Error('Unreachable');
+    }
+  }
 }
 
 export interface RouteAndQuote {
   route: TradeRoute;
   quote: QuoteType;
+}
+
+export interface IApiRouteAndQuote {
+  route: ApiTradeRoute;
+  quote: QuoteType;
+}
+
+export interface IUiQuotesResult {
+  allRoutesCount: number;
+  routes: IApiRouteAndQuote[];
+}
+
+export interface IApiRouteAndQuoteJSON {
+  route: IApiRouteJSON;
+  quote: QuoteType;
+}
+
+export interface IUiQuotesResultJSON {
+  allRoutesCount: number;
+  routes: IApiRouteAndQuoteJSON[];
 }
 
 // Each DEX is a TradeStepProvider

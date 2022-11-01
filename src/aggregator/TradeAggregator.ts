@@ -1,12 +1,14 @@
 import { App } from '../generated';
 import {
-  QuoteType,
   RouteAndQuote,
+  ApiTradeRoute,
   TokenTypeFullname,
   TradeRoute,
   TradeStep,
   TradingPool,
-  TradingPoolProvider
+  TradingPoolProvider,
+  IUiQuotesResult,
+  IUiQuotesResultJSON
 } from './types';
 import { PontemPoolProvider } from './pontem';
 import { CONFIGS } from '../config';
@@ -16,6 +18,7 @@ import { AnimePoolProvider } from './animeswap';
 import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
 import { AptosClient } from 'aptos';
 import { CetusPoolProvider } from './cetus';
+import { whip } from '../utils';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -239,7 +242,8 @@ export class TradeAggregator {
     y: RawCoinInfo,
     maxSteps: 1 | 2 | 3 = 3,
     reloadState = true,
-    allowRoundTrip = false
+    allowRoundTrip = false,
+    customReloadMinInterval: number | undefined = undefined
   ) {
     const routes = this.getAllRoutes(x, y, maxSteps, allowRoundTrip);
     const poolSet = new Set(routes.flatMap((r) => r.steps).map((s) => s.pool));
@@ -247,7 +251,7 @@ export class TradeAggregator {
     for (const pool of poolSet) {
       if (!pool.isStateLoaded() || reloadState) {
         try {
-          promises.push(pool.reloadState(this.app));
+          promises.push(pool.reloadState(this.app, customReloadMinInterval));
         } catch (e) {
           if (this.printError) {
             console.log('Load state err: ', e);
@@ -266,14 +270,15 @@ export class TradeAggregator {
     y: RawCoinInfo,
     maxSteps: 1 | 2 | 3 = 3,
     reloadState = true,
-    allowRoundTrip = false
+    allowRoundTrip = false,
+    customReloadMinInterval: number | undefined = undefined
   ): Promise<RouteAndQuote[]> {
-    const routes = await this.reloadPools(x, y, maxSteps, reloadState, allowRoundTrip);
-    const result: { route: TradeRoute; quote: QuoteType }[] = [];
+    const routes = await this.reloadPools(x, y, maxSteps, reloadState, allowRoundTrip, customReloadMinInterval);
+    const result: RouteAndQuote[] = [];
     for (const route of routes) {
       try {
         const quote = route.getQuote(inputUiAmt);
-        result.push({ route, quote });
+        if (quote.outputUiAmt > 0) result.push({ route, quote });
       } catch (e) {
         if (this.printError) {
           console.log('Get quote err: ', e);
@@ -282,6 +287,74 @@ export class TradeAggregator {
     }
     result.sort((a, b) => b.quote.outputUiAmt - a.quote.outputUiAmt);
     return result;
+  }
+
+  async getQuotesUni(
+    inputUiAmt: number,
+    x: RawCoinInfo,
+    y: RawCoinInfo,
+    maxSteps: 1 | 2 | 3 = 3,
+    reloadState = true,
+    allowRoundTrip = false,
+    customReloadMinInterval: number | undefined = undefined,
+    isViaAPI = false
+  ): Promise<IUiQuotesResult> {
+    if (!isViaAPI) {
+      const routeAndQuotes = await this.getQuotes(
+        inputUiAmt,
+        x,
+        y,
+        maxSteps,
+        reloadState,
+        allowRoundTrip,
+        customReloadMinInterval
+      );
+      const routeSnippetAndQuotes = routeAndQuotes.map((r) => ({
+        ...r,
+        route: r.route.toApiTradeRoute()
+      }));
+      return {
+        allRoutesCount: routeSnippetAndQuotes.length,
+        routes: routeSnippetAndQuotes
+      };
+    } else {
+      const result = await this.requestQuotesViaAPI(inputUiAmt, x, y, maxSteps, reloadState, allowRoundTrip);
+      return result;
+    }
+  }
+
+  async requestQuotesViaAPI(
+    inputUiAmt: number,
+    x: RawCoinInfo,
+    y: RawCoinInfo,
+    maxSteps: 1 | 2 | 3 = 3,
+    reloadState = true,
+    allowRoundTrip = false
+  ): Promise<IUiQuotesResult> {
+    return whip
+      .url(`/v1/quotes`)
+      .query({
+        fromToken: x.token_type.type,
+        toToken: y.token_type.type,
+        fromUiAmt: inputUiAmt,
+        maxSteps,
+        reloadState,
+        allowRoundTrip
+      })
+      .get()
+      .json((json: IUiQuotesResultJSON) => {
+        return {
+          allRoutesCount: json.allRoutesCount,
+          routes: json.routes.map((r) => ({
+            quote: r.quote,
+            route: ApiTradeRoute.fromJSON(r.route, this.coinListClient)
+          }))
+        };
+      })
+      .catch((error) => {
+        console.log(`Request quotes from ${x.symbol} to ${y.symbol} failed`, error);
+        throw error;
+      });
   }
 
   async getBestQuote(
