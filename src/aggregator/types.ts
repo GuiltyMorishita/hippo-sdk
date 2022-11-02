@@ -371,7 +371,7 @@ export class ApiTradeRoute extends TradeRouteBase<ApiTradeStep> {
   }
 
   static fromJSON(json: IApiRouteJSON, registry: CoinListClient) {
-    const tokens = json.tokens.map((t) => registry.getCoinInfoByFullName(t));
+    const tokens = json.tokens.map((t) => registry.fullnameToCoinInfo[t]);
     const steps = json.steps.map((s) => ApiTradeStep.fromJSON(s));
     return new ApiTradeRoute(tokens, steps);
   }

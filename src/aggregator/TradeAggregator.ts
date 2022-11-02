@@ -19,6 +19,7 @@ import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
 import { AptosClient } from 'aptos';
 import { CetusPoolProvider } from './cetus';
 import { whip } from '../utils';
+import PromiseThrottle, { PromiseCreator } from 'promise-throttle';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -27,11 +28,13 @@ export class TradeAggregator {
   public poolProviders: TradingPoolProvider[];
   public app: App;
   public cachedRoutes: [string, TradeRoute[]][];
+  public promiseThrottle: PromiseThrottle;
 
   constructor(
     public client: AptosClient,
     netConfig = CONFIGS.mainnet,
     coinListClient?: CoinListClient,
+    poolReloadRequestsRateOfSecond = Infinity,
     poolProviders?: TradingPoolProvider[],
     public printError = false,
     buildDefaultPoolList = true
@@ -54,16 +57,28 @@ export class TradeAggregator {
     if (buildDefaultPoolList) {
       this.buildDefaultPoolList();
     }
+    this.promiseThrottle = new PromiseThrottle({
+      requestsPerSecond: poolReloadRequestsRateOfSecond
+    });
   }
 
   static async create(
     client: AptosClient,
     netConfig = CONFIGS.mainnet,
     coinListClient?: CoinListClient,
+    poolReloadRequestsRateOfSecond: number = Infinity,
     poolProviders?: TradingPoolProvider[],
     printError = false
   ) {
-    const agg = new TradeAggregator(client, netConfig, coinListClient, poolProviders, printError, false);
+    const agg = new TradeAggregator(
+      client,
+      netConfig,
+      coinListClient,
+      poolReloadRequestsRateOfSecond,
+      poolProviders,
+      printError,
+      false
+    );
     await agg.updatePoolLists();
     return agg;
   }
@@ -248,11 +263,11 @@ export class TradeAggregator {
   ) {
     const routes = this.getAllRoutes(x, y, maxSteps, allowRoundTrip);
     const poolSet = new Set(routes.flatMap((r) => r.steps).map((s) => s.pool));
-    const promises: Promise<void>[] = [];
+    const promises: PromiseCreator<void>[] = [];
     for (const pool of poolSet) {
       if (!pool.isStateLoaded() || reloadState) {
         try {
-          promises.push(pool.reloadState(this.app, customReloadMinInterval));
+          promises.push(() => pool.reloadState(this.app, customReloadMinInterval));
         } catch (e) {
           if (this.printError) {
             console.log('Load state err: ', e);
@@ -261,7 +276,7 @@ export class TradeAggregator {
       }
     }
     console.log(`Reloading ${promises.length} pools`);
-    await Promise.all(promises);
+    await this.promiseThrottle.addAll<void>(promises);
     return routes;
   }
 
