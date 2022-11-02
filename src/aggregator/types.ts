@@ -200,6 +200,12 @@ abstract class TradeRouteBase<T> {
   abstract steps: T[];
   abstract xCoinInfo: RawCoinInfo;
   abstract yCoinInfo: RawCoinInfo;
+  abstract getSwapParams(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): SwapParamType;
+  abstract makeSwapPayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload: boolean
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload;
   abstract makePayload(
     inputUiAmt: UITokenAmount,
     minOutAmt: UITokenAmount,
@@ -277,102 +283,8 @@ export class TradeRoute extends TradeRouteBase<TradeStep> {
   }
 
   getSwapParams(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): SwapParamType {
-    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals));
-    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals));
-    const dummyTag = stdlib.String.String.getTag();
-    if (this.steps.length === 1) {
-      const step0 = this.steps[0];
-      return {
-        numSteps: u8(1),
-        // first
-        firstDexType: u8(step0.pool.dexType),
-        firstPoolType: step0.pool.poolType,
-        firstIsReversed: step0.isXtoY,
-        // second
-        secondDexType: u8(0),
-        secondPoolType: u64(0),
-        secondIsReversed: false,
-        // third
-        thirdDexType: u8(0),
-        thirdPoolType: u64(0),
-        thirdIsReversed: false,
-        // sizes
-        inAmt: u64(inputSize),
-        minOutAmt: u64(minOutputSize),
-        types: [
-          this.xTag, // X
-          dummyTag, // Y
-          dummyTag, // Z
-          this.yTag, // CoinOut
-          step0.getTagE(), // E1
-          dummyTag, // E2
-          dummyTag // E3
-        ]
-      };
-    } else if (this.steps.length === 2) {
-      const step0 = this.steps[0];
-      const step1 = this.steps[1];
-      return {
-        numSteps: u8(2),
-        // first
-        firstDexType: u8(step0.pool.dexType),
-        firstPoolType: step0.pool.poolType,
-        firstIsReversed: step0.isXtoY,
-        // second
-        secondDexType: u8(step1.pool.dexType),
-        secondPoolType: step1.pool.poolType,
-        secondIsReversed: step1.isXtoY,
-        // third
-        thirdDexType: u8(0),
-        thirdPoolType: u64(0),
-        thirdIsReversed: false,
-        // sizes
-        inAmt: u64(inputSize),
-        minOutAmt: u64(minOutputSize),
-        types: [
-          coinInfoToTag(this.tokens[0]), // X
-          coinInfoToTag(this.tokens[1]), // Y
-          dummyTag, // Z
-          coinInfoToTag(this.tokens[2]), // CoinOut
-          step0.getTagE(), // E1
-          step1.getTagE(), // E2
-          dummyTag // E3
-        ]
-      };
-    } else if (this.steps.length === 3) {
-      const step0 = this.steps[0];
-      const step1 = this.steps[1];
-      const step2 = this.steps[2];
-      return {
-        numSteps: u8(3),
-        // first
-        firstDexType: u8(step0.pool.dexType),
-        firstPoolType: step0.pool.poolType,
-        firstIsReversed: step0.isXtoY,
-        // second
-        secondDexType: u8(step1.pool.dexType),
-        secondPoolType: step1.pool.poolType,
-        secondIsReversed: step1.isXtoY,
-        // third
-        thirdDexType: u8(step2.pool.dexType),
-        thirdPoolType: step2.pool.poolType,
-        thirdIsReversed: step2.isXtoY,
-        // sizes
-        inAmt: u64(inputSize),
-        minOutAmt: u64(minOutputSize),
-        types: [
-          coinInfoToTag(this.tokens[0]), // X
-          coinInfoToTag(this.tokens[1]), // Y
-          coinInfoToTag(this.tokens[2]), // Z
-          coinInfoToTag(this.tokens[3]), // CoinOut
-          step0.getTagE(), // E1
-          step1.getTagE(), // E2
-          step2.getTagE() // E3
-        ]
-      };
-    } else {
-      throw new Error('Unreachable');
-    }
+    const routeSnippet = this.toApiTradeRoute();
+    return routeSnippet.getSwapParams(inputUiAmt, minOutAmt);
   }
 
   makeSwapPayload(
@@ -380,27 +292,8 @@ export class TradeRoute extends TradeRouteBase<TradeStep> {
     minOutAmt: UITokenAmount,
     isJSONPayload = false
   ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
-    const params = this.getSwapParams(inputUiAmt, minOutAmt);
-    return Aggregator.buildPayload_swap(
-      params.numSteps,
-      // first
-      params.firstDexType,
-      params.firstPoolType,
-      params.firstIsReversed,
-      // second
-      params.secondDexType,
-      params.secondPoolType,
-      params.secondIsReversed,
-      // third
-      params.thirdDexType,
-      params.thirdPoolType,
-      params.thirdIsReversed,
-      // sizes
-      params.inAmt,
-      params.minOutAmt,
-      params.types,
-      isJSONPayload
-    );
+    const routeSnippet = this.toApiTradeRoute();
+    return routeSnippet.makeSwapPayload(inputUiAmt, minOutAmt, isJSONPayload);
   }
 
   makePayload(
@@ -478,9 +371,136 @@ export class ApiTradeRoute extends TradeRouteBase<ApiTradeStep> {
   }
 
   static fromJSON(json: IApiRouteJSON, registry: CoinListClient) {
-    const tokens = json.tokens.map((t) => registry.fullnameToCoinInfo[t]);
+    const tokens = json.tokens.map((t) => registry.getCoinInfoByFullName(t));
     const steps = json.steps.map((s) => ApiTradeStep.fromJSON(s));
     return new ApiTradeRoute(tokens, steps);
+  }
+
+  getSwapParams(inputUiAmt: UITokenAmount, minOutAmt: UITokenAmount): SwapParamType {
+    const inputSize = Math.floor(inputUiAmt * Math.pow(10, this.xCoinInfo.decimals));
+    const minOutputSize = Math.floor(minOutAmt * Math.pow(10, this.yCoinInfo.decimals));
+    const dummyTag = stdlib.String.String.getTag();
+    if (this.steps.length === 1) {
+      const step0 = this.steps[0];
+      return {
+        numSteps: u8(1),
+        // first
+        firstDexType: u8(step0.dexType),
+        firstPoolType: step0.poolType,
+        firstIsReversed: step0.isXtoY,
+        // second
+        secondDexType: u8(0),
+        secondPoolType: u64(0),
+        secondIsReversed: false,
+        // third
+        thirdDexType: u8(0),
+        thirdPoolType: u64(0),
+        thirdIsReversed: false,
+        // sizes
+        inAmt: u64(inputSize),
+        minOutAmt: u64(minOutputSize),
+        types: [
+          coinInfoToTag(this.xCoinInfo), // X
+          dummyTag, // Y
+          dummyTag, // Z
+          coinInfoToTag(this.yCoinInfo), // CoinOut
+          step0.tagE, // E1
+          dummyTag, // E2
+          dummyTag // E3
+        ]
+      };
+    } else if (this.steps.length === 2) {
+      const step0 = this.steps[0];
+      const step1 = this.steps[1];
+      return {
+        numSteps: u8(2),
+        // first
+        firstDexType: u8(step0.dexType),
+        firstPoolType: step0.poolType,
+        firstIsReversed: step0.isXtoY,
+        // second
+        secondDexType: u8(step1.dexType),
+        secondPoolType: step1.poolType,
+        secondIsReversed: step1.isXtoY,
+        // third
+        thirdDexType: u8(0),
+        thirdPoolType: u64(0),
+        thirdIsReversed: false,
+        // sizes
+        inAmt: u64(inputSize),
+        minOutAmt: u64(minOutputSize),
+        types: [
+          coinInfoToTag(this.tokens[0]), // X
+          coinInfoToTag(this.tokens[1]), // Y
+          dummyTag, // Z
+          coinInfoToTag(this.tokens[2]), // CoinOut
+          step0.tagE, // E1
+          step1.tagE, // E2
+          dummyTag // E3
+        ]
+      };
+    } else if (this.steps.length === 3) {
+      const step0 = this.steps[0];
+      const step1 = this.steps[1];
+      const step2 = this.steps[2];
+      return {
+        numSteps: u8(3),
+        // first
+        firstDexType: u8(step0.dexType),
+        firstPoolType: step0.poolType,
+        firstIsReversed: step0.isXtoY,
+        // second
+        secondDexType: u8(step1.dexType),
+        secondPoolType: step1.poolType,
+        secondIsReversed: step1.isXtoY,
+        // third
+        thirdDexType: u8(step2.dexType),
+        thirdPoolType: step2.poolType,
+        thirdIsReversed: step2.isXtoY,
+        // sizes
+        inAmt: u64(inputSize),
+        minOutAmt: u64(minOutputSize),
+        types: [
+          coinInfoToTag(this.tokens[0]), // X
+          coinInfoToTag(this.tokens[1]), // Y
+          coinInfoToTag(this.tokens[2]), // Z
+          coinInfoToTag(this.tokens[3]), // CoinOut
+          step0.tagE, // E1
+          step1.tagE, // E2
+          step2.tagE // E3
+        ]
+      };
+    } else {
+      throw new Error('Unreachable');
+    }
+  }
+
+  makeSwapPayload(
+    inputUiAmt: UITokenAmount,
+    minOutAmt: UITokenAmount,
+    isJSONPayload = false
+  ): TxnBuilderTypes.TransactionPayloadEntryFunction | Types.TransactionPayload_EntryFunctionPayload {
+    const params = this.getSwapParams(inputUiAmt, minOutAmt);
+    return Aggregator.buildPayload_swap(
+      params.numSteps,
+      // first
+      params.firstDexType,
+      params.firstPoolType,
+      params.firstIsReversed,
+      // second
+      params.secondDexType,
+      params.secondPoolType,
+      params.secondIsReversed,
+      // third
+      params.thirdDexType,
+      params.thirdPoolType,
+      params.thirdIsReversed,
+      // sizes
+      params.inAmt,
+      params.minOutAmt,
+      params.types,
+      isJSONPayload
+    );
   }
 
   makePayload(
