@@ -20,6 +20,7 @@ import { AptosClient } from 'aptos';
 import { CetusPoolProvider } from './cetus';
 import { whip } from '../utils';
 import PromiseThrottle, { PromiseCreator } from 'promise-throttle';
+import { PancakePoolProvider } from './pancake';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -51,7 +52,8 @@ export class TradeAggregator {
           new AuxPoolProvider(this.app, netConfig, this.coinListClient),
           new AuxMarketProvider(this.app, netConfig, this.coinListClient),
           new AnimePoolProvider(this.app, netConfig, this.coinListClient),
-          new CetusPoolProvider(this.app, netConfig, this.coinListClient)
+          new CetusPoolProvider(this.app, netConfig, this.coinListClient),
+          new PancakePoolProvider(this.app, netConfig, this.coinListClient)
         ];
     this.cachedRoutes = [];
     if (buildDefaultPoolList) {

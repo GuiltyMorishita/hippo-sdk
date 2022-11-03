@@ -26,7 +26,7 @@ export class PancakePoolProvider extends TradingPoolProvider {
 
   async loadPoolList(): Promise<PancakeTradingPool[]> {
     const poolList: PancakeTradingPool[] = [];
-    const ownerAddress = this.netConfig.auxAddress;
+    const ownerAddress = this.netConfig.pancakeAddress;
     const resources = await this.app.client.getAccountResources(ownerAddress);
     for (const resource of resources) {
       if (resource.type.indexOf('swap::TokenPairReserve') > 0) {
