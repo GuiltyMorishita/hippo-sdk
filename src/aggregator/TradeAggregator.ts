@@ -11,16 +11,17 @@ import {
   IUiQuotesResultJSON
 } from './types';
 import { PontemPoolProvider } from './pontem';
-import { CONFIGS } from '../config';
+import { CONFIGS, HIPPO_API_ORIGIN } from '../config';
 import { AptoswapPoolProvider } from './aptoswap';
 import { AuxMarketProvider, AuxPoolProvider } from './aux';
 import { AnimePoolProvider } from './animeswap';
 import { CoinListClient, NetworkType, RawCoinInfo } from '@manahippo/coin-list';
 import { AptosClient } from 'aptos';
 import { CetusPoolProvider } from './cetus';
-import { whip } from '../utils';
 import PromiseThrottle, { PromiseCreator } from 'promise-throttle';
 import { PancakePoolProvider } from './pancake';
+import wretch from 'wretch';
+import QueryStringAddon from 'wretch/addons/queryString';
 
 export class TradeAggregator {
   public allPools: TradingPool[];
@@ -336,7 +337,7 @@ export class TradeAggregator {
         routes: routeSnippetAndQuotes
       };
     } else {
-      const result = await this.requestQuotesViaAPI(inputUiAmt, x, y, maxSteps, reloadState, allowRoundTrip);
+      const result = await this.requestQuotesViaAPI(inputUiAmt, x, y, reloadState);
       return result;
     }
   }
@@ -345,19 +346,18 @@ export class TradeAggregator {
     inputUiAmt: number,
     x: RawCoinInfo,
     y: RawCoinInfo,
-    maxSteps: 1 | 2 | 3 = 3,
     reloadState = true,
-    allowRoundTrip = false
+    apiOrigin = HIPPO_API_ORIGIN
   ): Promise<IUiQuotesResult> {
-    return whip
-      .url(`/v1/quotes`)
+    return wretch(apiOrigin)
+      .addon(QueryStringAddon)
+      .url(
+        `/v1/quotes/from/${encodeURIComponent(x.token_type.type)}/amt/${inputUiAmt}/to/${encodeURIComponent(
+          y.token_type.type
+        )}`
+      )
       .query({
-        fromToken: x.token_type.type,
-        toToken: y.token_type.type,
-        fromUiAmt: inputUiAmt,
-        maxSteps,
-        reloadState,
-        allowRoundTrip
+        reloadState
       })
       .get()
       .json((json: IUiQuotesResultJSON) => {
