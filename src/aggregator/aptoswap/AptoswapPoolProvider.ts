@@ -1,10 +1,10 @@
 import { TradingPoolProvider } from '../types';
 import { parseMoveStructTag, StructTag } from '@manahippo/move-to-ts';
 import { typeTagToTypeInfo } from '../../utils';
-import { AptoswapTradingPool } from './index';
 import { POOLS } from './pools';
 import { toStructTag } from '../utils';
 import { Aptoswap } from '../../generated';
+import { AptoswapTradingPool } from './AptoswapTradingPool';
 
 export class AptoswapPoolProvider extends TradingPoolProvider {
   async loadPoolList(): Promise<AptoswapTradingPool[]> {

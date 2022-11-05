@@ -9,23 +9,18 @@ export class EconiaPoolProvider extends TradingPoolProvider {
     const markets = registry.markets;
     const pools: TradingPool[] = [];
     const promises: Promise<void>[] = [];
+
     markets.forEach((mi, marketId) => {
+      const xCoinInfo = this.coinList.getCoinInfoByType(mi.trading_pair_info.base_type_info);
+      const yCoinInfo = this.coinList.getCoinInfoByType(mi.trading_pair_info.quote_type_info);
       if (
-        this.coinList.hasTokenType(mi.trading_pair_info.base_type_info) &&
-        this.coinList.hasTokenType(mi.trading_pair_info.quote_type_info) &&
+        xCoinInfo != undefined &&
+        yCoinInfo != undefined &&
         // host is devnet contract
         mi.host.hex() === this.netConfig.hippoAggregatorAddress.hex()
       ) {
         pools.push(
-          new EconiaTradingPoolV1(
-            this.coinList.getCoinInfoByType(mi.trading_pair_info.base_type_info),
-            this.coinList.getCoinInfoByType(mi.trading_pair_info.quote_type_info),
-            null,
-            mi,
-            mi.host,
-            this.app.parserRepo,
-            new U64(marketId)
-          )
+          new EconiaTradingPoolV1(xCoinInfo, yCoinInfo, null, mi, mi.host, this.app.parserRepo, new U64(marketId))
         );
       }
     });
